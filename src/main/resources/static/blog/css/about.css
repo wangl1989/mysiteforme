@@ -1,11 +1,4 @@
-﻿/*
-
-@Name：不落阁整站模板源码 
-@Author：Absolutely 
-@Site：http://www.lyblogs.cn
-
-*/
-.layui-tab-brief {
+﻿.layui-tab-brief {
     background: #fff;
     min-height: 100vh;
 }
@@ -155,9 +148,9 @@
     }
 }
 
-/* 中等屏幕（桌面显示器，大于等于 992px） */
-@media (min-width: 992px) {
-    .blog-container {
-        width: 962px;
-    }
-}
+/*!* 中等屏幕（桌面显示器，大于等于 992px） *!*/
+/*@media (min-width: 992px) {*/
+    /*.blog-container {*/
+        /*width: 982px;*/
+    /*}*/
+/*}*/

@@ -47,6 +47,7 @@ public class ChannelDirective extends BaseDirective implements TemplateDirective
         }else{
             wrapper.eq("parent_id",pid);
         }
+        wrapper.orderBy("sort",false);
         List<BlogChannel> channelList = blogChannelService.getChannelListByWrapper(limit,wrapper);
         if(channelList.size()<=0){
             throw new TemplateModelException("返回值为空");

@@ -22,6 +22,11 @@ public class BlogComment extends DataEntity<BlogComment> {
      * 评论内容
      */
 	private String content;
+
+	/**
+	 * 评论类型：1.文章评论，2.系统留言
+	 */
+	private Integer type;
     /**
      * ip
      */
@@ -71,6 +76,15 @@ public class BlogComment extends DataEntity<BlogComment> {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
 	public String getIp() {
 		return ip;
 	}

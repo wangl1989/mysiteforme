@@ -15,7 +15,7 @@
             <a class="blog-logo" href="${base}/showBlog/index">${site.name}</a>
             <@articleChannelList cid="${channel.id}">
                 <#list result as item>
-                    <a href="/showBlog${item.href}"><cite>${item.name}</cite></a>
+                    <a href="${base}/showBlog${item.href}"><cite>${item.name}</cite></a>
                 </#list>
             </@articleChannelList>
         </blockquote>

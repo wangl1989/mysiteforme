@@ -8,6 +8,7 @@ import com.mysiteforme.admin.entity.BlogComment;
 import com.mysiteforme.admin.dao.BlogCommentDao;
 import com.mysiteforme.admin.service.BlogCommentService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.mysiteforme.admin.util.Constants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,13 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
 
     @Override
     public Integer getMaxFloor(Long articleId) {
-        Object o = selectObj(Condition.create().setSqlSelect("max(floor)").eq("article_id",articleId));
+        Object o = null;
+        if(articleId != null){
+            o = selectObj(Condition.create().setSqlSelect("max(floor)").eq("article_id",articleId));
+        }else{
+            o = selectObj(Condition.create().setSqlSelect("max(floor)").eq("type", Constants.COMMENT_TYPE_LEVING_A_MESSAGE));
+        }
+
         Integer floor = 0;
         if(o != null){
             floor =  (Integer)o;
@@ -37,10 +44,13 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
     }
 
     @Override
-    public Page<BlogComment> getArticleComments(Long articleId,Page<BlogComment> page) {
+    public Page<BlogComment> getArticleComments(Long articleId,Integer type,Page<BlogComment> page) {
         EntityWrapper<BlogComment> wrapper = new EntityWrapper<>();
         wrapper.eq("del_flag",false);
-        wrapper.eq("article_id",articleId);
+        if(articleId != null){
+            wrapper.eq("article_id",articleId);
+        }
+        wrapper.eq("type",type);
         wrapper.orderBy("floor",true);
         return selectPage(page,wrapper);
     }

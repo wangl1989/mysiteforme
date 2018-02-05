@@ -75,7 +75,7 @@
             <a class="blog-logo" href="${base}/showBlog/index">${site.name}</a>
             <@articleChannelList cid="${article.channelId}">
                 <#list result as item>
-                    <a href="/showBlog${item.href}"><cite>${item.name}</cite></a>
+                    <a href="${base}/showBlog${item.href}"><cite>${item.name}</cite></a>
                 </#list>
             </@articleChannelList>
         </blockquote>
@@ -237,7 +237,7 @@
             isAuto: false,
             isLazyimg: true,
             done: function(page, next){ //加载下一页
-                $.post("${base}/showBlog/articleCommentList",{articleId:${article.id},page:page},function (res) {
+                $.post("${base}/showBlog/articleCommentList",{articleId:${article.id},type:1,page:page},function (res) {
                     if(res.success){
                         var getTpl = demo.innerHTML;
                         laytpl(getTpl).render(res.data, function(html){
@@ -252,7 +252,12 @@
         flow.load(f);
         //监听评论提交
         form.on('submit(formRemark)', function (data) {
-            var content = content_editor.txt.html();
+            var content = content_editor.txt.html(),
+            ct=content_editor.txt.text();
+            if(null === ct || "" === ct || undefined === ct){
+                layer.msg("来说两句吧");
+                return false;
+            }
             if(null === content || "" === content || undefined === content){
                 layer.msg("来说两句吧");
                 return false;

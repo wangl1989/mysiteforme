@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller.web;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.BaseController;
@@ -8,6 +9,7 @@ import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.entity.BlogComment;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.lucene.LuceneSearch;
+import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.http.HTMLFilter;
@@ -71,7 +73,7 @@ public class BlogPageController extends BaseController{
     }
 
     /**
-     * 跳转文章专栏
+     * 跳转文章专栏列表页
      * @param httpServletRequest
      * @param model
      * @return
@@ -140,6 +142,12 @@ public class BlogPageController extends BaseController{
         return "blog/articleContent";
     }
 
+    /**
+     * 文章评论
+     * @param blogComment
+     * @param request
+     * @return
+     */
     @PostMapping("saveComment")
     @ResponseBody
     public RestResponse add(BlogComment blogComment, HttpServletRequest request){
@@ -170,12 +178,68 @@ public class BlogPageController extends BaseController{
         if(StringUtils.isNotBlank(blogComment.getRemarks())){
             return RestResponse.failure("非法请求");
         }
-        HttpSession session = request.getSession();
-        log.info("session的ID为"+session.getId());
+        //类型隶属于文章评论
+        blogComment.setType(Constants.COMMENT_TYPE_ARTICLE_COMMENT);
         String content = new HTMLFilter().filter(blogComment.getContent());
         content.replace("\"", "'");
         if(content.length()>1000){
             return RestResponse.failure("您的评论内容太多啦！系统装不下啦！");
+        }
+        blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
+        Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
+        blogComment.setSystem(map.get("os"));
+        blogComment.setBrowser(map.get("browser"));
+        String ip = ToolUtil.getClientIp(request);
+        if("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)){
+            ip = "内网地址";
+        }
+        blogComment.setIp(ip);
+        blogCommentService.insert(blogComment);
+        return RestResponse.success();
+    }
+
+    /**
+     * 系统留言
+     * @param blogComment
+     * @param request
+     * @return
+     */
+    @PostMapping("saveMessage")
+    @ResponseBody
+    public RestResponse saveMessage(BlogComment blogComment, HttpServletRequest request){
+        if(StringUtils.isBlank(blogComment.getContent())){
+            return RestResponse.failure("评论内容不能为空");
+        }
+        if(blogComment.getArticleId() != null) {
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getChannelId() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getIp() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(StringUtils.isNotBlank(blogComment.getIp())){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getFloor() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getAdminReply() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getDelFlag()){
+            return RestResponse.failure("非法请求");
+        }
+        if(StringUtils.isNotBlank(blogComment.getRemarks())){
+            return RestResponse.failure("非法请求");
+        }
+        //隶属于系统留言
+        blogComment.setType(Constants.COMMENT_TYPE_LEVING_A_MESSAGE);
+        String content = new HTMLFilter().filter(blogComment.getContent());
+        content.replace("\"", "'");
+        if(content.length()>1000){
+            return RestResponse.failure("您的留言内容太多啦！系统装不下啦！");
         }
         blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
         Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
@@ -201,12 +265,57 @@ public class BlogPageController extends BaseController{
     @ResponseBody
     public RestResponse articleCommentList(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                            @RequestParam(value = "limit",defaultValue = "5")Integer limit,
-                                           @RequestParam(value = "articleId",required = false)Long articleId){
-        if(articleId == null){
-            return RestResponse.failure("文章ID不能为空");
+                                           @RequestParam(value = "articleId",required = false)Long articleId,
+                                           @RequestParam(value = "type",required = false)Integer type){
+        if(type == null){
+            return RestResponse.failure("请求类型不能为空");
         }
-        Page<BlogComment> pageData = blogCommentService.getArticleComments(articleId,new Page<BlogComment>(page,limit));
+        if(type != 1 && type != 2){
+            return RestResponse.failure("请求类型错误");
+        }
+        Page<BlogComment> pageData = blogCommentService.getArticleComments(articleId,type,new Page<BlogComment>(page,limit));
         return RestResponse.success().setData(pageData);
     }
+
+    /**
+     * 关于本站 跳转到 他的第一个子栏目
+     * @return
+     */
+    @GetMapping(value = {"/about","/about"})
+    public String redictSunChannel(){
+        return "redirect:/showBlog/about/blog";
+    }
+    /**
+     * 关于博客
+     * @return
+     */
+    @GetMapping(value = {"/about/**"})
+    public String toAbout(HttpServletRequest request,Model model){
+        String href = request.getRequestURI();
+        href = href.replaceFirst("/showBlog","");
+        if(href.endsWith("/")){
+            href = href.substring(0,href.length()-1);
+        }
+        BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
+        if(blogChannel == null){
+            throw new MyException("地址没找到",404);
+        }
+        model.addAttribute("channel",blogChannel);
+        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        wrapper.eq("del_flag",false);
+        wrapper.eq("channel_id",blogChannel.getId());
+        wrapper.orderBy("is_top",false).orderBy("is_recommend",false);
+        List<BlogArticle> list = blogArticleService.selectList(wrapper);
+        if(list.size() == 1){
+            model.addAttribute("oneArticle",list.get(0));
+        }
+        if(list.size()>1){
+            list.remove(0);
+            model.addAttribute("friendlink",list);
+        }
+
+        return "blog"+href;
+    }
+
 
 }

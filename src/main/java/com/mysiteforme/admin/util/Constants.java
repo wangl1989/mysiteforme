@@ -33,4 +33,13 @@ public class Constants {
 	 */
 	public static final Integer QUARTZ_STATUS_PUSH = 1;
 
+	/**
+	 * 评论类型：1文章评论
+	 */
+	public static final Integer COMMENT_TYPE_ARTICLE_COMMENT = 1;
+	/**
+	 * 评论类型：2.系统留言
+	 */
+	public static final Integer COMMENT_TYPE_LEVING_A_MESSAGE = 2;
+
 }

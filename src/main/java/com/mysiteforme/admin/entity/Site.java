@@ -41,6 +41,22 @@ public class Site extends DataEntity<Site> {
 	private String description;
 	private String powerby;
 	private String record;
+	/**
+	 * 网站网址
+	 */
+	private String url;
+
+	/**
+	 * 是否开放系统评论
+	 */
+	@TableField("open_message")
+	private Boolean openMessage = false;
+
+	/**
+	 * 是否匿名评论
+	 */
+	@TableField("is_no_name")
+	private Boolean isNoName = false;
 
 
 	public String getName() {
@@ -193,6 +209,30 @@ public class Site extends DataEntity<Site> {
 
 	public void setRecord(String record) {
 		this.record = record;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public Boolean getOpenMessage() {
+		return openMessage;
+	}
+
+	public void setOpenMessage(Boolean openMessage) {
+		this.openMessage = openMessage;
+	}
+
+	public Boolean getNoName() {
+		return isNoName;
+	}
+
+	public void setNoName(Boolean noName) {
+		isNoName = noName;
 	}
 
 	@Override

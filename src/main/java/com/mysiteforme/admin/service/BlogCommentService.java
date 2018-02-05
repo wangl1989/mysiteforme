@@ -13,8 +13,8 @@ import com.baomidou.mybatisplus.service.IService;
  */
 public interface BlogCommentService extends IService<BlogComment> {
 
-    public Integer getMaxFloor(Long articleId);
+    Integer getMaxFloor(Long articleId);
 
-    Page<BlogComment> getArticleComments(Long articleId,Page<BlogComment> page);
+    Page<BlogComment> getArticleComments(Long articleId,Integer type,Page<BlogComment> page);
 
 }

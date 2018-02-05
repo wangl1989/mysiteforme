@@ -15,7 +15,7 @@
                 <@mychannel limit="5">
                     <#list result as item>
                         <li class="layui-nav-item <#if (channel.href?contains(item.href))> layui-this</#if>" >
-                            <a href="/showBlog${item.href}"><i class="fa fa-home fa-fw"></i>&nbsp;${item.name}</a>
+                            <a href="${base}/showBlog${item.href}"><i class="layui-icon" style="font-size: 18px;">${item.logo}</i>&nbsp;${item.name}</a>
                         </li>
                     </#list>
                 </@mychannel>

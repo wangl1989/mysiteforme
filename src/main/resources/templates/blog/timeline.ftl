@@ -18,7 +18,7 @@
             <a href="home.html" title="网站首页">网站首页</a>
             <@articleChannelList cid="${channel.id}">
                 <#list result as item>
-                    <a href="/showBlog${item.href}"><cite>${item.name}</cite></a>
+                    <a href="${base}/showBlog${item.href}"><cite>${item.name}</cite></a>
                 </#list>
             </@articleChannelList>
         </blockquote>
@@ -32,9 +32,9 @@
                     <h1><i class="fa fa-clock-o"></i>时光轴<span> —— 记录生活点点滴滴</span></h1>
                     <div class="timeline-line"></div>
                     <div class="timeline-year">
-                        <h2><a class="yearToggle" href="javascript:;">2017年</a><i class="fa fa-caret-down fa-fw"></i></h2>
+                        <h2><a class="yearToggle" href="javascript:">2017年</a><i class="fa fa-caret-down fa-fw"></i></h2>
                         <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:;">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
+                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
                             <ul>
                                 <li class=" ">
                                     <div class="h4  animated fadeInLeft">
@@ -63,7 +63,7 @@
                             </ul>
                         </div>
                         <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:;">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
+                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
                             <ul>
                                 <li class=" ">
                                     <div class="h4  animated fadeInLeft">
@@ -93,9 +93,9 @@
                         </div>
                     </div>
                     <div class="timeline-year">
-                        <h2><a class="yearToggle" href="javascript:;">2016年</a><i class="fa fa-caret-down fa-fw"></i></h2>
+                        <h2><a class="yearToggle" href="javascript:">2016年</a><i class="fa fa-caret-down fa-fw"></i></h2>
                         <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:;">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
+                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
                             <ul>
                                 <li class=" ">
                                     <div class="h4  animated fadeInLeft">
@@ -124,7 +124,7 @@
                             </ul>
                         </div>
                         <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:;">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
+                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
                             <ul>
                                 <li class=" ">
                                     <div class="h4  animated fadeInLeft">
@@ -160,52 +160,11 @@
     </div>
 </div>
 <!-- 底部 -->
-<footer class="blog-footer">
-    <p><span>Copyright</span><span>&copy;</span><span>2017</span><a href="http://www.lyblogs.cn">不落阁</a><span>Design By LY</span></p>
-    <p><a href="http://www.miibeian.gov.cn/" target="_blank">蜀ICP备16029915号-1</a></p>
-</footer>
-<!--侧边导航-->
-<ul class="layui-nav layui-nav-tree layui-nav-side blog-nav-left layui-hide" lay-filter="nav">
-    <li class="layui-nav-item">
-        <a href="home.html"><i class="fa fa-home fa-fw"></i>&nbsp;网站首页</a>
-    </li>
-    <li class="layui-nav-item">
-        <a href="article.html"><i class="fa fa-file-text fa-fw"></i>&nbsp;文章专栏</a>
-    </li>
-    <li class="layui-nav-item">
-        <a href="resource.html"><i class="fa fa-tags fa-fw"></i>&nbsp;资源分享</a>
-    </li>
-    <li class="layui-nav-item layui-this">
-        <a href="timeline.html"><i class="fa fa-road fa-fw"></i>&nbsp;点点滴滴</a>
-    </li>
-    <li class="layui-nav-item">
-        <a href="about.html"><i class="fa fa-info fa-fw"></i>&nbsp;关于本站</a>
-    </li>
-</ul>
-<!--分享窗体-->
-<div class="blog-share layui-hide">
-    <div class="blog-share-body">
-        <div style="width: 200px;height:100%;">
-            <div class="bdsharebuttonbox">
-                <a class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
-                <a class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
-                <a class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
-                <a class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
-            </div>
-        </div>
-    </div>
-</div>
-<!--遮罩-->
-<div class="blog-mask animated layui-hide"></div>
-<!-- layui.js -->
-<script src="../plug/layui/layui.js"></script>
-<!-- 全局脚本 -->
-<script src="../js/global.js"></script>
+<#include "${base}/blog/common/foot.ftl">
 <!-- 本页脚本 -->
 <script type="text/javascript">
     layui.use('jquery', function () {
         var $ = layui.jquery;
-
         $(function () {
             $('.monthToggle').click(function () {
                 $(this).parent('h3').siblings('ul').slideToggle('slow');

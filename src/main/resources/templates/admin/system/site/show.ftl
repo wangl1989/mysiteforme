@@ -40,6 +40,25 @@
             <td>name</td>
         </tr>
         <tr>
+            <td>网站地址</td>
+            <td><input type="text" class="layui-input cmsName" name="url" value="${site.url}" lay-verify="required" placeholder="请输入网站地址"></td>
+            <td>url</td>
+        </tr>
+        <tr>
+            <td>是否开放留言</td>
+            <td>
+                <input type="checkbox" <#if (site.openMessage == true)>checked=""</#if> name="openMessage" lay-skin="switch"  lay-text="打开|关闭">
+            </td>
+            <td>openMessage</td>
+        </tr>
+        <tr>
+            <td>是否可以匿名留言</td>
+            <td>
+                <input type="checkbox" <#if (site.noName == true)>checked=""</#if> name="noName" lay-skin="switch"  lay-text="可以|不可">
+            </td>
+            <td>noName</td>
+        </tr>
+        <tr>
             <td>当前版本</td>
             <td><input type="text" class="layui-input version" name="version" value="${site.version}" placeholder="请输入当前版本"></td>
             <td>version</td>
@@ -91,7 +110,7 @@
         <tr>
             <td>地址</td>
             <td><input type="text" class="layui-input author" name="address" value="${site.address}" placeholder="请输入地址"></td>
-            <td>weibo</td>
+            <td>address</td>
         </tr>
         <tr>
             <td>网站LOGO</td>
@@ -263,6 +282,18 @@
                 c = c.replace(/\"/g, "'");
                 data.field.remarks = c;
             }
+
+            if(null == data.field.openMessage || undefined === data.field.openMessage || "" === data.field.openMessage){
+                data.field.openMessage = false;
+            }else{
+                data.field.openMessage = true;
+            }
+            if(null == data.field.noName || undefined === data.field.noName || "" === data.field.noName){
+                data.field.noName = false;
+            }else{
+                data.field.noName = true;
+            }
+
 
             var loadIndex = layer.load(2, {
                 shade: [0.3, '#333']
