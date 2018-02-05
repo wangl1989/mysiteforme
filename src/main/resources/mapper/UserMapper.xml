@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.UserDao" >
+    <!-- 这儿定义一个resultMap -->
+    <resultMap type="com.mysiteforme.admin.entity.User" id="UserMap">
+        <id property="id" column="id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="password"  column="password"/>
+        <result property="salt"  column="salt"/>
+        <result property="locked" column="locked"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="icon" column="icon" />
+        <collection property="roleLists"  ofType="com.mysiteforme.admin.entity.Role">
+            <result property="id" column="role.id"/>
+            <result property="name" column="role.name"/>
+        </collection>
+        <collection property="menus"  ofType="com.mysiteforme.admin.entity.Menu">
+            <result property="id" column="menu.id"/>
+            <result property="name" column="menu.name"/>
+            <result property="href" column="menu.href"/>
+            <result property="permission" column="menu.permission"/>
+            <result property="bgColor" column="menu.bgColor"/>
+            <result property="icon" column="menu.icon"/>
+            <result property="sort" column="menu.sort"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectUserByMap" resultMap="UserMap"  parameterType="java.util.Map">
+        SELECT
+        u.id,
+        u.login_name,
+        u.nick_name,
+        u.tel,
+        u.email,
+        u.password,
+        u.salt,
+        u.locked,
+        u.del_flag,
+        u.icon,
+        r.id     		AS 	"role.id",
+        r.name			AS	"role.name",
+        m.id 			AS 	"menu.id",
+        m.name			AS	"menu.name",
+        m.permission	AS 	"menu.permission",
+        m.href      	AS 	"menu.href",
+        m.bg_color      AS  "menu.bgColor",
+        m.icon          AS  "menu.icon",
+        m.sort          AS  "menu.sort",
+        u.remarks
+        from
+        sys_user u
+        left join sys_user_role  sur  	on  	sur.user_id = u.id
+        left join sys_role r				 	on  	r.id = sur.role_id
+        left join sys_role_menu  srm 	on 	srm.role_id = r.id
+        left join sys_menu  m    		on 	m.id = srm.menu_id
+        where
+        1=1
+        <if test="id == 0 or id == null">
+         and u.del_flag = false
+         and r.del_flag = false
+        </if>
+        <if test="loginName !=null and loginName !=''">
+            and (
+            u.login_name 	= #{loginName}
+            or u.tel 				= #{loginName}
+            or u.email 		= #{loginName}
+            )
+        </if>
+        <if test="id != 0 and id != null">
+            and u.id = #{id}
+        </if>
+    </select>
+
+    <select id="saveUserRoles">
+        insert into sys_user_role(user_id,role_id)
+        values
+        <foreach collection="roleIds" item="item" index="index" separator="," >
+            (#{userId},#{item.id})
+        </foreach>
+    </select>
+
+    <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
+        delete from sys_user_role where user_id = #{userId}
+    </delete>
+</mapper>

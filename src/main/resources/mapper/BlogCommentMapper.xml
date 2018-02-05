@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.BlogCommentDao" >
+    <select id="selectArticleComments" resultType="com.mysiteforme.admin.entity.BlogComment">
+        select
+        c.id,
+        c.content,
+        c.ip,
+        c.system,
+        c.browser,
+        c.floor,
+        c.channel_id  as "channelId",
+        c.article_id  as "articleId",
+        c.reply_id    as "replyId",
+        c.is_admin_reply  as "isAdminReply",
+        c.reply_content   as "replyContent",
+        c.create_by       as "createId",
+        c.create_date     as "createDate",
+        c.update_by       as "updateId",
+        c.update_date     as "updateDate",
+        c.remarks,
+        c.del_flag        as "delFlag"
+        from
+        blog_comment c
+        where c.del_flag = FALSE
+        <if test="articleId != null and articleId != 0">
+            and c.article_id = #{articleId}
+        </if>
+        order by c.floor desc
+    </select>
+</mapper>

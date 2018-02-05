@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.BlogTagsDao" >
+
+    <select id="getTagsByChannelId" resultType="com.mysiteforme.admin.entity.BlogTags"  parameterType="java.lang.Long">
+        SELECT
+        t.id,
+        t.name,
+        t.sort
+        from
+        blog_tags t
+        left join blog_article_tags  bat 	on  bat.tags_id = t.id
+        left join
+        (select * from blog_article WHERE del_flag = FALSE and channel_id = #{channelId}) a   on  a.id = bat.article_id
+        where
+        t.del_flag = FALSE
+    </select>
+
+
+    <select id="getTagsByArticleId" resultType="com.mysiteforme.admin.entity.BlogTags">
+        SELECT
+        t.id,
+        t.name,
+        t.sort
+        from
+        blog_tags t
+        left join blog_article_tags  bat 	on  bat.tags_id = t.id
+        left join blog_article a on  a.id = bat.article_id
+        where
+        t.del_flag = FALSE
+        and a.id = #{articleId}
+    </select>
+
+    <select id="removeArticleTagsByTagId">
+      delete from blog_article_tags where tags_id = #{tagId}
+    </select>
+
+</mapper>

@@ -1,0 +1,28 @@
+package ${package.Service};
+
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+#set($tablecomment = "")
+#set($tabletype = "")
+#foreach($e in $table.comment.split(","))
+    #if( $foreach.count == 1 )
+        #set($tablecomment = $e)
+    #elseif( $foreach.count == 2 )
+        #set($tabletype = $e)
+    #end
+#end
+/**
+ * <p>
+ * $!{tablecomment} 服务类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${kotlin})
+interface ${table.serviceName} : ${superServiceClass}<${entity}>
+#else
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+}
+#end

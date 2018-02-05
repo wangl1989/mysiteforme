@@ -1,0 +1,408 @@
+#set($tablecomment = "")
+#set($tabletype = "")
+#foreach($e in $table.comment.split(","))
+#if( $foreach.count == 1 )
+#set($tablecomment = $e)
+#elseif( $foreach.count == 2 )
+#set($tabletype = $e)
+#end
+#end
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>$!{tablecomment}添加--${site.name}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="description" content="${site.description}"/>
+    <meta name="keywords" content="${site.keywords}"/>
+    <meta name="author" content="${site.author}"/>
+    <link rel="icon" href="${site.logo}">
+    <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ width:33.333%; float:left; margin-right:0; }
+        @media(max-width:1240px){
+            .layui-form-item .layui-inline{ width:100%; float:none; }
+        }
+        .layui-form-item .role-box {
+            position: relative;
+        }
+        .layui-form-item .role-box .jq-role-inline {
+            height: 100%;
+            overflow: auto;
+        }
+
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form" style="width:80%;">
+#foreach($field in ${table.fields})
+#set($comment = "")
+#set($type = "")
+#set($isNullAble = true)
+#set($defaultValue = false)
+#set($listIsShow = true)
+#set($listIsSearch = false)
+#foreach( $e in $field.comment.split(","))
+#if( $foreach.count == 1 )
+#set($comment = $e)
+#elseif( $foreach.count == 2 )
+#set($type = $e)
+#elseif( $foreach.count == 3)
+#if($e == "YES")
+#set($isNullAble = true)
+#else
+#set($isNullAble = false)
+#end
+#elseif( $foreach.count == 4)
+#if($e == "true")
+#set($defaultValue = true)
+#else
+#set($defaultValue = false)
+#end
+#elseif( $foreach.count == 5)
+#if($e == "true")
+#set($listIsShow = true)
+#else
+#set($listIsShow = false)
+#end
+#elseif( $foreach.count == 6)
+#if($e == "true")
+#set($listIsSearch = true)
+#else
+#set($listIsSearch = false)
+#end
+#end
+#end
+#if($type != '0')
+    <div class="layui-form-item">
+        <label class="layui-form-label">#if("$!comment" != "")${comment}#end</label>
+        <div class="layui-input-block">
+
+#if($type == "input")
+            <input #if($field.type.toLowerCase() == "int")type="number"#else type="text"#end  class="layui-input" name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end placeholder="请输入#if("$!comment" != "")${comment}#end">
+#elseif($type == "select")
+            <select name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end>
+                <option value="" selected="">请选择#if("$!comment" != "")${comment}#end</option>
+                <@my type="${table.name}_${field.name}">
+                <#list result as r>
+                <option value="${r.value}" >${r.label}</option>
+                </#list>
+                </@my>
+            </select>
+#elseif($type == "radio")
+            <@my type="${table.name}_${field.name}">
+                <#list result as r>
+                <input type="radio" name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end value="${r.value}" title="${r.label}">
+                </#list>
+            </@my>
+#elseif($type == "checkbox")
+            <@my type="${table.name}_${field.name}">
+            <#list result as r>
+            <input type="checkbox" name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end title="${r.label}" value="${r.value}">
+            </#list>
+            </@my>
+#elseif($type == "switch")
+#if($defaultValue == true)
+#set ($camelColumnName = $field.capitalName.substring(0,1).toLowerCase() + $field.capitalName.substring(1,$field.capitalName.length()))
+            <input type="checkbox" name="${camelColumnName}" #if($!isNullAble == false)lay-verify="required"#end lay-skin="switch" value="1" lay-text="是|否" >
+#else
+            <#assign ${table.name}_${field.name}_yes="">
+            <#assign ${table.name}_${field.name}_yes_value="">
+            <#assign ${table.name}_${field.name}_no="">
+            <@my type="${table.name}_${field.name}">
+                <#list result as r>
+                    <\#if (r_index == 0)>
+                    <#assign ${table.name}_${field.name}_yes="${r.label}">
+                    <#assign ${table.name}_${field.name}_yes_value="${r.value}">
+                    </\#if>
+                    <\#if (r_index == 1)>
+                    <#assign ${table.name}_${field.name}_no="${r.label}">
+                    </\#if>
+                </#list>
+            </@my>
+            <input type="checkbox" name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end lay-skin="switch" value="${${table.name}_${field.name}_yes_value}" lay-text="${${table.name}_${field.name}_yes}|${${table.name}_${field.name}_no}" checked>
+#end
+
+#elseif($type == "textarea")
+            <textarea name="${field.propertyName}" #if($!isNullAble == false)lay-verify="required"#end placeholder="请输入#if("$!comment" != "")${comment}#end" class="layui-textarea"></textarea>
+#elseif($type == "timer")
+            <input type="text" name="${field.propertyName}" id="${field.propertyName}"   lay-verify="date#if($!isNullAble == false)|required#end" placeholder="请选择#if("$!comment" != "")${comment}#end" autocomplete="off" class="layui-input">
+#elseif($type == "editor")
+            <div id="${field.propertyName}"></div>
+#elseif($type == "uploadImg")
+            <input type="hidden" class="layui-input" name="${field.propertyName}" id="${field.propertyName}" >
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test_${field.propertyName}">上传#if("$!comment" != "")${comment}#end</button>
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" id="demo_${field.propertyName}">
+                    <p id="demoText_${field.propertyName}"></p>
+                </div>
+            </div>
+#else
+            <input type="hidden" class="layui-input" name="${field.propertyName}" id="${field.propertyName}" >
+            <div class="layui-upload-drag" id="${field.propertyName}">
+              <i class="layui-icon"></i>
+              <p>点击上传，或将文件拖拽到此处</p>
+            </div>
+#end
+        </div>
+    </div>
+#end
+#end
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="add${entity}">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" src="${base}/static/layui/layui.js"></script>
+#if($table.comment.indexOf("editor") != -1)
+<script type="text/javascript" src="${base}/static/js/wangEditor.min.js"></script>
+#end
+<script>
+    layui.use(['form','jquery','layer'#if($table.comment.indexOf("upload") != -1),'upload'#end#if($table.comment.indexOf("timer") != -1),'laydate'#end],function(){
+        var form      = layui.form,
+                $     = layui.jquery,
+#if($table.comment.indexOf("upload") != -1)
+                upload = layui.upload,
+#end
+#if($table.comment.indexOf("editor") != -1)
+                E = window.wangEditor,
+#end
+#if($table.comment.indexOf("timer") != -1)
+                laydate = layui.laydate,
+#end
+                layer = layui.layer;
+
+#foreach($e in $table.comment.split(","))
+#if($e.indexOf("uploadImg") != -1)
+#foreach($m in $e.split("-"))
+#if($foreach.count == 2)
+                        //普通图片上传
+        var upload_${m} = upload.render({
+            elem: '#test_${m}',
+            url: '${base}/file/upload/',
+            field:'test',
+            before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo_${m}').attr('src', result); //图片链接（base64）
+                });
+            },
+            done: function(res){
+                //如果上传失败
+                if(res.success == false){
+                    return layer.msg('上传失败');
+                }
+                $("#${m}").val(res.data.url);
+            },
+            error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText_${m}');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    upload_${m}.upload();
+                });
+            }
+        });
+#end
+#end
+#elseif($e.indexOf("editor") != -1)
+#foreach($m in $e.split("-"))
+#if($foreach.count == 2)
+                        var ${m}_editor = new E('#${m}');
+                        //图片上传
+                ${m}_editor.customConfig.uploadImgServer = '${base}/file/uploadWang';
+                ${m}_editor.customConfig.uploadFileName = 'test';
+                // 自定义处理粘贴的文本内容(这里处理图片抓取)
+                ${m}_editor.customConfig.pasteTextHandle = function (content) {
+                    if(undefined == content){
+                        return content;
+                    }
+                    if(content.indexOf("src=")<=0){
+                        return content;
+                    }
+                    var loadContent = layer.load(2, {
+                        shade: [0.3, '#333']
+                    });
+                    $.ajax({
+                        url: "${base}/file/doContent/",
+                        type: "POST",
+                        async: false,
+                        data:{"content":content},
+                        dataType: "json",
+                        success:function(res){
+                            layer.close(loadContent);
+                            content = res.data;
+                        }
+                    });
+                    return content;
+                };
+                // 关闭粘贴样式的过滤
+                ${m}_editor.customConfig.pasteFilterStyle = false;
+                ${m}_editor.customConfig.customAlert = function (info) {
+                    // info 是需要提示的内容
+                    layer.msg(info);
+                };
+                ${m}_editor.create();
+#end
+#end
+
+#elseif($e.indexOf("timer") != -1)
+#foreach($m in $e.split("-"))
+#if($foreach.count == 2)
+                          //初始赋值
+                          laydate.render({
+                            elem: '#${m}'
+                          });
+#end
+#end
+#end
+#end
+
+        form.on("submit(add${entity})",function(data){
+#foreach($e in $table.comment.split(","))
+#if($e.indexOf("switch") != -1)
+#set($n = "") ##第一个值
+#set($t = "") ##第二个值
+#set($i = "") ##第三个值
+#set($four = "") ##第四个值
+#set($five = "") ##第五个值
+#foreach($m in $e.split("-"))
+#if($foreach.count == 1)
+#set($n = $m)
+#elseif($foreach.count == 2)
+#set($t = $m)
+#elseif($foreach.count == 3)
+#set($i = $m)
+#elseif($foreach.count == 4)
+#set($four = $m)
+#else
+#set($five = $m)
+#end
+#end
+#if($four == "true")
+                if(undefined === data.field.${t} || '0' === data.field.${t} || null === data.field.${t}){
+                    data.field.${t} = false;
+                }else{
+                    data.field.${t} = true;
+                }
+#else
+                <#assign ${table.name}_${five}_yes="">
+                <#assign ${table.name}_${five}_yes_value="">
+                <#assign ${table.name}_${five}_no="">
+                <#assign ${table.name}_${five}_no_value="">
+                <@my type="${table.name}_${five}">
+                    <#list result as r>
+                        <\#if (r_index == 0)>
+                        <#assign ${table.name}_${five}_yes="${r.label}">
+                        <#assign ${table.name}_${five}_yes_value="${r.value}">
+                        </\#if>
+                        <\#if (r_index == 1)>
+                        <#assign ${table.name}_${five}_no="${r.label}">
+                        <#assign ${table.name}_${five}_no_value="${r.value}">
+                        </\#if>
+                    </#list>
+                </@my>
+                if(undefined === data.field.${t} || '${${table.name}_${five}_no_value}' === data.field.${t} || null === data.field.${t}){
+                    data.field.${t} = ${${table.name}_${five}_no_value};
+                }else{
+                    data.field.${t} = ${${table.name}_${five}_yes_value};
+                }
+#end
+
+#elseif($e.indexOf("editor") != -1)
+#set($n = "") ##第一个值
+#set($t = "") ##第二个值
+#set($i = "") ##第三个值
+#foreach($m in $e.split("-"))
+#if($foreach.count == 1)
+#set($n = $m)
+#elseif($foreach.count == 2)
+#set($t = $m)
+#elseif($foreach.count == 3)
+#set($i = $m)
+#end
+#end
+                var c = ${t}_editor.txt.html();
+#if($i == "NO")
+                if(null === c || "" === c || undefined === c){
+                    layer.msg("内容不能为空");
+                    return false;
+                }
+#end
+                c = c.replace(/\"/g, "'");
+                data.field.${t} = c;
+#elseif($e.indexOf("upload") != -1)
+#set($n = "") ##第一个值
+#set($t = "") ##第二个值
+#set($i = "") ##第三个值
+#foreach($m in $e.split("-"))
+#if($foreach.count == 1)
+#set($n = $m)
+#elseif($foreach.count == 2)
+#set($t = $m)
+#else
+#set($i = $m)
+#end
+#end
+#if($i == "NO")
+                    if(null === data.field.${t} || "" ===data.field.${t}){
+                        layer.msg("文件必须上传");
+                        return false;
+                    }
+#end
+#elseif($e.indexOf("timer") != -1)
+#set($n = "") ##第一个值
+#set($t = "") ##第二个值
+#set($i = "") ##第三个值
+#foreach($m in $e.split("-"))
+#if($foreach.count == 1)
+#set($n = $m)
+#elseif($foreach.count == 2)
+#set($t = $m)
+#else
+#set($i = $m)
+#end
+#end
+#if($i == "YES")
+                    if(null === data.field.${t} || "" ===data.field.${t}){
+                        delete data.field["${t}"];
+                    }else{
+                        data.field.${t} = new Date(data.field.${t});
+                    }
+#else
+                    data.field.${t} = new Date(data.field.${t});
+#end
+#else
+#end
+#end
+
+            var loadIndex = layer.load(2, {
+                shade: [0.3, '#333']
+            });
+            $.post("${base}#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/add",data.field,function(res){
+                layer.close(loadIndex);
+                if(res.success){
+                    parent.layer.msg("$!{tablecomment}添加成功！",{time:1000},function(){
+                        parent.layer.close(parent.addIndex);
+                        //刷新父页面
+                        parent.location.reload();
+                    });
+                }else{
+                    layer.msg(res.message);
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>
