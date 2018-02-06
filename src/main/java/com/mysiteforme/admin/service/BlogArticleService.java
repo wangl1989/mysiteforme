@@ -110,4 +110,11 @@ public interface BlogArticleService extends IService<BlogArticle> {
      * @return
      */
     List<BlogArticle> selectNewCommentArticle(Integer limit);
+
+    /**
+     * 查询跟当前文章相似的文章 依据文章标签
+     * @param map
+     * @return
+     */
+    List<BlogArticle> selectLikeSameWithTags(Map<String,Object> map);
 }

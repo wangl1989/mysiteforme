@@ -58,20 +58,43 @@
             display: block;
         }
 
-        /* ul ol 样式 */
-        ul, ol {
-            margin: 10px 0 10px 20px;
-        }
     </style>
 
 </head>
 <body>
 <!-- 导航 -->
-<#include "${base}/blog/common/nav.ftl">
+<!-- 导航 -->
+<nav class="blog-nav layui-header">
+    <div class="blog-container">
+        <!-- QQ互联登陆 -->
+        <a href="javascript:" class="blog-user">
+            <i class="fa fa-qq"></i>
+        </a>
+        <a href="javascript:" class="blog-user layui-hide">
+            <img src="${base}/static/blog/images/Absolutely.jpg" alt="Absolutely" title="Absolutely" />
+        </a>
+        <!-- 不落阁 -->
+        <a class="blog-logo" href="${base}/showBlog/index">${site.name}</a>
+        <!-- 导航菜单 -->
+        <ul class="layui-nav" lay-filter="nav">
+                <@mychannel limit="5">
+                    <#list result as item>
+                        <li class="layui-nav-item <#if (item.href?contains('wzzl'))> layui-this</#if>" >
+                            <a href="${base}/showBlog${item.href}"><i class="layui-icon" style="font-size: 18px;">${item.logo}</i>&nbsp;${item.name}</a>
+                        </li>
+                    </#list>
+                </@mychannel>
+        </ul>
+        <!-- 手机和平板的导航开关 -->
+        <a class="blog-navicon" href="javascript:">
+            <i class="fa fa-navicon"></i>
+        </a>
+    </div>
+</nav>
 <!-- 主体（一般只改变这里的内容） -->
 <div class="blog-body">
     <div class="blog-container">
-        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow">
+        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow" style="border-left: 5px solid #37C6C0;">
             <a class="blog-logo" href="${base}/showBlog/index">${site.name}</a>
             <@articleChannelList cid="${article.channelId}">
                 <#list result as item>
@@ -93,6 +116,17 @@
                     </div>
                     <div class="article-detail-content">
                         ${article.content}
+                        <@tags aid = "${article.id}">
+                            <#if (result?? && result?size>0)>
+                        <hr />
+                        <p>
+                            &nbsp; &nbsp;
+                            <#list result as item>
+                                    <a class="layui-btn layui-btn-sm">${item.name}</a>
+                            </#list>
+                        </p>
+                            </#if>
+                        </@tags>
                     </div>
                 </div>
                 <#if (article.blogChannel != null && article.blogChannel.canComment == true)>
@@ -158,13 +192,19 @@
                 <div class="blog-module shadow">
                     <div class="blog-module-title">相似文章</div>
                     <ul class="fa-ul blog-module-ul">
-                        <@myindex limit="8" order="recommend">
+                        <@same limit="8" articleid = "${article.id}">
                             <#if (result?size>0)>
                                 <#list result as item>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="${base+"/showBlog/articleContent/"+item.id}"><#if (item.title?length>50)>${item.title?substring(0,25)}<#else>${item.title}</#if></a></li>
+                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="${base+"/showBlog/articleContent/"+item.id}" title="${item.title}">
+                            <#if item.title?length lt 18>
+                                ${item.title}
+                            <#else>
+                                ${item.title[0..19]}...
+                            </#if>
+                        </a></li>
                                 </#list>
                             </#if>
-                        </@myindex>
+                        </@same>
                     </ul>
                 </div>
                 <div class="blog-module shadow">
@@ -173,7 +213,13 @@
                         <@myindex limit="8" order="sort">
                             <#if (result?size>0)>
                                 <#list result as item>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="${base+"/showBlog/articleContent/"+item.id}"><#if (item.title?length>50)>${item.title?substring(0,25)}<#else>${item.title}</#if></a></li>
+                        <li><i class="fa-li fa fa-angle-double-right" style="margin: unset"></i><a href="${base+"/showBlog/articleContent/"+item.id}" title="${item.title}">
+                            <#if item.title?length lt 18>
+                                ${item.title}
+                            <#else>
+                                ${item.title[0..19]}...
+                            </#if>
+                        </a></li>
                                 </#list>
                             </#if>
                         </@myindex>

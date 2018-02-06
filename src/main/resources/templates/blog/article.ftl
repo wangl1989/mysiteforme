@@ -11,7 +11,7 @@
 <!-- 主体（一般只改变这里的内容） -->
 <div class="blog-body">
     <div class="blog-container">
-        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow">
+        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow" style="border-left: 5px solid #37C6C0;">
             <a class="blog-logo" href="${base}/showBlog/index">${site.name}</a>
             <@articleChannelList cid="${channel.id}">
                 <#list result as item>
@@ -28,7 +28,7 @@
                             <#if item.showPic??>
                                 <img src="${item.showPic}" alt="${item.title}" />
                             <#else>
-                                        <img src="${base}/static/blog/images/cover/201703181909057125.jpg" alt="${item.title}" />
+                                        <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </#if>
                         </div>
                         <div class="article-right">
@@ -49,6 +49,8 @@
                         </div>
                     </div>
                     </#list>
+                    <hr class="layui-bg-blue" style="margin-top: 40px">
+                    <div id="pageDemo" style="text-align: center;"></div>
                 </#if>
             </div>
             <div class="blog-main-right">
@@ -82,24 +84,34 @@
                         <@myindex limit="8" order="recommend">
                             <#if (result?size>0)>
                                 <#list result as item>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="${base+"/showBlog/articleContent/"+item.id}" target="_blank"><#if (item.title?length>50)>${item.title?substring(0,25)}<#else>${item.title}</#if></a></li>
+                        <li><i class="fa-li fa fa-angle-double-right" style="margin: unset"></i><a href="${base+"/showBlog/articleContent/"+item.id}" title="${item.title}" target="_blank">
+                        <#if item.title?length lt 18>
+                            ${item.title}
+                        <#else>
+                            ${item.title[0..19]}...
+                        </#if></a></li>
                                 </#list>
                             </#if>
                         </@myindex>
                     </ul>
                 </div>
-                <div class="blog-module shadow">
-                    <div class="blog-module-title">随便看看</div>
-                    <ul class="fa-ul blog-module-ul">
-                        <@myindex limit="8" order="sort">
-                            <#if (result?size>0)>
-                                <#list result as item>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="${base+"/showBlog/articleContent/"+item.id}" target="_blank"><#if (item.title?length>50)>${item.title?substring(0,25)}<#else>${item.title}</#if></a></li>
-                                </#list>
-                            </#if>
-                        </@myindex>
-                    </ul>
-                </div>
+                <#--<div class="blog-module shadow">-->
+                    <#--<div class="blog-module-title">随便看看</div>-->
+                    <#--<ul class="fa-ul blog-module-ul">-->
+                        <#--<@myindex limit="8" order="sort">-->
+                            <#--<#if (result?size>0)>-->
+                                <#--<#list result as item>-->
+                        <#--<li><i class="fa-li fa fa-angle-double-right" style="margin: unset"></i><a href="${base+"/showBlog/articleContent/"+item.id}" target="_blank" title="${item.title}">-->
+                        <#--<#if item.title?length lt 18>-->
+                            <#--${item.title}-->
+                        <#--<#else>-->
+                            <#--${item.title[0..19]}...-->
+                        <#--</#if></a></li>-->
+                                <#--</#list>-->
+                            <#--</#if>-->
+                        <#--</@myindex>-->
+                    <#--</ul>-->
+                <#--</div>-->
                 <!--右边悬浮 平板或手机设备显示-->
                 <div class="category-toggle"><i class="fa fa-chevron-left"></i></div>
             </div>
@@ -165,12 +177,29 @@
 </script>
 
 <script>
-    layui.use(['form','jquery','layer','laytpl'],function(){
+    layui.use(['form','jquery','layer','laytpl','laypage'],function(){
         var form      = layui.form,
                 $     = layui.jquery,
             layer     = layui.layer,
+            laypage = layui.laypage,
             laytpl    = layui.laytpl;
 
+        laypage.render({
+            elem: 'pageDemo'
+            ,count: ${pagelist.total}
+            ,curr:${pagelist.current}
+            ,theme: '#1DB0B8'
+            ,limit:10
+            ,jump: function(obj, first){
+                //obj包含了当前分页的所有参数，比如：
+                console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                console.log(obj.limit); //得到每页显示的条数
+                if(!first){
+                    location.href="${base+"/showBlog"+channel.href}?page="+obj.curr+"&limit="+obj.limit;
+                }
+
+            }
+        });
         form.on("submit(formSearch)",function(data){
             if(data.field.keywords === undefined || data.field.keywords == null || data.field.keywords === ""){
                 layer.msg("搜索关键词不能为空");
@@ -180,9 +209,9 @@
                 if(res.success){
                     $(".blog-main-left").html("");
                     var getTpl = demo.innerHTML;
-                    laytpl(getTpl).render(res.data, function(html){
-                        $(".blog-main-left").html(html);
-                    });
+                        laytpl(getTpl).render(res.data, function(html){
+                            $(".blog-main-left").html(html);
+                        });
                 }else {
                     layer.msg(res.mssage);
                 }

@@ -41,16 +41,16 @@ body {
         background: #fff;
         font-size: 13px;
         margin-bottom: 15px;
-        -moz-box-shadow:6px 7px 20px #FF4912;
-        -webkit-box-shadow:6px 7px 20px #FF4912;
-        box-shadow:6px 7px 20px #FF4912;
+        -moz-box-shadow:3px 3px 6px #37C6C0;
+        -webkit-box-shadow:3px 3px 6px #37C6C0;
+        box-shadow:3px 3px 6px #37C6C0;
         -moz-border-radius:9px;
         -webkit-border-radius:9px;
         border-radius:9px;
     }
 
         .blog-main > .home-tips > i {
-            color: #009688;
+            color: #37C6C0;
             font-size: 15px;
         }
 
@@ -171,8 +171,8 @@ body {
     height: 64px;
     position: fixed;
     top: 0;
-    background-color: #393D49;
-    border-bottom: 1px solid #5FB878;
+    background-color: #495A80;
+    border-bottom: 1px solid #37C6C0;
 }
 
     .blog-nav .layui-nav {
@@ -242,7 +242,7 @@ body {
         right: 0;
         padding: 10px 12px;
         color: white;
-        border: 1px solid #009688;
+        border: 1px solid #37C6C0;
         margin-top: 13px;
     }
 
@@ -278,9 +278,9 @@ body {
 /*网站底部*/
 .blog-footer {
     text-align: center;
-    border-top: 1px solid #009688;
+    border-top: 1px solid #37C6C0;
     margin-top: 15px;
-    background: #2F4056;
+    background: #495A80;
     padding: 5px 0;
     color: #d3d2d2;
 }
@@ -456,20 +456,21 @@ body {
     -o-transition: all 0.3s linear;
     -webkit-transition: all 0.3s linear;
     transition: all 0.3s linear;
-    -moz-box-shadow:5px 7px 20px #2EA68A;
-    -webkit-box-shadow:5px 7px 20px #2EA68A;
-    box-shadow:5px 7px 20px #2EA68A;
+    -moz-box-shadow:3px 5px 6px #D0E9FF;
+    -webkit-box-shadow:3px 5px 6px #D0E9FF;
+    box-shadow:3px 5px 6px #D0E9FF;
     -moz-border-radius:9px;
     -webkit-border-radius:9px;
     border-radius:9px;
 }
 
     .article:hover {
-        border-left: 5px solid #009688;
+        border-left: 5px solid #D0E9FF;
         -moz-transition: all 0.3s linear;
         -o-transition: all 0.3s linear;
         -webkit-transition: all 0.3s linear;
         transition: all 0.3s linear;
+        border-radius:9px;
     }
 
     .article > .article-left {
@@ -493,7 +494,7 @@ body {
         }
 
             .article > .article-right > .article-title a:hover {
-                color: #009688;
+                color: #37C6C0;
             }
 
         .article > .article-right > .article-abstract {
@@ -512,7 +513,7 @@ body {
         }
 
         .article > .article-footer a {
-            color: #009688;
+            color: #37C6C0;
         }
 
         .article > .article-footer .article-viewinfo,
@@ -580,16 +581,16 @@ body {
     padding: 15px;
     background: #fff;
     height: 100%;
-    -moz-box-shadow:5px 7px 20px #2EA68A;
-    -webkit-box-shadow:5px 7px 20px #2EA68A;
-    box-shadow:5px 7px 20px #2EA68A;
+    -moz-box-shadow:3px 5px 6px #D0E9FF;
+    -webkit-box-shadow:3px 5px 6px #D0E9FF;
+    box-shadow:3px 5px 6px #D0E9FF;
     -moz-border-radius:9px;
     -webkit-border-radius:9px;
     border-radius:9px;
 }
 
     .blog-module > .blog-module-title {
-        border-bottom: 1px solid #009688;
+        border-bottom: 1px solid #37C6C0;
         font-size: 15px;
         font-weight: 500;
         padding: 0 0 5px 0;
@@ -602,7 +603,7 @@ body {
 }
 
     .blog-module-ul li .fa {
-        color: #009688;
+        color: #37C6C0;
     }
 /*右侧模块END*/
 
@@ -624,7 +625,7 @@ body {
 
     .article-category > .article-category-title {
         text-align: center;
-        border-bottom: 1px solid #009688;
+        border-bottom: 1px solid #37C6C0;
         font-size: 15px;
         font-weight: 500;
         padding: 0 0 5px 0;
@@ -636,7 +637,7 @@ body {
         color: #eee;
         padding: 5px 1%;
         margin: 4px 0;
-        background: #009688;
+        background: #37C6C0;
         width: 98%;
         text-align: center;
         line-height: 19px;
@@ -657,7 +658,7 @@ body {
     right: 0;
     top: 40%;
     width: 15px;
-    background: #009688;
+    background: #37C6C0;
     color: #fff;
     font-size: 16px;
     padding: 30px 0;
@@ -898,7 +899,7 @@ body {
         }
 
         .blog-comment .info .btn-reply {
-            color: #009688;
+            color: #37C6C0;
         }
 
     .blog-comment .content {

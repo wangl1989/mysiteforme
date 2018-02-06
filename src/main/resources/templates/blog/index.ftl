@@ -33,7 +33,7 @@
                     <@ar channelId="6">
                         <#if (result?size>0)>
                             <#list result as items>
-                            <span style="color: #009688"><#if (items.length >100)> ${items.content?substring(0,100)} <#else> ${items.content} </#if>></span>
+                            <span style="color: #37C6C0"><#if (items.length >100)> ${items.content?substring(0,100)} <#else> ${items.content} </#if>></span>
                             </#list>
                         </#if>
                     </@ar>
@@ -49,7 +49,7 @@
                                     <#if item.showPic??>
                                         <img src="${item.showPic}" alt="${item.title}" />
                                     <#else>
-                                        <img src="${base}/static/blog/images/cover/201703181909057125.jpg" alt="${item.title}" />
+                                        <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                                     </#if>
                                 </div>
                                 <div class="article-right">

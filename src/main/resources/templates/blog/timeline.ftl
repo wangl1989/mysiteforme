@@ -14,7 +14,7 @@
 <!-- 主体（一般只改变这里的内容） -->
 <div class="blog-body">
     <div class="blog-container">
-        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow">
+        <blockquote class="layui-elem-quote sitemap layui-breadcrumb shadow" style="border-left: 5px solid #37C6C0;">
             <a href="home.html" title="网站首页">网站首页</a>
             <@articleChannelList cid="${channel.id}">
                 <#list result as item>

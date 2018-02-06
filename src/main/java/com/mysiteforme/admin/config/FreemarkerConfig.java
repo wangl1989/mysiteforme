@@ -44,6 +44,9 @@ public class FreemarkerConfig {
     @Autowired
     private NewCommentArticleTempletModel newCommentArticleTempletModel;
 
+    @Autowired
+    private LookLikeArticlesTempletModel lookLikeArticlesTempletModel;
+
     @PostConstruct
     public void setSharedVariable() {
         //系统字典标签
@@ -65,5 +68,7 @@ public class FreemarkerConfig {
         configuration.setSharedVariable("tags",tagsTempletModel);
         //最新评论文章集合
         configuration.setSharedVariable("nca",newCommentArticleTempletModel);
+        //当前文章相似的文章
+        configuration.setSharedVariable("same",lookLikeArticlesTempletModel);
     }
 }

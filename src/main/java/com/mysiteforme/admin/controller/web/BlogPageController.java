@@ -82,7 +82,9 @@ public class BlogPageController extends BaseController{
      * @return
      */
     @GetMapping(value = {"/wzzl","/wzzl/**"})
-    public String articleParttener(HttpServletRequest httpServletRequest,Model model) {
+    public String articleParttener(@RequestParam(value = "page",defaultValue = "1")Integer page,
+                                   @RequestParam(value = "limit",defaultValue = "10")Integer limit,
+                                   HttpServletRequest httpServletRequest,Model model) {
         String href = httpServletRequest.getRequestURI();
         href = href.replaceFirst("/showBlog","");
         if(href.endsWith("/")){
@@ -99,7 +101,7 @@ public class BlogPageController extends BaseController{
             map.put("channelId",blogChannel.getId());
         }
         model.addAttribute("channel",blogChannel);
-        Page<BlogArticle> pageList = blogArticleService.selectDetailArticle(map,new Page<BlogArticle>(1,10));
+        Page<BlogArticle> pageList = blogArticleService.selectDetailArticle(map,new Page<BlogArticle>(page,limit));
         model.addAttribute("pagelist",pageList);
         return "blog/article";
     }

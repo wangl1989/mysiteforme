@@ -25,6 +25,13 @@ public interface BlogArticleDao extends BaseMapper<BlogArticle> {
 
     List<BlogArticle> selectNewCommentArticle(Integer limit);
 
+    /**
+     * 查找当前文章的标签相似的文章
+     * @param map
+     * @return
+     */
+    List<BlogArticle> selectLikeSameWithTags(Map<String,Object> map);
+
     void saveArticleTags(Map<String, Object> map);
 
     void removeArticleTags(Long articleId);

@@ -230,4 +230,9 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
     public List<BlogArticle> selectNewCommentArticle(Integer limit) {
         return baseMapper.selectNewCommentArticle(limit);
     }
+
+    @Override
+    public List<BlogArticle> selectLikeSameWithTags(Map<String, Object> map) {
+        return baseMapper.selectLikeSameWithTags(map);
+    }
 }

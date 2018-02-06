@@ -1,8 +1,9 @@
 package com.mysiteforme.admin.freemark;
 
-import com.mysiteforme.admin.entity.BlogTags;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.service.BlogTagsService;
+import com.mysiteforme.admin.service.BlogArticleService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,46 +15,42 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by wangl on 2018/2/4.
- * todo: 获取文章的标签集合
+ * Created by wangl on 2018/2/7.
+ * todo:
  */
 @Component
-public class TagsTempletModel extends BaseDirective implements TemplateDirectiveModel {
+public class LookLikeArticlesTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
     @Autowired
-    private BlogTagsService blogTagsService;
-
+    private BlogArticleService blogArticleService;
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         Iterator iterator = map.entrySet().iterator();
-        Long aid = null;
-        Long cid = null;
+        Integer limit = 5;
+        Long articleId = null;
         while (iterator.hasNext()) {
             Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("aid")){
-                aid = getLong(paramName,paramValue);
+            if(paramName.toLowerCase().equals("articleid")){
+                articleId = getLong(paramName,paramValue);
             }
-            if(paramName.toLowerCase().equals("cid")){
-                cid = getLong(paramName,paramValue);
+            if(paramName.toLowerCase().equals("limit")){
+                int templimit = getInt(paramName,paramValue);
+                if(templimit>0){
+                    limit = templimit;
+                }
             }
         }
-        if(aid != null && cid != null){
-            throw new MyException("文章ID跟栏目ID不能同时存在");
+        if(articleId == null){
+            throw new MyException("模版参数错误");
         }
-        List<BlogTags> list  = null;
-        if(aid != null){
-            list = blogTagsService.getTagsByArticleId(aid);
-        }
-        if(cid != null){
-            list = blogTagsService.getTagsByChannelId(cid);
-        }
-        if(cid == null && aid == null){
-            list = blogTagsService.getTagsByChannelId(null);
-        }
+        Map<String,Object> dataMap = Maps.newHashMap();
+        dataMap.put("limit",limit);
+        dataMap.put("articleId",articleId);
+        List<BlogArticle> articleList = blogArticleService.selectLikeSameWithTags(dataMap);
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_26);
-        environment.setVariable("result", builder.build().wrap(list));
+        environment.setVariable("result", builder.build().wrap(articleList));
         templateDirectiveBody.render(environment.getOut());
     }
 }
