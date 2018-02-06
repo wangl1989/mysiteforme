@@ -2,6 +2,7 @@ package com.mysiteforme.admin.controller.web;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.BlogArticle;
@@ -12,6 +13,7 @@ import com.mysiteforme.admin.lucene.LuceneSearch;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
+import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.http.HTMLFilter;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -306,7 +309,7 @@ public class BlogPageController extends BaseController{
         wrapper.eq("channel_id",blogChannel.getId());
         wrapper.orderBy("is_top",false).orderBy("is_recommend",false);
         List<BlogArticle> list = blogArticleService.selectList(wrapper);
-        if(list.size() == 1){
+        if(list.size() >0){
             model.addAttribute("oneArticle",list.get(0));
         }
         if(list.size()>1){
@@ -317,5 +320,61 @@ public class BlogPageController extends BaseController{
         return "blog"+href;
     }
 
+    @GetMapping(value = {"/dddd","/dddd/"})
+    public String dddd(HttpServletRequest request,Model model){
+        String href = request.getRequestURI();
+        href = href.replaceFirst("/showBlog","");
+        if(href.endsWith("/")){
+            href = href.substring(0,href.length()-1);
+        }
+        BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
+        if(blogChannel == null){
+            throw new MyException("地址没找到",404);
+        }
+        model.addAttribute("channel",blogChannel);
+        List<BlogArticle> list = blogArticleService.selectTimeLineList(blogChannel.getId());
+        if(list.size()>0){
+            Map<Object,Object> yearMap = Maps.newLinkedHashMap();
+            for(BlogArticle blogArticle : list){
+                Date  d= blogArticle.getCreateDate();
+                Integer year = DateUtil.year(d);
+                Integer monthe = DateUtil.month(d)+1;
+                if(yearMap.containsKey(year.toString())){
+                    Map<String,List<BlogArticle>> monthMap = (Map<String,List<BlogArticle>>) yearMap.get(year.toString());
+                    if(monthMap.containsKey(monthe.toString())){
+                        List<BlogArticle> blogArticles = monthMap.get(monthe.toString());
+                        blogArticles.add(blogArticle);
+                    }else{
+                        List<BlogArticle> blogArticles = Lists.newArrayList();
+                        blogArticles.add(blogArticle);
+                        monthMap.put(monthe.toString(),blogArticles);
+                    }
+                }else{
+                    Map<String,List<BlogArticle>> monthMap = Maps.newLinkedHashMap();
+                    List<BlogArticle> blogArticles = Lists.newArrayList();
+                    blogArticles.add(blogArticle);
+                    monthMap.put(monthe.toString(),blogArticles);
+                    yearMap.put(year.toString(),monthMap);
+                }
+            }
+            model.addAttribute("year",yearMap);
+        }
+        return "blog/timeline";
+    }
+
+    @GetMapping(value = {"/share","/share/"})
+    public String rescourceShare(HttpServletRequest request,Model model){
+        String href = request.getRequestURI();
+        href = href.replaceFirst("/showBlog","");
+        if(href.endsWith("/")){
+            href = href.substring(0,href.length()-1);
+        }
+        BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
+        if(blogChannel == null){
+            throw new MyException("地址没找到",404);
+        }
+        model.addAttribute("channel",blogChannel);
+        return "blog/share";
+    }
 
 }

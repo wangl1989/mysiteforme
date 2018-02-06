@@ -23,7 +23,7 @@ public interface BlogArticleDao extends BaseMapper<BlogArticle> {
 
     List<BlogArticle> selectDetailArticle(Map<String, Object> map);
 
-    List<BlogArticle> selectNewCommentArticle();
+    List<BlogArticle> selectNewCommentArticle(Integer limit);
 
     void saveArticleTags(Map<String, Object> map);
 

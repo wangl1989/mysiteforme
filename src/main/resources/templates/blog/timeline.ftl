@@ -29,131 +29,43 @@
             </div>
             <div class="timeline-box shadow">
                 <div class="timeline-main">
-                    <h1><i class="fa fa-clock-o"></i>时光轴<span> —— 记录生活点点滴滴</span></h1>
+                    <h1><i class="fa fa-clock-o"></i>时光如水,岁月静好</h1>
                     <div class="timeline-line"></div>
-                    <div class="timeline-year">
-                        <h2><a class="yearToggle" href="javascript:">2017年</a><i class="fa fa-caret-down fa-fw"></i></h2>
-                        <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
-                            <ul>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月23日 19:33</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">该时光轴支持手机平板PC，但并不能兼容一些老的浏览器！</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月11日 20:29</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2017年2月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月10日 20:35</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2017年2月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
-                            <ul>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月23日 19:33</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2017年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月11日 20:29</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2017年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月10日 20:35</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2017年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="timeline-year">
-                        <h2><a class="yearToggle" href="javascript:">2016年</a><i class="fa fa-caret-down fa-fw"></i></h2>
-                        <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">2月</a><i class="fa fa-caret-down fa-fw"></i></h3>
-                            <ul>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月23日 19:33</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年2月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月11日 20:29</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年2月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">02月10日 20:35</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年2月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="timeline-month">
-                            <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">1月</a><i class="fa fa-caret-down fa-fw"></i></h3>
-                            <ul>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月23日 19:33</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月11日 20:29</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                                <li class=" ">
-                                    <div class="h4  animated fadeInLeft">
-                                        <p class="date">01月10日 20:35</p>
-                                    </div>
-                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
-                                    <div class="content animated fadeInRight">这是2016年1月发表的</div>
-                                    <div class="clear"></div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <h1 style="padding-top:4px;padding-bottom:2px;margin-top:40px;"><i class="fa fa-hourglass-end"></i>THE END</h1>
+                    <#if year??>
+                        <#assign keys = year?keys />
+                        <#if (keys?? && keys?size>0)>
+                            <#list keys as key>
+                                <div class="timeline-year">
+                                    <h2><a class="yearToggle" href="javascript:">${key}年</a><i class="fa fa-caret-down fa-fw"></i></h2>
+                                    <#assign monthsMap = year["${key}"] />
+                                    <#assign monthsKeys = monthsMap?keys />
+                                    <#if (monthsKeys?? && monthsKeys?size>0)>
+                                        <#list monthsKeys as month>
+                                            <div class="timeline-month">
+                                                <h3 class=" animated fadeInLeft"><a class="monthToggle" href="javascript:">${month}月</a><i class="fa fa-caret-down fa-fw"></i></h3>
+                                                <ul>
+                                                    <#assign daylist = monthsMap["${month}"] />
+                                                    <#if (daylist?? && daylist?size>0)>
+                                                        <#list daylist as day>
+                                                            <li class=" ">
+                                                                <div class="h4  animated fadeInLeft">
+                                                                    <p class="date">${day.createDate?string("MM月dd日 hh:mm:ss")}</p>
+                                                                </div>
+                                                                <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                                <div class="content animated fadeInRight">${day.title}</div>
+                                                                <div class="clear"></div>
+                                                            </li>
+                                                        </#list>
+                                                    </#if>
+                                                </ul>
+                                            </div>
+                                        </#list>
+                                    </#if>
+                                </div>
+                            </#list>
+                        </#if>
+                    </#if>
+                    <h1 style="padding-top:4px;padding-bottom:2px;margin-top:40px;"><i class="fa fa-hourglass-end"></i>起航,远方</h1>
                 </div>
             </div>
         </div>

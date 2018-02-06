@@ -36,7 +36,7 @@
                     <div class="aboutinfo">
                         <#if oneArticle??>
                         <div class="aboutinfo-figure">
-                            <img src="${oneArticle.showPic}" alt="${site.name}" />
+                            <img src="${oneArticle.showPic}" alt="${site.name}" style="width: 200px" />
                         </div>
                         <p class="aboutinfo-nickname">${oneArticle.title}</p>
                         <p class="aboutinfo-introduce">${oneArticle.subTitle}</p>

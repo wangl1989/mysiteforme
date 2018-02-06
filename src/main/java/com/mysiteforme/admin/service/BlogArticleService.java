@@ -96,4 +96,18 @@ public interface BlogArticleService extends IService<BlogArticle> {
      * 创建文章搜索索引
      */
     void createArticlIndex();
+
+    /**
+     * 获取时间轴的文章
+     * @param id
+     * @return
+     */
+    List<BlogArticle> selectTimeLineList(Long id);
+
+    /**
+     * 查询最新评论的文章
+     * @param limit
+     * @return
+     */
+    List<BlogArticle> selectNewCommentArticle(Integer limit);
 }

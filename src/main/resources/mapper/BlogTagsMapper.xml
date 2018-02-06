@@ -11,7 +11,11 @@
         blog_tags t
         left join blog_article_tags  bat 	on  bat.tags_id = t.id
         left join
-        (select * from blog_article WHERE del_flag = FALSE and channel_id = #{channelId}) a   on  a.id = bat.article_id
+        (select * from blog_article WHERE del_flag = FALSE
+         <if test="channelId != null and channelId != 0">
+             and channel_id = #{channelId}
+         </if>
+         ) a   on  a.id = bat.article_id
         where
         t.del_flag = FALSE
     </select>

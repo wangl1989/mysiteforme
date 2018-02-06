@@ -172,12 +172,16 @@
         delete from blog_article_tags where article_id = #{articleId}
     </select>
 
-    <select id="selectNewCommentArticle" resultType="com.mysiteforme.admin.entity.BlogArticle">
+    <select id="selectNewCommentArticle" resultType="com.mysiteforme.admin.entity.BlogArticle" parameterType="java.lang.Integer">
         select
         <include refid="select"/>,
-        blog_article a
-        right join blog_comment c on c.article_id = a.id
-        where c.del_flag = FALSE
+        c.create_date as "newestCommentTime"
+        from blog_article a
+        right join
+        (select create_date,article_id from blog_comment where del_flag = false and type = 1 order by create_date desc) c on c.article_id = a.id
+        where a.del_flag = FALSE
+        GROUP BY a.id
         order by c.create_date desc
+        limit #{limit}
     </select>
 </mapper>

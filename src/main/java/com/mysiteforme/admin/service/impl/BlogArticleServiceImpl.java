@@ -125,6 +125,9 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
                 if("publish".equals(list[i])){
                     list[i] = "publist_time";
                 }
+                if("view".equals(list[i])){
+                    list[i] = "click";
+                }
                 orderString.add(list[i]);
             }else {
                 throw new MyException("模版传参错误");
@@ -210,5 +213,21 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
                 e.printStackTrace();
             }
         }
+    }
+
+    @Cacheable(value = "myarticle",key="'time_line_channel_id_'+#id.toString()",unless = "#result == null or #result.size() == 0")
+    @Override
+    public List<BlogArticle> selectTimeLineList(Long id) {
+        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        wrapper.eq("del_flag",false);
+        wrapper.eq("channel_id",id);
+        wrapper.orderBy("create_date",false);
+        return selectList(wrapper);
+    }
+
+
+    @Override
+    public List<BlogArticle> selectNewCommentArticle(Integer limit) {
+        return baseMapper.selectNewCommentArticle(limit);
     }
 }

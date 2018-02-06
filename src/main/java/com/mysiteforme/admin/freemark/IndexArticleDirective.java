@@ -32,7 +32,7 @@ public class IndexArticleDirective extends BaseDirective implements TemplateDire
         Iterator iterator = map.entrySet().iterator();
         Map<String,Object> paramMap = Maps.newHashMap();
         Integer limit = 10;
-        String order = "top,recommend,publish,sort";
+        String order = "top,recommend,publish,sort,view";
         while (iterator.hasNext()) {
             Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
             String paramName = param.getKey();

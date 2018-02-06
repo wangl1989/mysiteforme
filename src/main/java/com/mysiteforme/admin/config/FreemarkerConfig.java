@@ -41,6 +41,9 @@ public class FreemarkerConfig {
     @Autowired
     private TagsTempletModel tagsTempletModel;
 
+    @Autowired
+    private NewCommentArticleTempletModel newCommentArticleTempletModel;
+
     @PostConstruct
     public void setSharedVariable() {
         //系统字典标签
@@ -58,7 +61,9 @@ public class FreemarkerConfig {
         configuration.setSharedVariable("clickNumber",articleClickTempletModel);
         //获取系统用户信息
         configuration.setSharedVariable("sysuser",sysUserTempletModel);
-
+        //获取标签集合
         configuration.setSharedVariable("tags",tagsTempletModel);
+        //最新评论文章集合
+        configuration.setSharedVariable("nca",newCommentArticleTempletModel);
     }
 }

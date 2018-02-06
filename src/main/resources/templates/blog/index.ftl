@@ -95,54 +95,73 @@
                 <div class="blog-module shadow">
                     <div class="blog-module-title">热文排行</div>
                     <ul class="fa-ul blog-module-ul">
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">Web安全之跨站请求伪造CSRF</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">ASP.NET MVC 防范跨站请求伪造（CSRF）</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">常用正则表达式</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">EF CodeFirst数据迁移常用指令</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">浅谈.NET Framework基元类型</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">C#基础知识回顾-扩展方法</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">一步步制作时光轴（一）（HTML篇）</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="detail.html">一步步制作时光轴（二）（CSS篇）</a></li>
+                        <@myindex order="view,publish" limit="6">
+                        <#if (result?? && result?size>0)>
+                            <#list result as item>
+                                <li><i class="fa-li fa fa-angle-double-right" style="margin: unset"></i><a title="${item.title}" href="${base+"/showBlog/articleContent/"+item.id}">
+                                <#if item.title?length lt 18>
+                                    ${item.title}
+                                <#else>
+                                    ${item.title[0..19]}...
+                                </#if></a></li>
+                            </#list>
+                        </#if>
+                        </@myindex>
                     </ul>
                 </div>
                 <div class="blog-module shadow">
-                    <div class="blog-module-title">最近分享</div>
+                    <div class="blog-module-title">最新评论的文章</div>
                     <ul class="fa-ul blog-module-ul">
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="http://pan.baidu.com/s/1c1BJ6Qc" target="_blank">Canvas</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="http://pan.baidu.com/s/1kVK8UhT" target="_blank">pagesize.js</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="https://pan.baidu.com/s/1mit2aiW" target="_blank">时光轴</a></li>
-                        <li><i class="fa-li fa fa-hand-o-right"></i><a href="https://pan.baidu.com/s/1nuAKF81" target="_blank">图片轮播</a></li>
+                        <@nca>
+                            <#if (result?? && result?size>0)>
+                                <#list result as item>
+                                    <li><i class="fa-li fa fa-angle-double-right" style="margin: unset"></i><a href="${base+"/showBlog/articleContent/"+item.id}" target="_blank" title="${item.title}">
+                                        <#if item.title?length lt 18>
+                                            ${item.title}
+                                        <#else>
+                                            ${item.title[0..19]}...
+                                        </#if></a></li>
+                                </#list>
+                            </#if>
+                        </@nca>
                     </ul>
                 </div>
-                <div class="blog-module shadow">
-                    <div class="blog-module-title">一路走来</div>
-                    <dl class="footprint">
-                        <dt>2017年03月12日</dt>
-                        <dd>新增留言回复功能！人人都可参与回复！</dd>
-                        <dt>2017年03月10日</dt>
-                        <dd>不落阁2.0基本功能完成，正式上线！</dd>
-                        <dt>2017年03月09日</dt>
-                        <dd>新增文章搜索功能！</dd>
-                        <dt>2017年02月25日</dt>
-                        <dd>QQ互联接入网站，可QQ登陆发表评论与留言！</dd>
-                    </dl>
-                </div>
-                <div class="blog-module shadow">
-                    <div class="blog-module-title">后台记录</div>
-                    <dl class="footprint">
-                        <dt>2017年03月16日</dt>
-                        <dd>分页新增页容量控制</dd>
-                        <dt>2017年03月12日</dt>
-                        <dd>新增管家提醒功能</dd>
-                        <dt>2017年03月10日</dt>
-                        <dd>新增Win10快捷菜单</dd>
-                    </dl>
-                </div>
+                <#--<div class="blog-module shadow">-->
+                    <#--<div class="blog-module-title">一路走来</div>-->
+                    <#--<dl class="footprint">-->
+                        <#--<dt>2017年03月12日</dt>-->
+                        <#--<dd>新增留言回复功能！人人都可参与回复！</dd>-->
+                        <#--<dt>2017年03月10日</dt>-->
+                        <#--<dd>不落阁2.0基本功能完成，正式上线！</dd>-->
+                        <#--<dt>2017年03月09日</dt>-->
+                        <#--<dd>新增文章搜索功能！</dd>-->
+                        <#--<dt>2017年02月25日</dt>-->
+                        <#--<dd>QQ互联接入网站，可QQ登陆发表评论与留言！</dd>-->
+                    <#--</dl>-->
+                <#--</div>-->
+                <#--<div class="blog-module shadow">-->
+                    <#--<div class="blog-module-title">后台记录</div>-->
+                    <#--<dl class="footprint">-->
+                        <#--<dt>2017年03月16日</dt>-->
+                        <#--<dd>分页新增页容量控制</dd>-->
+                        <#--<dt>2017年03月12日</dt>-->
+                        <#--<dd>新增管家提醒功能</dd>-->
+                        <#--<dt>2017年03月10日</dt>-->
+                        <#--<dd>新增Win10快捷菜单</dd>-->
+                    <#--</dl>-->
+                <#--</div>-->
                 <div class="blog-module shadow">
                     <div class="blog-module-title">友情链接</div>
                     <ul class="blogroll">
-                        <li><a target="_blank" href="http://www.layui.com/" title="Layui">Layui</a></li>
-                        <li><a target="_blank" href="http://www.pagemark.cn/" title="页签">页签</a></li>
+                        <@ar channelid = "16" limit="6">
+                            <#if (result?? && result?size>1)>
+                                <#list result as item>
+                                    <#if (item_index>0)>
+                                        <li><a target="_blank" href="${item.outLinkUrl}" title="${item.title}">${item.title}</a></li>
+                                    </#if>
+                                </#list>
+                            </#if>
+                        </@ar>
                     </ul>
                 </div>
             </div>

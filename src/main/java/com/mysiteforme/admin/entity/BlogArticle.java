@@ -94,14 +94,29 @@ public class BlogArticle extends DataEntity<BlogArticle> {
      */
 	private Integer status;
 
+	/**
+	 * 文章所属栏目
+	 */
 	@TableField(exist = false)
 	private BlogChannel blogChannel;
 
+	/**
+	 * 文章标签集合
+	 */
 	@TableField(exist = false)
 	private List<BlogTags> blogTags;
 
+	/**
+	 * 文章评论数
+	 */
 	@TableField(exist = false)
 	private Integer commentCount;
+
+	/**
+	 * 当前文章最新评论时间
+	 */
+	@TableField(exist = false)
+	private Date newestCommentTime;
 
 	public String getTitle() {
 		return title;
@@ -240,6 +255,14 @@ public class BlogArticle extends DataEntity<BlogArticle> {
 
 	public void setCommentCount(Integer commentCount) {
 		this.commentCount = commentCount;
+	}
+
+	public Date getNewestCommentTime() {
+		return newestCommentTime;
+	}
+
+	public void setNewestCommentTime(Date newestCommentTime) {
+		this.newestCommentTime = newestCommentTime;
 	}
 
 	@Override

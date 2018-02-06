@@ -39,9 +39,6 @@ public class TagsTempletModel extends BaseDirective implements TemplateDirective
                 cid = getLong(paramName,paramValue);
             }
         }
-        if(aid == null && cid == null){
-            throw new MyException("文章ID或者栏目ID不能同时为空");
-        }
         if(aid != null && cid != null){
             throw new MyException("文章ID跟栏目ID不能同时存在");
         }
@@ -51,6 +48,9 @@ public class TagsTempletModel extends BaseDirective implements TemplateDirective
         }
         if(cid != null){
             list = blogTagsService.getTagsByChannelId(cid);
+        }
+        if(cid == null || aid == null){
+            list = blogTagsService.getTagsByChannelId(null);
         }
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_26);
         environment.setVariable("result", builder.build().wrap(list));
