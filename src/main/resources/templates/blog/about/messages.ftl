@@ -6,6 +6,17 @@
     <!-- 本页样式表 -->
     <link href="${base}/static/blog/css/about.css?t=${.now?long}" rel="stylesheet" />
     <style type="text/css">
+        /**管理员回复的图片样式**/
+        .admincss img{
+            vertical-align: middle;
+            display: inline-block;
+            border: none;
+            width: auto;
+            height: auto;
+            margin:0;
+            position: unset;
+            border-radius: unset;
+        }
         /**编辑器样式**/
         .toolbar {
             border: 1px solid #ccc;
@@ -120,28 +131,47 @@
                                             <div class="content">
                                                 {{ item.content }}
                                             </div>
+                                            {{# if(item.adminReply){ }}
+                                            <div class="comment-child">
+                                                <fieldset class="layui-elem-field" style="border-color:#D0E9FF">
+                                                    <legend>管理员回复</legend>
+                                                    <div class="layui-field-box">
+                                                        {{# if(item.updateUser.icon != ""){ }}
+                                                        <img style="width: 40px;height: 40px" src="{{ item.updateUser.icon }}" alt="{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }}  " />
+                                                        {{# }else{ }}
+                                                        <img style="width: 40px;height: 40px" src="${base}/static/images/face.jpg" alt="{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }}  "  />
+                                                        {{# } }}
+                                                        <div class="info">
+                                                            <span class="username">{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }} </span>
+                                                            <span class="time">{{ layui.laytpl.timeago(item.updateDate) }}</span>
+                                                            <span class="admincss">{{ item.replyContent }}</span>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                            {{# } }}
                                             <p class="info info-footer"><span class="time">{{ layui.laytpl.toDateString(item.createDate) }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
                                         </div>
+                                        {{# if(item.replayList.length>0){ }}
                                         <hr />
+                                        {{#  layui.each(item.replayList, function(index, replyItem){ }}
                                         <div class="comment-child">
                                             <img src="${base}/static/blog/images/Absolutely.jpg" alt="Absolutely" />
                                             <div class="info">
-                                                <span class="username">Absolutely</span><span>这是用户回复内容</span>
+                                                <span class="username">Absolutely</span><span>{{ replyItem.content }}</span>
                                             </div>
-                                            <p class="info"><span class="time">2017-03-18 18:26</span></p>
+                                            <p class="info"><span class="time">{{ layui.laytpl.timeago(replyItem.createDate) }}</span></p>
                                         </div>
-                                        <div class="comment-child">
-                                            <img src="${base}/static/blog/images/Absolutely.jpg" alt="Absolutely" />
-                                            <div class="info">
-                                                <span class="username">Absolutely</span><span>这是第二个用户回复内容</span>
-                                            </div>
-                                            <p class="info"><span class="time">2017-03-18 18:26</span></p>
-                                        </div>
+                                        {{#  }); }}
+
+                                        {{# } }}
+
                                         <!-- 回复表单默认隐藏 -->
                                         <div class="replycontainer">
                                             <form class="layui-form" action="">
+                                                <input name="replyId" type="hidden" value="{{ item.id }}">
                                                 <div class="layui-form-item">
-                                                    <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>
+                                                    <textarea name="content" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>
                                                 </div>
                                                 <div class="layui-form-item">
                                                     <button class="layui-btn layui-btn-mini" lay-submit="formReply" lay-filter="formReply">提交</button>
@@ -162,6 +192,7 @@
 <!-- 底部 -->
 <#include "${base}/blog/common/foot.ftl">
 <!-- 本页脚本 -->
+
 <script src="${base}/static/blog/js/about.js?v=1.0"></script>
 <script type="text/javascript" src="${base}/static/js/wangEditor.min.js"></script>
 <script type="text/javascript" src="${base}/static/js/xss.min.js"  ></script>
@@ -260,16 +291,38 @@
 
         //监听留言回复提交
         form.on('submit(formReply)', function (data) {
-            var index = layer.load(1);
-            //模拟留言回复
-            setTimeout(function () {
-                layer.close(index);
-                var content = data.field.replyContent;
-                var html = '<div class="comment-child"><img src="../images/Absolutely.jpg"alt="Absolutely"/><div class="info"><span class="username">模拟回复</span><span>' + content + '</span></div><p class="info"><span class="time">2017-03-18 18:26</span></p></div>';
-                $(data.form).find('textarea').val('');
-                $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
-                layer.msg("回复成功", { icon: 1 });
-            }, 500);
+            var c = data.field.content;
+            if(c === undefined || null == c ||  c === ""){
+                layer.msg("写点什么再回复吧");
+                return false;
+            }
+            if(c.length>500){
+                layer.msg("回复的太多啦,请精简一下吧");
+                return false;
+            }
+            data.field.content = filterXSS(c);
+            $.post("${base}/showBlog/replyMessage",data.field,function(res){
+                if (res.success){
+                    layer.msg("留言成功", { icon: 1 });
+                    $(data.form).find('textarea').val('');
+                    var html = '<div class="comment-child"><img src="${base}/static/blog/images/Absolutely.jpg"alt="Absolutely"/><div class="info"><span class="username">Absolutely</span><span>' + data.field.content + '</span></div><p class="info"><span class="time">'+layui.laytpl.toDateString(res.data.createDate)+'</span></p></div>';
+                    $(data.form).parent('.replycontainer').siblings('hr').after(html).siblings('.comment-parent').children('p').children('a').click();
+                    flow.load(f);
+                }else{
+                    layer.msg(res.message);
+                }
+            });
+
+            // var index = layer.load(1);
+            // //模拟留言回复
+            // setTimeout(function () {
+            //     layer.close(index);
+            //     var content = data.field.replyContent;
+            //     var html = '<div class="comment-child"><img src="../images/Absolutely.jpg"alt="Absolutely"/><div class="info"><span class="username">模拟回复</span><span>' + content + '</span></div><p class="info"><span class="time">2017-03-18 18:26</span></p></div>';
+            //     $(data.form).find('textarea').val('');
+            //     $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
+            //     layer.msg("回复成功", { icon: 1 });
+            // }, 500);
             return false;
         });
         </#if>

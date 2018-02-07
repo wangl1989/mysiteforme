@@ -262,6 +262,73 @@ public class BlogPageController extends BaseController{
     }
 
     /**
+     * 回复留言
+     * @param blogComment
+     * @param request
+     * @return
+     */
+    @PostMapping("replyMessage")
+    @ResponseBody
+    public RestResponse replyMessage(BlogComment blogComment, HttpServletRequest request){
+        if(StringUtils.isBlank(blogComment.getContent())){
+            return RestResponse.failure("回复内容不能为空");
+        }
+        if(blogComment.getReplyId() == null){
+            return RestResponse.failure("回复ID不能为空");
+        }
+        if(blogComment.getArticleId() != null) {
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getChannelId() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getIp() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(StringUtils.isNotBlank(blogComment.getIp())){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getFloor() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getAdminReply() != null){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getDelFlag()){
+            return RestResponse.failure("非法请求");
+        }
+        if(StringUtils.isNotBlank(blogComment.getRemarks())){
+            return RestResponse.failure("非法请求");
+        }
+        if(blogComment.getType() != null){
+            return RestResponse.failure("非法请求");
+        }
+        BlogComment targetComment = blogCommentService.selectById(blogComment.getReplyId());
+        if(targetComment == null){
+            return RestResponse.failure("非法请求");
+        }
+        //隶属于系统留言
+        blogComment.setType(targetComment.getType());
+        String content = blogComment.getContent();
+        content = content.replace("\"", "\'");
+        if(content.length()>1000){
+            return RestResponse.failure("您的回复内容太多啦！系统装不下啦！");
+        }
+        blogComment.setContent(content);
+        blogComment.setFloor(blogCommentService.getMaxFloorByReply(blogComment.getReplyId())+1);
+        Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
+        blogComment.setSystem(map.get("os"));
+        blogComment.setBrowser(map.get("browser"));
+        String ip = ToolUtil.getClientIp(request);
+        if("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)){
+            ip = "内网地址";
+        }
+        blogComment.setIp(ip);
+        blogCommentService.saveOrUpdateBlogComment(blogComment);
+        return RestResponse.success().setData(blogComment);
+    }
+
+    /**
      * 获取文章评论
      * @param page
      * @param limit

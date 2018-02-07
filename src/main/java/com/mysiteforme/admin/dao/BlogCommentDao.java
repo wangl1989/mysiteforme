@@ -17,7 +17,17 @@ import java.util.Map;
  */
 public interface BlogCommentDao extends BaseMapper<BlogComment> {
 
+    /**
+     * 查询文章评论 手动分页
+     * @param map
+     * @return
+     */
     List<BlogComment> selectArticleComments(Map<String, Object> map);
 
     Integer selectArticleCommentsCount(Map<String, Object> map);
+
+    List<BlogComment> selectArticleCommentsByPlus(Map<String, Object> map,Page page);
+
+    List<BlogComment> getCommentByReplyId(Long replyId);
+
 }

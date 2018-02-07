@@ -110,7 +110,9 @@
     </script>
 
     <script type="text/html" id="barDemo">
+        {{# if(d.replyId == null){ }}
         <a class="layui-btn layui-btn-xs" lay-event="edit">回复</a>
+        {{# } }}
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
 </div>

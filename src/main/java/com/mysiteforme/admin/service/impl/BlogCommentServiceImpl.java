@@ -46,16 +46,30 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
     }
 
     @Override
+    public Integer getMaxFloorByReply(Long replyId) {
+        Object o = selectObj(Condition.create().setSqlSelect("max(floor)").eq("reply_id",replyId));
+        Integer floor = 0;
+        if(o != null){
+            floor =  (Integer)o;
+        }
+        return floor;
+    }
+
+    @Override
     public Page<BlogComment> getArticleComments(Long articleId,Integer type,Page<BlogComment> page) {
         Map<String,Object> map = Maps.newHashMap();
         if(articleId != null){
             map.put("articleId",articleId);
         }
         map.put("type",type);
-        map.put("start",page.getCurrent() == 1 ? 0 : (page.getCurrent()-1)*page.getLimit()+1);
-        map.put("limit",page.getLimit());
-        List<BlogComment> list = baseMapper.selectArticleComments(map);
-        page.setRecords(list).setTotal(baseMapper.selectArticleCommentsCount(map));
+//        map.put("start",page.getCurrent() == 1 ? 0 : (page.getCurrent()-1)*page.getLimit());
+//        map.put("limit",page.getLimit());
+//        List<BlogComment> list = baseMapper.selectArticleComments(map);
+//        Integer total = baseMapper.selectArticleCommentsCount(map);
+//        page.setRecords(list);
+//        page.setTotal(total);
+        List<BlogComment> list = baseMapper.selectArticleCommentsByPlus(map,page);
+        page.setRecords(list);
         return page;
     }
 

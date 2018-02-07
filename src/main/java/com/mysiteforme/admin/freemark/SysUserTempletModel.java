@@ -23,7 +23,10 @@ public class SysUserTempletModel implements TemplateMethodModelEx {
             throw new RuntimeException("参数为空");
         }
         SimpleNumber simpleNumber = (SimpleNumber) list.get(0);
-        Long articleId = simpleNumber.getAsNumber().longValue();
-        return userService.findUserById(articleId);
+        if(simpleNumber == null){
+            return null;
+        }
+        Long userId = simpleNumber.getAsNumber().longValue();
+        return userService.findUserById(userId);
     }
 }

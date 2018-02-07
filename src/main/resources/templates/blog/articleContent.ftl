@@ -8,6 +8,16 @@
     <!-- 本页样式表 -->
     <link href="${base}/static/blog/css/detail.css" rel="stylesheet" />
     <style type="text/css">
+        .admincss img{
+            vertical-align: middle;
+            display: inline-block;
+            border: none;
+            width: auto;
+            height: auto;
+            margin:0;
+            position: unset;
+            border-radius: unset;
+        }
         /**编辑器样式**/
         .toolbar {
             border: 1px solid #ccc;
@@ -167,6 +177,28 @@
                             <div class="content">
                                 {{ item.content }}
                             </div>
+                            {{# if(item.adminReply){ }}
+
+                                    <div class="comment-child">
+                                        <fieldset class="layui-elem-field" style="border-color:#D0E9FF">
+                                            <legend>管理员回复</legend>
+                                            <div class="layui-field-box">
+                                                {{# if(item.updateUser.icon != ""){ }}
+                                                <img style="width: 40px;height: 40px" src="{{ item.updateUser.icon }}" alt="{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }}  " />
+                                                {{# }else{ }}
+                                                <img style="width: 40px;height: 40px" src="${base}/static/images/face.jpg" alt="{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }}  "  />
+                                                {{# } }}
+                                                <div class="info">
+                                                    <span class="username">{{# if(item.updateUser.nickName != ''){ }} {{ item.updateUser.nickName }} {{# }else{ }} {{ item.updateUser.loginName }} {{# } }} </span>
+                                                    <span class="time">{{ layui.laytpl.timeago(item.updateDate) }}</span>
+                                                    <span class="admincss">{{ item.replyContent }}</span>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+
+
+                            {{# } }}
                         </div>
                     </li>
                     {{#  }); }}

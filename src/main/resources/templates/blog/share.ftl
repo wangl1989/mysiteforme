@@ -31,7 +31,7 @@
                     <div class="resource shadow">
                         <div class="resource-cover">
                             <a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">
-                                <img src="${base}/static/blog/images/cover/201703051349045432.jpg" alt="时光轴" />
+                                <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </a>
                         </div>
                         <h1 class="resource-title"><a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">时光轴</a></h1>
@@ -49,7 +49,7 @@
                     <div class="resource shadow">
                         <div class="resource-cover">
                             <a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">
-                                <img src="${base}/static/blog/images/cover/201703051349045432.jpg" alt="时光轴" />
+                                <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </a>
                         </div>
                         <h1 class="resource-title"><a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">时光轴</a></h1>
@@ -67,7 +67,7 @@
                     <div class="resource shadow">
                         <div class="resource-cover">
                             <a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">
-                                <img src="${base}/static/blog/images/cover/201703051349045432.jpg" alt="时光轴" />
+                                <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </a>
                         </div>
                         <h1 class="resource-title"><a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">时光轴</a></h1>
@@ -85,7 +85,7 @@
                     <div class="resource shadow">
                         <div class="resource-cover">
                             <a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">
-                                <img src="${base}/static/blog/images/cover/201703051349045432.jpg" alt="时光轴" />
+                                <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </a>
                         </div>
                         <h1 class="resource-title"><a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">时光轴</a></h1>
@@ -103,7 +103,7 @@
                     <div class="resource shadow">
                         <div class="resource-cover">
                             <a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">
-                                <img src="${base}/static/blog/images/cover/201703051349045432.jpg" alt="时光轴" />
+                                <img src="${base}/static/images/timg_meitu_2.jpg" alt="${item.title}" />
                             </a>
                         </div>
                         <h1 class="resource-title"><a href="javascript:layer.msg(&#39;这里填演示地址&#39;)" target="_blank">时光轴</a></h1>
