@@ -58,15 +58,34 @@
         replay.browser    as "replayList.browser",
         replay.floor      as "replayList.floor"
         from
-        (select * from blog_comment where del_flag = false and reply_id is null limit #{start},#{size}) c
-        left join (select * from blog_comment where del_flag = false and reply_id is not null) replay on replay.reply_id = c.id
-        where c.del_flag = FALSE
+        (select * from blog_comment where
+          del_flag = false
+        and reply_id is null
         <if test="articleId != null and articleId != 0">
-            and c.article_id = #{articleId}
+            and article_id = #{articleId}
         </if>
         <if test="type != null and (type == 1 or type == 2)">
-            and c.type = #{type}
+            and type = #{type}
         </if>
-        order by c.floor desc
+        order by floor desc
+        limit #{start},#{limit}) c
+        left join (select * from blog_comment where del_flag = false and reply_id is not null) replay on replay.reply_id = c.id
+    </select>
+
+    <select id="selectArticleCommentsCount" resultType="java.lang.Integer">
+        SELECT
+        count(c.*)
+        from
+        (select * from blog_comment where
+        del_flag = false
+        and reply_id is null
+        <if test="articleId != null and articleId != 0">
+            and article_id = #{articleId}
+        </if>
+        <if test="type != null and (type == 1 or type == 2)">
+            and type = #{type}
+        </if>
+        order by floor desc) c
+        left join (select * from blog_comment where del_flag = false and reply_id is not null) replay on replay.reply_id = c.id
     </select>
 </mapper>

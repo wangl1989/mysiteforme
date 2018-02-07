@@ -55,7 +55,8 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
         map.put("start",page.getCurrent() == 1 ? 0 : (page.getCurrent()-1)*page.getLimit()+1);
         map.put("limit",page.getLimit());
         List<BlogComment> list = baseMapper.selectArticleComments(map);
-        return page.setRecords(list);
+        page.setRecords(list).setTotal(baseMapper.selectArticleCommentsCount(map));
+        return page;
     }
 
     @CacheEvict(value = "commentData",key = "'article_'+#blogComment.articleId+'_commentcount'")
