@@ -231,6 +231,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         return baseMapper.selectNewCommentArticle(limit);
     }
 
+    @Cacheable(value = "blogTagsData",key = "'tag_'+#map['articleId'].toString()+'_sameArticles_limit_'+#map['limit'].toString()")
     @Override
     public List<BlogArticle> selectLikeSameWithTags(Map<String, Object> map) {
         return baseMapper.selectLikeSameWithTags(map);

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>博客评论编辑--${site.name}</title>
+    <title>管理员回复--${site.name}</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -26,7 +26,29 @@
             height: 100%;
             overflow: auto;
         }
-
+        /* blockquote 样式 */
+        blockquote {
+            display: block;
+            border-left: 8px solid #d0e5f2;
+            padding: 5px 10px;
+            margin: 10px 0;
+            line-height: 1.4;
+            font-size: 100%;
+            background-color: #f1f1f1;
+        }
+        /* code 样式 */
+        code {
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+            background-color: #f1f1f1;
+            border-radius: 3px;
+            padding: 3px 5px;
+            margin: 0 3px;
+        }
+        pre code {
+            display: block;
+        }
     </style>
 </head>
 <body class="childrenBody">
@@ -35,43 +57,35 @@
     <div class="layui-form-item">
         <label class="layui-form-label">评论内容</label>
         <div class="layui-input-block">
-                <textarea name="content" lay-verify="required"  placeholder="请输入评论内容" class="layui-textarea">${blogComment.content}</textarea>
-
+            ${blogComment.content}
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">ip</label>
-        <div class="layui-input-block">
-                <input  type="text" class="layui-input" value = "${blogComment.ip}" name="ip"  placeholder="请输入ip">
-
+        <div class="layui-inline">
+            <label class="layui-form-label">ip</label>
+            <div class="layui-input-inline">
+            <#if (blogComment.ip?? && blogComment.ip != "")>
+                <span class="layui-badge layui-bg-blue">${blogComment.ip}</span>
+            </#if>
+            </div>
         </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">操作系统</label>
-        <div class="layui-input-block">
-                <input  type="text" class="layui-input" value = "${blogComment.system}" name="system"  placeholder="请输入操作系统">
-
+        <div class="layui-inline">
+            <label class="layui-form-label">操作系统</label>
+            <div class="layui-input-inline">
+                <span class="layui-badge layui-bg-green">${blogComment.system}</span>
+            </div>
         </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">浏览器</label>
-        <div class="layui-input-block">
-                <input  type="text" class="layui-input" value = "${blogComment.browser}" name="browser"  placeholder="请输入浏览器">
-
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">管理员是否回复</label>
-        <div class="layui-input-block">
-                <input type="checkbox" name="adminReply"  lay-skin="switch" lay-text="是|否" value="1"  <#if (blogComment.adminReply == true)> checked </#if> >
-
+        <div class="layui-inline">
+            <label class="layui-form-label">浏览器</label>
+            <div class="layui-input-inline">
+                <span class="layui-badge layui-bg-cyan">${blogComment.browser}</span>
+            </div>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">管理员回复内容</label>
         <div class="layui-input-block">
-                <textarea name="replyContent"   placeholder="请输入管理员回复内容" class="layui-textarea">${blogComment.replyContent}</textarea>
-
+            <div id="content">${blogComment.replyContent}</div>
         </div>
     </div>
     <div class="layui-form-item">
@@ -82,28 +96,72 @@
     </div>
 </form>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
+<script type="text/javascript" src="${base}/static/js/xss.min.js"  ></script>
+<script type="text/javascript" src="${base}/static/js/wangEditor.min.js"></script>
 <script>
     layui.use(['form','jquery','layer'],function(){
         var form      = layui.form,
                 $     = layui.jquery,
+                E = window.wangEditor,
                 layer = layui.layer;
 
-
-        form.on("submit(addBlogComment)",function(data){
-                 if(undefined === data.field.adminReply || '0' === data.field.adminReply || null === data.field.adminReply){
-                data.field.adminReply = false;
-            }else{
-                data.field.adminReply = true;
+        var content_editor = new E('#content');
+        //图片上传
+        content_editor.customConfig.uploadImgServer = '${base}/file/uploadWang';
+        content_editor.customConfig.uploadFileName = 'test';
+        // 自定义处理粘贴的文本内容(这里处理图片抓取)
+        content_editor.customConfig.pasteTextHandle = function (content) {
+            if(undefined === content){
+                return content;
             }
+            if(content.indexOf("src=")<=0){
+                return content;
+            }
+            var loadContent = layer.load(2, {
+                shade: [0.3, '#333']
+            });
+            $.ajax({
+                url: "${base}/file/doContent/",
+                type: "POST",
+                async: false,
+                data:{"content":content},
+                dataType: "json",
+                success:function(res){
+                    layer.close(loadContent);
+                    content = res.data;
+                }
+            });
+            return content;
+        };
+        // 关闭粘贴样式的过滤
+        content_editor.customConfig.pasteFilterStyle = false;
+        content_editor.customConfig.customAlert = function (info) {
+            // info 是需要提示的内容
+            layer.msg(info);
+        };
+        content_editor.create();
+        form.on("submit(addBlogComment)",function(data){
+            //编辑器数据
+            var c = content_editor.txt.html(),
+                    ct=content_editor.txt.text();
+            if(null === ct || "" === ct || undefined === ct){
+                layer.msg("回复内容不能为空");
+                return false;
+            }
+            if(null === c || "" === c || undefined === c){
+                layer.msg("回复内容不能为空");
+                return false;
+            }
+            data.field.replyContent = filterXSS(c).replace(/\"/g, "'");
             var loadIndex = layer.load(2, {
                 shade: [0.3, '#333']
             });
             //给角色赋值
-            $.post("${base}/admin/blogComment/edit",data.field,function(res){
+            $.post("${base}/admin/blogComment/adminReplay",data.field,function(res){
                 layer.close(loadIndex);
                 if(res.success){
-                    parent.layer.msg("博客评论编辑成功！",{time:1000},function(){
-                        parent.layer.close(parent.editIndex);
+                    parent.layer.msg("回复成功！",{time:1000},function(){
+                        parent.layer.closeAll();
                         //刷新父页面
                         parent.location.reload();
                     });

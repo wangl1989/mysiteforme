@@ -120,6 +120,33 @@
                                             <div class="content">
                                                 {{ item.content }}
                                             </div>
+                                            <p class="info info-footer"><span class="time">{{ layui.laytpl.toDateString(item.createDate) }}</span><a class="btn-reply" href="javascript:;" onclick="btnReplyClick(this)">回复</a></p>
+                                        </div>
+                                        <hr />
+                                        <div class="comment-child">
+                                            <img src="${base}/static/blog/images/Absolutely.jpg" alt="Absolutely" />
+                                            <div class="info">
+                                                <span class="username">Absolutely</span><span>这是用户回复内容</span>
+                                            </div>
+                                            <p class="info"><span class="time">2017-03-18 18:26</span></p>
+                                        </div>
+                                        <div class="comment-child">
+                                            <img src="${base}/static/blog/images/Absolutely.jpg" alt="Absolutely" />
+                                            <div class="info">
+                                                <span class="username">Absolutely</span><span>这是第二个用户回复内容</span>
+                                            </div>
+                                            <p class="info"><span class="time">2017-03-18 18:26</span></p>
+                                        </div>
+                                        <!-- 回复表单默认隐藏 -->
+                                        <div class="replycontainer">
+                                            <form class="layui-form" action="">
+                                                <div class="layui-form-item">
+                                                    <textarea name="replyContent" lay-verify="replyContent" placeholder="请输入回复内容" class="layui-textarea" style="min-height:80px;"></textarea>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <button class="layui-btn layui-btn-mini" lay-submit="formReply" lay-filter="formReply">提交</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </li>
                                     {{#  }); }}
@@ -140,6 +167,15 @@
 <script type="text/javascript" src="${base}/static/js/xss.min.js"  ></script>
 <script type="text/javascript" src="${base}/static/js/tools.js?v=${.now?long}"  ></script>
 <script>
+    function btnReplyClick(elem) {
+        var $ = layui.jquery;
+        $(elem).parent('p').parent('.comment-parent').siblings('.replycontainer').slideToggle("slow");
+        if ($(elem).text() === '回复') {
+            $(elem).text('收起')
+        } else {
+            $(elem).text('回复')
+        }
+    }
     layui.use(['form','jquery','layer','flow','laytpl'],function(){
         var form      = layui.form,
                 $     = layui.jquery,
@@ -219,6 +255,21 @@
                     layer.msg(res.message);
                 }
             });
+            return false;
+        });
+
+        //监听留言回复提交
+        form.on('submit(formReply)', function (data) {
+            var index = layer.load(1);
+            //模拟留言回复
+            setTimeout(function () {
+                layer.close(index);
+                var content = data.field.replyContent;
+                var html = '<div class="comment-child"><img src="../images/Absolutely.jpg"alt="Absolutely"/><div class="info"><span class="username">模拟回复</span><span>' + content + '</span></div><p class="info"><span class="time">2017-03-18 18:26</span></p></div>';
+                $(data.form).find('textarea').val('');
+                $(data.form).parent('.replycontainer').before(html).siblings('.comment-parent').children('p').children('a').click();
+                layer.msg("回复成功", { icon: 1 });
+            }, 500);
             return false;
         });
         </#if>

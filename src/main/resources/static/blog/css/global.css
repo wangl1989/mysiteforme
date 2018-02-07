@@ -871,9 +871,14 @@ body {
         padding: 15px 0 10px 0;
     }
 
+.blog-comment .replycontainer{
+    margin-left: 53px;
+    padding-top: 5px;
+    display: none;
+}
+
     .blog-comment .content,
-    .blog-comment .info,
-    .blog-comment .replycontainer {
+    .blog-comment .info {
         margin-left: 53px;
     }
 
@@ -881,8 +886,7 @@ body {
         font-size: 13px;
     }
 
-    .blog-comment .info,
-    .blog-comment .replycontainer {
+    .blog-comment .info {
         padding-top: 5px;
     }
 

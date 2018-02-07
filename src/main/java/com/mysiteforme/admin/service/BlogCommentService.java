@@ -17,4 +17,7 @@ public interface BlogCommentService extends IService<BlogComment> {
 
     Page<BlogComment> getArticleComments(Long articleId,Integer type,Page<BlogComment> page);
 
+    void saveOrUpdateBlogComment(BlogComment blogComment);
+
+    Integer getArticleCommentsCount(Long articleId);
 }

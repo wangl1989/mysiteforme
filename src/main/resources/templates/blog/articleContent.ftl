@@ -271,8 +271,6 @@
             'redo'  // 重复
         ];
         content_editor.customConfig.zIndex = 100;
-        // 关闭粘贴样式的过滤
-        content_editor.customConfig.pasteFilterStyle = false;
         content_editor.customConfig.customAlert = function (info) {
             // info 是需要提示的内容
             layer.msg(info);
@@ -308,18 +306,18 @@
                 layer.msg("来说两句吧");
                 return false;
             }
-            content = content.replace(/\"/g, "'");
             if(content.length>1000){
                 layer.msg("您的评论内容太多啦！系统装不下啦！");
                 return false;
             }
-            data.field.content = filterXSS(content);
+            data.field.content = filterXSS(content).replace(/\"/g, "'");
             $.post("${base}/showBlog/saveComment",data.field,function(res){
                 if (res.success){
-                    layer.msg("评论成功", { icon: 1 });
-                    content_editor.txt.clear();
-                    $("#commentList").html("");
-                    flow.load(f);
+                    layer.msg("评论成功", { icon: 1,time:1000 },function () {
+                        content_editor.txt.clear();
+                        $("#commentList").html("");
+                        flow.load(f);
+                    });
                 }else{
                     layer.msg(res.message);
                 }

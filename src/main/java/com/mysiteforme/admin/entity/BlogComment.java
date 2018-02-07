@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 
+import java.util.List;
+
 /**
  * <p>
  * 博客评论
@@ -68,6 +70,9 @@ public class BlogComment extends DataEntity<BlogComment> {
      */
 	@TableField("reply_content")
 	private String replyContent;
+
+	@TableField(exist = false)
+	private List<BlogComment> replayList;
 
 	public String getContent() {
 		return content;
@@ -149,6 +154,13 @@ public class BlogComment extends DataEntity<BlogComment> {
 		this.replyContent = replyContent;
 	}
 
+	public List<BlogComment> getReplayList() {
+		return replayList;
+	}
+
+	public void setReplayList(List<BlogComment> replayList) {
+		this.replayList = replayList;
+	}
 
 	@Override
 	public String toString() {

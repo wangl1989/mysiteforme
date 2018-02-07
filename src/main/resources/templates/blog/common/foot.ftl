@@ -1,7 +1,7 @@
 <!-- 底部 -->
     <footer class="blog-footer">
-        <p><span>Copyright</span><span>&copy;</span><span>2017</span><a href="http://www.lyblogs.cn">不落阁</a><span>Design By LY</span></p>
-        <p><a href="http://www.miibeian.gov.cn/" target="_blank">蜀ICP备16029915号-1</a></p>
+        <p><span>Copyright</span><span>&copy;</span><span>2018</span><a href="${site.url}">${site.name}</a><span>Design By ${site.author}</span></p>
+        <p><a href="http://www.miibeian.gov.cn/" target="_blank">${site.record}</a></p>
     </footer>
     <!--侧边导航-->
     <ul class="layui-nav layui-nav-tree layui-nav-side blog-nav-left layui-hide" lay-filter="nav">

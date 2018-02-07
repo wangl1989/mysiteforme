@@ -147,4 +147,21 @@ public class BlogCommentController {
         return RestResponse.success();
     }
 
+    @PostMapping("adminReplay")
+    @ResponseBody
+    @SysLog("管理员回复")
+    public RestResponse adminReplay(BlogComment blogComment){
+        if(null == blogComment.getId() || 0 == blogComment.getId()){
+            return RestResponse.failure("ID不能为空");
+        }
+        if(StringUtils.isBlank(blogComment.getReplyContent())){
+            return RestResponse.failure("回复内容不能为空");
+        }
+        String content = blogComment.getReplyContent().replace("\"", "\'");
+        blogComment.setReplyContent(content);
+        blogComment.setAdminReply(true);
+        blogCommentService.saveOrUpdateBlogComment(blogComment);
+        return RestResponse.success();
+    }
+
 }

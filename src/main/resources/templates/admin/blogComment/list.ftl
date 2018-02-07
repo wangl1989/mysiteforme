@@ -16,6 +16,39 @@
     <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
     <link rel="stylesheet" href="//at.alicdn.com/t/font_tnyc012u2rlwstt9.css" media="all" />
     <link rel="stylesheet" href="${base}/static/css/user.css" media="all" />
+    <style>
+        .detail-body{
+            margin: 20px 0 0;
+            min-height: 306px;
+            line-height: 26px;
+            font-size: 16px;
+            color: #333;
+            word-wrap: break-word;
+        }
+        /* blockquote 样式 */
+        blockquote {
+            display: block;
+            border-left: 8px solid #d0e5f2;
+            padding: 5px 10px;
+            margin: 10px 0;
+            line-height: 1.4;
+            font-size: 100%;
+            background-color: #f1f1f1;
+        }
+        /* code 样式 */
+        code {
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+            background-color: #f1f1f1;
+            border-radius: 3px;
+            padding: 3px 5px;
+            margin: 0 3px;
+        }
+        pre code {
+            display: block;
+        }
+    </style>
 </head>
 <body class="childrenBody">
 <fieldset class="layui-elem-field">
@@ -26,12 +59,6 @@
             <label>评论内容:</label>
                 <div class="layui-input-inline">
                 <input type="text" value="" name="s_content" placeholder="请输入评论内容" class="layui-input search_input">
-                </div>
-    </div>
-    <div class="layui-inline" style="margin-left: 15px">
-            <label>ip:</label>
-                <div class="layui-input-inline">
-                <input type="text" value="" name="s_ip" placeholder="请输入ip" class="layui-input search_input">
                 </div>
     </div>
     <div class="layui-inline" style="margin-left: 15px">
@@ -58,6 +85,22 @@
 </fieldset>
 <div class="layui-form users_list">
     <table class="layui-table" id="test" lay-filter="demo"></table>
+
+    <script type="text/html" id="content">
+        {{#  if(d.content != "" && d.content != null){ }}
+        <span><button lay-event="showcontent" class="layui-btn layui-btn-warm layui-btn-sm">评论内容</button></span>
+        {{#  } else { }}
+        <span ></span>
+        {{#  } }}
+    </script>
+
+    <script type="text/html" id="replyContent">
+        {{#  if(d.replyContent != "" && d.replyContent != null){ }}
+        <span><button lay-event="showReplyContent" class="layui-btn layui-btn-warm layui-btn-sm">回复内容</button></span>
+        {{#  } else { }}
+        <span ></span>
+        {{#  } }}
+    </script>
     <script type="text/html" id="isAdminReply">
         {{#  if(d.adminReply == true){ }}
         <span>是</span>
@@ -65,23 +108,15 @@
         <span>否</span>
         {{# } }}
     </script>
-    <script type="text/html" id="userStatus">
-        <!-- 这里的 checked 的状态只是演示 -->
-        {{#  if(d.delFlag == false){ }}
-        <span class="layui-badge layui-bg-green">正常</span>
-        {{#  } else { }}
-        <span class="layui-badge layui-bg-gray">停用</span>
-        {{#  } }}
-    </script>
 
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">回复</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
 </div>
 <div id="page"></div>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
-<script type="text/javascript" src="${base}/static/js/tools.js"></script>
+<script type="text/javascript" src="${base}/static/js/tools.js?t=${.now?long}"></script>
 <script>
     layui.use(['layer','form','table','laydate'], function() {
         var layer = layui.layer,
@@ -96,7 +131,7 @@
             var data = obj.data;
             if(obj.event === 'edit'){
                 var editIndex = layer.open({
-                    title : "编辑博客评论",
+                    title : "回复博客评论",
                     type : 2,
                     content : "${base}/admin/blogComment/edit?id="+data.id,
                     success : function(layero, index){
@@ -114,7 +149,7 @@
                 layer.full(editIndex);
             }
             if(obj.event === "del"){
-                layer.confirm("你确定要删除该博客评论么？",{btn:['是的,我确定','我再想想']},
+                layer.confirm("你确定要删除该评论么？",{btn:['是的,我确定','我再想想']},
                         function(){
                             $.post("${base}/admin/blogComment/delete",{"id":data.id},function (res){
                                 if(res.success){
@@ -128,6 +163,26 @@
                             });
                         }
                 )
+            }
+            if(obj.event === "showcontent"){
+                layer.open({
+                    type: 1,
+                    closeBtn: 0,
+                    shadeClose: true,
+                    title: 'content预览',
+                    area: ['700px', '500px'],
+                    content: '<div class="detail-body" style="margin:20px;">'+data.content+'</div>'
+                });
+            }
+            if(obj.event === "showReplyContent"){
+                layer.open({
+                    type: 1,
+                    title: 'content预览',
+                    closeBtn: 0,
+                    shadeClose: true,
+                    area: ['700px', '500px'],
+                    content: '<div class="detail-body" style="margin:20px;">'+data.replyContent+'</div>'
+                });
             }
         });
 
@@ -146,13 +201,12 @@
             cellMinWidth: 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             cols: [[
                 {type:'checkbox'},
-                {field:'content', title: '评论内容'},
+                {field:'content', title: '评论内容',templet:'#content'},
                 {field:'ip', title: 'ip'},
                 {field:'system', title: '操作系统'},
                 {field:'browser', title: '浏览器'},
                 {field:'adminReply', title: '管理员是否回复',templet:'#isAdminReply'},
-                {field:'replyContent', title: '管理员回复内容'},
-                {field:'delFlag',    title: '博客评论状态',width:'12%',templet:'#userStatus'},
+                {field:'replyContent', title: '管理员回复内容',templet:'#replyContent'},
                 {field:'createDate',  title: '创建时间',width:'15%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title:'操作',  width: '15%', align: 'center',toolbar: '#barDemo'}
             ]]

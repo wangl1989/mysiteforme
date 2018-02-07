@@ -1,7 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mysiteforme.admin.dao.BlogCommentDao" >
-    <select id="selectArticleComments" resultType="com.mysiteforme.admin.entity.BlogComment">
+
+    <resultMap id="detailComment" type="com.mysiteforme.admin.entity.BlogComment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="ip" property="ip"/>
+        <result column="system" property="system"/>
+        <result column="browser" property="browser"/>
+        <result column="type" property="type"/>
+        <result column="floor" property="floor"/>
+        <result column="channelId" property="channelId"/>
+        <result column="articleId" property="articleId"/>
+        <result column="replyId" property="replyId"/>
+        <result column="isAdminReply" property="adminReply"/>
+        <result column="replyContent" property="replyContent"/>
+        <result column="updateDate" property="updateDate"/>
+        <result column="createDate" property="createDate"/>
+        <result column="remarks" property="remarks"/>
+        <result column="delFlag" property="delFlag"/>
+        <collection property="replayList" ofType="com.mysiteforme.admin.entity.BlogComment">
+            <id property="id" column="replayList.id" />
+            <result property="content" column="replayList.content" />
+            <result property="createDate" column="replayList.createDate" />
+            <result property="ip" column="replayList.ip" />
+            <result property="system" column="replayList.system" />
+            <result property="browser" column="replayList.browser" />
+            <result property="floor" column="replayList.floor" />
+        </collection>
+    </resultMap>
+
+    <select id="selectArticleComments" resultMap="detailComment">
         select
         c.id,
         c.content,
@@ -9,6 +38,7 @@
         c.system,
         c.browser,
         c.floor,
+        c.type,
         c.channel_id  as "channelId",
         c.article_id  as "articleId",
         c.reply_id    as "replyId",
@@ -19,12 +49,23 @@
         c.update_by       as "updateId",
         c.update_date     as "updateDate",
         c.remarks,
-        c.del_flag        as "delFlag"
+        c.del_flag        as "delFlag",
+        replay.id         as "replayList.id",
+        replay.content    as "replayList.content",
+        replay.create_date as "replayList.createDate",
+        replay.ip         as "replayList.ip",
+        replay.system     as "replayList.system",
+        replay.browser    as "replayList.browser",
+        replay.floor      as "replayList.floor"
         from
-        blog_comment c
+        (select * from blog_comment where del_flag = false and reply_id is null limit #{start},#{size}) c
+        left join (select * from blog_comment where del_flag = false and reply_id is not null) replay on replay.reply_id = c.id
         where c.del_flag = FALSE
         <if test="articleId != null and articleId != 0">
             and c.article_id = #{articleId}
+        </if>
+        <if test="type != null and (type == 1 or type == 2)">
+            and c.type = #{type}
         </if>
         order by c.floor desc
     </select>

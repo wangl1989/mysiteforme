@@ -17,5 +17,5 @@ import java.util.Map;
  */
 public interface BlogCommentDao extends BaseMapper<BlogComment> {
 
-    List<BlogComment> selectArticleComments(Map<String, Object> map, Page<BlogComment> page);
+    List<BlogComment> selectArticleComments(Map<String, Object> map);
 }

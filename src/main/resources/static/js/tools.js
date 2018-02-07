@@ -85,4 +85,24 @@ layui.define(["layer","laytpl"],function(exports){
         }
         return result;
     }
+
+    /**
+     * 转义html字符
+     * @param str
+     * @returns {string | void}
+     */
+    laytpl.escape2Html = function (str) {
+        var arrEntities={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
+        return str.replace(/&(lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
+    };
+
+    /**
+     * 空格转义成普通字符串
+     * @param str
+     * @returns {string | void}
+     */
+    laytpl.nbsp2Space = function (str) {
+        var arrEntities = {'nbsp' : ' '};
+        return str.replace(/&(nbsp);/ig, function(all, t){return arrEntities[t]})
+    }
 });

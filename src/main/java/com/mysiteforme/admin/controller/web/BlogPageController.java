@@ -185,11 +185,12 @@ public class BlogPageController extends BaseController{
         }
         //类型隶属于文章评论
         blogComment.setType(Constants.COMMENT_TYPE_ARTICLE_COMMENT);
-        String content = new HTMLFilter().filter(blogComment.getContent());
-        content.replace("\"", "'");
+        String content = blogComment.getContent();
+        content = content.replace("\"", "\'");
         if(content.length()>1000){
             return RestResponse.failure("您的评论内容太多啦！系统装不下啦！");
         }
+        blogComment.setContent(content);
         blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
         Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
         blogComment.setSystem(map.get("os"));
@@ -199,7 +200,7 @@ public class BlogPageController extends BaseController{
             ip = "内网地址";
         }
         blogComment.setIp(ip);
-        blogCommentService.insert(blogComment);
+        blogCommentService.saveOrUpdateBlogComment(blogComment);
         return RestResponse.success();
     }
 
@@ -241,11 +242,12 @@ public class BlogPageController extends BaseController{
         }
         //隶属于系统留言
         blogComment.setType(Constants.COMMENT_TYPE_LEVING_A_MESSAGE);
-        String content = new HTMLFilter().filter(blogComment.getContent());
-        content.replace("\"", "'");
+        String content = blogComment.getContent();
+        content = content.replace("\"", "\'");
         if(content.length()>1000){
             return RestResponse.failure("您的留言内容太多啦！系统装不下啦！");
         }
+        blogComment.setContent(content);
         blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
         Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
         blogComment.setSystem(map.get("os"));

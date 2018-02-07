@@ -134,6 +134,7 @@ public class BlogArticleController extends BaseController{
         }
         Object o = blogArticleService.selectObj(Condition.create()
                 .setSqlSelect("max(sort)")
+                .eq("channel_id",blogArticle.getChannelId())
                 .eq("del_flag",false));
         int sort = 0;
         if(o != null){

@@ -11,18 +11,29 @@
 <#include "${base}/blog/common/nav.ftl">
 <!-- 主体（一般只改变这里的内容） -->
 <div class="blog-body">
-    <!-- canvas -->
-    <canvas id="canvas-banner" style="background: #393D49;"></canvas>
-    <!--为了及时效果需要立即设置canvas宽高，否则就在home.js中设置-->
-    <script type="text/javascript">
-        var canvas = document.getElementById('canvas-banner');
-        canvas.width = window.document.body.clientWidth - 10;//减去滚动条的宽度
-        if (screen.width >= 992) {
-            canvas.height = window.innerHeight * 1 / 3;
-        } else {
-            canvas.height = window.innerHeight * 2 / 7;
-        }
-    </script>
+    <!--全屏滚动-->
+    <div class="layui-carousel" id="carousel">
+        <div carousel-item>
+            <@ar channelId="19">
+                <#if (result?size>0)>
+                    <#list result as items>
+                    <div><img src="${items.showPic}"></div>
+                    </#list>
+                </#if>
+            </@ar>
+        </div>
+    </div>
+    <!--end 全屏滚动-->
+    <#--<!--为了及时效果需要立即设置canvas宽高，否则就在home.js中设置&ndash;&gt;-->
+    <#--<script type="text/javascript">-->
+        <#--var canvas = document.getElementById('canvas-banner');-->
+        <#--canvas.width = window.document.body.clientWidth - 10;//减去滚动条的宽度-->
+        <#--if (screen.width >= 992) {-->
+            <#--canvas.height = window.innerHeight * 1 / 3;-->
+        <#--} else {-->
+            <#--canvas.height = window.innerHeight * 2 / 7;-->
+        <#--}-->
+    <#--</script>-->
     <!-- 这个一般才是真正的主体内容 -->
     <div class="blog-container">
         <div class="blog-main">
@@ -66,7 +77,7 @@
                                     <span class="article-author"><i class="fa fa-user"></i>&nbsp;&nbsp;<#if (sysuser(item.createId).nickName??)>${sysuser(item.createId).nickName}<#else>${sysuser(item.createId).loginName}</#if></span>
                                     <span><i class="fa fa-tag"></i>&nbsp;&nbsp;<a href="${base+"/showBlog"+item.blogChannel.href}">${item.blogChannel.name}</a></span>
                                     <span class="article-viewinfo"><i class="fa fa-eye"></i>&nbsp;${clickNumber(item.id)}</span>
-                                    <span class="article-viewinfo"><i class="fa fa-commenting"></i>&nbsp;${item.commentCount}</span>
+                                    <span class="article-viewinfo"><i class="fa fa-commenting"></i>&nbsp;${commentNumber(item.id)}</span>
                                 </div>
                             </div>
                         </#list>
@@ -172,6 +183,6 @@
 <!-- 底部 -->
 <#include "${base}/blog/common/foot.ftl">
 <!-- 本页脚本 -->
-<script src="${base}/static/blog/js/home.js"></script>
+<script src="${base}/static/blog/js/home.js?t=${.now?long}"></script>
 </body>
 </html>

@@ -1,17 +1,19 @@
-﻿/*
+﻿layui.use(['jquery','carousel'], function () {
+    var $ = layui.jquery,
+        carousel = layui.carousel;
 
-@Name：不落阁整站模板源码 
-@Author：Absolutely 
-@Site：http://www.lyblogs.cn
+    carousel.render({
+        elem: '#carousel',
+        width: '100%', //设置容器宽度
+        arrow: 'hover' //始终显示箭头
+        //,anim: 'updown' //切换动画方式
+    });
 
-*/
-
-layui.use('jquery', function () {
-    var $ = layui.jquery;
-    $(function () {
+    $(function(){
         //播放公告
         playAnnouncement(3000);
     });
+
     function playAnnouncement(interval) {
         var index = 0;
         var $announcement = $('.home-tips-container>span');
@@ -25,7 +27,7 @@ layui.use('jquery', function () {
         }, interval);
     }
     //画canvas
-    DrawCanvas();
+    // DrawCanvas();
 });
 
 function DrawCanvas() {
@@ -198,12 +200,12 @@ function DrawCanvas() {
     requestAnimationFrame(animateDots);
 }
 
-//监听窗口大小改变
-window.addEventListener("resize", resizeCanvas, false);
-
-//窗口大小改变时改变canvas宽度
-function resizeCanvas() {
-    var canvas = document.getElementById('canvas-banner');
-    canvas.width = window.document.body.clientWidth;
-    canvas.height = window.innerHeight * 1 / 3;
-}
+// //监听窗口大小改变
+// window.addEventListener("resize", resizeCanvas, false);
+//
+// //窗口大小改变时改变canvas宽度
+// function resizeCanvas() {
+//     var canvas = document.getElementById('canvas-banner');
+//     canvas.width = window.document.body.clientWidth;
+//     canvas.height = window.innerHeight * 1 / 3;
+// }
