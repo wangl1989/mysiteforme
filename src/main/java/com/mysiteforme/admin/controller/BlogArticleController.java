@@ -10,6 +10,7 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.lucene.LuceneSearch;
 import com.mysiteforme.admin.service.BlogChannelService;
 import com.xiaoleilu.hutool.date.DateUtil;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -56,9 +57,9 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/list";
     }
 
+    @RequiresPermissions("blog:article:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求博客内容列表数据")
     public LayerData<BlogArticle> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
@@ -106,7 +107,6 @@ public class BlogArticleController extends BaseController{
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增博客内容页面")
     public String add(@RequestParam(value = "channelId",required = false)Long channelId, Model model){
         BlogChannel blogChannel = blogChannelService.selectById(channelId);
         if(blogChannel != null){
@@ -119,6 +119,7 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/add";
     }
 
+    @RequiresPermissions("blog:article:add")
     @PostMapping("add")
     @SysLog("保存新增博客内容数据")
     @ResponseBody
@@ -152,7 +153,6 @@ public class BlogArticleController extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑博客内容页面")
     public String edit(Long id,Model model){
         BlogArticle blogArticle = blogArticleService.selectOneDetailById(id);
         model.addAttribute("blogArticle",blogArticle);
@@ -163,6 +163,7 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/edit";
     }
 
+    @RequiresPermissions("blog:article:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客内容数据")
@@ -190,6 +191,7 @@ public class BlogArticleController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("blog:article:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客内容数据")

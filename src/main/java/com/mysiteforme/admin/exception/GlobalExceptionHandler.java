@@ -7,6 +7,7 @@ import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 import freemarker.template.TemplateModelException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.ui.Model;
@@ -36,13 +37,35 @@ public class GlobalExceptionHandler {
                        HttpRequestMethodNotSupportedException.class,
                        HttpMediaTypeNotSupportedException.class,
                        TemplateModelException.class,
-                       Exception.class,
                        SQLException.class})
     public ModelAndView handleHttpMessageNotReadableException(HttpServletRequest request,
                                                               HttpServletResponse response,
                                                               Exception e){
         RestResponse restResponse = RestResponse.failure(e.getMessage());
         return new ModelAndView("admin/error/500",restResponse);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ModelAndView resolveException(HttpServletRequest request,
+                                         HttpServletResponse response,
+                                         UnauthorizedException unauthorizedException) {
+        if (ToolUtil.isAjax(request)) {
+            try {
+                response.setContentType("application/json;charset=UTF-8");
+                PrintWriter writer = response.getWriter();
+                RestResponse failResponse = RestResponse.failure("您无此权限,请联系管理员!");
+                writer.write(JSONObject.toJSONString(failResponse));
+                writer.flush();
+                writer.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }else {
+            RestResponse restResponse = RestResponse.failure(unauthorizedException.getMessage());
+            return new ModelAndView("admin/error/500",restResponse);
+        }
+
+        return null;
     }
 
     /**
@@ -60,7 +83,6 @@ public class GlobalExceptionHandler {
         return "admin/error/404";
     }
 
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
     @ExceptionHandler(MyException.class)
     public String myException(HttpServletRequest request, HttpServletResponse response, MyException ex,Model model) {
         if(ex.getCode() == 404){

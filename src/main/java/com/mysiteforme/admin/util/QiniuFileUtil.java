@@ -38,10 +38,10 @@ public class QiniuFileUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QiniuFileUtil.class);
 
-	private static String path = "http://ow9lg82yy.bkt.clouddn.com/";
+	private static String path = "https://static.mysiteforme.com/";
 	private static String qiniuAccess = "PXj2yRJGbfyhiUid_qeateOg-kiLaF9ZkteYuQQL";
 	private static String qiniuKey = "0h9ICCVUgtrLAspsANW-5IW3mG-45SoYDIF1DTDe";
-	private static String bucketName = "xingbook";
+	private static String bucketName = "wanggg";
 
 	/***
 	 * 普通上传图片

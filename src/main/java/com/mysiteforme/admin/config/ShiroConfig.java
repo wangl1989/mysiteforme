@@ -82,14 +82,7 @@ public class ShiroConfig {
         return defaultWebSecurityManager;
     }
 
-    /**
-     * 保证实现了Shiro内部lifecycle函数的bean执行
-     * @return
-     */
-    @Bean
-    public static LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){
-        return new LifecycleBeanPostProcessor();
-    }
+
 
     @Bean
     public SimpleCookie rememberMeCookie(){
@@ -118,6 +111,15 @@ public class ShiroConfig {
         DefaultAdvisorAutoProxyCreator creator=new DefaultAdvisorAutoProxyCreator();
         creator.setProxyTargetClass(true);
         return creator;
+    }
+
+    /**
+     * 保证实现了Shiro内部lifecycle函数的bean执行
+     * @return
+     */
+    @Bean
+    public static LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){
+        return new LifecycleBeanPostProcessor();
     }
 
     @Bean

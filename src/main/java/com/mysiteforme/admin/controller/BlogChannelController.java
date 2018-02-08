@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.Condition;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.mysiteforme.admin.entity.BlogChannel;
@@ -42,16 +43,15 @@ public class BlogChannelController extends BaseController{
         return "/admin/blogChannel/list";
     }
 
+    @RequiresPermissions("blog:channel:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求博客栏目列表数据")
     public RestResponse list(HttpServletRequest request){
         List<BlogChannel> blogChannels = blogChannelService.selectChannelList();
         return RestResponse.success().setData(blogChannels);
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增博客栏目页面")
     public String add(@RequestParam(value = "parentId",required = false)Long parentId,Model model){
         if(parentId != null && parentId != 0){
             BlogChannel blogChannel = blogChannelService.selectById(parentId);
@@ -64,6 +64,7 @@ public class BlogChannelController extends BaseController{
         return "/admin/blogChannel/add";
     }
 
+    @RequiresPermissions("blog:channel:add")
     @PostMapping("add")
     @SysLog("保存新增博客栏目数据")
     @ResponseBody
@@ -108,7 +109,6 @@ public class BlogChannelController extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑博客栏目页面")
     public String edit(Long id,Model model){
         BlogChannel blogChannel = blogChannelService.selectById(id);
         model.addAttribute("blogChannel",blogChannel);
@@ -120,6 +120,7 @@ public class BlogChannelController extends BaseController{
         return "/admin/blogChannel/edit";
     }
 
+    @RequiresPermissions("blog:channel:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客栏目数据")
@@ -143,6 +144,7 @@ public class BlogChannelController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("blog:channel:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客栏目数据")
