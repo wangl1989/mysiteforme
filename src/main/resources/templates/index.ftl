@@ -121,10 +121,10 @@
             </div>
         </div>
     </div>
-    <#--<!-- 底部 &ndash;&gt;-->
-    <#--<div class="layui-footer footer">-->
-        <#--<p>copyright @2017 请叫我马哥　　<a onclick="donation()" class="layui-btn layui-btn-danger layui-btn-small">捐赠作者</a></p>-->
-    <#--</div>-->
+    <!-- 底部 -->
+    <div class="layui-footer footer">
+        <p>Copyright © 2018孤独的旅行家  Design By 马哥 <a href="http://www.miibeian.gov.cn" target="_blank">苏ICP备17063650号 </a></p>
+    </div>
 </div>
 <script>
     var baseUrl = "${base}";

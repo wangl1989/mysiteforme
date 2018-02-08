@@ -18,7 +18,7 @@
 </video>
 <div class="video_mask"></div>
 <div class="login">
-    <h1>layuiCMS-管理登录</h1>
+    <h1>孤独的旅行家</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
         <div class="layui-form-item">
             <input class="layui-input" name="username" placeholder="用户名" lay-verify="required" type="text" autocomplete="off">

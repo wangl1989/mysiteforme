@@ -21,6 +21,7 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
@@ -40,7 +41,12 @@ public class LuceneSearch {
 
     private static Log log = LogFactory.get();
     //Lucene索引文件路径
-    public static String dir="D:\\lucence";
+    public static String dir;
+
+    @Value("${lucence-dic}")
+    public void setDir(String lucenceDir) {
+        dir = lucenceDir;
+    }
     //定义分词器
     static Analyzer analyzer = new IKAnalyzer();
 

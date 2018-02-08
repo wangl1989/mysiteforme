@@ -28,10 +28,10 @@ public class CreateTableFiles {
     private String password;
     @Value("${spring.datasource.url}")
     private String dataBaseUrl;
-
-    public static final String baseDic="D://mysite";
-
-    public static final String zipFile="D://源码.rar";
+    @Value("${source-code-dic}")
+    public  String baseDic;
+    @Value("${source-code-zipfile}")
+    public  String zipFile;
 
     public void createFile(String[] tableNames,Integer type) {
         AutoGenerator mpg = new AutoGenerator();

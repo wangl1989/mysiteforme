@@ -415,7 +415,7 @@ public class TableController extends BaseController{
         }
 
         synchronized(this){
-            File baseFloder = new File(CreateTableFiles.baseDic);
+            File baseFloder = new File(createTableFiles.baseDic);
             ZipUtil.deleteDir(baseFloder);
             if(baseTables != null && baseTables.length>0){
                 createTableFiles.createFile(baseTables,1);
@@ -423,12 +423,12 @@ public class TableController extends BaseController{
             if(treeTables != null && treeTables.length>0){
                 createTableFiles.createFile(treeTables,2);
             }
-            File f = new File(CreateTableFiles.zipFile);
+            File f = new File(createTableFiles.zipFile);
             try {
                 if(f.exists()){
                     f.delete();
                 }
-                com.xiaoleilu.hutool.util.ZipUtil.zip(CreateTableFiles.baseDic,CreateTableFiles.zipFile);
+                com.xiaoleilu.hutool.util.ZipUtil.zip(createTableFiles.baseDic,createTableFiles.zipFile);
             }catch (Exception e){
                 e.printStackTrace();
             }

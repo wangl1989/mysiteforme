@@ -1,7 +1,7 @@
-#
+/*#
 # Quartz seems to work best with the driver mysql-connector-java-5.1.34-bin.jar
 #
-/*# PLEASE consider using mysql with innodb tables to avoid locking issues
+  PLEASE consider using mysql with innodb tables to avoid locking issues#
 #
 # In your Quartz properties file, you'll need to set
 # org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate

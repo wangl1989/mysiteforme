@@ -208,7 +208,7 @@ public class VerifyCodeUtil {
         int fx = height - fsize;
         int fy = fsize;
         //设定字体
-        graphics.setFont(new Font("Default", Font.BOLD, fsize));
+        graphics.setFont(new Font("微软雅黑", Font.BOLD, fsize));
         //写验证码字符
         for(int i=0; i<textCode.length(); i++){
             fy = randomLocation ? (int)((Math.random()*0.3+0.6)*height) : fy;
