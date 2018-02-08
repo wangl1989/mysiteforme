@@ -11,6 +11,7 @@ import com.mysiteforme.admin.entity.VO.TableVO;
 import com.mysiteforme.admin.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,9 @@ public class TableController extends BaseController{
      * @param request
      * @return
      */
+    @RequiresPermissions("sys:table:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求数据表列表数据")
     public LayerData<TableVO> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                     @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                     ServletRequest request){
@@ -81,11 +82,11 @@ public class TableController extends BaseController{
     }
 
     @GetMapping("add")
-    @SysLog("跳转数据表新增页面")
     public String add(){
         return "admin/system/table/add";
     }
 
+    @RequiresPermissions("sys:table:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存数据表新增数据")
@@ -114,7 +115,6 @@ public class TableController extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑数据表页面")
     public String edit(String name,Model model){
         TableVO tableVO = tableService.detailTable(name);
         String[] comments = tableVO.getComment().split(",");
@@ -145,6 +145,7 @@ public class TableController extends BaseController{
         return "admin/system/table/edit";
     }
 
+    @RequiresPermissions("sys:table:edit")
     @PostMapping("editTable")
     @ResponseBody
     @SysLog("保存数据表编辑数据")
@@ -175,6 +176,7 @@ public class TableController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:table:list")
     @PostMapping("fieldlist")
     @ResponseBody
     @SysLog("请求字段展示数据(分页显示)")
@@ -220,6 +222,7 @@ public class TableController extends BaseController{
         }
     }
 
+    @RequiresPermissions("sys:table:list")
     @PostMapping("showFields")
     @ResponseBody
     @SysLog("请求字段展示数据(全部显示)")
@@ -244,6 +247,7 @@ public class TableController extends BaseController{
         return tableLayerData;
     }
 
+    @RequiresPermissions("sys:table:addField")
     @PostMapping("addField")
     @ResponseBody
     @SysLog("保存单独新增字段数据")
@@ -290,6 +294,7 @@ public class TableController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:table:editField")
     @PostMapping("editField")
     @ResponseBody
     @SysLog("保存单独编辑字段数据")
@@ -365,7 +370,7 @@ public class TableController extends BaseController{
     }
 
 
-
+    @RequiresPermissions("sys:table:deleteField")
     @PostMapping("deleteField")
     @ResponseBody
     @SysLog("删除字段数据")
@@ -381,7 +386,7 @@ public class TableController extends BaseController{
         return RestResponse.success();
     }
 
-
+    @RequiresPermissions("sys:table:deleteTable")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除数据表数据")
@@ -396,6 +401,7 @@ public class TableController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:table:download")
     @PostMapping("download")
     @ResponseBody
     @SysLog("下载JAVA源码")

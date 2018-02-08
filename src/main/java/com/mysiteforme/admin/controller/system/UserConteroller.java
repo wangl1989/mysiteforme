@@ -13,6 +13,7 @@ import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/list";
     }
 
+    @RequiresPermissions("sys:user:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<User> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -61,13 +63,13 @@ public class UserConteroller extends BaseController{
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增系统用户页面")
     public String add(Model model){
         List<Role> roleList = roleService.selectAll();
         model.addAttribute("roleList",roleList);
         return "admin/system/user/add";
     }
 
+    @RequiresPermissions("sys:user:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增系统用户数据")
@@ -102,7 +104,6 @@ public class UserConteroller extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转系统用户编辑页面")
     public String edit(Long id,Model model){
         User user = userService.findUserById(id);
         StringBuffer roleIds = new StringBuffer();
@@ -121,6 +122,7 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/edit";
     }
 
+    @RequiresPermissions("sys:user:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存系统用户编辑数据")
@@ -166,6 +168,7 @@ public class UserConteroller extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:user:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除系统用户数据(单个)")
@@ -181,6 +184,7 @@ public class UserConteroller extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:user:delete")
     @PostMapping("deleteSome")
     @ResponseBody
     @SysLog("删除系统用户数据(多个)")
@@ -211,7 +215,6 @@ public class UserConteroller extends BaseController{
     }
 
     @GetMapping("userinfo")
-    @SysLog("跳转个人信息页面")
     public String toEditMyInfo(Model model){
         Long userId = MySysUser.id();
         User user = userService.findUserById(userId);
@@ -221,6 +224,7 @@ public class UserConteroller extends BaseController{
     }
 
     @PostMapping("saveUserinfo")
+    @SysLog("系统用户个人信息修改")
     @ResponseBody
     public RestResponse saveUserInfo(User user){
         if(user.getId() == 0 || user.getId() == null){

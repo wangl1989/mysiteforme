@@ -6,6 +6,7 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ public class SiteController extends BaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SiteController.class);
 
+    @RequiresPermissions("sys:site:list")
     @GetMapping("show")
     @SysLog("跳转网站展示页面")
     public String show(Model model){
@@ -38,6 +40,7 @@ public class SiteController extends BaseController{
         return "admin/system/site/show";
     }
 
+    @RequiresPermissions("sys:site:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存网站基本数据")
@@ -50,6 +53,9 @@ public class SiteController extends BaseController{
         }
         if(StringUtils.isBlank(site.getName())){
             return RestResponse.failure("站点名称不能为空");
+        }
+        if(StringUtils.isNotBlank(site.getRemarks())){
+            site.setRemarks(site.getRemarks().replace("\"", "\'"));
         }
         siteService.updateSite(site);
         return RestResponse.success();

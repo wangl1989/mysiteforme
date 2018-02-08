@@ -9,6 +9,7 @@ import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -33,18 +34,18 @@ public class MenuController extends BaseController{
         return "admin/system/menu/test";
     }
 
+    @RequiresPermissions("sys:menu:list")
     @PostMapping("tree")
     @ResponseBody
-    @SysLog("请求一个ztree类型菜单树数据")
     public RestResponse tree(){
         List<ZtreeVO> ztreeVOs = menuService.showTreeMenus();
         LOGGER.info(JSONObject.toJSONString(ztreeVOs));
         return RestResponse.success().setData(ztreeVOs);
     }
 
+    @RequiresPermissions("sys:menu:list")
     @PostMapping("treelist")
     @ResponseBody
-    @SysLog("请求菜单树数据")
     public RestResponse treelist(){
         Map<String,Object> map = Maps.newHashMap();
         map.put("parentId",null);
@@ -53,7 +54,6 @@ public class MenuController extends BaseController{
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增菜单页面")
     public String add(@RequestParam(value = "parentId",required = false) Long parentId,Model model){
         if(parentId != null){
             Menu menu = menuService.selectById(parentId);
@@ -62,6 +62,7 @@ public class MenuController extends BaseController{
         return "admin/system/menu/add";
     }
 
+    @RequiresPermissions("sys:menu:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增菜单数据")
@@ -108,13 +109,13 @@ public class MenuController extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑菜单页面")
     public String edit(Long id,Model model){
         Menu menu = menuService.selectById(id);
         model.addAttribute("menu",menu);
        return "admin/system/menu/edit";
     }
 
+    @RequiresPermissions("sys:menu:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑菜单数据")
@@ -145,6 +146,7 @@ public class MenuController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:menu:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除菜单")

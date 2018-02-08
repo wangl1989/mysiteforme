@@ -9,6 +9,7 @@ import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.Encodes;
 import com.mysiteforme.admin.util.ToolUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -18,6 +19,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.web.util.WebUtils;
@@ -50,12 +52,16 @@ public class AuthRealm extends AuthorizingRealm {
         Set<Role> roles = user.getRoleLists();
         Set<String> roleNames = Sets.newHashSet();
         for (Role role : roles) {
-            roleNames.add(role.getName());
+            if(StringUtils.isNotBlank(role.getName())){
+                roleNames.add(role.getName());
+            }
         }
         Set<Menu> menus = user.getMenus();
         Set<String> permissions = Sets.newHashSet();
         for (Menu menu : menus) {
-            permissions.add(menu.getPermission());
+            if(StringUtils.isNotBlank(menu.getPermission())){
+                permissions.add(menu.getPermission());
+            }
         }
         info.setRoles(roleNames);
         info.setStringPermissions(permissions);
@@ -82,6 +88,12 @@ public class AuthRealm extends AuthorizingRealm {
                 getName()  //realm name
         );
         return authenticationInfo;
+    }
+
+    public void removeUserAuthorizationInfoCache(String username) {
+        SimplePrincipalCollection pc = new SimplePrincipalCollection();
+        pc.add(username, super.getName());
+        super.clearCachedAuthorizationInfo(pc);
     }
 
     /**

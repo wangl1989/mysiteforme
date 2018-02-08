@@ -10,6 +10,7 @@ import com.mysiteforme.admin.util.RestResponse;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,9 @@ public class DictController extends BaseController{
         return "admin/system/dict/list";
     }
 
+    @RequiresPermissions("sys:dict:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求系统字典列表数据")
     public LayerData<Dict> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                 @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                 ServletRequest request){
@@ -77,7 +78,9 @@ public class DictController extends BaseController{
         return "admin/system/dict/add";
     }
 
+    @RequiresPermissions("sys:dict:add")
     @PostMapping("add")
+    @SysLog("新增系统字典")
     @ResponseBody
     public RestResponse add(Dict dict){
         if(StringUtils.isBlank(dict.getType())){
@@ -111,7 +114,9 @@ public class DictController extends BaseController{
         return "admin/system/dict/edit";
     }
 
+    @RequiresPermissions("sys:dict:edit")
     @PostMapping("edit")
+    @SysLog("编辑系统字典")
     @ResponseBody
     public RestResponse edit(Dict dict){
         if(dict.getId()==null || dict.getId() == 0){
@@ -147,7 +152,9 @@ public class DictController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("sys:dict:editType")
     @PostMapping("editType")
+    @SysLog("编辑系统字典类型")
     @ResponseBody
     public RestResponse editType(@RequestParam(value="oldType",required = false)String oldType,
                                  @RequestParam(value = "newType",required = false)String newType){

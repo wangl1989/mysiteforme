@@ -1,6 +1,7 @@
 package com.mysiteforme.admin.controller;
 
 import com.xiaoleilu.hutool.date.DateUtil;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -49,9 +50,9 @@ public class QuartzTaskLogController {
         return "/admin/quartzTaskLog/list";
     }
 
+    @RequiresPermissions("quartz:log:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求任务执行日志列表数据")
     public LayerData<QuartzTaskLog> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
@@ -75,13 +76,11 @@ public class QuartzTaskLogController {
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增任务执行日志页面")
     public String add(){
         return "/admin/quartzTaskLog/add";
     }
 
     @PostMapping("add")
-    @SysLog("保存新增任务执行日志数据")
     @ResponseBody
     public RestResponse add(QuartzTaskLog quartzTaskLog){
         quartzTaskLogService.insert(quartzTaskLog);
@@ -89,7 +88,6 @@ public class QuartzTaskLogController {
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑任务执行日志页面")
     public String edit(Long id,Model model){
         QuartzTaskLog quartzTaskLog = quartzTaskLogService.selectById(id);
         model.addAttribute("quartzTaskLog",quartzTaskLog);
@@ -98,7 +96,6 @@ public class QuartzTaskLogController {
 
     @PostMapping("edit")
     @ResponseBody
-    @SysLog("保存编辑任务执行日志数据")
     public RestResponse edit(QuartzTaskLog quartzTaskLog){
         if(null == quartzTaskLog.getId() || 0 == quartzTaskLog.getId()){
             return RestResponse.failure("ID不能为空");
@@ -107,6 +104,7 @@ public class QuartzTaskLogController {
         return RestResponse.success();
     }
 
+    @RequiresPermissions("quartz:log:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除任务执行日志数据")

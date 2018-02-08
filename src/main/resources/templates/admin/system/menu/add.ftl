@@ -66,7 +66,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">菜单权限</label>
         <div class="layui-input-block">
-            <input type="text" class="layui-input" name="permission" lay-verify="email"  placeholder="菜单权限">
+            <input type="text" class="layui-input" name="permission"  placeholder="菜单权限">
         </div>
     </div>
     <div class="layui-form-item">

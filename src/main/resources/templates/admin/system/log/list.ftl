@@ -142,7 +142,7 @@
                 {field:'requestUri',    title: '请求地址'},
                 {field:'httpMethod',    title: '操作方式'},
                 {field:'classMethod',    title: '请求方法'},
-                {field:'params',    title: '请求参数',templet:'#params'},
+                {field:'id',    title: '请求参数',templet:'#params'},
                 {field:'sessionId',    title: 'sessionId'},
                 {field:'id',    title: '返回内容',templet:'#response'},
                 {field:'useTime',    title: '执行时间(ms)'},

@@ -2,6 +2,7 @@ package com.mysiteforme.admin.controller;
 
 import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.date.DateUtil;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -51,9 +52,9 @@ public class BlogCommentController {
         return "/admin/blogComment/list";
     }
 
+    @RequiresPermissions("blog:comment:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求博客评论列表数据")
     public LayerData<BlogComment> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
@@ -97,7 +98,6 @@ public class BlogCommentController {
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增博客评论页面")
     public String add(){
         return "/admin/blogComment/add";
     }
@@ -113,7 +113,6 @@ public class BlogCommentController {
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑博客评论页面")
     public String edit(Long id,Model model){
         BlogComment blogComment = blogCommentService.selectById(id);
         model.addAttribute("blogComment",blogComment);
@@ -122,7 +121,6 @@ public class BlogCommentController {
 
     @PostMapping("edit")
     @ResponseBody
-    @SysLog("保存编辑博客评论数据")
     public RestResponse edit(BlogComment blogComment){
         if(null == blogComment.getId() || 0 == blogComment.getId()){
             return RestResponse.failure("ID不能为空");
@@ -134,6 +132,7 @@ public class BlogCommentController {
         return RestResponse.success();
     }
 
+    @RequiresPermissions("blog:comment:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客评论数据")
@@ -147,6 +146,7 @@ public class BlogCommentController {
         return RestResponse.success();
     }
 
+    @RequiresPermissions("blog:comment:reply")
     @PostMapping("adminReplay")
     @ResponseBody
     @SysLog("管理员回复")
