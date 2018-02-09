@@ -170,7 +170,7 @@
         </div>
     </div>
 </form>
-<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="${base}/static/js/jquery.min.js"></script>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
 <script type="text/javascript" src="${base}/static/js/wangEditor.min.js"></script>
 <script type="text/javascript" src="${base}/static/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
@@ -181,6 +181,7 @@
                 upload = layui.upload,
                 E = window.wangEditor,
                 laydate = layui.laydate,
+                imageIndex,
                 layer = layui.layer,
                 zTreeObj,
                 setting  = {callback:{
@@ -214,8 +215,12 @@
                 obj.preview(function(index, file, result){
                     $('#demo_showPic').attr('src', result); //图片链接（base64）
                 });
+                imageIndex = layer.load(2, {
+                    shade: [0.3, '#333']
+                });
             },
             done: function(res){
+                layer.close(imageIndex);
                 //如果上传失败
                 if(res.success === false){
                     return layer.msg('上传失败');
@@ -223,6 +228,7 @@
                 $("#showPic").val(res.data.url);
             },
             error: function(){
+                layer.close(imageIndex);
                 //演示失败状态，并实现重传
                 var demoText = $('#demoText_showPic');
                 demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');

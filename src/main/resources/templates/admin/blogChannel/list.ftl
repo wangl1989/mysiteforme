@@ -37,8 +37,8 @@
     <div id="demo"></div>
 </div>
 </body>
+<script type="text/javascript" src="${base}/static/js/jquery.min.js"></script>
 <script src="https://static.mysiteforme.com/layui-treetable/layui/layui.js"></script>
-<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 
 <script type="text/javascript">
     layui.use(['tree', 'layer','table'], function() {

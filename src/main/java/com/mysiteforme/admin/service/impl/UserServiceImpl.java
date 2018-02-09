@@ -68,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		ToolUtil.entryptPassword(user);
 		user.setLocked(false);
 		baseMapper.insert(user);
-		return user;
+		return findUserById(user.getId());
 	}
 
 	@Override

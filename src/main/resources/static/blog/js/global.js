@@ -17,20 +17,20 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
             $(user).toggleClass('layui-hide').siblings('a.blog-user').toggleClass('layui-hide');
         }, 800);
     });
-    //分享工具
-    layui.util.fixbar({
-        bar1: '&#xe641;',
-        click: function (type) {
-            if (type === 'bar1') {
-                var sear = new RegExp('layui-hide');
-                if (sear.test($('.blog-share').attr('class'))) {
-                    shareIn();
-                } else {
-                    shareOut();
-                }
-            }
-        }
-    });
+    // //分享工具
+    // layui.util.fixbar({
+    //     bar1: '&#xe641;',
+    //     click: function (type) {
+    //         if (type === 'bar1') {
+    //             var sear = new RegExp('layui-hide');
+    //             if (sear.test($('.blog-share').attr('class'))) {
+    //                 shareIn();
+    //             } else {
+    //                 shareOut();
+    //             }
+    //         }
+    //     }
+    // });
 
     //子栏目导航点击事件
     $('.child-nav span').click(function () {
@@ -140,16 +140,3 @@ layui.use(['element', 'layer', 'util', 'form'], function () {
     }
 
 });
-
-
-//百度分享插件
-window._bd_share_config = {
-    "common": {
-        "bdSnsKey": {},
-        "bdText": "",
-        "bdStyle": "0",
-        "bdSize": "32"
-    },
-    "share": {}
-};
-with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];
