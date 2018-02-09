@@ -5,6 +5,58 @@
     <#include "${base}/blog/common/header.ftl">
 <!-- 本页样式表 -->
 <link href="${base}/static/blog/css/about.css?t=${.now?long}" rel="stylesheet" />
+<style type="text/css">
+    /**编辑器样式**/
+    .toolbar {
+        border: 1px solid #ccc;
+        border-bottom: none;
+    }
+    .text {
+        border: 1px solid #ccc;
+        height: 200px;
+    }
+    /* table 样式 */
+    table {
+        border-top: 1px solid #ccc;
+        border-left: 1px solid #ccc;
+    }
+    table td,
+    table th {
+        border-bottom: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        padding: 3px 5px;
+    }
+    table th {
+        border-bottom: 2px solid #ccc;
+        text-align: center;
+    }
+
+    /* blockquote 样式 */
+    blockquote {
+        display: block;
+        border-left: 8px solid #d0e5f2;
+        padding: 5px 10px;
+        margin: 10px 0;
+        line-height: 1.4;
+        font-size: 100%;
+        background-color: #f1f1f1;
+    }
+
+    /* code 样式 */
+    code {
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+        background-color: #f1f1f1;
+        border-radius: 3px;
+        padding: 3px 5px;
+        margin: 0 3px;
+    }
+    pre code {
+        display: block;
+    }
+
+</style>
 </head>
 <body>
 <#include "${base}/blog/common/nav.ftl">
@@ -33,10 +85,10 @@
                 </ul>
                 <div class="layui-tab-content">
                     <div class="layui-tab-item" style="display: block">
+                        <#if oneArticle??>
                         <div class="aboutinfo">
-                            <#if oneArticle??>
                             <div class="aboutinfo-figure">
-                                <img src="${oneArticle.showPic}" alt="${site.name}" />
+                                <img style="border-radius: unset;" src="${oneArticle.showPic}" alt="${site.name}" />
                             </div>
                             <p class="aboutinfo-nickname">${oneArticle.title}</p>
                             <p class="aboutinfo-introduce">${oneArticle.subTitle}</p>
@@ -49,15 +101,14 @@
                                     </#list>
                                 </@mychannel>
                             </div>
-
-                            <fieldset class="layui-elem-field layui-field-title">
-                                <legend>简介</legend>
-                                <div class="layui-field-box aboutinfo-abstract">
-                                ${oneArticle.content}
-                                </div>
-                            </fieldset>
-                            </#if>
                         </div>
+                        <fieldset class="layui-elem-field layui-field-title">
+                            <legend>简介</legend>
+                            <div class="layui-field-box aboutinfo-abstract">
+                            ${oneArticle.content}
+                            </div>
+                        </fieldset>
+                        </#if>
                     </div>
                 </div>
             </div>

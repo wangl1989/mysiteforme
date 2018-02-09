@@ -10,7 +10,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
-    <link rel="stylesheet" href="${base}/static/css/login.css" media="all" />
+    <link rel="stylesheet" href="${base}/static/css/login.css?t=${.now?long}" media="all" />
+    <style type="text/css">
+        .loginTip{
+            height: 50px;
+            width: 260px;
+            padding: 20px;
+            border-radius: 4px;
+            position: absolute;
+            left: 50%;
+            top: 85%;
+            margin: -150px 0 0 -150px;
+            z-index: 99;
+        }
+        .loginTip span{
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+        }
+    </style>
 </head>
 <body>
 <video class="video-player" preload="auto" autoplay="autoplay" loop="loop" data-height="1080" data-width="1920" height="1080" width="1920">
@@ -35,6 +53,9 @@
         </div>
         <button class="layui-btn login_btn" lay-submit="" lay-filter="login">登录</button>
     </form>
+</div>
+<div class="loginTip">
+    <span>用户名:admin &nbsp;&nbsp;&nbsp;密码:123456</span>
 </div>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
 <script>
