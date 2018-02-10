@@ -77,9 +77,9 @@
         <div class="layui-inline" >
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
-        <div class="layui-inline">
-            <a class="layui-btn layui-btn-normal" data-type="addBlogComment">添加博客评论</a>
-        </div>
+        <#--<div class="layui-inline">-->
+            <#--<a class="layui-btn layui-btn-normal" data-type="addBlogComment">添加博客评论</a>-->
+        <#--</div>-->
     </form>
   </div>
 </fieldset>

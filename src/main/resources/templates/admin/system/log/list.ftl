@@ -82,7 +82,7 @@
         {{# if(d.remoteAddr == '127.0.0.1'){ }}
         <span>内网地址</span>
         {{# }else{ }}
-        <span>{{d.area}}-{{d.province}}-{{d.city}}</span>
+        <span>{{d.province}}-{{d.city}}</span>
         {{# } }}
     </script>
     <script type="text/html" id="params">
