@@ -47,6 +47,9 @@
 #快速体验
 * 将源码导入IDE 
 * 将源码路径下的src/main/resources/sql 中的mysiteforme.sql导入到数据库中(qrtz.sql为定时任务的几张jibenbiao mysiteforme.sql已经包含)
-* 系统管理员帐号：test  密码: 1
+* 将src\main\resources目录下的application.yml配置文件里的mysql用户名密码改成你本地的
 * 安装redis数据库 默认数据库密码为空(注*** 必须安装redis 否则本系统会报错)
-* redis的window版本有些地方下载可以下不下来,可以联系我私下传给你
+* redis的window版本有些地方下载可以下不下来,可以到这里下载https://pan.baidu.com/s/1dG22JQT  
+* 注册redis系统服务 打开cmd--->切换到安装redis的目录--->redis-server.exe --service-install redis.windows-service.conf
+* 启动系统 预览地址为:http://localhost:8080  管理员用户名：test 密码：1
+
