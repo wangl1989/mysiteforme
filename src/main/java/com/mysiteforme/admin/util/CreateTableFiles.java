@@ -14,6 +14,7 @@ import com.xiaoleilu.hutool.util.ZipUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,21 +132,21 @@ public class CreateTableFiles {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输入文件名称
-                return "D://mysite/" + tableInfo.getEntityPath() + "/list.ftl";
+                return baseDic+ "/"  + tableInfo.getEntityPath() + "/list.ftl";
             }
         });
         focList.add(new FileOutConfig("/templates/vm/add.jsp.vm") {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输入文件名称
-                return "D://mysite/" + tableInfo.getEntityPath() + "/add.ftl";
+                return baseDic+ "/" + tableInfo.getEntityPath() + "/add.ftl";
             }
         });
         focList.add(new FileOutConfig("/templates/vm/edit.jsp.vm") {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输入文件名称
-                return "D://mysite/" + tableInfo.getEntityPath() + "/edit.ftl";
+                return baseDic+ "/"  + tableInfo.getEntityPath() + "/edit.ftl";
             }
         });
         cfg.setFileOutConfigList(focList);
