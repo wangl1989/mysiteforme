@@ -2,6 +2,11 @@ package com.mysiteforme.admin.upload;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Created by wangl on 2018/2/8.
  * todo: 云上传工具
@@ -12,7 +17,7 @@ public interface UploadUtil {
      * @param file MultipartFile文件对象
      * @return  文件在云上的地址
      */
-    public String upload(MultipartFile file);
+    public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException;
 
     /**
      * 删除已经上传到云上的文件
@@ -26,7 +31,7 @@ public interface UploadUtil {
      * @param url 网络文件的地址
      * @return  文件在云上的地址
      */
-    public String uploadNetFile(String url);
+    public String uploadNetFile(String url) throws IOException, NoSuchAlgorithmException;
 
     /**
      * 上传本地指定路径的图片
