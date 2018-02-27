@@ -257,6 +257,7 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/changePassword";
     }
 
+    @RequiresPermissions("sys:user:changePassword")
     @PostMapping("changePassword")
     @SysLog("用户修改密码")
     @ResponseBody
