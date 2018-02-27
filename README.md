@@ -1,5 +1,5 @@
 # mysiteforme
-系统后台预览地址: https://admin.mysiteforme.com 用户名:admin  密码:123456<br/>
+系统后台预览地址: https://admin.mysiteforme.com 用户名:admin  密码:123456(<del>该账户不能修改密码</del>)<br/>
 #主要功能
 * 系统用户,角色,权限增删改查,权限分配，权限配色<br/>
 * 系统字典<br/>
