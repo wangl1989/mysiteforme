@@ -12,7 +12,7 @@
 * 核心框架：SpringBoot
 * 安全框架：Apache Shiro 1.3.2
 * 缓存框架：Redis 4.0
-* 搜索框架：Lucese 7.1
+* 搜索框架：Lucene 7.1
 * 任务调度：quartz 2.3
 * 持久层框架：MyBatis 3 <a href="http://baomidou.oschina.io/mybatis-plus-doc/#/" target="_blank">mybatisplus</a> 2.1.4
 * 数据库连接池：Alibaba Druid 1.0.2
