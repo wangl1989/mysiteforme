@@ -117,6 +117,7 @@
         m.name      as "title",
         m.icon      as "icon",
         m.href      as "href",
+        m.sort,
         #{userId}   as "myuserId"
         FROM
         (select * from sys_menu where del_flag = FALSE ) m
