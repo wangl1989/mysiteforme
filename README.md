@@ -1,5 +1,5 @@
 # mysiteforme
-系统后台预览地址: https://admin.mysiteforme.com 用户名:admin  密码:123456<br/>
+系统后台预览地址: https://admin.mysiteforme.com 用户名:admin  密码:123456(<del>该账户不能修改密码</del>)<br/>
 #主要功能
 * 系统用户,角色,权限增删改查,权限分配，权限配色<br/>
 * 系统字典<br/>
@@ -12,7 +12,7 @@
 * 核心框架：SpringBoot
 * 安全框架：Apache Shiro 1.3.2
 * 缓存框架：Redis 4.0
-* 搜索框架：Lucese 7.1
+* 搜索框架：Lucene 7.1
 * 任务调度：quartz 2.3
 * 持久层框架：MyBatis 3 <a href="http://baomidou.oschina.io/mybatis-plus-doc/#/" target="_blank">mybatisplus</a> 2.1.4
 * 数据库连接池：Alibaba Druid 1.0.2
