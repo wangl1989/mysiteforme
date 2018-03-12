@@ -54,6 +54,6 @@
 * 注册redis系统服务 打开cmd--->切换到安装redis的目录--->redis-server.exe --service-install redis.windows-service.conf
 * 启动系统 预览地址为:http://localhost:8080  管理员用户名：test 密码：1
 
-#技术交流
+#技术交流<br/>
 ![](https://static.mysiteforme.com/28104140.png?raw=true)
 
