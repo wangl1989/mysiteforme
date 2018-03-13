@@ -19,6 +19,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,9 @@ import java.util.*;
 @Controller
 public class LoginController extends BaseController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+
+	@Value("${server.port}")
+	private String port;
 
 	@GetMapping("login")
 	public String login(HttpServletRequest request) {
@@ -154,7 +158,12 @@ public class LoginController extends BaseController {
 		if(menus != null && menus.size()>0){
 			for (Menu menu : menus){
 				if(StringUtils.isNotBlank(menu.getHref())){
-					StringBuilder mys = new StringBuilder("http://localhost:8080/static");
+					StringBuilder mys = new StringBuilder("http://localhost");
+					if("80".equals(port)){
+						mys.append("/static");
+					}else{
+						mys.append(":").append(port).append("/static");
+					}
 					mys.append(menu.getHref());
 					String result= HttpUtil.get(mys.toString());
 					if(StringUtils.isNotBlank(result)){

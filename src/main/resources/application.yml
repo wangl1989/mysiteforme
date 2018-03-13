@@ -1,13 +1,16 @@
-#app
+#公共配置
 server:
-    port: 8080
+    port: 80
     tomcat:
       uri-encoding: UTF-8
-
-#spring
 spring:
+  #激活哪一个环境的配置文件
+  profiles:
+    active: dev
+  #视图配置
   mvc:
     static-path-pattern: /static/**
+  #网络请求配置
   http:
       encoding:
         force: true
@@ -17,6 +20,7 @@ spring:
           max-file-size: 100MB
           max-request-size: 100MB
           enabled: true
+  #模板引擎配置
   freemarker:
       template-loader-path: classpath:/templates/
       prefer-file-system-access: false
@@ -27,29 +31,10 @@ spring:
         template_exception_handler: ignore
       request-context-attribute: rc
       charset: UTF-8
-
-  cache:
-      type: redis
-      cache-names: mysiteforme
-  redis:
-      database: 1
-      host: 127.0.0.1
-      port: 6379
-      password:       # 密码（默认为空）
-      timeout: 6000  # 连接超时时长（毫秒）
-      pool:
-        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
-        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10      # 连接池中的最大空闲连接
-        min-idle: 5       # 连接池中的最小空闲连接
-
-
+  #连接池配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=false
-    username: wangl
-    password: 123456
     druid:
       validationQuery: SELECT 1
       initialSize: 10
@@ -63,7 +48,10 @@ spring:
       logAbandoned: true
       poolPreparedStatements: true
       maxOpenPreparedStatements: 100
-
+  #缓存配置
+  cache:
+      type: redis
+      cache-names: mysiteforme
 #mybatisPlus
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -97,20 +85,111 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
 
+---
+#开发环境配置
+server:
+  #端口
+  port: 8080
+spring:
+  profiles: dev
+  #redis配置
+  redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    username: root
+    password: tntjoy
+
 #自定义配置属性
 #源码生成文件夹
-#本地路径
 source-code-dic:  D://mysite
 source-code-zipfile:  D://源码.rar
-#阿里云路径
-#source-code-dic:  /opt/mysite
-#source-code-zipfile:  /opt/源码.rar
 
 #搜索文件生成包的位置
 #本地路径
 lucence-dic: D://lucence
+
+---
+#测试环境配置
+server:
+  #端口
+  port: 8085
+spring:
+  profiles: test
+  #redis配置
+  redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    username: root
+    password: 123456
+
+server-address: localhost
+#自定义配置属性
+#源码生成文件夹
+#本地路径
+source-code-dic: home/mysiteforme/mysite
+source-code-zipfile: home/mysiteforme/源码.rar
+
+#搜索文件生成包的位置
+#本地路径
+lucence-dic: home/mysiteforme/lucence
+
+---
+#生产环境配置
+server:
+  #端口
+  port: 8080
+spring:
+  profiles: pro
+  #redis配置
+  redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    username: root
+    password: 123456
+
+#自定义配置属性
+#源码生成文件夹
 #阿里云路径
-#lucence-dic : /opt/lucence
+source-code-dic:  /opt/mysite
+source-code-zipfile:  /opt/源码.rar
+
+#搜索文件生成包的位置
+#阿里云路径
+lucence-dic : /opt/lucence
+
 
 
 
