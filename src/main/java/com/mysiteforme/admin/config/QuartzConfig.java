@@ -18,13 +18,13 @@ import java.util.Properties;
 public class QuartzConfig {
 
     @Value("${spring.datasource.driver-class-name}")
-    String driverClass;
+    private String driverClass;
     @Value("${spring.datasource.url}")
-    String url;
+    private String url;
     @Value("${spring.datasource.username}")
-    String userName;
+    private String userName;
     @Value("${spring.datasource.password}")
-    String passWord;
+    private String passWord;
 
     @Bean
     public DataSource dataSource() {
@@ -56,12 +56,12 @@ public class QuartzConfig {
         prop.put("org.quartz.jobStore.maxMisfiresToHandleAtATime", "1");
 
         prop.put("org.quartz.jobStore.misfireThreshold", "12000");
-        prop.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
+        prop.put("org.quartz.jobStore.tablePrefix", "qrtz_");
         schedulerFactoryBean.setQuartzProperties(prop);
 
         schedulerFactoryBean.setSchedulerName("MySiteForMeScheduler");
         //延时启动
-        schedulerFactoryBean.setStartupDelay(3);
+        schedulerFactoryBean.setStartupDelay(20);
         schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
         //可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
         schedulerFactoryBean.setOverwriteExistingJobs(true);
