@@ -110,6 +110,11 @@ spring:
     username: root
     password: tntjoy
 
+#日志
+logging:
+  config: classpath:log/logback.xml
+  path: D:\log\mysiteforme
+
 #自定义配置属性
 #源码生成文件夹
 source-code-dic:  D://mysite
@@ -144,7 +149,11 @@ spring:
     username: root
     password: 123456
 
-server-address: localhost
+#日志
+logging:
+  config: classpath:log/logback.xml
+  path: /home/log/mysiteforme
+
 #自定义配置属性
 #源码生成文件夹
 #本地路径
@@ -179,6 +188,11 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
     username: root
     password: 123456
+
+#日志
+logging:
+  config: classpath:log/logback.xml
+  path: /home/log/mysiteforme
 
 #自定义配置属性
 #源码生成文件夹
