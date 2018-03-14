@@ -1,6 +1,6 @@
 # mysiteforme
-系统后台预览地址: https://admin.mysiteforme.com 用户名:admin  密码:123456(<del>该账户不能修改密码</del>)<br/>
-技术交流QQ群：692984846<br/>
+系统后台预览地址: https://admin.mysiteforme.com 用户名:`admin`  密码:`123456`(<del>该账户不能修改密码</del>)<br/>
+技术交流QQ群：`692984846`<br/>
 #主要功能
 * 系统用户,角色,权限增删改查,权限分配，权限配色<br/>
 * 系统字典<br/>
@@ -41,18 +41,18 @@
 * WEB:<del>Tomcat8</del> （采用springboot框架开发时,并没有用到额外的tomcat 用的框架自带的）
 
 #运行环境
-* WEB服务器：Weblogic、Tomcat、WebSphere、JBoss、Jetty 等
-* 数据库服务器：Mysql5.5+
-* 操作系统：Windows、Linux (Linux 大小写特别敏感 特别要注意,还有Linux上没有微软雅黑字体,需要安装这个字体,用于生成验证码)
+* WEB服务器：`Weblogic`、`Tomcat`、`WebSphere`、`JBoss`、`Jetty` 等
+* 数据库服务器：`Mysql5.5+`
+* 操作系统：`Windows`、`Linux` (Linux 大小写特别敏感 特别要注意,还有Linux上没有微软雅黑字体,需要安装这个字体,用于生成验证码)
 
 #快速体验
 * 将源码导入IDE 
 * 将源码路径下的src/main/resources/sql 中的mysiteforme.sql导入到数据库中(qrtz.sql为定时任务的几张jibenbiao mysiteforme.sql已经包含)
 * 将src\main\resources目录下的application.yml配置文件里的mysql用户名密码改成你本地的
 * 安装redis数据库 默认数据库密码为空(注*** 必须安装redis 否则本系统会报错)
-* redis的window版本有些地方下载可以下不下来,可以到这里下载https://pan.baidu.com/s/1dG22JQT  
-* 注册redis系统服务 打开cmd--->切换到安装redis的目录--->redis-server.exe --service-install redis.windows-service.conf
-* 启动系统 预览地址为:http://localhost:8080  管理员用户名：test 密码：1
+* redis的window版本有些地方下载可以下不下来,可以到这里下载`https://pan.baidu.com/s/1dG22JQT`  
+* 注册redis系统服务 打开cmd--->切换到安装redis的目录--->`redis-server.exe --service-install redis.windows-service.conf`
+* 启动系统 预览地址为:`http://localhost:8080`  管理员用户名：`test` 密码：`1`
 
 #技术交流<br/>
 ![](https://static.mysiteforme.com/28104140.png?raw=true)
