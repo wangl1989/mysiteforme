@@ -56,7 +56,7 @@ public class QuartzConfig {
         prop.put("org.quartz.jobStore.maxMisfiresToHandleAtATime", "1");
 
         prop.put("org.quartz.jobStore.misfireThreshold", "12000");
-        prop.put("org.quartz.jobStore.tablePrefix", "qrtz_");
+        prop.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
         schedulerFactoryBean.setQuartzProperties(prop);
 
         schedulerFactoryBean.setSchedulerName("MySiteForMeScheduler");
