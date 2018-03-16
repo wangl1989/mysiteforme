@@ -45,7 +45,7 @@
         var dateTemp;
         var flag = 1;
         for (var i = 0; i < 15; i++) {
-            dateTemp = (myDate.getFullYear()+1)+"-"+(myDate.getMonth()+1)+"-"+(myDate.getDate()+1);
+            dateTemp = myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+(myDate.getDate()+1);
             dateArray.push(dateTemp);
             myDate.setDate(myDate.getDate() + flag);
         }
