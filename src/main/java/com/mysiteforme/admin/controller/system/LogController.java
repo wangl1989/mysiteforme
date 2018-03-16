@@ -72,4 +72,11 @@ public class LogController extends BaseController{
         logService.deleteBatchIds(ids);
         return RestResponse.success();
     }
+
+    @GetMapping("pvs")
+    @ResponseBody
+    public RestResponse getPV(){
+        List<Integer> pvs = logService.selectSelfMonthData();
+        return RestResponse.success().setData(pvs);
+    }
 }

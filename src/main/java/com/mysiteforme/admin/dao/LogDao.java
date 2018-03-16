@@ -1,7 +1,10 @@
 package com.mysiteforme.admin.dao;
 
-import com.mysiteforme.admin.entity.Log;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.mysiteforme.admin.entity.Log;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface LogDao extends BaseMapper<Log> {
 
+    List<Map> selectSelfMonthData();
 }

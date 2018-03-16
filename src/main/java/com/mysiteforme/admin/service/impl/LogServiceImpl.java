@@ -1,11 +1,15 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.mysiteforme.admin.entity.Log;
-import com.mysiteforme.admin.dao.LogDao;
-import com.mysiteforme.admin.service.LogService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
+import com.mysiteforme.admin.dao.LogDao;
+import com.mysiteforme.admin.entity.Log;
+import com.mysiteforme.admin.service.LogService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -19,4 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogService {
 
+    @Override
+    public List<Integer> selectSelfMonthData() {
+        List<Map> list =  baseMapper.selectSelfMonthData();
+        List<Integer> pv = Lists.newArrayList();
+        for(Map map : list){
+            pv.add(Integer.valueOf(map.get("total").toString()));
+        }
+        return pv;
+    }
 }
