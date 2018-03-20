@@ -11,7 +11,7 @@
     <meta name="format-detection" content="telephone=no">
 </head>
 <body layout:fragment="content">
-<iframe id="druidIframe" onload="reinitIframe()"  width="100%" height="100%" src="https://admin.mysiteforme.com/druid/index.html" frameborder="0"></iframe>
+<iframe id="druidIframe" onload="reinitIframe()"  width="100%" height="100%" src="${base}/druid/index.html" frameborder="0"></iframe>
 <script th:inline="javascript">
     function reinitIframe() {
         var iframe = document.getElementById("druidIframe");
