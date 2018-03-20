@@ -18,7 +18,7 @@ public class DruidDBConfig {
         ServletRegistrationBean reg = new ServletRegistrationBean();
         reg.setServlet(new StatViewServlet());
         reg.addUrlMappings("/druid/*");
-        reg.addInitParameter("allow", "127.0.0.1"); //白名单
+        //reg.addInitParameter("allow", "127.0.0.1"); //白名单
         reg.addInitParameter("resetEnable","false");
         return reg;
     }
