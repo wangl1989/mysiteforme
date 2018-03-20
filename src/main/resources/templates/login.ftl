@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html class="loginHtml">
 <head>
     <meta charset="utf-8">
-    <title>登录--layui后台管理模板</title>
+    <title>MySiteForMe系统后台--孤独的旅行家</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="https://static.mysiteforme.com/866ac55f-b471-40cf-a794-db73128c8fcd.ico">
     <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
     <link rel="stylesheet" href="${base}/static/css/login.css?t=${.now?long}" media="all" />
     <style type="text/css">
@@ -31,10 +32,7 @@
     </style>
 </head>
 <body>
-<video class="video-player" preload="auto" autoplay="autoplay" loop="loop" data-height="1080" data-width="1920" height="1080" width="1920">
-    <source src="https://static.mysiteforme.com/login.mp4" type="video/mp4">
-</video>
-<div class="video_mask"></div>
+<div id="bg-body"></div>
 <div class="login">
     <h1>孤独的旅行家</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
@@ -58,11 +56,25 @@
     <span>用户名:admin &nbsp;&nbsp;&nbsp;密码:123456</span>
 </div>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
+<script type="text/javascript" src="${base}/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="${base}/static/js/jquery.bcat.bgswitcher.js"></script>
 <script>
     layui.use(['layer', 'form'], function() {
         var layer = layui.layer,
                 $ = layui.jquery,
                 form = layui.form;
+
+        $(document).ready(function() {
+            var srcBgArray = ["https://static.mysiteforme.com/chun.jpg",
+                "https://static.mysiteforme.com/xia.jpg",
+                "https://static.mysiteforme.com/qiu.jpg",
+                "https://static.mysiteforme.com/dong.jpg"];
+            $('#bg-body').bcatBGSwitcher({
+                timeout:5000,
+                urls: srcBgArray,
+                alt: 'Full screen background image'
+            });
+        });
 
         $("#mycode").on('click',function(){
             var t = Math.random();
