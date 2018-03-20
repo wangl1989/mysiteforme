@@ -88,24 +88,32 @@
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
 <script>
+    Array.prototype.contains = function ( needle ) {
+        for (i in this) {
+            if (this[i] == needle) return true;
+        }
+        return false;
+    };
     layui.use(['form','layer','jquery'], function(){
         var form = layui.form,
             layer = layui.layer,
                 $ = layui.jquery;
         form.on('checkbox(roleMenu)',function(data){
-            var v = data.elem.getAttribute("data-parentIds");
+            var v = data.elem.getAttribute("data-parentIds"),
+            myarr=v.split(",");
             var child = $(data.elem).parents('form').find('input[type="checkbox"]');
             if(data.elem.checked){//勾选的时候的动作,父栏目层级全部勾选
                 child.each(function(index, item){
-                    if(v.indexOf(item.value)>=0){
+                    if(myarr.contains(item.value)){
                         item.checked = data.elem.checked;
                     }
                 });
             }else{ //取消选择的时候，子栏目层级全部取消选择
                 child.each(function(index, item){
                     //获取每一个checkbox的 父栏目ID组
-                    var r = item.getAttribute("data-parentIds");
-                    if(r.indexOf(data.value)>=0){
+                    var r = item.getAttribute("data-parentIds"),
+                    noarr = r.split(",");
+                    if(noarr.contains(data.value)){
                         item.checked = data.elem.checked;
                     }
                 });

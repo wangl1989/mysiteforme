@@ -3,27 +3,18 @@
 <mapper namespace="com.mysiteforme.admin.dao.LogDao" >
 
     <select id="selectSelfMonthData" resultType="java.util.Map">
-        SELECT
-        count(log.remote_addr) AS total,
+        select
+        count(DISTINCT remote_addr) as "total",
         DATE_FORMAT(
-        log.create_date,
+        create_date,
         '%Y-%m-%d'
         ) AS days
-        FROM
-        (
-        SELECT
-        remote_addr,
-        create_date
         FROM
         sys_log
         WHERE
         remote_addr IS NOT NULL
-        GROUP BY
-        remote_addr
-        ) AS log
+        and DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt; date(create_date)
         GROUP BY DAY(create_date)
-        ORDER BY days DESC
-        limit 15
     </select>
 
 </mapper>
