@@ -43,6 +43,8 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
                 total = Integer.valueOf(map.get("total").toString());
                 if(date.equalsIgnoreCase(dayList.get(i))){
                     break;
+                }else{
+                    total = 0;
                 }
             }
             pv.add(total);
