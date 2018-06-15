@@ -14,7 +14,7 @@
         WHERE
         remote_addr IS NOT NULL
         and DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt; date(create_date)
-        GROUP BY DAY(create_date)
+        GROUP BY date(create_date)
     </select>
 
 </mapper>

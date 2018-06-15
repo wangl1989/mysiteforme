@@ -38,16 +38,31 @@
     <script type="text/javascript">
         var dom = document.getElementById("container");
         var myChart = echarts.init(dom);
-        var app = {};
-        var myDate = new Date(); //获取今天日期
-        myDate.setDate(myDate.getDate() - 15);
         var dateArray = [];
-        var dateTemp;
-        var flag = 1;
-        for (var i = 0; i < 15; i++) {
-            dateTemp = myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+(myDate.getDate()+1);
-            dateArray.push(dateTemp);
-            myDate.setDate(myDate.getDate() + flag);
+        function getDay(day){
+            var today = new Date();
+
+            var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
+
+            today.setTime(targetday_milliseconds); //注意，这行是关键代码
+
+            var tYear = today.getFullYear();
+            var tMonth = today.getMonth();
+            var tDate = today.getDate();
+            tMonth = doHandleMonth(tMonth + 1);
+            tDate = doHandleMonth(tDate);
+            return tYear+"-"+tMonth+"-"+tDate;
+        }
+        function doHandleMonth(month){
+            var m = month;
+            if(month.toString().length === 1){
+                m = "0" + month;
+            }
+            return m;
+        }
+        for(i=-14; i<=0;i++){
+            console.log(getDay(i));
+            dateArray.push(getDay(i));
         }
         $.get('${base}/admin/system/log/pvs').done(function (res) {
             myChart.setOption({
