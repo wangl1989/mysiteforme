@@ -1,9 +1,11 @@
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.baomidou.mybatisplus.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -49,4 +51,8 @@ public interface BlogTagsService extends IService<BlogTags> {
     List<BlogTags> getTagsByArticleId(Long articleId);
 
     void deleteThisTag(Long id);
+
+    Page<BlogTags> selectTagsPage(Map<String, Object> map, Page<BlogTags> page);
+
+    List<BlogTags> selectTagsPage(Map<String, Object> map);
 }

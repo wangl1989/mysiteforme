@@ -1,6 +1,7 @@
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 
@@ -26,6 +27,9 @@ public class BlogTags extends DataEntity<BlogTags> {
      */
 	private Integer sort;
 
+	@TableField(exist = false)
+	private Integer tagsUseCount;
+
 
 	public String getName() {
 		return name;
@@ -43,12 +47,20 @@ public class BlogTags extends DataEntity<BlogTags> {
 		this.sort = sort;
 	}
 
+	public Integer getTagsUseCount() {
+		return tagsUseCount;
+	}
+
+	public void setTagsUseCount(Integer tagsUseCount) {
+		this.tagsUseCount = tagsUseCount;
+	}
 
 	@Override
 	public String toString() {
 		return "BlogTags{" +
 			", name=" + name +
 			", sort=" + sort +
+			", tagsUseCount=" + tagsUseCount +
 			"}";
 	}
 }

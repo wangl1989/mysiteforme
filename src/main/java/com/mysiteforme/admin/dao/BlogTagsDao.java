@@ -1,9 +1,11 @@
 package com.mysiteforme.admin.dao;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -34,4 +36,14 @@ public interface BlogTagsDao extends BaseMapper<BlogTags> {
      * @param tagId 标签ID
      */
     void removeArticleTagsByTagId(Long tagId);
+
+    /**
+     * 根据删选条件获取博客标签的分页列表
+     * @param map
+     * @param page
+     * @return
+     */
+    List<BlogTags> selectTagsPage(Map<String, Object> map,Page<BlogTags> page);
+
+    List<BlogTags> selectTagsPage(Map<String, Object> map);
 }

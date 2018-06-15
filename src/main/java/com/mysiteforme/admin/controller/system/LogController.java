@@ -7,6 +7,7 @@ import com.mysiteforme.admin.entity.Log;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -63,6 +64,7 @@ public class LogController extends BaseController{
         return  layerData;
     }
 
+    @RequiresPermissions("system:logs:delete")
     @PostMapping("delete")
     @ResponseBody
     public RestResponse delete(@RequestParam("ids[]") List<Long> ids){

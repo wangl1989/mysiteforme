@@ -93,16 +93,31 @@
             if(obj.event === "del"){
                 layer.confirm("你确定要删除该博客标签么？",{btn:['是的,我确定','我再想想']},
                         function(){
-                            $.post("${base}/admin/blogTags/delete",{"id":data.id},function (res){
-                                if(res.success){
-                                    layer.msg("删除成功",{time: 1000},function(){
-                                        location.reload();
-                                    });
-                                }else{
-                                    layer.msg(res.message);
-                                }
-
-                            });
+                            var count = data.tagsUseCount;
+                            if(count > 0){
+                                layer.confirm("<center>该标签有"+count+"文章正在使用<br>如果删除会删除对应文章的标签!</center>",{btn:['是的,我非常肯定','好吧,容我三思']},
+                                        function () {
+                                            $.post("${base}/admin/blogTags/delete",{"id":data.id},function (res){
+                                                if(res.success){
+                                                    layer.msg("删除成功",{time: 1000},function(){
+                                                        location.reload();
+                                                    });
+                                                }else{
+                                                    layer.msg(res.message);
+                                                }
+                                            });
+                                        });
+                            }else{
+                                $.post("${base}/admin/blogTags/delete",{"id":data.id},function (res){
+                                    if(res.success){
+                                        layer.msg("删除成功",{time: 1000},function(){
+                                            location.reload();
+                                        });
+                                    }else{
+                                        layer.msg(res.message);
+                                    }
+                                });
+                            }
                         }
                 )
             }
@@ -124,6 +139,7 @@
             cols: [[
                 {type:'checkbox'},
                 {field:'name', title: '标签名字'},
+                {field:'tagsUseCount', title: '使用次数',width:'9%'},
                 {field:'delFlag',    title: '博客标签状态',width:'12%',templet:'#userStatus'},
                 {field:'createDate',  title: '创建时间',width:'15%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title:'操作',  width: '15%', align: 'center',toolbar: '#barDemo'}

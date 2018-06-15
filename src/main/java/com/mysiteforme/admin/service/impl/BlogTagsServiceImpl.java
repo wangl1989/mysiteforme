@@ -2,6 +2,7 @@ package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.mapper.Condition;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.dao.BlogArticleDao;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.mysiteforme.admin.dao.BlogTagsDao;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -75,5 +77,17 @@ public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTags> impl
     public void deleteThisTag(Long id) {
         deleteById(id);
         baseMapper.removeArticleTagsByTagId(id);
+    }
+
+    @Override
+    public Page<BlogTags> selectTagsPage(Map<String, Object> map, Page<BlogTags> page) {
+        List<BlogTags> blogTagsList = baseMapper.selectTagsPage(map,page);
+        page.setRecords(blogTagsList);
+        return page;
+    }
+
+    @Override
+    public List<BlogTags> selectTagsPage(Map<String, Object> map) {
+        return baseMapper.selectTagsPage(map);
     }
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.Condition;
 import com.mysiteforme.admin.base.BaseController;
 import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.http.HTMLFilter;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -49,37 +50,32 @@ public class BlogTagsController extends BaseController{
         return "/admin/blogTags/list";
     }
 
+    @RequiresPermissions("blog:tags:list")
     @PostMapping("list")
     @ResponseBody
-    @SysLog("请求博客标签列表数据")
     public LayerData<BlogTags> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
         Map map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<BlogTags> layerData = new LayerData<>();
-        EntityWrapper<BlogTags> wrapper = new EntityWrapper<>();
-        wrapper.eq("del_flag",false);
         if(!map.isEmpty()){
             String name = (String) map.get("name");
-            if(StringUtils.isNotBlank(name)) {
-                wrapper.like("name",name);
-            }else{
+            if(StringUtils.isBlank(name)) {
                 map.remove("name");
             }
-
         }
-        Page<BlogTags> pageData = blogTagsService.selectPage(new Page<>(page,limit),wrapper);
+        Page<BlogTags> pageData = blogTagsService.selectTagsPage(map,new Page<BlogTags>(page,limit));
         layerData.setData(pageData.getRecords());
         layerData.setCount(pageData.getTotal());
         return layerData;
     }
 
     @GetMapping("add")
-    @SysLog("跳转新增博客标签页面")
     public String add(){
         return "/admin/blogTags/add";
     }
 
+    @RequiresPermissions("blog:tags:add")
     @PostMapping("add")
     @SysLog("保存新增博客标签数据")
     @ResponseBody
@@ -89,13 +85,13 @@ public class BlogTagsController extends BaseController{
     }
 
     @GetMapping("edit")
-    @SysLog("跳转编辑博客标签页面")
     public String edit(Long id,Model model){
         BlogTags blogTags = blogTagsService.selectById(id);
         model.addAttribute("blogTags",blogTags);
         return "/admin/blogTags/edit";
     }
 
+    @RequiresPermissions("blog:tags:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客标签数据")
@@ -107,6 +103,7 @@ public class BlogTagsController extends BaseController{
         return RestResponse.success();
     }
 
+    @RequiresPermissions("blog:tags:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客标签数据")

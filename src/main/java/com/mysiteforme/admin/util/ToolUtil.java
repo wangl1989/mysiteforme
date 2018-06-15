@@ -237,7 +237,6 @@ public class ToolUtil {
 		StringBuilder sb = new StringBuilder("http://ip.taobao.com/service/getIpInfo.php?ip=");
 		sb.append(ip);
 		String result= HttpUtil.get(sb.toString(), "UTF-8");
-		LOGGER.info(result);
 		Map resultMap = JSON.parseObject(result,Map.class);
 		Integer code = (Integer) resultMap.get("code");
 		Map finalMap = Maps.newHashMap();

@@ -39,4 +39,25 @@
       delete from blog_article_tags where tags_id = #{tagId}
     </select>
 
+    <select id="selectTagsPage" resultType="com.mysiteforme.admin.entity.BlogTags">
+        SELECT
+        t.id,
+        t.name,
+        t.sort,
+        t.create_date as createDate,
+        t.create_by   as createId,
+        t.update_by   as updateId,
+        t.update_date as updateDate,
+        t.remarks,
+        t.del_flag    as delFlag,
+        (select count(0) FROM blog_article_tags where tags_id = t.id) as tagsUseCount
+        FROM
+        blog_tags t
+        where
+        t.del_flag = false
+        <if test="name != null and name !=''">
+         and t.name like CONCAT('%','${name}','%')
+        </if>
+    </select>
+
 </mapper>

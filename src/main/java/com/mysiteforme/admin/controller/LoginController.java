@@ -305,6 +305,12 @@ public class LoginController extends BaseController {
 		return blogChannelService.selectCount(new EntityWrapper<BlogChannel>().eq("del_flag",false));
 	}
 
+	@GetMapping("/static/admin/blogTags/list")
+	@ResponseBody
+	public int getTagsStatistics(){
+		return blogTagsService.listAll().size();
+	}
+
 	/**
 	 * 统计定时任务数量
 	 * @return
