@@ -158,6 +158,7 @@ public class UserConteroller extends BaseController{
                 }
             }
         }
+        user.setIcon(oldUser.getIcon());
         userService.updateUser(user);
         //先解除用户跟角色的关系
         userService.dropUserRolesByUserId(user.getId());
