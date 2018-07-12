@@ -79,10 +79,15 @@
     <table class="layui-table" id="test" lay-filter="demo"></table>
 
     <script type="text/html" id="remoteAddr">
+
         {{# if(d.remoteAddr == '127.0.0.1'){ }}
         <span>内网地址</span>
         {{# }else{ }}
+        {{# if(d.province == undefined && d.city == undefined){ }}
+        <span>{{d.area}}</span>
+        {{# }else{ }}
         <span>{{d.province}}-{{d.city}}</span>
+        {{# } }}
         {{# } }}
     </script>
     <script type="text/html" id="params">

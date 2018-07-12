@@ -14,4 +14,6 @@ public interface UploadInfoService extends IService<UploadInfo> {
 
     public UploadInfo getOneInfo();
 
+    public void updateInfo(UploadInfo uploadInfo);
+
 }

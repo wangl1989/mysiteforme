@@ -85,6 +85,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MyException.class)
     public String myException(HttpServletRequest request, HttpServletResponse response, MyException ex,Model model) {
+        log.info(ex.getMsg());
         if(ex.getCode() == 404){
             model.addAttribute("url",request.getRequestURI());
             return "admin/error/404";

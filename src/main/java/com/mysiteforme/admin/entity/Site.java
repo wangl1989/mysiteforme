@@ -1,11 +1,10 @@
 package com.mysiteforme.admin.entity;
 
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -25,6 +24,8 @@ public class Site extends DataEntity<Site> {
 	private String author;
 	@TableField("author_icon")
 	private String authorIcon;
+	@TableField("file_upload_type")
+	private String fileUploadType;
 	private String weibo;
 	private String qq;
 	private String git;
@@ -89,6 +90,14 @@ public class Site extends DataEntity<Site> {
 
 	public void setAuthorIcon(String authorIcon) {
 		this.authorIcon = authorIcon;
+	}
+
+	public String getFileUploadType() {
+		return fileUploadType;
+	}
+
+	public void setFileUploadType(String fileUploadType) {
+		this.fileUploadType = fileUploadType;
 	}
 
 	public String getWeibo() {
@@ -248,6 +257,7 @@ public class Site extends DataEntity<Site> {
 			", author=" + author +
 			", phone=" + phone +
 			", email=" + email +
+			", fileUploadType=" + fileUploadType +
 			", logo=" + logo +
 			", server=" + server +
 			", database=" + database +

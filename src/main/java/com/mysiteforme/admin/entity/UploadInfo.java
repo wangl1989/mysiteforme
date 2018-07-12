@@ -2,6 +2,7 @@ package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.FieldStrategy;
 import com.mysiteforme.admin.base.DataEntity;
 
 /**
@@ -20,68 +21,78 @@ public class UploadInfo extends DataEntity<UploadInfo> {
     /**
      * 本地window系统上传路径
      */
-	@TableField("local_window_url")
+	@TableField(value = "local_window_url")
 	private String localWindowUrl;
     /**
      * 本地LINUX系统上传路径
      */
-	@TableField("local_linux_url")
+	@TableField(value = "local_linux_url")
 	private String localLinuxUrl;
     /**
      * 七牛前缀路径
      */
-	@TableField("qiniu_base_path")
+	@TableField(value = "qiniu_base_path")
 	private String qiniuBasePath;
     /**
      * 七牛bucket的目录名称
      */
-	@TableField("qiniu_bucket_name")
+	@TableField(value = "qiniu_bucket_name")
 	private String qiniuBucketName;
     /**
      * 七牛文件存储目录
      */
-	@TableField("qiniu_dir")
+	@TableField(value = "qiniu_dir",strategy= FieldStrategy.IGNORED)
 	private String qiniuDir;
     /**
      * 七牛qiniuAccess值
      */
-	@TableField("qiniu_access_key")
+	@TableField(value = "qiniu_access_key")
 	private String qiniuAccessKey;
     /**
      * 七牛qiniuKey的值
      */
-	@TableField("qiniu_secret_key")
+	@TableField(value = "qiniu_secret_key")
 	private String qiniuSecretKey;
+	/**
+	 * 七牛上传测试结果
+	 */
+	@TableField("qiniu_test_access")
+	private Boolean qiniuTestAccess;
     /**
      * 阿里云前缀路径
      */
-	@TableField("oss_base_path")
+	@TableField(value = "oss_base_path")
 	private String ossBasePath;
     /**
      * 阿里云bucket的目录名称
      */
-	@TableField("oss_bucket_name")
+	@TableField(value = "oss_bucket_name")
 	private String ossBucketName;
     /**
      * 阿里云文件上传目录
      */
-	@TableField("oss_dir")
+	@TableField(value = "oss_dir",strategy= FieldStrategy.IGNORED)
 	private String ossDir;
     /**
      * 阿里云ACCESS_KEY_ID值
      */
-	@TableField("oss_key_id")
+	@TableField(value = "oss_key_id")
 	private String ossKeyId;
     /**
      * 阿里云ACCESS_KEY_SECRET
      */
-	@TableField("oss_key_secret")
+	@TableField(value = "oss_key_secret")
 	private String ossKeySecret;
 	/**
 	 * 阿里云ENDPOINT值
 	 */
-	@TableField("oss_endpoint")
+	@TableField(value = "oss_endpoint")
 	private String ossEndpoint;
+	/**
+	 * 阿里云上传测试结果
+	 */
+	@TableField(value = "oss_test_access")
+	private Boolean ossTestAccess;
 
 	public String getLocalWindowUrl() {
 		return localWindowUrl;
@@ -174,6 +185,22 @@ public class UploadInfo extends DataEntity<UploadInfo> {
 
 	public void setOssEndpoint(String ossEndpoint) {
 		this.ossEndpoint = ossEndpoint;
+	}
+
+	public Boolean getQiniuTestAccess() {
+		return qiniuTestAccess;
+	}
+
+	public void setQiniuTestAccess(Boolean qiniuTestAccess) {
+		this.qiniuTestAccess = qiniuTestAccess;
+	}
+
+	public Boolean getOssTestAccess() {
+		return ossTestAccess;
+	}
+
+	public void setOssTestAccess(Boolean ossTestAccess) {
+		this.ossTestAccess = ossTestAccess;
 	}
 
 	@Override

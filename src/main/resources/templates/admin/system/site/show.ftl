@@ -78,6 +78,15 @@
             <td>authorIcon</td>
         </tr>
         <tr>
+            <td>文件上传方式</td>
+            <td>
+                <input type="radio" name="fileUploadType" value="local" title="本地上传" <#if (site.fileUploadType == "local") >checked=""</#if>   >
+                <input type="radio" name="fileUploadType" value="qiniu" title="七牛云存储" lay-filter="qiniuUpload" <#if (site.fileUploadType == "qiniu") >checked=""</#if>>
+                <input type="radio" name="fileUploadType" value="oss" title="阿里云存储" lay-filter="ossUpload" <#if (site.fileUploadType == "oss") >checked=""</#if>>
+            </td>
+            <td>fileUploadType</td>
+        </tr>
+        <tr>
             <td>微博</td>
             <td><input type="text" class="layui-input author" name="weibo" value="${site.weibo}" placeholder="请输入微博地址"></td>
             <td>weibo</td>
@@ -179,8 +188,8 @@
 <script type="text/javascript" src="${base}/static/js/wangEditor.min.js"></script>
 <script>
     layui.use(['form','layer','jquery','upload'], function(){
-        var form = layui.form,
-            layer = layui.layer,
+            var form = layui.form,
+                layer = layui.layer,
                 upload=layui.upload,
                 E = window.wangEditor,
                 $ = layui.jquery;
@@ -274,6 +283,27 @@
                     })
                 }
             }
+        });
+
+        form.on('radio(qiniuUpload)', function(data){
+            layer.open({
+                title : "七牛云信息",
+                type : 2,
+                content : "${base}/admin/system/site/qiniu",
+                area: ['600px','550px'],
+                cancel:function (index, layero) {
+                    console.log(layero);
+                }
+            });
+        });
+
+        form.on('radio(ossUpload)', function(data){
+            layer.open({
+                title : "阿里云信息",
+                type : 2,
+                content : "${base}/admin/system/site/oss",
+                area: ['600px','600px']
+            });
         });
 
         form.on('submit(site)',function(data){

@@ -1,7 +1,6 @@
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 
@@ -47,6 +46,8 @@ public class Rescource extends DataEntity<Rescource> {
 	@TableField("file_type")
 	private String fileType;
 
+	@TableField("original_net_url")
+	private String originalNetUrl;
 
 	public String getFileName() {
 		return fileName;
@@ -96,6 +97,13 @@ public class Rescource extends DataEntity<Rescource> {
 		this.fileType = fileType;
 	}
 
+	public String getOriginalNetUrl() {
+		return originalNetUrl;
+	}
+
+	public void setOriginalNetUrl(String originalNetUrl) {
+		this.originalNetUrl = originalNetUrl;
+	}
 
 	@Override
 	public String toString() {
@@ -106,6 +114,7 @@ public class Rescource extends DataEntity<Rescource> {
 			", hash=" + hash +
 			", fileSize=" + fileSize +
 			", fileType=" + fileType +
+			", originalNetUrl=" + originalNetUrl +
 			"}";
 	}
 }

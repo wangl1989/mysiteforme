@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.service;
 
+import com.mysiteforme.admin.entity.UploadInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,4 +41,10 @@ public interface UploadService {
      * @return
      */
     public String uploadBase64(String base64);
+
+    /**
+     * 上传测试
+     * @return
+     */
+    public Boolean testAccess(UploadInfo uploadInfo);
 }

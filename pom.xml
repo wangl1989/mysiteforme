@@ -32,9 +32,10 @@
 		<mybatisplus.version>2.1.4</mybatisplus.version>
 		<fastjson.version>1.2.41</fastjson.version>
 		<jackson.version>2.9.3</jackson.version>
-		<druid.version>1.0.2</druid.version>
+		<druid.version>1.1.9</druid.version>
 		<guava.version>17.0</guava.version>
 		<quartz.version>2.3.0</quartz.version>
+		<skip>true</skip>
 	</properties>
 
 	<repositories>
@@ -45,6 +46,12 @@
 	</repositories>
 
 	<dependencies>
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -142,7 +149,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.drtrang</groupId>
+			<groupId>com.alibaba</groupId>
 			<artifactId>druid-spring-boot-starter</artifactId>
 			<version>${druid.version}</version>
 		</dependency>
@@ -215,6 +222,13 @@
 			<groupId>com.qiniu</groupId>
 			<artifactId>qiniu-java-sdk</artifactId>
 			<version>[7.2.0, 7.2.99]</version>
+		</dependency>
+
+		<!--阿里云OSS上传-->
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+			<version>2.8.2</version>
 		</dependency>
 
 		<!--网页抓取-->

@@ -1,14 +1,10 @@
 package com.mysiteforme.admin.base;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.mysiteforme.admin.entity.*;
+import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import com.mysiteforme.admin.service.*;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 public class BaseController {
 	
@@ -62,4 +58,7 @@ public class BaseController {
 
 	@Autowired
 	protected QuartzTaskLogService quartzTaskLogService;
+
+	@Autowired
+	protected UploadInfoService uploadInfoService;
 }

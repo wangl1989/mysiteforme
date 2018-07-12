@@ -3,6 +3,8 @@ package com.mysiteforme.admin.controller.system;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
+import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
@@ -13,6 +15,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -47,17 +51,42 @@ public class FileController {
     @Value("localUploadPath")
     private String localUploadPath;
 
+    @Autowired
+    @Qualifier("qiniuService")
+    private UploadService qiniuService;
+
+    @Autowired
+    @Qualifier("ossService")
+    private UploadService ossService;
+
+    @Autowired
+    @Qualifier("localService")
+    private UploadService localService;
+
     @PostMapping("upload")
     @ResponseBody
     @SysLog("文件上传")
-    public RestResponse uploadFile(@RequestParam("test") MultipartFile file) {
+    public RestResponse uploadFile(@RequestParam("test") MultipartFile file,HttpServletRequest httpServletRequest) {
+        Site site = (Site)httpServletRequest.getAttribute("site");
+        if(site == null){
+            return RestResponse.failure("加载信息错误");
+        }
 
         if(file == null){
             return RestResponse.failure("上传文件为空 ");
         }
+        String url = null;
         Map m = Maps.newHashMap();
         try {
-            String url = QiniuFileUtil.upload(file);
+            if("local".equals(site.getFileUploadType())){
+                url = localService.upload(file);
+            }
+            if("qiniu".equals(site.getFileUploadType())){
+                url = qiniuService.upload(file);
+            }
+            if("oss".equals(site.getFileUploadType())){
+                url = ossService.upload(file);
+            }
             m.put("url", url);
             m.put("name", file.getOriginalFilename());
         } catch (Exception e) {
@@ -91,8 +120,11 @@ public class FileController {
     @PostMapping("uploadWang")
     @ResponseBody
     @SysLog("富文本编辑器文件上传")
-    public Map<String,Object> uploadWang(@RequestParam("test") MultipartFile[] file) {
-
+    public Map<String,Object> uploadWang(@RequestParam("test") MultipartFile[] file,HttpServletRequest httpServletRequest) {
+        Site site = (Site)httpServletRequest.getAttribute("site");
+        if(site == null){
+            return RestResponse.failure("加载信息错误");
+        }
         if(file == null || file.length == 0){
             return RestResponse.failure("上传文件为空 ");
         }
@@ -100,7 +132,16 @@ public class FileController {
         Map<String,Object> m = Maps.newHashMap();
         try {
             for (int i=0;i<file.length;i++) {
-                String url = QiniuFileUtil.upload(file[i]);
+                String url = null;
+                if("local".equals(site.getFileUploadType())){
+                    url = localService.upload(file[i]);
+                }
+                if("qiniu".equals(site.getFileUploadType())){
+                    url = qiniuService.upload(file[i]);
+                }
+                if("oss".equals(site.getFileUploadType())){
+                    url = ossService.upload(file[i]);
+                }
                 data.add(url);
             }
             m.put("errno",0);
@@ -119,7 +160,12 @@ public class FileController {
     @PostMapping("doContent")
     @ResponseBody
     @SysLog("富文本编辑器内容图片上传")
-    public RestResponse doContent(@RequestParam(value="content",required = false) String content) throws IOException, NoSuchAlgorithmException {
+    public RestResponse doContent(@RequestParam(value="content",required = false) String content,
+                                  HttpServletRequest httpServletRequest) throws IOException, NoSuchAlgorithmException {
+        Site site = (Site)httpServletRequest.getAttribute("site");
+        if(site == null){
+            return RestResponse.failure("加载信息错误");
+        }
         if (StringUtils.isBlank(content)){
             return RestResponse.failure("复制内容为空");
         }
@@ -127,11 +173,29 @@ public class FileController {
         Elements links = doc.select("img[src]");
         for(Element e : links){
             String imgSrc = e.attr("abs:src");
-            if(imgSrc.contains("file:")){
-                imgSrc.replace("\\","/");
-                e.attr("src",QiniuFileUtil.uploadLocalImg(imgSrc.substring(6)));
-            }else{
-                e.attr("src",QiniuFileUtil.uploadImageSrc(imgSrc));
+            if("local".equals(site.getFileUploadType())){
+                if(imgSrc.contains("file:")){
+                    imgSrc.replace("\\","/");
+                    e.attr("src",localService.uploadLocalImg(imgSrc.substring(6)));
+                }else{
+                    e.attr("src",localService.uploadNetFile(imgSrc));
+                }
+            }
+            if("qiniu".equals(site.getFileUploadType())){
+                if(imgSrc.contains("file:")){
+                    imgSrc.replace("\\","/");
+                    e.attr("src",qiniuService.uploadLocalImg(imgSrc.substring(6)));
+                }else{
+                    e.attr("src",qiniuService.uploadNetFile(imgSrc));
+                }
+            }
+            if("oss".equals(site.getFileUploadType())){
+                if(imgSrc.contains("file:")){
+                    imgSrc.replace("\\","/");
+                    e.attr("src",ossService.uploadLocalImg(imgSrc.substring(6)));
+                }else{
+                    e.attr("src",ossService.uploadNetFile(imgSrc));
+                }
             }
         }
         String outHtml = doc.body().toString();
