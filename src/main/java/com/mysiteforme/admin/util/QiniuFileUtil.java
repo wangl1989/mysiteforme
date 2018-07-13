@@ -1,11 +1,8 @@
 package com.mysiteforme.admin.util;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.mysiteforme.admin.controller.system.LogController;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.service.RescourceService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
@@ -14,23 +11,14 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FetchRet;
 import com.qiniu.util.Auth;
-import com.qiniu.util.StringMap;
-import com.qiniu.util.UrlSafeBase64;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Decoder;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
@@ -39,8 +27,8 @@ public class QiniuFileUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QiniuFileUtil.class);
 
 	private static String path = "https://static.mysiteforme.com/";
-	private static String qiniuAccess = "PXj2yRJGbfyhiUid_qeateOg-kiLaF9ZkteYuQQL";
-	private static String qiniuKey = "0h9ICCVUgtrLAspsANW-5IW3mG-45SoYDIF1DTDe";
+	private static String qiniuAccess = "****************";
+	private static String qiniuKey = "****************";
 	private static String bucketName = "wanggg";
 
 	/***
