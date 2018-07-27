@@ -83,6 +83,25 @@
         </foreach>
     </select>
 
+    <select id="selectUserMenuCount" resultType="java.util.Map">
+        select
+        (select count(*) from sys_user where del_flag =false) as "sys:user:list",
+        (select count(*) from sys_role where del_flag =false) as "sys:role:list",
+        (select count(*) from sys_menu where del_flag =false) as "sys:menu:list",
+        (select count(*) from sys_rescource where del_flag = false) as "sys:rescource:list",
+        (select count(*) from sys_log where del_flag = false) as "sys:log:list",
+        24 as "sys:site:list",
+        (select count(*) from information_schema.tables where table_schema='mysiteforme_local') as "sys:table:list",
+        (select count(*) from sys_dict where del_flag = false) as "sys:dict:list",
+        (select count(*) from blog_comment where del_flag =false) as "blog:comment:list",
+        (select count(*) from blog_article where del_flag = false) as "blog:article:list",
+        (select count(*) from blog_channel where del_flag = false) as "blog:channel:list",
+        (select count(*) from blog_tags where del_flag = false) as "blog:tags:list",
+        (select count(*) from quartz_task where del_flag = false) as "quartz:task:list",
+        (select count(*) from quartz_task_log where del_flag = false) as "quartz:log:list"
+    </select>
+
+
     <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
         delete from sys_user_role where user_id = #{userId}
     </delete>

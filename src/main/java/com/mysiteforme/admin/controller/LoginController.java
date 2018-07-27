@@ -141,33 +141,18 @@ public class LoginController extends BaseController {
 		ImageIO.write(bufferedImage, "JPEG", response.getOutputStream());
 	}
 
-	public static void main(String args[]){
-		LOGGER.info("result的值为"+HttpUtil.get("http://localhost:8080/static/admin/quartzTask/list"));
-	}
-
 	@GetMapping("main")
 	public String main(Model model){
-		showStatistics(model);
-		return "main";
-	}
-
-	private void showStatistics(Model model){
+		Map map = userService.selectUserMenuCount();
 		User user = userService.findUserById(MySysUser.id());
 		Set<Menu> menus = user.getMenus();
 		java.util.List<Menu> showMenus = Lists.newArrayList();
 		if(menus != null && menus.size()>0){
 			for (Menu menu : menus){
 				if(StringUtils.isNotBlank(menu.getHref())){
-					StringBuilder mys = new StringBuilder("http://localhost");
-					if("80".equals(port)){
-						mys.append("/static");
-					}else{
-						mys.append(":").append(port).append("/static");
-					}
-					mys.append(menu.getHref());
-					String result= HttpUtil.get(mys.toString());
-					if(StringUtils.isNotBlank(result)){
-						menu.setDataCount(Integer.valueOf(result));
+					Long result = (Long)map.get(menu.getPermission());
+					if(result != null){
+						menu.setDataCount(result.intValue());
 						showMenus.add(menu);
 					}
 				}
@@ -175,6 +160,7 @@ public class LoginController extends BaseController {
 		}
 		showMenus.sort(new MenuComparator());
 		model.addAttribute("userMenu",showMenus);
+		return "main";
 	}
 
 	/**
@@ -194,144 +180,6 @@ public class LoginController extends BaseController {
 		SecurityUtils.getSubject().logout();
 		return "redirect:/login";
 	}
-
-	/**
-	 * 统计用户
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/user/list")
-	@ResponseBody
-	public Integer getUserStatistics(){
-		return userService.selectCount(new EntityWrapper<User>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计角色
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/role/list")
-	@ResponseBody
-	public Integer getRoleStatistics(){
-		return roleService.selectCount(new EntityWrapper<Role>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计菜单
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/menu/list")
-	@ResponseBody
-	public Integer getMenuStatistics(){
-		return menuService.selectCount(new EntityWrapper<Menu>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计资源
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/rescource/list")
-	@ResponseBody
-	public Integer getRescourceStatistics(){
-		return rescourceService.selectCount(new EntityWrapper<Rescource>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计日志
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/log/list")
-	@ResponseBody
-	public Integer getLogStatistics(){
-		return logService.selectCount(new EntityWrapper<Log>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计站点
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/site/show")
-	@ResponseBody
-	public Integer getSiteStatistics(){
-		return 15;
-	}
-
-	/**
-	 * 统计数据库
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/table/list")
-	@ResponseBody
-	public Integer getTableStatistics(){
-		return tableService.getTableCount();
-	}
-
-	/***
-	 * 统计字典
-	 * @return
-	 */
-	@GetMapping("/static/admin/system/dict/list")
-	@ResponseBody
-	public Integer getDictStatistics(){
-		return dictService.selectCount(new EntityWrapper<Dict>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计博客评论
-	 * @return
-	 */
-	@GetMapping("/static/admin/blogComment/list")
-	@ResponseBody
-	public Integer getCommentStatistics(){
-		return blogCommentService.selectCount(new EntityWrapper<BlogComment>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计博客文章
-	 * @return
-	 */
-	@GetMapping("/static/admin/blogArticle/list")
-	@ResponseBody
-	public Integer getArticleStatistics(){
-		return blogArticleService.selectCount(new EntityWrapper<BlogArticle>().eq("del_flag",false));
-	}
-
-	/**
-	 * 统计博客栏目
-	 * @return
-	 */
-	@GetMapping("/static/admin/blogChannel/list")
-	@ResponseBody
-	public Integer getChannelStatistics(){
-		return blogChannelService.selectCount(new EntityWrapper<BlogChannel>().eq("del_flag",false));
-	}
-
-	@GetMapping("/static/admin/blogTags/list")
-	@ResponseBody
-	public int getTagsStatistics(){
-		return blogTagsService.listAll().size();
-	}
-
-	/**
-	 * 统计定时任务数量
-	 * @return
-	 */
-	@GetMapping("/static/admin/quartzTask/list")
-	@ResponseBody
-	public Integer getQuartzTaskStatistics(){
-		int str = quartzTaskService.selectCount(new EntityWrapper<QuartzTask>().eq("del_flag",false));
-		return str;
-	}
-
-	/**
-	 * 统计定时任务日志数量
-	 * @return
-	 */
-	@GetMapping("/static/admin/quartzTaskLog/list")
-	@ResponseBody
-	public Integer getQuartzTaskLogStatistics(){
-		return quartzTaskLogService.selectCount(new EntityWrapper<QuartzTaskLog>().eq("del_flag",false));
-	}
-
 }
 
 class MenuComparator implements Comparator<Menu>{

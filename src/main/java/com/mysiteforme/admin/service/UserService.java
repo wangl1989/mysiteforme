@@ -33,4 +33,6 @@ public interface UserService extends IService<User> {
 	int userCount(String param);
 
 	void deleteUser(User user);
+
+	Map selectUserMenuCount();
 }

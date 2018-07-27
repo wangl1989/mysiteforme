@@ -25,4 +25,6 @@ public interface UserDao extends BaseMapper<User> {
 	void saveUserRoles(@Param("userId")Long id, @Param("roleIds")Set<Role> roles);
 
 	void dropUserRolesByUserId(@Param("userId")Long userId);
+
+	Map selectUserMenuCount();
 }

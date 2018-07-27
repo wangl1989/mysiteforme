@@ -117,4 +117,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		user.updateById();
 	}
 
+	/**
+	 * 查询用户拥有的每个菜单具体数量
+	 * @return
+	 */
+	@Override
+	public Map selectUserMenuCount() {
+		return baseMapper.selectUserMenuCount();
+	}
+
 }
