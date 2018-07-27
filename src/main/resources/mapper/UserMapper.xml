@@ -91,7 +91,7 @@
         (select count(*) from sys_rescource where del_flag = false) as "sys:rescource:list",
         (select count(*) from sys_log where del_flag = false) as "sys:log:list",
         24 as "sys:site:list",
-        (select count(*) from information_schema.tables where table_schema='mysiteforme_local') as "sys:table:list",
+        (select count(*) from information_schema.tables where table_schema='mysiteforme') as "sys:table:list",
         (select count(*) from sys_dict where del_flag = false) as "sys:dict:list",
         (select count(*) from blog_comment where del_flag =false) as "blog:comment:list",
         (select count(*) from blog_article where del_flag = false) as "blog:article:list",
