@@ -1,6 +1,7 @@
 package com.mysiteforme.admin.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.User;
 import com.xiaoleilu.hutool.http.HttpUtil;
@@ -229,39 +230,42 @@ public class ToolUtil {
 		return map;
 	}
 
+	/***
+	 * 腾讯WebService API
+	 * http://lbs.qq.com/webservice_v1/guide-ip.html
+	 * @param ip
+	 * @return
+	 */
 	public static Map<String,String> getAddressByIP(String ip) {
 		if("0:0:0:0:0:0:0:1".equals(ip)){
 			ip = "0.0.0.0";
 		}
 		Map<String,String> map = Maps.newHashMap();
-		StringBuilder sb = new StringBuilder("http://ip.taobao.com/service/getIpInfo.php?ip=");
+		StringBuilder sb = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?key=N7XBZ-NX764-OFOUH-D5LJY-KZ3QK-6WFNX&ip=");
 		sb.append(ip);
 		String result= HttpUtil.get(sb.toString(), "UTF-8");
 		Map resultMap = JSON.parseObject(result,Map.class);
-		Integer code = (Integer) resultMap.get("code");
+		Integer status = (Integer) resultMap.get("status");
 		Map finalMap = Maps.newHashMap();
-		if(code == 0){
-			Map<String,String> detail = (Map<String,String>)resultMap.get("data");
-			String area = detail.get("country");
-			String isp = detail.get("isp");
-			String province = detail.get("region");
+		if(status == 0){
+			Map m = (Map) resultMap.get("result");
+			Map<String,String> detail = (Map<String,String>)m.get("ad_info");
+			String area = detail.get("nation");
+			String isp = "";
+			String province = detail.get("province");
 			String city = detail.get("city");
-			if(StringUtils.isNotBlank(area) && !"XX".equalsIgnoreCase(area)){
+			finalMap.put("isp",isp);
+			if(StringUtils.isNotBlank(area)){
 				finalMap.put("area",area);
 			}else {
 				finalMap.put("area","");
 			}
-			if(StringUtils.isNotBlank(isp) && !"XX".equalsIgnoreCase(isp)){
-				finalMap.put("isp",isp);
-			}else {
-				finalMap.put("isp","");
-			}
-			if(StringUtils.isNotBlank(province) && !"XX".equalsIgnoreCase(province)){
+			if(StringUtils.isNotBlank(province)){
 				finalMap.put("province",province);
 			}else {
 				finalMap.put("province","");
 			}
-			if(StringUtils.isNotBlank(city) && !"XX".equalsIgnoreCase(city)){
+			if(StringUtils.isNotBlank(city)){
 				finalMap.put("city",city);
 			}else{
 				finalMap.put("city","");
@@ -285,14 +289,18 @@ public class ToolUtil {
 		//long t2 = System.currentTimeMillis();
 		//System.out.println("执行时间为"+(t2-t1));
 
-		StringBuilder sb = new StringBuilder("http://ip.taobao.com/service/getIpInfo.php?ip=117.82.105.93");
-		String result= HttpUtil.get(sb.toString(), "UTF-8");
-		Map<String,String> map = Maps.newHashMap();
-		Map resultMap = JSON.parseObject(result,Map.class);
-		Integer code = (Integer) resultMap.get("code");
-		if(code == 0){
-			Map<String,String> detail = (Map<String,String>)resultMap.get("data");
-			String country = detail.get("country");
-		}
+		//StringBuilder sb = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?ip=117.82.187.111&key=N7XBZ-NX764-OFOUH-D5LJY-KZ3QK-6WFNX");
+		//String result= HttpUtil.get(sb.toString(), "UTF-8");
+		//Map<String,String> map = Maps.newHashMap();
+		//Map resultMap = JSON.parseObject(result,Map.class);
+		//Map m = (Map) resultMap.get("result");
+		//Map r = (Map) m.get("ad_info");
+		//Integer code = (Integer) resultMap.get("code");
+		//if(code == 0){
+		//	Map<String,String> detail = (Map<String,String>)resultMap.get("data");
+		//	String country = detail.get("country");
+		//}
+		Map maps = getAddressByIP("203.69.66.102");
+		System.out.println(JSONObject.toJSONString(maps));
 	}
 }
