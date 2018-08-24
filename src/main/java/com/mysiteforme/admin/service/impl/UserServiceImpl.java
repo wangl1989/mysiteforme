@@ -7,9 +7,6 @@ import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.service.UserService;
-import com.mysiteforme.admin.util.Constants;
-import com.mysiteforme.admin.util.Digests;
-import com.mysiteforme.admin.util.Encodes;
 import com.mysiteforme.admin.util.ToolUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -68,6 +65,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		ToolUtil.entryptPassword(user);
 		user.setLocked(false);
 		baseMapper.insert(user);
+		//保存用户角色关系
+		this.saveUserRoles(user.getId(),user.getRoleLists());
 		return findUserById(user.getId());
 	}
 
@@ -81,6 +80,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	@Transactional(readOnly = false, rollbackFor = Exception.class)
 	public User updateUser(User user) {
 		baseMapper.updateById(user);
+		//先解除用户跟角色的关系
+		this.dropUserRolesByUserId(user.getId());
+		this.saveUserRoles(user.getId(),user.getRoleLists());
 		return user;
 	}
 

@@ -98,8 +98,6 @@ public class UserConteroller extends BaseController{
         if(user.getId() == null || user.getId() == 0){
             return RestResponse.failure("保存用户信息出错");
         }
-        //保存用户角色关系
-        userService.saveUserRoles(user.getId(),user.getRoleLists());
         return RestResponse.success();
     }
 
@@ -160,12 +158,6 @@ public class UserConteroller extends BaseController{
         }
         user.setIcon(oldUser.getIcon());
         userService.updateUser(user);
-        //先解除用户跟角色的关系
-        userService.dropUserRolesByUserId(user.getId());
-        if(user.getId() == null || user.getId() == 0){
-            return RestResponse.failure("保存用户信息出错");
-        }
-        userService.saveUserRoles(user.getId(),user.getRoleLists());
         return RestResponse.success();
     }
 
