@@ -19,10 +19,10 @@
     <h1>孤独的旅行家</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
         <div class="layui-form-item">
-            <input class="layui-input" name="username" value="admin" placeholder="用户名:admin" lay-verify="required" type="text" autocomplete="off">
+            <input class="layui-input" name="username" value="" placeholder="请输入用户名" lay-verify="required" type="text" autocomplete="off">
         </div>
         <div class="layui-form-item">
-            <input class="layui-input" name="password" value="123456" placeholder="密码:123456" lay-verify="required" type="password" autocomplete="off">
+            <input class="layui-input" name="password" value="" placeholder="请输入密码" lay-verify="required" type="password" autocomplete="off">
         </div>
         <div class="layui-form-item form_code">
             <input class="layui-input" name="code" placeholder="验证码" lay-verify="required" type="text" autocomplete="off">
