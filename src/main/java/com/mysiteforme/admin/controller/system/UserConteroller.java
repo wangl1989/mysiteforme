@@ -241,6 +241,7 @@ public class UserConteroller extends BaseController{
                 }
             }
         }
+        user.setRoleLists(oldUser.getRoleLists());
         userService.updateUser(user);
         return RestResponse.success();
     }

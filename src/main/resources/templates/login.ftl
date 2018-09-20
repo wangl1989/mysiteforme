@@ -12,24 +12,6 @@
     <link rel="icon" href="https://static.mysiteforme.com/866ac55f-b471-40cf-a794-db73128c8fcd.ico">
     <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
     <link rel="stylesheet" href="${base}/static/css/login.css?t=${.now?long}" media="all" />
-    <style type="text/css">
-        .loginTip{
-            height: 50px;
-            width: 260px;
-            padding: 20px;
-            border-radius: 4px;
-            position: absolute;
-            left: 50%;
-            top: 85%;
-            margin: -150px 0 0 -150px;
-            z-index: 99;
-        }
-        .loginTip span{
-            text-align: center;
-            color: #fff;
-            font-size: 20px;
-        }
-    </style>
 </head>
 <body>
 <div id="bg-body"></div>
@@ -37,10 +19,10 @@
     <h1>孤独的旅行家</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
         <div class="layui-form-item">
-            <input class="layui-input" name="username" placeholder="用户名" lay-verify="required" type="text" autocomplete="off">
+            <input class="layui-input" name="username" value="admin" placeholder="用户名:admin" lay-verify="required" type="text" autocomplete="off">
         </div>
         <div class="layui-form-item">
-            <input class="layui-input" name="password" placeholder="密码" lay-verify="required" type="password" autocomplete="off">
+            <input class="layui-input" name="password" value="123456" placeholder="密码:123456" lay-verify="required" type="password" autocomplete="off">
         </div>
         <div class="layui-form-item form_code">
             <input class="layui-input" name="code" placeholder="验证码" lay-verify="required" type="text" autocomplete="off">
@@ -49,11 +31,17 @@
         <div class="layui-form-item">
             <input type="checkbox" name="rememberMe" value="true" lay-skin="primary" checked title="记住帐号?">
         </div>
-        <button class="layui-btn login_btn" lay-submit="" lay-filter="login">登录</button>
+        <div class="layui-form-item">
+            <button class="layui-btn login_btn" lay-submit="" lay-filter="login">登录</button>
+        </div>
+        <div class="layui-form-item">
+            <fieldset class="layui-elem-field">
+                <div class="layui-field-box" style="color: #fff;font-size: 20px;">
+                    用户名:test &nbsp;&nbsp;&nbsp;密码:1
+                </div>
+            </fieldset>
+        </div>
     </form>
-</div>
-<div class="loginTip">
-    <span>用户名:admin &nbsp;&nbsp;&nbsp;密码:123456</span>
 </div>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
 <script type="text/javascript" src="${base}/static/js/jquery.min.js"></script>
