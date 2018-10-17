@@ -29,15 +29,15 @@
 * 富文本：<a href="http://www.wangeditor.com/" target="_blank">wangEditor</a>
 
 ### 系统登录
-![](https://oss.mysiteforme.com/github/%E7%99%BB%E5%BD%95%E9%A1%B5.png?x-oss-process=style/60style)
+![](https://github.com/wangl1989/mysiteforme/blob/master/src/main/resources/static/images/%E7%99%BB%E5%BD%95%E9%A1%B5.png)
 ### 系统权限
-![](https://oss.mysiteforme.com/github/%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D.png?raw=true)
+![](https://github.com/wangl1989/mysiteforme/blob/master/src/main/resources/static/images/%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D.png)
 ### 系统日志
-![](https://oss.mysiteforme.com/github/%E7%B3%BB%E7%BB%9F%E6%97%A5%E5%BF%97.png?raw=true)
+![](https://github.com/wangl1989/mysiteforme/blob/master/src/main/resources/static/images/%E7%B3%BB%E7%BB%9F%E6%97%A5%E5%BF%97.png)
 ### 数据表
-![](https://oss.mysiteforme.com/github/%E6%95%B0%E6%8D%AE%E8%A1%A8.png?raw=true)
+![](https://github.com/wangl1989/mysiteforme/blob/master/src/main/resources/static/images/%E6%95%B0%E6%8D%AE%E8%A1%A8.png)
 ### 权限分配
-![](https://oss.mysiteforme.com/github/%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D.png?raw=true)
+![](https://github.com/wangl1989/mysiteforme/blob/master/src/main/resources/static/images/%E7%B3%BB%E7%BB%9F%E6%9D%83%E9%99%90.png)
 
 ### 开发环境
 建议开发者使用以下环境，这样避免版本带来的问题
