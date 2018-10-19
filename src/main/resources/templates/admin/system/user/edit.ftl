@@ -64,7 +64,7 @@
                     <#if roleList??>
                         <#if (roleList?size > 0)>
                             <#list roleList as role>
-                                <input type="checkbox" name="roles"  value="${role.id}" title="${role.name}" lay-filter="role" <#if roleIds?contains(role.id?string)>checked</#if> />
+                                <input type="checkbox" name="roles"  value="${role.id}" title="${role.name}" lay-filter="role" <#list roleIds as roleId><#if (roleId == role.id)>checked</#if></#list> />
                             </#list>
                         </#if>
                     </#if>

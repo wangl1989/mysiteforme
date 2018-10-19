@@ -5,7 +5,6 @@ import com.mysiteforme.admin.base.MySysUser;
 import com.mysiteforme.admin.entity.Log;
 import com.mysiteforme.admin.exception.GlobalExceptionHandler;
 import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -22,10 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -88,7 +85,11 @@ public class WebLogAspect {
         sysLog.setBrowser(browserMap.get("os")+"-"+browserMap.get("browser"));
 
         if(!"127.0.0.1".equals(ip)){
-            Map<String,String> map = ToolUtil.getAddressByIP(ToolUtil.getClientIp(request));
+            Map<String,String> map = (Map<String,String>)session.getAttribute("addressIp");
+            if(map == null){
+                map = ToolUtil.getAddressByIP(ToolUtil.getClientIp(request));
+                session.setAttribute("addressIp",map);
+            }
             sysLog.setArea(map.get("area"));
             sysLog.setProvince(map.get("province"));
             sysLog.setCity(map.get("city"));

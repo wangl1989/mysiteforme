@@ -2,6 +2,7 @@ package com.mysiteforme.admin.controller.system;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.google.common.collect.Lists;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.base.MySysUser;
@@ -104,18 +105,18 @@ public class UserConteroller extends BaseController{
     @GetMapping("edit")
     public String edit(Long id,Model model){
         User user = userService.findUserById(id);
-        StringBuffer roleIds = new StringBuffer();
+        List<Long> roleIdList = Lists.newArrayList();
         if(user != null) {
             Set<Role> roleSet = user.getRoleLists();
             if (roleSet != null && roleSet.size() > 0) {
                 for (Role r : roleSet) {
-                    roleIds.append(r.getId().toString()).append(",");
+                    roleIdList.add(r.getId());
                 }
             }
         }
         List<Role> roleList = roleService.selectAll();
         model.addAttribute("localuser",user);
-        model.addAttribute("roleIds",roleIds);
+        model.addAttribute("roleIds",roleIdList);
         model.addAttribute("roleList",roleList);
         return "admin/system/user/edit";
     }
