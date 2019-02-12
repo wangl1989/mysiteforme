@@ -23,13 +23,13 @@
     <#if children?? && children?size gt 0>
         <#list children as child>
             <#if child.children?? && child.children?size gt 0>
-            <li style="margin-top: 5px;margin-left: 1.5em"><input type="checkbox" title="${child.name}" value="${child.id}" data-parentIds = "${child.parentIds}"  lay-filter="roleMenu" <#if menuIds?contains(child.id?string)>checked</#if> />
+            <li style="margin-top: 5px;margin-left: 1.5em"><input type="checkbox" title="${child.name}" value="${child.id}" data-parentIds = "${child.parentIds}"  lay-filter="roleMenu" <#if menuIds?seq_contains(child.id)>checked</#if> />
                 <ul>
                     <@bpTree children=child.children />
                 </ul>
             </li>
             <#else>
-            <li style="margin-top: 5px;margin-left: 1.5em"><input type="checkbox" title="${child.name}" value="${child.id}" data-parentIds = "${child.parentIds}"  lay-filter="roleMenu"  <#if menuIds?contains(child.id?string)>checked</#if> /></li>
+            <li style="margin-top: 5px;margin-left: 1.5em"><input type="checkbox" title="${child.name}" value="${child.id}" data-parentIds = "${child.parentIds}"  lay-filter="roleMenu"  <#if menuIds?seq_contains(child.id)>checked</#if> /></li>
             </#if>
         </#list>
     </#if>
@@ -67,7 +67,7 @@
             <#list menuList as menu>
                 <div class="layui-inline">
                     <fieldset class="layui-elem-field">
-                        <legend><input type="checkbox"  value="${menu.id}" data-parentIds = "${menu.parentIds}" title="${menu.name}" lay-filter="roleMenu" <#if menuIds?contains(menu.id?string)>checked</#if> /></legend>
+                        <legend><input type="checkbox"  value="${menu.id}" data-parentIds = "${menu.parentIds}" title="${menu.name}" lay-filter="roleMenu" <#if menuIds?seq_contains(menu.id)>checked</#if> /></legend>
                         <div class="layui-field-box">
                             <ul style="padding: 0 15px">
                                 <@bpTree children=menu.children />

@@ -1,8 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
@@ -110,12 +110,14 @@ public class RoleController extends BaseController{
     @GetMapping("edit")
     public String edit(Long id,Model model){
         Role role = roleService.getRoleById(id);
-        StringBuilder menuIds = new StringBuilder();
+        //StringBuilder menuIds = new StringBuilder();
+        List<Long> menuIds = Lists.newArrayList();
         if(role != null) {
             Set<Menu> menuSet = role.getMenuSet();
             if (menuSet != null && menuSet.size() > 0) {
                 for (Menu m : menuSet) {
-                    menuIds.append(m.getId().toString()).append(",");
+                    //menuIds.append(m.getId().toString()).append(",");
+                    menuIds.add(m.getId());
                 }
             }
         }
@@ -125,7 +127,7 @@ public class RoleController extends BaseController{
         List<Menu> menuList = menuService.selectAllMenus(map);
         model.addAttribute("role",role);
         model.addAttribute("menuList",menuList);
-        model.addAttribute("menuIds",menuIds.toString());
+        model.addAttribute("menuIds",menuIds);
         return "admin/system/role/edit";
     }
 
