@@ -231,51 +231,45 @@ public class ToolUtil {
 	}
 
 	/***
-	 * 腾讯WebService API
-	 * http://lbs.qq.com/webservice_v1/guide-ip.html
 	 * @param ip
 	 * @return
 	 */
 	public static Map<String,String> getAddressByIP(String ip) {
-		if("0:0:0:0:0:0:0:1".equals(ip)){
-			ip = "0.0.0.0";
-		}
-		Map<String,String> map = Maps.newHashMap();
-		StringBuilder sb = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?key=N7XBZ-NX764-OFOUH-D5LJY-KZ3QK-6WFNX&ip=");
-		sb.append(ip);
-		String result= HttpUtil.get(sb.toString(), "UTF-8");
-		Map resultMap = JSON.parseObject(result,Map.class);
-		Integer status = (Integer) resultMap.get("status");
+		String area = "";
+		String province = "";
+		String city = "";
+		String isp = "";
 		Map finalMap = Maps.newHashMap();
-		if(status == 0){
-			Map m = (Map) resultMap.get("result");
-			Map<String,String> detail = (Map<String,String>)m.get("ad_info");
-			String area = detail.get("nation");
-			String isp = "";
-			String province = detail.get("province");
-			String city = detail.get("city");
-			finalMap.put("isp",isp);
-			if(StringUtils.isNotBlank(area)){
-				finalMap.put("area",area);
-			}else {
-				finalMap.put("area","");
+		try{
+			if("0:0:0:0:0:0:0:1".equals(ip)){
+				ip = "0.0.0.0";
 			}
-			if(StringUtils.isNotBlank(province)){
-				finalMap.put("province",province);
-			}else {
-				finalMap.put("province","");
-			}
-			if(StringUtils.isNotBlank(city)){
-				finalMap.put("city",city);
+			StringBuilder sb = new StringBuilder("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=");
+			sb.append(ip);
+			String result= HttpUtil.get(sb.toString(), "GBK");
+			Map resultMap = JSON.parseObject(result,Map.class);
+			String status = (String) resultMap.get("err");
+
+			province = (String) resultMap.get("pro");
+			city = (String) resultMap.get("city");
+			if("noprovince".equalsIgnoreCase(status)){
+				area = (String) resultMap.get("addr");
 			}else{
-				finalMap.put("city","");
+				area = "中国";
+				String addr = (String) resultMap.get("addr");
+				if(StringUtils.isNotBlank(addr)){
+					isp = addr.split(" ")[1];
+				}
 			}
-		}else{
-			finalMap.put("area","未知");
-			finalMap.put("isp","未知");
-			finalMap.put("province","未知");
-			finalMap.put("city","未知");
+		}catch (Exception e){
+			e.printStackTrace();
 		}
+
+
+		finalMap.put("area",area);
+		finalMap.put("province",province);
+		finalMap.put("city",city);
+		finalMap.put("isp",isp);
 		return finalMap;
 	}
 
@@ -300,7 +294,7 @@ public class ToolUtil {
 		//	Map<String,String> detail = (Map<String,String>)resultMap.get("data");
 		//	String country = detail.get("country");
 		//}
-		Map maps = getAddressByIP("203.69.66.102");
+		Map maps = getAddressByIP("117.82.187.111");
 		System.out.println(JSONObject.toJSONString(maps));
 	}
 }

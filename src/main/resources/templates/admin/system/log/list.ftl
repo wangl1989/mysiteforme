@@ -83,11 +83,17 @@
         {{# if(d.remoteAddr == '127.0.0.1'){ }}
         <span>内网地址</span>
         {{# }else{ }}
-        {{# if(d.province == undefined && d.city == undefined){ }}
-        <span>{{d.area}}</span>
-        {{# }else{ }}
-        <span>{{d.province}}-{{d.city}}</span>
-        {{# } }}
+            {{# if(d.area == "中国"){ }}
+                {{# if(d.city == undefined || d.city == null || d.city == ""){ }}
+                    <span>{{d.province}}</span>
+                {{# }else{ }}
+                    <span>{{d.province}}-{{d.city}}</span>
+                {{# } }}
+            {{# }else if(d.area == "未知" || d.area == undefined || d.area == null || d.area == ""){ }}
+                <span>{{d.remoteAddr}}</span>
+            {{# }else{ }}
+                <span>{{d.area}}</span>
+            {{# } }}
         {{# } }}
     </script>
     <script type="text/html" id="params">
