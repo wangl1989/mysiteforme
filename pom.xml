@@ -35,7 +35,6 @@
 		<druid.version>1.1.9</druid.version>
 		<guava.version>17.0</guava.version>
 		<quartz.version>2.3.0</quartz.version>
-		<skip>true</skip>
 	</properties>
 
 	<repositories>
@@ -292,6 +291,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- 跳过单元测试 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
