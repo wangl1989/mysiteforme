@@ -34,7 +34,7 @@
 		<jackson.version>2.9.3</jackson.version>
 		<druid.version>1.1.9</druid.version>
 		<guava.version>17.0</guava.version>
-		<quartz.version>2.3.0</quartz.version>
+		<quartz.version>2.3.2</quartz.version>
 	</properties>
 
 	<repositories>
