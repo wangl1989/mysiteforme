@@ -33,6 +33,13 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
 
     private static final Logger logger = LoggerFactory.getLogger(LocalUploadServiceImpl.class);
 
+    /**
+     * 上传文件到本地服务器
+     * @param file 要上传的文件
+     * @return 文件的Web访问URL
+     * @throws IOException IO异常
+     * @throws NoSuchAlgorithmException 加密算法异常
+     */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
         byte[] data = file.getBytes();
@@ -74,6 +81,11 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return webUrl;
     }
 
+    /**
+     * 删除本地文件
+     * @param path 文件路径
+     * @return 删除是否成功
+     */
     @Override
     public Boolean delete(String path) {
         path = path.replaceFirst("/","classpath:");
@@ -85,6 +97,13 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         }
     }
 
+    /**
+     * 下载网络文件并上传到本地服务器
+     * @param url 网络文件URL
+     * @return 文件的Web访问URL
+     * @throws IOException IO异常
+     * @throws NoSuchAlgorithmException 加密算法异常
+     */
     @Override
     public String uploadNetFile(String url) throws IOException, NoSuchAlgorithmException {
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
@@ -133,6 +152,11 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return webUrl;
     }
 
+    /**
+     * 上传本地图片到服务器
+     * @param localPath 本地图片路径
+     * @return 文件的Web访问URL
+     */
     @Override
     public String uploadLocalImg(String localPath) {
         File file = new File(localPath);
@@ -208,6 +232,11 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return returnUrl.toString();
     }
 
+    /**
+     * 上传Base64编码的图片
+     * @param base64 Base64编码的图片数据
+     * @return 文件的Web访问URL，上传失败返回null
+     */
     @Override
     public String uploadBase64(String base64) {
         StringBuilder webUrl=new StringBuilder("/static/upload/");
@@ -247,6 +276,11 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         }
     }
 
+    /**
+     * 测试上传配置是否可用
+     * @param uploadInfo 上传配置信息
+     * @return 配置是否可用
+     */
     @Override
     public Boolean testAccess(UploadInfo uploadInfo) {
         return null;

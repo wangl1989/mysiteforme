@@ -23,6 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class SiteServiceImpl extends ServiceImpl<SiteDao, Site> implements SiteService {
 
+    /**
+     * 获取当前站点信息
+     * 结果会被缓存
+     * 只返回未删除的站点
+     * @return 站点信息对象
+     */
     @Cacheable(value = "currentSite",key = "'currentSite'")
     @Override
     public Site getCurrentSite() {
@@ -31,6 +37,11 @@ public class SiteServiceImpl extends ServiceImpl<SiteDao, Site> implements SiteS
         return getOne(wrapper);
     }
 
+    /**
+     * 更新站点信息
+     * 同时清除站点缓存
+     * @param site 要更新的站点信息对象
+     */
     @CacheEvict(value = "currentSite",key = "'currentSite'")
     @Transactional(rollbackFor = Exception.class)
     @Override

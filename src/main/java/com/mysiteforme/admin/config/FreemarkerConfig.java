@@ -4,12 +4,16 @@ import com.mysiteforme.admin.freemark.*;
 import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import freemarker.template.TemplateModelException;
 
 import javax.annotation.PostConstruct;
 
 /**
- * Created by wangl on 2017/11/26.
- * todo:
+ * Freemarker模板引擎配置类
+ * 配置自定义标签和模型
+ * @author wangl
+ * @since 2017/11/26
  */
 @Component
 public class FreemarkerConfig {
@@ -68,6 +72,9 @@ public class FreemarkerConfig {
         this.commentNumberTempletModel = commentNumberTempletModel;
     }
 
+    /**
+     * 初始化Freemarker配置
+     */
     @PostConstruct
     public void setSharedVariable() {
         //系统字典标签
@@ -94,4 +101,5 @@ public class FreemarkerConfig {
         //当前文章相似的文章
         configuration.setSharedVariable("same",lookLikeArticlesTempletModel);
     }
+
 }

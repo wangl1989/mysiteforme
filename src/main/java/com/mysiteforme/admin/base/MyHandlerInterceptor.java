@@ -16,8 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Created by wangl on 2017/11/30.
- * todo:
+ * 系统通用拦截器
+ * 用于处理系统通用的请求拦截
+ * @author wangl
+ * @since 2017/11/30
  */
 @Component
 public class MyHandlerInterceptor implements HandlerInterceptor {
@@ -36,6 +38,10 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
         this.userCacheService = userCacheService;
     }
 
+    /**
+     * 前置处理,在请求处理之前进行调用
+     * @return true:继续流程 false:中断流程
+     */
     @Override
     public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
 //        LOGGER.info("当前请求路径.."+httpServletRequest.getRequestURI());
@@ -55,11 +61,17 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
         return false;
     }
 
+    /**
+     * 请求处理之后进行调用,但是在视图被渲染之前
+     */
     @Override
     public void postHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, ModelAndView modelAndView) {
 
     }
 
+    /**
+     * 在整个请求结束之后被调用
+     */
     @Override
     public void afterCompletion(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, Exception e) {
 

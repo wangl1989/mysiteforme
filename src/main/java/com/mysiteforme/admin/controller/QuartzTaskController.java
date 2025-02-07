@@ -46,12 +46,22 @@ public class QuartzTaskController {
         this.quartzTaskService = quartzTaskService;
     }
 
+    /**
+     * 显示任务列表页面
+     * @return 列表页面路径
+     */
     @GetMapping("list")
     @SysLog("跳转定时任务列表")
     public String list(){
         return "/admin/quartzTask/list";
     }
 
+    /**
+     * 获取任务列表数据
+     * @param limit 每页数量
+     * @param page 分页参数
+     * @return 分页数据
+     */
     @RequiresPermissions("quartz:task:list")
     @PostMapping("list")
     @ResponseBody
@@ -84,11 +94,20 @@ public class QuartzTaskController {
         return layerData;
     }
 
+    /**
+     * 显示任务添加页面
+     * @return 添加页面路径
+     */
     @GetMapping("add")
     public String add(){
         return "/admin/quartzTask/add";
     }
 
+    /**
+     * 保存任务
+     * @param quartzTask 任务对象
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:add")
     @PostMapping("add")
     @SysLog("保存新增定时任务数据")
@@ -98,6 +117,12 @@ public class QuartzTaskController {
         return RestResponse.success();
     }
 
+    /**
+     * 编辑任务
+     * @param id 任务ID
+     * @param model 模型对象
+     * @return 编辑页面路径
+     */
     @GetMapping("edit")
     public String edit(Long id,Model model){
         QuartzTask quartzTask = quartzTaskService.getById(id);
@@ -105,6 +130,11 @@ public class QuartzTaskController {
         return "/admin/quartzTask/edit";
     }
 
+    /**
+     * 更新任务
+     * @param quartzTask 任务对象
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:edit")
     @PostMapping("edit")
     @ResponseBody
@@ -117,6 +147,11 @@ public class QuartzTaskController {
         return RestResponse.success();
     }
 
+    /**
+     * 删除任务
+     * @param ids 任务ID集合
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:delete")
     @PostMapping("delete")
     @ResponseBody

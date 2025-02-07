@@ -50,15 +50,28 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         this.rescourceService = rescourceService;
     }
 
+    /**
+     * 获取上传配置信息
+     * @return 上传配置对象
+     */
     private UploadInfo getUploadInfo(){
         return uploadInfoService.getOneInfo();
     }
 
+    /**
+     * 获取七牛云上传管理器
+     * @return 上传管理器实例
+     */
     private UploadManager getUploadManager(){
         Configuration cfg = new Configuration();
         return new UploadManager(cfg);
     }
 
+    /**
+     * 获取七牛云认证对象
+     * @return 认证对象
+     * @throws MyException 当上传配置不存在时抛出异常
+     */
     private Auth getAuth(){
         if(getUploadInfo() == null){
             throw new MyException("上传信息配置不存在");
@@ -66,18 +79,31 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return Auth.create(getUploadInfo().getQiniuAccessKey(), getUploadInfo().getQiniuSecretKey());
     }
 
+    /**
+     * 获取上传凭证
+     * @return 上传凭证字符串
+     */
     private String getToken(){
         return getAuth().uploadToken(getUploadInfo().getQiniuBucketName());
     }
 
+    /**
+     * 获取七牛云空间管理器
+     * @return 空间管理器实例
+     */
     private BucketManager getBucketManager(){
         Configuration config = new Configuration();
         Auth auth = Auth.create(getUploadInfo().getQiniuAccessKey(), getUploadInfo().getQiniuSecretKey());
         return new BucketManager(auth,config);
     }
 
-
-
+    /**
+     * 上传文件到七牛云
+     * @param file 要上传的文件
+     * @return 文件的访问URL
+     * @throws IOException IO异常
+     * @throws NoSuchAlgorithmException 加密算法异常
+     */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
         String fileName, extName;
@@ -117,6 +143,11 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return returnUrl.toString();
     }
 
+    /**
+     * 从七牛云删除文件
+     * @param path 文件路径
+     * @return 删除是否成功
+     */
     @Override
     public Boolean delete(String path) {
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
@@ -137,6 +168,11 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         }
     }
 
+    /**
+     * 上传网络文件并上传到七牛云
+     * @param url 网络文件URL
+     * @return 上传后的文件访问URL
+     */
     @Override
     public String uploadNetFile(String url) {
         String fileName = RandomUtil.randomUUID();
@@ -176,6 +212,12 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return returnUrl.toString();
     }
 
+    /**
+     * 上传本地图片到七牛云
+     * @param localPath 本地文件路径
+     * @return 上传后的文件访问URL
+     * @throws MyException 当本地文件不存在或上传失败时抛出异常
+     */
     @Override
     public String uploadLocalImg(String localPath) {
         File file = new File(localPath);
@@ -228,6 +270,12 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return filePath;
     }
 
+    /**
+     * 上传Base64编码的图片到七牛云
+     * @param base64 Base64编码的图片数据
+     * @return 上传后的文件访问URL
+     * @throws MyException 当上传失败时抛出异常
+     */
     @Override
     public String uploadBase64(String base64) {
         StringBuilder key = new StringBuilder();
@@ -250,6 +298,12 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         return returnUrl.toString();
     }
 
+    /**
+     * 测试七牛云配置是否可用
+     * 通过上传测试图片验证配置的正确性
+     * @param uploadInfo 七牛云配置信息
+     * @return 配置是否可用
+     */
     @Override
     public Boolean testAccess(UploadInfo uploadInfo) {
         ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");

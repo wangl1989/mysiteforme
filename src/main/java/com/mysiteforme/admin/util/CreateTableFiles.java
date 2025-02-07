@@ -5,14 +5,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
+import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
+import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.baomidou.mybatisplus.generator.query.SQLQuery;
 import com.mysiteforme.admin.base.DataEntity;
 import com.mysiteforme.admin.base.TreeEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.util.*;
 
+/**
+ * 数据库表生成文件工具类
+ * 用于根据数据库表结构自动生成相关的实体类、Mapper、Service等文件
+ * 
+ * @author wangl
+ */
 @Component
 public class CreateTableFiles {
     @Value("${spring.datasource.driver-class-name}")
@@ -39,7 +48,12 @@ public class CreateTableFiles {
 
     public void createFile(String[] tableNames,int type,String driverName,String userName,String password,String dataBaseUrl,String baseDic,String zipFile,String author) {
         // 使用 FastAutoGenerator 快速配置代码生成器
-        FastAutoGenerator.create(driverName, userName, password)
+        FastAutoGenerator.create(dataBaseUrl, userName, password)
+                .dataSourceConfig(builder ->
+                        builder.databaseQueryClass(SQLQuery.class)
+                                .typeConvert(new MySqlTypeConvert())
+                                .dbQuery(new MySqlQuery())
+                )
                 .globalConfig(builder -> {
                     builder.author(author) // 设置作者
                             .disableOpenDir()   // 执行完成后是否自动打开输出目录
@@ -88,18 +102,21 @@ public class CreateTableFiles {
                         })
                         .customFile(new ArrayList<CustomFile>(){{
                             add(new CustomFile.Builder()
+                                    .enableFileOverride()
                                     .fileName("list.ftl")
                                     .filePath(baseDic+ "/" + OutputFile.entity + "/")
                                     .templatePath("/templates/vm/list.jsp.vm")
                                     .packageName("front")
                                     .build());
                             add(new CustomFile.Builder()
+                                    .enableFileOverride()
                                     .fileName("add.ftl")
                                     .filePath(baseDic+ "/" + OutputFile.entity + "/")
                                     .templatePath("/templates/vm/add.jsp.vm")
                                     .packageName("front")
                                     .build());
                             add(new CustomFile.Builder()
+                                    .enableFileOverride()
                                     .fileName("edit.jsp")
                                     .filePath(baseDic+ "/" + OutputFile.entity + "/")
                                     .templatePath("/templates/vm/edit.jsp.vm")

@@ -35,12 +35,22 @@ import java.util.Map;
 @RequestMapping("/admin/blogTags")
 public class BlogTagsController extends BaseController{
 
+    /**
+     * 显示标签列表页面
+     * @return 列表页面路径
+     */
+    @RequiresPermissions("blog:tags:list")
     @GetMapping("list")
-    @SysLog("跳转博客标签列表")
     public String list(){
         return "/admin/blogTags/list";
     }
 
+    /**
+     * 获取标签列表数据
+     * @param limit 每页条数
+     * @param page 分页参数
+     * @return 分页数据
+     */
     @RequiresPermissions("blog:tags:list")
     @PostMapping("list")
     @ResponseBody
@@ -61,11 +71,21 @@ public class BlogTagsController extends BaseController{
         return layerData;
     }
 
+    /**
+     * 显示标签添加页面
+     * @return 添加页面路径
+     */
+    @RequiresPermissions("blog:tags:add")
     @GetMapping("add")
     public String add(){
         return "/admin/blogTags/add";
     }
 
+    /**
+     * 保存标签
+     * @param blogTags 标签对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:tags:add")
     @PostMapping("add")
     @SysLog("保存新增博客标签数据")
@@ -75,6 +95,13 @@ public class BlogTagsController extends BaseController{
         return RestResponse.success();
     }
 
+    /**
+     * 编辑标签
+     * @param id 标签ID
+     * @param model 模型对象
+     * @return 编辑页面路径
+     */
+    @RequiresPermissions("blog:tags:edit")
     @GetMapping("edit")
     public String edit(Long id,Model model){
         BlogTags blogTags = blogTagsService.getById(id);
@@ -82,6 +109,11 @@ public class BlogTagsController extends BaseController{
         return "/admin/blogTags/edit";
     }
 
+    /**
+     * 更新标签
+     * @param blogTags 标签对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:tags:edit")
     @PostMapping("edit")
     @ResponseBody
@@ -94,6 +126,11 @@ public class BlogTagsController extends BaseController{
         return RestResponse.success();
     }
 
+    /**
+     * 删除标签
+     * @param id 标签ID
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:tags:delete")
     @PostMapping("delete")
     @ResponseBody

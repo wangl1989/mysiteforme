@@ -28,6 +28,11 @@ import java.util.Map;
 @Transactional(rollbackFor = Exception.class)
 public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComment> implements BlogCommentService {
 
+    /**
+     * 获取指定文章或留言板的最大楼层数
+     * @param articleId 文章ID，为null时表示获取留言板的最大楼层
+     * @return 最大楼层数，无评论时返回0
+     */
     @Override
     public Integer getMaxFloor(Long articleId) {
         QueryWrapper<BlogComment> queryWrapper = new QueryWrapper<>();
@@ -50,6 +55,11 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
         return floor;
     }
 
+    /**
+     * 获取指定回复评论下的最大楼层数
+     * @param replyId 被回复的评论ID
+     * @return 最大楼层数，无回复时返回0
+     */
     @Override
     public Integer getMaxFloorByReply(Long replyId) {
         QueryWrapper<BlogComment> queryWrapper = new QueryWrapper<>();
@@ -64,6 +74,13 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
         return floor;
     }
 
+    /**
+     * 分页获取文章评论列表
+     * @param articleId 文章ID
+     * @param type 评论类型
+     * @param page 分页参数
+     * @return 分页的评论列表
+     */
     @Override
     public IPage<BlogComment> getArticleComments(Long articleId, Integer type, IPage<BlogComment> page) {
         Map<String,Object> map = Maps.newHashMap();
@@ -76,12 +93,23 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentDao, BlogComm
         return page;
     }
 
+    /**
+     * 保存或更新评论
+     * 同时清除文章评论数量的缓存
+     * @param blogComment 评论对象
+     */
     @CacheEvict(value = "commentData",key = "'article_'+#blogComment.articleId+'_commentcount'")
     @Override
     public void saveOrUpdateBlogComment(BlogComment blogComment) {
         saveOrUpdate(blogComment);
     }
 
+    /**
+     * 获取文章的评论数量
+     * 结果会被缓存
+     * @param articleId 文章ID
+     * @return 评论数量
+     */
     @Cacheable(value = "commentData",key = "'article_'+#articleId+'_commentcount'")
     @Override
     public Integer getArticleCommentsCount(Long articleId) {

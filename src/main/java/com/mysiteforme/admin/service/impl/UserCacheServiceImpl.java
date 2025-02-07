@@ -19,6 +19,13 @@ import java.util.Map;
 @Service
 public class UserCacheServiceImpl extends ServiceImpl<UserDao, User> implements UserCacheService {
 
+    /**
+     * 根据用户ID查找用户信息
+     * 结果会被缓存，缓存key为'user_id_'+用户ID
+     * 当结果为null时不缓存
+     * @param id 用户ID
+     * @return 用户信息对象，未找到时返回null
+     */
     @Cacheable(value = "user",key="'user_id_'+T(String).valueOf(#id)",unless = "#result == null")
     public User findUserById(Long id) {
         Map<String,Object> map = Maps.newHashMap();

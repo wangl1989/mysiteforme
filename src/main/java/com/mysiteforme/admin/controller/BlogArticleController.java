@@ -43,12 +43,22 @@ import java.util.Map;
 @RequestMapping("/admin/blogArticle")
 public class BlogArticleController extends BaseController{
 
+    /**
+     * 显示文章列表页面
+     * @return 列表页面路径
+     */
+    @RequiresPermissions("blog:article:list")
     @GetMapping("list")
-    @SysLog("跳转博客内容列表")
     public String list(){
         return "/admin/blogArticle/list";
     }
 
+    /**
+     * 获取文章列表数据
+     * @param limit 每页条数
+     * @param page 分页参数
+     * @return 分页数据
+     */
     @RequiresPermissions("blog:article:list")
     @PostMapping("list")
     @ResponseBody
@@ -98,6 +108,12 @@ public class BlogArticleController extends BaseController{
         return layerData;
     }
 
+    /**
+     * 显示文章添加页面
+     * @param model 模型对象
+     * @return 添加页面路径
+     */
+    @RequiresPermissions("blog:article:add")
     @GetMapping("add")
     public String add(@RequestParam(value = "channelId",required = false)Long channelId, Model model){
         BlogChannel blogChannel = blogChannelService.getById(channelId);
@@ -111,9 +127,14 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/add";
     }
 
+    /**
+     * 保存文章
+     * @param blogArticle 文章对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:article:add")
     @PostMapping("add")
-    @SysLog("保存新增博客内容数据")
+    @SysLog("保存新增博客文章数据")
     @ResponseBody
     public RestResponse add(@RequestBody BlogArticle blogArticle){
         if(StringUtils.isBlank(blogArticle.getTitle())){

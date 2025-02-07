@@ -1,5 +1,11 @@
 package com.mysiteforme.admin.util;
 
+/**
+ * 系统常量定义类
+ * 用于定义系统中使用的各种常量值
+ * 
+ * @author wangl
+ */
 public class Constants {
 	/**
 	 * shiro采用加密算法

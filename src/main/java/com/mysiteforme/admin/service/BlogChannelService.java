@@ -19,6 +19,7 @@ public interface BlogChannelService extends IService<BlogChannel> {
 
     /**
      * 获取ztree格式的树结构数据
+     * @return ztree格式的栏目列表
      */
     List<ZtreeVO> selectZtreeData();
 
@@ -34,8 +35,9 @@ public interface BlogChannelService extends IService<BlogChannel> {
     void saveOrUpdateChannel(BlogChannel blogChannel);
 
     /**
-     * 获取栏目名称的数量
+     * 根据栏目名称获取数量
      * @param name 栏目名称
+     * @return 栏目数量
      */
     long getCountByName(String name);
 
@@ -46,14 +48,18 @@ public interface BlogChannelService extends IService<BlogChannel> {
      * @return 栏目list集合
      */
     List<BlogChannel> getChannelListByWrapper(int limit, QueryWrapper<BlogChannel> wrapper);
+
     /**
      * 获得当前栏目的所有父栏目集合
      * @param channelId 当前栏目ID
+     * @return 父栏目列表
      */
     List<BlogChannel> getParentsChannel(Long channelId);
 
     /**
      * 根据地址获取栏目对象
+     * @param href 栏目链接地址
+     * @return 栏目对象
      */
     BlogChannel getChannelByHref(String href);
 }

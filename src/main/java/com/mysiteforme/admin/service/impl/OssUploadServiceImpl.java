@@ -49,14 +49,29 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         this.uploadInfoService = uploadInfoService;
     }
 
+    /**
+     * 获取上传配置信息
+     * @return 上传配置对象
+     */
     private UploadInfo getUploadInfo(){
         return uploadInfoService.getOneInfo();
     }
 
+    /**
+     * 获取OSS客户端实例
+     * @return OSS客户端
+     */
     private OSS getOSSClient(){
         return new OSSClientBuilder().build(getUploadInfo().getOssEndpoint(),getUploadInfo().getOssKeyId(), getUploadInfo().getOssKeySecret());
     }
 
+    /**
+     * 上传文件到阿里云OSS
+     * @param file 要上传的文件
+     * @return 文件的访问URL
+     * @throws IOException IO异常
+     * @throws NoSuchAlgorithmException 加密算法异常
+     */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
         String fileName,realNames = "";
@@ -122,6 +137,11 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         return returnUrl.toString();
     }
 
+    /**
+     * 从阿里云OSS删除文件
+     * @param path 文件路径
+     * @return 删除是否成功
+     */
     @Override
     public Boolean delete(String path) {
         path = path.replace(getUploadInfo().getOssBasePath(), "");
@@ -143,6 +163,12 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         }
     }
 
+    /**
+     * 上传网络文件并上传到阿里云OSS
+     * @param url 网络文件URL
+     * @return 上传后的文件访问URL
+     * @throws IOException IO异常
+     */
     @Override
     public String uploadNetFile(String url) throws IOException {
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
@@ -177,6 +203,11 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         return returnUrl.toString();
     }
 
+    /**
+     * 上传本地图片到阿里云OSS
+     * @param localPath 本地文件路径
+     * @return 上传后的文件访问URL
+     */
     @Override
     public String uploadLocalImg(String localPath) {
         File file = new File(localPath);
@@ -224,6 +255,11 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         return null;
     }
 
+    /**
+     * 上传Base64编码的图片到阿里云OSS
+     * @param base64 Base64编码的图片数据
+     * @return 上传后的文件访问URL
+     */
     @Override
     public String uploadBase64(String base64) {
         //base64数据转换为byte[]类型
@@ -262,6 +298,12 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         return returnUrl.toString();
     }
 
+    /**
+     * 测试阿里云OSS配置是否可用
+     * 通过上传测试图片验证配置的正确性
+     * @param uploadInfo OSS配置信息
+     * @return 配置是否可用
+     */
     @Override
     public Boolean testAccess(UploadInfo uploadInfo) {
         ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");

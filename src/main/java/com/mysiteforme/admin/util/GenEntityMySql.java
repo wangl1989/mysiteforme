@@ -13,7 +13,7 @@ public class GenEntityMySql {
 
 
         CreateTableFiles createTableFiles = new CreateTableFiles();
-        createTableFiles.createFile(new String[]{"bolg_article"},1,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author);
+        createTableFiles.createFile(new String[]{"blog_article"},1,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author);
 
 
 	}

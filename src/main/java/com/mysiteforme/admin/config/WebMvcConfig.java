@@ -24,20 +24,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by wang on 2025/02/07.
- * todo:springMVC配置文件
+ * Spring MVC配置类
+ * 配置视图解析、资源映射、消息转换等
+ * @author wang
+ * @since 2025/02/07
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    //视图跳转控制器
+    /**
+     * 添加视图控制器
+     * @param registry 视图控制器注册器
+     */
     @Override
     public void addViewControllers(@NotNull ViewControllerRegistry registry) {
 //        registry.addViewController("/login").setViewName("login");  // 将 `/login` 映射到 `login.html`
 //        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);              // 优先级（可选）
     }
 
-    //访问静态资源
+    /**
+     * 配置静态资源映射
+     * @param registry 资源处理器注册器
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
@@ -61,8 +69,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     *  fastjson序列化
-     * */
+     * 配置消息转换器
+     * @param converters 消息转换器列表
+     */
     @Override
     public void configureMessageConverters(@NotNull List<HttpMessageConverter<?>> converters) {
         List<MediaType> supportedMediaTypes = new ArrayList<>();
@@ -98,6 +107,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 StandardCharsets.UTF_8);
     }
 
+    /**
+     * 添加拦截器
+     * @param registry 拦截器注册器
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MyHandlerInterceptor())

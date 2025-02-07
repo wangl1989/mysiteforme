@@ -45,12 +45,24 @@ public class BlogCommentController {
     public BlogCommentController(BlogCommentService blogCommentService) {
         this.blogCommentService = blogCommentService;
     }
+
+    /**
+     * 显示评论列表页面
+     * @return 列表页面路径
+     */
     @GetMapping("list")
     @SysLog("跳转博客评论列表")
     public String list(){
         return "/admin/blogComment/list";
     }
 
+    /**
+     * 获取评论列表数据
+     * @param page 分页参数
+     * @param limit 每页记录数
+     * @param request 请求对象
+     * @return 分页数据
+     */
     @RequiresPermissions("blog:comment:list")
     @PostMapping("list")
     @ResponseBody
@@ -131,6 +143,11 @@ public class BlogCommentController {
         return RestResponse.success();
     }
 
+    /**
+     * 删除评论
+     * @param id 评论ID
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:comment:delete")
     @PostMapping("delete")
     @ResponseBody

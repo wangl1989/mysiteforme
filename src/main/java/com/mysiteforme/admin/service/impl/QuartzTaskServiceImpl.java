@@ -59,28 +59,53 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         }
     }
 
+    /**
+     * 根据任务ID查询任务对象
+     * @param jobId 任务ID
+     * @return 任务对象
+     */
     @Override
     public QuartzTask queryObject(Long jobId) {
         return baseMapper.selectById(jobId);
     }
 
+    /**
+     * 分页查询任务列表
+     * @param wrapper 查询条件
+     * @param page 分页参数
+     * @return 分页结果
+     */
     @Override
     public IPage<QuartzTask> queryList(QueryWrapper<QuartzTask> wrapper, IPage<QuartzTask> page) {
         return page(page,wrapper);
     }
 
+    /**
+     * 保存定时任务
+     * 同时创建调度任务
+     * @param quartzTask 任务对象
+     */
     @Override
     public void saveQuartzTask(QuartzTask quartzTask) {
         baseMapper.insert(quartzTask);
         ScheduleUtils.createScheduleJob(scheduler,quartzTask);
     }
 
+    /**
+     * 更新定时任务
+     * 同时更新调度任务
+     * @param quartzTask 任务对象
+     */
     @Override
     public void updateQuartzTask(QuartzTask quartzTask) {
         baseMapper.updateById(quartzTask);
         ScheduleUtils.updateScheduleJob(scheduler,quartzTask);
     }
 
+    /**
+     * 批量删除定时任务
+     * @param ids 任务ID列表
+     */
     @Override
     public void deleteBatchTasks(List<Long> ids) {
         for(Long id : ids){
@@ -89,6 +114,11 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         removeByIds(ids);
     }
 
+    /**
+     * 批量更新任务状态
+     * @param ids 任务ID列表
+     * @param status 目标状态
+     */
     @Override
     public void updateBatchTasksByStatus(List<Long> ids, Integer status) {
         List<QuartzTask> list = listByIds(ids);
@@ -98,6 +128,10 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         updateBatchById(list);
     }
 
+    /**
+     * 立即执行多个任务
+     * @param jobIds 任务ID列表
+     */
     @Override
     public void run(List<Long> jobIds) {
         for(Long jobId : jobIds){
@@ -105,6 +139,10 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         }
     }
 
+    /**
+     * 暂停多个任务
+     * @param jobIds 任务ID列表
+     */
     @Override
     public void paush(List<Long> jobIds) {
         for(Long jobId : jobIds){
@@ -113,6 +151,10 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         updateBatchTasksByStatus(jobIds, Constants.QUARTZ_STATUS_PUSH);
     }
 
+    /**
+     * 恢复多个任务
+     * @param jobIds 任务ID列表
+     */
     @Override
     public void resume(List<Long> jobIds) {
         for(Long jobId : jobIds){

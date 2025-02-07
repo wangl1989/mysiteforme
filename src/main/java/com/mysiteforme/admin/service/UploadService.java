@@ -8,38 +8,47 @@ import java.security.NoSuchAlgorithmException;
 
 public interface UploadService {
     /**
-     * 文件上传方法
-     * @param file MultipartFile文件对象
-     * @return  文件在云上的地址
+     * 上传文件
+     * @param file 要上传的文件
+     * @return 文件的访问URL
+     * @throws IOException IO异常
+     * @throws NoSuchAlgorithmException 加密算法异常
      */
     String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException;
 
     /**
-     * 删除已经上传到云上的文件
-     * @param path 文件地址
-     * @return 是否删除成功
+     * 删除文件
+     * @param path 文件路径
+     * @return 删除是否成功
      */
     Boolean delete(String path);
 
     /**
      * 上传网络文件
-     * @param url 网络文件的地址
-     * @return  文件在云上的地址
+     * @param url 网络文件URL
+     * @return 上传后的文件访问URL
+     * @throws IOException IO异常
      */
-    String uploadNetFile(String url) throws IOException, NoSuchAlgorithmException;
+    String uploadNetFile(String url) throws IOException,NoSuchAlgorithmException;
 
     /**
-     * 上传本地指定路径的图片
+     * 上传本地图片
+     * @param localPath 本地文件路径
+     * @return 上传后的文件访问URL
      */
     String uploadLocalImg(String localPath);
 
     /**
-     * 上传base64格式的文件
+     * 上传Base64编码的图片
+     * @param base64 Base64编码的图片数据
+     * @return 上传后的文件访问URL
      */
     String uploadBase64(String base64);
 
     /**
-     * 上传测试
+     * 测试上传配置是否可用
+     * @param uploadInfo 上传配置信息
+     * @return 配置是否可用
      */
     Boolean testAccess(UploadInfo uploadInfo);
 }

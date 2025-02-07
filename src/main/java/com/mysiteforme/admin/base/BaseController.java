@@ -6,8 +6,16 @@ import com.mysiteforme.admin.service.*;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * 基础控制器
+ * 提供通用的Controller功能
+ */
 public class BaseController {
 	
+	/**
+	 * 获取当前登录用户
+	 * @return 当前登录的用户对象,未登录返回null
+	 */
 	public User getCurrentUser() {
 		ShiroUser shiroUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
 		if(shiroUser == null) {
@@ -16,9 +24,15 @@ public class BaseController {
 		return userService.getById(shiroUser.getId());
 	}
 
+	/**
+	 * 用户服务接口
+	 */
 	@Autowired
 	protected UserService userService;
 
+	/**
+	 * 菜单服务接口
+	 */
 	@Autowired
 	protected MenuService menuService;
 

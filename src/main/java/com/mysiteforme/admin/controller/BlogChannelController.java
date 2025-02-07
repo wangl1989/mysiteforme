@@ -33,8 +33,12 @@ import java.util.List;
 @RequestMapping("/admin/blogChannel")
 public class BlogChannelController extends BaseController{
 
+    /**
+     * 显示栏目列表页面
+     * @return 列表页面路径
+     */
+    @RequiresPermissions("blog:channel:list")
     @GetMapping("list")
-    @SysLog("跳转博客栏目列表")
     public String list(){
         return "/admin/blogChannel/list";
     }
@@ -47,6 +51,13 @@ public class BlogChannelController extends BaseController{
         return RestResponse.success().setData(blogChannels);
     }
 
+    /**
+     * 显示栏目添加页面
+     * @param parentId 父栏目ID
+     * @param model 模型对象
+     * @return 添加页面路径
+     */
+    @RequiresPermissions("blog:channel:add")
     @GetMapping("add")
     public String add(@RequestParam(value = "parentId",required = false)Long parentId,Model model){
         if(parentId != null && parentId != 0){
@@ -60,6 +71,11 @@ public class BlogChannelController extends BaseController{
         return "/admin/blogChannel/add";
     }
 
+    /**
+     * 保存栏目
+     * @param blogChannel 栏目对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:channel:add")
     @PostMapping("add")
     @SysLog("保存新增博客栏目数据")
@@ -107,6 +123,13 @@ public class BlogChannelController extends BaseController{
         return RestResponse.success();
     }
 
+    /**
+     * 编辑栏目
+     * @param id 栏目ID
+     * @param model 模型对象
+     * @return 编辑页面路径
+     */
+    @RequiresPermissions("blog:channel:edit")
     @GetMapping("edit")
     public String edit(Long id,Model model){
         BlogChannel blogChannel = blogChannelService.getById(id);
@@ -119,6 +142,11 @@ public class BlogChannelController extends BaseController{
         return "/admin/blogChannel/edit";
     }
 
+    /**
+     * 更新栏目
+     * @param blogChannel 栏目对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:channel:edit")
     @PostMapping("edit")
     @ResponseBody
@@ -143,6 +171,11 @@ public class BlogChannelController extends BaseController{
         return RestResponse.success();
     }
 
+    /**
+     * 删除栏目
+     * @param id 栏目ID
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:channel:delete")
     @PostMapping("delete")
     @ResponseBody

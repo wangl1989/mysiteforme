@@ -24,6 +24,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * 七牛云文件操作工具类
+ * 提供七牛云文件上传、删除等操作
+ */
 public class QiniuFileUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(QiniuFileUtil.class);

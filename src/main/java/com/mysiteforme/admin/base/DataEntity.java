@@ -14,22 +14,23 @@ import lombok.Getter;
 import java.util.Date;
 
 /**
- * 数据Entity类
- *
+ * 数据实体基类
+ * 提供创建者、创建时间、更新者、更新时间等审计字段
+ * @author JeeSite
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public abstract class DataEntity extends BaseEntity {
 
     /**
-     *  创建者
+     * 创建者ID
      */
     @Getter
     @TableField(value = "create_by", fill = FieldFill.INSERT)
     protected Long createId;
 
     /**
-     * 创建日期
+     * 创建时间
      */
     @TableField(value = "create_date", fill = FieldFill.INSERT)
     protected Date createDate;
@@ -72,27 +73,38 @@ public abstract class DataEntity extends BaseEntity {
     @TableField(exist = false)
     protected User updateUser;
 
-
+    /**
+     * 获取创建时间
+     * @return 创建时间
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
 
+    /**
+     * 默认构造函数
+     * 初始化删除标记为false
+     */
     public DataEntity() {
         super();
         this.delFlag = false;
     }
 
+    /**
+     * 带ID的构造函数
+     * @param id 实体ID
+     */
     public DataEntity(Long id) {
         super(id);
     }
 
-
+    /**
+     * 获取更新时间
+     * @return 更新时间
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
     }
-
-
-
 }

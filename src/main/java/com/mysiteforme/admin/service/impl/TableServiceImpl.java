@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by wangl on 2017/12/25.
+ * Created by wang on 2017/12/25.
  * todo:
  */
 @Service
@@ -29,7 +29,6 @@ import java.util.Map;
 public class TableServiceImpl implements TableService {
 
     private final TableDao tableDao;
-
 
     private final DictService dictService;
 
@@ -39,26 +38,49 @@ public class TableServiceImpl implements TableService {
         this.dictService = dictService;
     }
 
+    /**
+     * 获取所有数据表信息
+     * @return 数据表列表
+     */
     @Override
     public List<TableVO> listAll() {
         return tableDao.listAll();
     }
 
+    /**
+     * 获取数据表总数
+     * @return 数据表数量
+     */
     @Override
     public Integer getTableCount() {
         return tableDao.selectTableCount();
     }
 
+    /**
+     * 检查表是否存在
+     * @param tableName 表名
+     * @return 存在返回1，不存在返回0
+     */
     @Override
     public Integer existTable(String tableName) {
         return tableDao.existTable(tableName);
     }
 
+    /**
+     * 检查表字段是否存在
+     * @param map 包含表名和字段名的参数Map
+     * @return 存在返回1，不存在返回0
+     */
     @Override
     public Integer existTableField(Map<String, Object> map) {
         return tableDao.existTableField(map);
     }
 
+    /**
+     * 创建数据表
+     * 包含字段注释处理和数据字典创建
+     * @param tableVO 表结构信息对象
+     */
     @Override
     public void creatTable(TableVO tableVO) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -101,15 +123,22 @@ public class TableServiceImpl implements TableService {
         tableDao.creatTable(map);
     }
 
-    private String getFieldName(String name,String type){
+    /**
+     * 将下划线命名转换为驼峰命名
+     * @param name 字段名
+     * @param type 字段类型
+     * @return 转换后的字段名
+     */
+    private String getFieldName(String name, String type) {
         if(type.equalsIgnoreCase("bit") && name.indexOf("is_") == 0){
             name = name.replaceFirst("is_","");
         }
         return Underline2Camel.underline2Camel(name,true);
     }
 
-    /***
-     * 添加字段comment的值
+    /**
+     * 添加字段注释值
+     * @param field 字段信息对象
      */
     private void addFiledCommentValue(TableField field){
         String sv = field.getComment() + "," + field.getDofor() + "," + field.getIsNullValue() + "," +
@@ -117,6 +146,10 @@ public class TableServiceImpl implements TableService {
         field.setComment(sv);
     }
 
+    /**
+     * 添加字段到数据字典
+     * @param field 字段信息对象
+     */
     private void addColumnToDict(TableField field){
         if(field.getDofor().equals("select") || field.getDofor().equals("radio") || field.getDofor().equals("checkbox") || field.getDofor().equals("switch")){
             StringBuilder desc = new StringBuilder();
@@ -138,6 +171,10 @@ public class TableServiceImpl implements TableService {
 
     }
 
+    /**
+     * 添加表字段
+     * @param tableField 字段信息对象
+     */
     @Override
     public void addColumn(TableField tableField) {
         //添加字典
@@ -149,6 +186,10 @@ public class TableServiceImpl implements TableService {
         changeTableComment(tableField.getTableName(),tableField.getTableComment(),tableField.getTableType());
     }
 
+    /**
+     * 更新表字段
+     * @param tableField 字段信息对象
+     */
     @Override
     public void updateColumn(TableField tableField) {
         dictService.deleteByType(tableField.getTableName()+"_"+tableField.getOldName());
@@ -175,8 +216,13 @@ public class TableServiceImpl implements TableService {
         changeTableComment(tableField.getTableName(),tableField.getTableComment(),tableField.getTableType());
     }
 
+    /**
+     * 删除表字段
+     * @param fieldName 字段名
+     * @param tableName 表名
+     */
     @Override
-    public void dropTableField(String fieldName,String tableName) {
+    public void dropTableField(String fieldName, String tableName) {
         Map<String,Object> map = Maps.newHashMap();
         map.put("fieldName",fieldName);
         map.put("tableName",tableName);
@@ -185,12 +231,22 @@ public class TableServiceImpl implements TableService {
     }
 
 
+    /**
+     * 删除数据表
+     * @param tableName 表名
+     */
     @Override
     public void dropTable(String tableName) {
         tableDao.dropTable(tableName);
         dictService.deleteByTableName(tableName);
     }
 
+    /**
+     * 分页查询数据表
+     * @param objectPage 分页对象
+     * @param map 查询条件
+     * @return 分页结果
+     */
     @Override
     public IPage<TableVO> selectTablePage(IPage<TableVO> objectPage, Map<String,Object> map) {
         List<TableVO> list = tableDao.listPage(map,objectPage);
@@ -198,13 +254,24 @@ public class TableServiceImpl implements TableService {
         return objectPage;
     }
 
+    /**
+     * 查询表字段列表
+     * @param map 查询条件
+     * @return 字段列表
+     */
     @Override
     public List<TableField> selectFields(Map<String,Object> map) {
         return tableDao.selectFields(map);
     }
 
+    /**
+     * 分页查询表字段
+     * @param objectPage 分页对象
+     * @param map 查询条件
+     * @return 分页结果
+     */
     @Override
-    public IPage<TableField> selectTableFieldPage(IPage<TableField> objectPage,Map<String,Object> map) {
+    public IPage<TableField> selectTableFieldPage(IPage<TableField> objectPage, Map<String,Object> map) {
         List<TableField> list = tableDao.selectFields(objectPage,map);
         for (TableField t : list){
             changeTableField(t);
@@ -213,6 +280,11 @@ public class TableServiceImpl implements TableService {
         return objectPage;
     }
 
+    /**
+     * 处理表字段信息
+     * 解析字段注释中的配置信息
+     * @param t 字段信息对象
+     */
     private void changeTableField(TableField t){
         String[] c = t.getComment().split(",");
         t.setComment(c[0]);
@@ -227,13 +299,25 @@ public class TableServiceImpl implements TableService {
         }
     }
 
+    /**
+     * 获取表详细信息
+     * @param name 表名
+     * @return 表详细信息
+     */
     @Override
     public TableVO detailTable(String name) {
         return tableDao.selectDetailTable(name);
     }
 
+    /**
+     * 修改表名
+     * @param name 新表名
+     * @param rename 旧表名
+     * @param comment 表注释
+     * @param tableType 表类型
+     */
     @Override
-    public void changeTableName(String name,String rename,String comment,Integer tableType) {
+    public void changeTableName(String name, String rename, String comment, Integer tableType) {
         Map<String,Object> tablemap = Maps.newHashMap();
         tablemap.put("name",rename);
         tablemap.put("tableType",tableType);
@@ -264,8 +348,14 @@ public class TableServiceImpl implements TableService {
         tableDao.changeTableName(map);
     }
 
+    /**
+     * 修改表注释
+     * @param name 表名
+     * @param comment 表注释
+     * @param tableType 表类型
+     */
     @Override
-    public void changeTableComment(String name,String comment,Integer tableType) {
+    public void changeTableComment(String name, String comment, Integer tableType) {
         Map<String,Object> tablemap = Maps.newHashMap();
         tablemap.put("name",name);
         tablemap.put("tableType",tableType);

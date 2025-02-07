@@ -26,16 +26,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by wangl on 2018/1/13.
- * todo:
+ * Web层日志切面
+ * 实现系统操作日志的记录
+ * @author wangl
+ * @since 2018/1/13
  */
 @Aspect
-@Order(5)
 @Component
+@Order(5)
 public class WebLogAspect {
 
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(WebLogAspect.class);
@@ -55,9 +56,16 @@ public class WebLogAspect {
 
     private Log sysLog = new Log();
 
+    /**
+     * 切入点表达式,拦截使用@SysLog注解的方法
+     */
     @Pointcut("@annotation(com.mysiteforme.admin.annotation.SysLog)")
     public void webLog(){}
 
+    /**
+     * 前置通知,在方法执行前记录系统日志
+     * @param joinPoint 连接点,包含被拦截方法的信息
+     */
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) {
         startTime.set(System.currentTimeMillis());
@@ -124,6 +132,12 @@ public class WebLogAspect {
         }
     }
 
+    /**
+     * 环绕通知,统一异常处理
+     * @param proceedingJoinPoint 连接点
+     * @return 方法执行结果
+     * @throws Throwable 执行异常
+     */
     @Around("webLog()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         try {
@@ -135,6 +149,10 @@ public class WebLogAspect {
         }
     }
 
+    /**
+     * 返回通知,记录响应结果
+     * @param ret 返回结果对象
+     */
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) {
         if(MySysUser.ShiroUser() != null) {

@@ -97,7 +97,7 @@ public class LuceneSearch {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
         //创建索引写入对象
         IndexWriter writer = new IndexWriter(directory,indexWriterConfig);
-        Document doc = DocumentUtil.writeDoc(blogArticle);
+        Document doc = DocumentUtil.article2Doc(blogArticle);
         writer.updateDocument(new Term("id", blogArticle.getId().toString()), doc);
         writer.commit();// 提交
         writer.close();// 关闭

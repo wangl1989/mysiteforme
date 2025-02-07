@@ -15,10 +15,10 @@ import java.io.Serializable;
 
 
 /**
- * Entity支持类
- *
+ * 实体类基类
+ * 提供ID等基础字段
+ * @author JeeSite
  */
-
 @Getter
 @Setter
 @Data
@@ -27,28 +27,32 @@ public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 6962439201546719734L;
 
     /**
-     * 实体编号（唯一标识）
+     * 实体ID,唯一标识
      */
     @TableId
     protected Long id;
 
-
-
-    public BaseEntity() {
-
-    }
-
-    public BaseEntity(Long id) {
-        this();
-        this.id = id;
-    }
+    /**
+     * 获取实体ID
+     * @return 实体ID
+     */
     @JsonSerialize(using=ToStringSerializer.class)
     public Long getId() {
         return id;
     }
 
+    /**
+     * 默认构造函数
+     */
+    public BaseEntity() {
+    }
 
-
-
-
+    /**
+     * 带ID的构造函数
+     * @param id 实体ID
+     */
+    public BaseEntity(Long id) {
+        this();
+        this.id = id;
+    }
 }

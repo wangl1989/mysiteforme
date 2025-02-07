@@ -12,8 +12,10 @@ import java.util.Properties;
 
 
 /**
- * Created by wangl on 2018/1/25.
- * todo:定时任务配置类
+ * Quartz定时任务配置类
+ * 配置定时任务的执行器和持久化
+ * @author wangl
+ * @since 2018/1/25
  */
 @Configuration
 public class QuartzConfig {
@@ -49,6 +51,10 @@ public class QuartzConfig {
         return druidDataSource;
     }
 
+    /**
+     * 配置Quartz调度工厂
+     * @return SchedulerFactoryBean实例
+     */
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws SQLException {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();

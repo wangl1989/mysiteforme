@@ -26,15 +26,24 @@ import java.util.Map;
 @Transactional(rollbackFor = Exception.class)
 public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogService {
 
+    /**
+     * 查询最近15天的日志数量统计
+     * 如果某天没有日志记录，则补充为0
+     * @return 最近15天的每日日志数量列表
+     */
     @Override
     public List<Integer> selectSelfMonthData() {
+        // 获取数据库中的日志统计数据
         List<Map<String,Object>> list =  baseMapper.selectSelfMonthData();
-        //补全数据库中不存在的日期，订单数为0
+        
+        // 生成最近15天的日期列表（从今天往前推14天）
         List<String> dayList = Lists.newArrayList();
         for (int i=-14;i<=0;i++){
             DateTime  dateTime = DateUtil.offsetDay(new Date(),i);
             dayList.add(dateTime.toString("yyyy-MM-dd"));
         }
+        
+        // 将数据库统计结果转换为每日数量列表，对缺失的日期补0
         List<Integer> pv = Lists.newArrayList();
         for (String s : dayList) {
             int total = 0;

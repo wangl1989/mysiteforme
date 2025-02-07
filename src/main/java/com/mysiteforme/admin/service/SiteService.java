@@ -13,8 +13,16 @@ import com.mysiteforme.admin.entity.Site;
  */
 public interface SiteService extends IService<Site> {
 
+    /**
+     * 获取当前站点信息
+     * @return 站点信息对象
+     */
     Site getCurrentSite();
 
+    /**
+     * 更新站点信息
+     * @param site 站点信息对象
+     */
     void updateSite(Site site);
 	
 }

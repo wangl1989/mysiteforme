@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
+/**
+ * MyBatis DAO标识注解
+ * 用于标记MyBatis的DAO接口,方便扫描器识别
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
@@ -21,13 +25,8 @@ import java.lang.annotation.*;
 public @interface MyBatisDao {
 
     /**
-
-     * The value may indicate a suggestion for a logical component name,
-
-     * to be turned into a Spring bean in case of an autodetected component.
-
-     * @return the suggested component name, if any
-
+     * 组件名称建议值
+     * @return 建议的组件名称
      */
     String value() default "";
 

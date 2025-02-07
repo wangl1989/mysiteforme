@@ -4,6 +4,8 @@
 package com.mysiteforme.admin.util;
 
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,18 +14,21 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 
 /**
- * 支持SHA-1/MD5消息摘要的工具类.
- * 
+ * 消息摘要工具类
+ * 支持SHA-1、MD5等消息摘要算法
+ * 可以对字符串、字节数组等进行摘要计算
+ * <p>
  * 返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
  * 
  * @author calvin
  */
 public class Digests {
+	private static final Logger logger = LoggerFactory.getLogger(Digests.class);
 
 	private static final String SHA1 = "SHA-1";
 	private static final String MD5 = "MD5";
 
-	private static SecureRandom random = new SecureRandom();
+	private static final SecureRandom random = new SecureRandom();
 
 	/**
 	 * 对输入字符串进行md5散列.
@@ -36,16 +41,31 @@ public class Digests {
 	}
 	
 	/**
-	 * 对输入字符串进行sha1散列.
+	 * 计算SHA-1消息摘要
+	 * @param input 输入字节数组
+	 * @return SHA-1摘要结果
 	 */
 	public static byte[] sha1(byte[] input) {
 		return digest(input, SHA1, null, 1);
 	}
 
+	/**
+	 * 计算SHA-1消息摘要
+	 * @param input 输入字节数组
+	 * @param salt 盐值
+	 * @return SHA-1摘要结果
+	 */
 	public static byte[] sha1(byte[] input, byte[] salt) {
 		return digest(input, SHA1, salt, 1);
 	}
 
+	/**
+	 * 计算SHA-1消息摘要
+	 * @param input 输入字节数组
+	 * @param salt 盐值
+	 * @param iterations 迭代次数
+	 * @return SHA-1摘要结果
+	 */
 	public static byte[] sha1(byte[] input, byte[] salt, int iterations) {
 		return digest(input, SHA1, salt, iterations);
 	}
@@ -69,6 +89,7 @@ public class Digests {
 			}
 			return result;
 		} catch (GeneralSecurityException e) {
+			logger.error(e.getMessage(), e);
 			throw Exceptions.unchecked(e);
 		}
 	}

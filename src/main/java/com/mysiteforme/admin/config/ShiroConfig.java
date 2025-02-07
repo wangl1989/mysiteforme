@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import javax.servlet.DispatcherType;
@@ -32,8 +33,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by wangl on 2017/11/22.
- * todo:
+ * Shiro安全框架配置类
+ * 配置认证、授权、会话管理等安全特性
+ * @author wangl
+ * @since 2017/11/22
  */
 @Configuration
 public class ShiroConfig {
@@ -59,6 +62,27 @@ public class ShiroConfig {
         return filterRegistrationBean;
     }
 
+    /**
+     * 配置安全管理器
+     * @param authRealm 自定义Realm
+     * @return SecurityManager实例
+     */
+    @Bean
+    public SecurityManager securityManager(@Qualifier("authRealm")AuthRealm authRealm){
+        logger.info("- - - - - - -shiro开始加载- - - - - - ");
+        DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
+        defaultWebSecurityManager.setRealm(authRealm);
+        defaultWebSecurityManager.setRememberMeManager(rememberMeManager());
+        defaultWebSecurityManager.setSessionManager(webSessionManager());
+        defaultWebSecurityManager.setCacheManager(cacheManager());
+        return defaultWebSecurityManager;
+    }
+
+    /**
+     * 配置Shiro过滤器
+     * @param authRealm 安全管理器
+     * @return ShiroFilterFactoryBean实例
+     */
     @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("authRealm")AuthRealm authRealm){
         ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
@@ -82,19 +106,6 @@ public class ShiroConfig {
     }
 
     @Bean
-    public SecurityManager securityManager(@Qualifier("authRealm")AuthRealm authRealm){
-        logger.info("- - - - - - -shiro开始加载- - - - - - ");
-        DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        defaultWebSecurityManager.setRealm(authRealm);
-        defaultWebSecurityManager.setRememberMeManager(rememberMeManager());
-        defaultWebSecurityManager.setSessionManager(webSessionManager());
-        defaultWebSecurityManager.setCacheManager(cacheManager());
-        return defaultWebSecurityManager;
-    }
-
-
-
-    @Bean
     public SimpleCookie rememberMeCookie(){
         //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
         SimpleCookie cookie = new SimpleCookie("rememberMe");
@@ -113,17 +124,8 @@ public class ShiroConfig {
     }
 
     /**
-     * AOP式方法级权限检查
-     */
-    @Bean
-    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator(){
-        DefaultAdvisorAutoProxyCreator creator=new DefaultAdvisorAutoProxyCreator();
-        creator.setProxyTargetClass(true);
-        return creator;
-    }
-
-    /**
-     * 保证实现了Shiro内部lifecycle函数的bean执行
+     * 配置生命周期处理器
+     * @return LifecycleBeanPostProcessor实例
      */
     @Bean
     public static LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){
@@ -172,5 +174,17 @@ public class ShiroConfig {
         RedisCacheManager manager = new RedisCacheManager();
         manager.setRedisManager(redisManager());
         return manager;
+    }
+
+    /**
+     * 开启Shiro注解支持
+     * @return DefaultAdvisorAutoProxyCreator实例
+     */
+    @Bean
+    @DependsOn({"lifecycleBeanPostProcessor"})
+    public DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator(){
+        DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        advisorAutoProxyCreator.setProxyTargetClass(true);
+        return advisorAutoProxyCreator;
     }
 }

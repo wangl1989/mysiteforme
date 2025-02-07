@@ -33,6 +33,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * 登录控制器
+ * 处理用户登录、登出等认证相关操作
+ */
 @Controller
 public class LoginController extends BaseController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
@@ -40,6 +44,10 @@ public class LoginController extends BaseController {
 	@Value("${server.port}")
 	private String port;
 
+	/**
+	 * 跳转到登录页面
+	 * @return 登录页面路径
+	 */
 	@GetMapping("login")
 	public String login(HttpServletRequest request) {
 		LOGGER.info("跳到这边的路径为:{}",request.getRequestURI());
@@ -52,6 +60,11 @@ public class LoginController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 用户登录
+	 * @param request HTTP请求对象
+	 * @return 登录结果
+	 */
 	@PostMapping("login/main")
 	@ResponseBody
 	@SysLog("用户登录")
@@ -113,14 +126,19 @@ public class LoginController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 登录成功后跳转到首页
+	 * @param model 模型对象
+	 * @return 首页路径
+	 */
 	@GetMapping("index")
 	public String showView(Model model){
 		return "index";
 	}
 
-
 	/**
-	 * 获取验证码图片和文本(验证码文本会保存在HttpSession中)
+	 * 生成验证码
+	 * @param response HTTP响应对象
 	 */
 	@GetMapping("/genCaptcha")
 	public void genCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -139,6 +157,11 @@ public class LoginController extends BaseController {
 		ImageIO.write(bufferedImage, "JPEG", response.getOutputStream());
 	}
 
+	/**
+	 * 登录成功后跳转到首页
+	 * @param model 模型对象
+	 * @return 首页路径
+	 */
 	@GetMapping("main")
 	public String main(Model model){
 		Map<String,Object> map = userService.selectUserMenuCount();
@@ -171,6 +194,10 @@ public class LoginController extends BaseController {
 		return s.isAuthenticated() ? "redirect:index" : "login";
 	}
 
+	/**
+	 * 用户登出
+	 * @return 登出结果
+	 */
 	@GetMapping("systemLogout")
 	@SysLog("退出系统")
 	public String logOut(){
