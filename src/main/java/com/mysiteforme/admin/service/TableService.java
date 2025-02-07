@@ -1,6 +1,6 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.VO.TableField;
 import com.mysiteforme.admin.entity.VO.TableVO;
 
@@ -31,11 +31,11 @@ public interface TableService {
 
     void dropTable(String tableName);
 
-    Page<TableVO> selectTablePage(Page<TableVO> objectPage, Map<String,Object> map);
+    IPage<TableVO> selectTablePage(IPage<TableVO> objectPage, Map<String,Object> map);
 
     List<TableField> selectFields(Map<String,Object> map);
 
-    Page<TableField> selectTableFieldPage(Page<TableField> objectPage,Map<String,Object> map);
+    IPage<TableField> selectTableFieldPage(IPage<TableField> objectPage, Map<String,Object> map);
 
     TableVO detailTable(String name);
 

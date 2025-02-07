@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.QuartzTask;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  * @author wangl
  * @since 2018-01-24
  */
+@Mapper
 public interface QuartzTaskDao extends BaseMapper<QuartzTask> {
 
 }

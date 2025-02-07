@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -15,10 +18,12 @@ import java.util.List;
  * @author wangl
  * @since 2018-01-18
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_comment")
-public class BlogComment extends DataEntity<BlogComment> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class BlogComment extends DataEntity {
 
     /**
      * 评论内容
@@ -74,71 +79,6 @@ public class BlogComment extends DataEntity<BlogComment> {
 	@TableField(exist = false)
 	private List<BlogComment> replayList;
 
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-	public String getSystem() {
-		return system;
-	}
-
-	public void setSystem(String system) {
-		this.system = system;
-	}
-	public String getBrowser() {
-		return browser;
-	}
-
-	public void setBrowser(String browser) {
-		this.browser = browser;
-	}
-	public Integer getFloor() {
-		return floor;
-	}
-
-	public void setFloor(Integer floor) {
-		this.floor = floor;
-	}
-	public Long getChannelId() {
-		return channelId;
-	}
-
-	public void setChannelId(Long channelId) {
-		this.channelId = channelId;
-	}
-	public Long getArticleId() {
-		return articleId;
-	}
-
-	public void setArticleId(Long articleId) {
-		this.articleId = articleId;
-	}
-	public Long getReplyId() {
-		return replyId;
-	}
-
-	public void setReplyId(Long replyId) {
-		this.replyId = replyId;
-	}
 	public Boolean getAdminReply() {
 		return isAdminReply;
 	}
@@ -146,21 +86,7 @@ public class BlogComment extends DataEntity<BlogComment> {
 	public void setAdminReply(Boolean isAdminReply) {
 		this.isAdminReply = isAdminReply;
 	}
-	public String getReplyContent() {
-		return replyContent;
-	}
 
-	public void setReplyContent(String replyContent) {
-		this.replyContent = replyContent;
-	}
-
-	public List<BlogComment> getReplayList() {
-		return replayList;
-	}
-
-	public void setReplayList(List<BlogComment> replayList) {
-		this.replayList = replayList;
-	}
 
 	@Override
 	public String toString() {

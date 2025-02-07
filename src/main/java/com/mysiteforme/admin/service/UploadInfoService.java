@@ -1,7 +1,7 @@
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.UploadInfo;
-import com.baomidou.mybatisplus.service.IService;
 /**
  * <p>
  * 文件上传配置 服务类
@@ -12,8 +12,8 @@ import com.baomidou.mybatisplus.service.IService;
  */
 public interface UploadInfoService extends IService<UploadInfo> {
 
-    public UploadInfo getOneInfo();
+    UploadInfo getOneInfo();
 
-    public void updateInfo(UploadInfo uploadInfo);
+    void updateInfo(UploadInfo uploadInfo);
 
 }

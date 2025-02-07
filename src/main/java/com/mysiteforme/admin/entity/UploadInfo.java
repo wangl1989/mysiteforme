@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.baomidou.mybatisplus.enums.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,10 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-07-06
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("upload_info")
-public class UploadInfo extends DataEntity<UploadInfo> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class UploadInfo extends DataEntity {
 
     /**
      * 本地window系统上传路径
@@ -41,7 +46,7 @@ public class UploadInfo extends DataEntity<UploadInfo> {
     /**
      * 七牛文件存储目录
      */
-	@TableField(value = "qiniu_dir",strategy= FieldStrategy.IGNORED)
+	@TableField(value = "qiniu_dir")
 	private String qiniuDir;
     /**
      * 七牛qiniuAccess值
@@ -71,7 +76,7 @@ public class UploadInfo extends DataEntity<UploadInfo> {
     /**
      * 阿里云文件上传目录
      */
-	@TableField(value = "oss_dir",strategy= FieldStrategy.IGNORED)
+	@TableField(value = "oss_dir")
 	private String ossDir;
     /**
      * 阿里云ACCESS_KEY_ID值
@@ -94,114 +99,7 @@ public class UploadInfo extends DataEntity<UploadInfo> {
 	@TableField(value = "oss_test_access")
 	private Boolean ossTestAccess;
 
-	public String getLocalWindowUrl() {
-		return localWindowUrl;
-	}
 
-	public void setLocalWindowUrl(String localWindowUrl) {
-		this.localWindowUrl = localWindowUrl;
-	}
-	public String getLocalLinuxUrl() {
-		return localLinuxUrl;
-	}
-
-	public void setLocalLinuxUrl(String localLinuxUrl) {
-		this.localLinuxUrl = localLinuxUrl;
-	}
-	public String getQiniuBasePath() {
-		return qiniuBasePath;
-	}
-
-	public void setQiniuBasePath(String qiniuBasePath) {
-		this.qiniuBasePath = qiniuBasePath;
-	}
-	public String getQiniuBucketName() {
-		return qiniuBucketName;
-	}
-
-	public void setQiniuBucketName(String qiniuBucketName) {
-		this.qiniuBucketName = qiniuBucketName;
-	}
-	public String getQiniuDir() {
-		return qiniuDir;
-	}
-
-	public void setQiniuDir(String qiniuDir) {
-		this.qiniuDir = qiniuDir;
-	}
-	public String getQiniuAccessKey() {
-		return qiniuAccessKey;
-	}
-
-	public void setQiniuAccessKey(String qiniuAccessKey) {
-		this.qiniuAccessKey = qiniuAccessKey;
-	}
-	public String getQiniuSecretKey() {
-		return qiniuSecretKey;
-	}
-
-	public void setQiniuSecretKey(String qiniuSecretKey) {
-		this.qiniuSecretKey = qiniuSecretKey;
-	}
-	public String getOssBasePath() {
-		return ossBasePath;
-	}
-
-	public void setOssBasePath(String ossBasePath) {
-		this.ossBasePath = ossBasePath;
-	}
-	public String getOssBucketName() {
-		return ossBucketName;
-	}
-
-	public void setOssBucketName(String ossBucketName) {
-		this.ossBucketName = ossBucketName;
-	}
-	public String getOssDir() {
-		return ossDir;
-	}
-
-	public void setOssDir(String ossDir) {
-		this.ossDir = ossDir;
-	}
-	public String getOssKeyId() {
-		return ossKeyId;
-	}
-
-	public void setOssKeyId(String ossKeyId) {
-		this.ossKeyId = ossKeyId;
-	}
-	public String getOssKeySecret() {
-		return ossKeySecret;
-	}
-
-	public void setOssKeySecret(String ossKeySecret) {
-		this.ossKeySecret = ossKeySecret;
-	}
-
-	public String getOssEndpoint() {
-		return ossEndpoint;
-	}
-
-	public void setOssEndpoint(String ossEndpoint) {
-		this.ossEndpoint = ossEndpoint;
-	}
-
-	public Boolean getQiniuTestAccess() {
-		return qiniuTestAccess;
-	}
-
-	public void setQiniuTestAccess(Boolean qiniuTestAccess) {
-		this.qiniuTestAccess = qiniuTestAccess;
-	}
-
-	public Boolean getOssTestAccess() {
-		return ossTestAccess;
-	}
-
-	public void setOssTestAccess(Boolean ossTestAccess) {
-		this.ossTestAccess = ossTestAccess;
-	}
 
 	@Override
 	public String toString() {

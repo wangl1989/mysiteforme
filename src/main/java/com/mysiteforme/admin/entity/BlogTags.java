@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,10 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-17
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_tags")
-public class BlogTags extends DataEntity<BlogTags> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class BlogTags extends DataEntity {
 
     /**
      * 标签名字
@@ -29,31 +34,6 @@ public class BlogTags extends DataEntity<BlogTags> {
 
 	@TableField(exist = false)
 	private Integer tagsUseCount;
-
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-
-	public Integer getTagsUseCount() {
-		return tagsUseCount;
-	}
-
-	public void setTagsUseCount(Integer tagsUseCount) {
-		this.tagsUseCount = tagsUseCount;
-	}
 
 	@Override
 	public String toString() {

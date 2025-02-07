@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.TreeEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,10 +16,12 @@ import com.mysiteforme.admin.base.TreeEntity;
  * @author wangl
  * @since 2018-01-18
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_channel")
+@Data
+@Getter
+@Setter
 public class BlogChannel extends TreeEntity<BlogChannel> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 名称
@@ -71,86 +76,6 @@ public class BlogChannel extends TreeEntity<BlogChannel> {
      */
 	@TableField("seo_description")
 	private String seoDescription;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Long getSiteId() {
-		return siteId;
-	}
-
-	public void setSiteId(Long siteId) {
-		this.siteId = siteId;
-	}
-
-	public String getHref() {
-		return href;
-	}
-
-	public void setHref(String href) {
-		this.href = href;
-	}
-
-	public String getLogo() {
-		return logo;
-	}
-
-	public void setLogo(String logo) {
-		this.logo = logo;
-	}
-	public Boolean getBaseChannel() {
-		return isBaseChannel;
-	}
-
-	public void setBaseChannel(Boolean isBaseChannel) {
-		this.isBaseChannel = isBaseChannel;
-	}
-	public Boolean getCanComment() {
-		return canComment;
-	}
-
-	public void setCanComment(Boolean canComment) {
-		this.canComment = canComment;
-	}
-	public Boolean getNoName() {
-		return isNoName;
-	}
-
-	public void setNoName(Boolean isNoName) {
-		this.isNoName = isNoName;
-	}
-	public Boolean getCanAduit() {
-		return isCanAduit;
-	}
-
-	public void setCanAduit(Boolean isCanAduit) {
-		this.isCanAduit = isCanAduit;
-	}
-	public String getSeoTitle() {
-		return seoTitle;
-	}
-
-	public void setSeoTitle(String seoTitle) {
-		this.seoTitle = seoTitle;
-	}
-	public String getSeoKeywords() {
-		return seoKeywords;
-	}
-
-	public void setSeoKeywords(String seoKeywords) {
-		this.seoKeywords = seoKeywords;
-	}
-	public String getSeoDescription() {
-		return seoDescription;
-	}
-
-	public void setSeoDescription(String seoDescription) {
-		this.seoDescription = seoDescription;
-	}
 
 
 	@Override

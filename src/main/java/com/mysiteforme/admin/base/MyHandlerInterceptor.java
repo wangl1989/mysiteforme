@@ -1,13 +1,10 @@
 package com.mysiteforme.admin.base;
 
 import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserService;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.util.Factory;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,15 +21,23 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component
 public class MyHandlerInterceptor implements HandlerInterceptor {
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(MyHandlerInterceptor.class);
+
+    private  SiteService siteService;
+    private  UserService userService;
+    private  UserCacheService userCacheService;
+
+    public MyHandlerInterceptor() {
+    }
 
     @Autowired
-    private SiteService siteService;
-    @Autowired
-    private UserService userService;
+    public MyHandlerInterceptor(SiteService siteService, UserService userService, UserCacheService userCacheService) {
+        this.siteService = siteService;
+        this.userService = userService;
+        this.userCacheService = userCacheService;
+    }
 
     @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) {
+    public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
 //        LOGGER.info("当前请求路径.."+httpServletRequest.getRequestURI());
         if (siteService == null || userService == null) {//解决service为null无法注入问题
             System.out.println("siteService is null!!!");
@@ -42,7 +47,7 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
 
         }
         httpServletRequest.setAttribute("site",siteService.getCurrentSite());
-        User user = userService.findUserById(MySysUser.id());
+        User user = userCacheService.findUserById(MySysUser.id());
         if(user != null){
             httpServletRequest.setAttribute("currentUser",user);
             return true;
@@ -51,12 +56,12 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) {
+    public void postHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, ModelAndView modelAndView) {
 
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+    public void afterCompletion(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, Exception e) {
 
     }
 }

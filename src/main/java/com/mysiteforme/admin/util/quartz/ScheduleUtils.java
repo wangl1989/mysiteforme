@@ -5,12 +5,14 @@ import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.util.Constants;
 import org.quartz.*;
 
+import java.util.Objects;
+
 
 /**
  * 类ScheduleUtils的功能描述:
  * 定时任务工具类
- * @auther hxy
- * @date 2017-08-25 16:18:10
+ * &#064;author  hxy
+ * &#064;date  2017-08-25 16:18:10
  */
 public class ScheduleUtils {
     private final static String JOB_NAME = "TASK_";
@@ -61,7 +63,7 @@ public class ScheduleUtils {
             scheduler.scheduleJob(jobDetail, trigger);
             
             //暂停任务
-            if(scheduleJob.getStatus() == Constants.QUARTZ_STATUS_PUSH){
+            if(Objects.equals(scheduleJob.getStatus(), Constants.QUARTZ_STATUS_PUSH)){
             	pauseJob(scheduler, scheduleJob.getId());
             }
         } catch (SchedulerException e) {
@@ -91,7 +93,7 @@ public class ScheduleUtils {
             scheduler.rescheduleJob(triggerKey, trigger);
             
             //暂停任务
-            if(scheduleJob.getStatus() == Constants.QUARTZ_STATUS_PUSH){
+            if(Objects.equals(scheduleJob.getStatus(), Constants.QUARTZ_STATUS_PUSH)){
             	pauseJob(scheduler, scheduleJob.getId());
             }
             

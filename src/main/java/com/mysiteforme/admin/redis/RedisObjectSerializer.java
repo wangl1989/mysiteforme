@@ -1,8 +1,8 @@
 package com.mysiteforme.admin.redis;
 
-/**
- * Created by wangl on 2017/11/25.
- * todo:
+/*
+  Created by wangl on 2017/11/25.
+  todo:
  */
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.serializer.support.DeserializingConverter;
@@ -14,8 +14,8 @@ import org.springframework.data.redis.serializer.SerializationException;
  * redis序列化对象
  */
 public class RedisObjectSerializer implements RedisSerializer<Object> {
-    private Converter<Object, byte[]> serializer = new SerializingConverter();
-    private Converter<byte[], Object> deserializer = new DeserializingConverter();
+    private final Converter<Object, byte[]> serializer = new SerializingConverter();
+    private final Converter<byte[], Object> deserializer = new DeserializingConverter();
     static final byte[] EMPTY_ARRAY = new byte[0];
 
     public Object deserialize(byte[] bytes) {

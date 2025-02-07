@@ -1,19 +1,21 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.dao.BlogChannelDao;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.BlogChannelService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,8 @@ import java.util.Map;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class BlogChannelServiceImpl extends ServiceImpl<BlogChannelDao, BlogChannel> implements BlogChannelService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BlogChannelServiceImpl.class);
 
     @Cacheable(value = "channelData",key = "'articleZtree'",unless = "#result == null or #result.size() == 0")
     @Override
@@ -47,7 +51,7 @@ public class BlogChannelServiceImpl extends ServiceImpl<BlogChannelDao, BlogChan
         try {
             list = baseMapper.selectChannelData(map);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("查询栏目列表失败",e);
         }
         return list;
     }
@@ -61,48 +65,49 @@ public class BlogChannelServiceImpl extends ServiceImpl<BlogChannelDao, BlogChan
     @Override
     public void saveOrUpdateChannel(BlogChannel blogChannel) {
         try {
-            insertOrUpdate(blogChannel);
+            saveOrUpdate(blogChannel);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("保存或更新栏目失败",e);
         }
     }
 
     @Override
-    public int getCountByName(String name) {
-        EntityWrapper<BlogChannel> wrapper = new EntityWrapper<>();
+    public long getCountByName(String name) {
+        QueryWrapper<BlogChannel> wrapper = new QueryWrapper<>();
         wrapper.eq("name",name);
         wrapper.eq("del_flag",false);
-        return selectCount(wrapper);
+        return count(wrapper);
     }
 
     @Cacheable(value = "channelData",key = "'blog_channel_top_limit'+#limit",unless = "#result == null or #result.size() == 0")
     @Override
-    public List<BlogChannel> getChannelListByWrapper(int limit, EntityWrapper<BlogChannel> wrapper) {
-        return selectPage(new Page<>(1,limit),wrapper).getRecords();
+    public List<BlogChannel> getChannelListByWrapper(int limit, QueryWrapper<BlogChannel> wrapper) {
+        return list(new Page<>(1,limit),wrapper);
     }
 
     @Cacheable(value = "channelData",key = "'blog_parent_channel_list_'+#channelId",unless = "#result == null or #result.size() == 0")
     @Override
     public List<BlogChannel> getParentsChannel(Long channelId) {
-        EntityWrapper<BlogChannel> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogChannel> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("id",channelId);
-        BlogChannel blogChannel = selectOne(wrapper);
+        BlogChannel blogChannel = getOne(wrapper);
+        if(blogChannel == null){
+            return null;
+        }
         String[] parentIds = blogChannel.getParentIds().split(",");
         List<Long> ids = Lists.newArrayList();
-        for(int i=0;i<parentIds.length;i++){
-            ids.add(Long.valueOf(parentIds[i]));
+        for (String parentId : parentIds) {
+            ids.add(Long.valueOf(parentId));
         }
-        List<BlogChannel> channelList = selectBatchIds(ids);
-        return channelList;
+        return listByIds(ids);
     }
 
     @Override
     public BlogChannel getChannelByHref(String href) {
-        EntityWrapper<BlogChannel> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogChannel> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("href",href);
-        BlogChannel c  = selectOne(wrapper);
-        return c;
+        return getOne(wrapper);
     }
 }

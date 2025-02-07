@@ -20,7 +20,7 @@ public class MySysUser {
     }
 
     public static String loginName() {
-        return ShiroUser().getloginName();
+        return ShiroUser().getLoginName();
     }
 
     public static String nickName(){
@@ -28,7 +28,6 @@ public class MySysUser {
     }
 
     public static ShiroUser ShiroUser() {
-        ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-        return user;
+        return (ShiroUser) SecurityUtils.getSubject().getPrincipal();
     }
 }

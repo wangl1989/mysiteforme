@@ -37,7 +37,7 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfig {
-    private Logger  logger = LoggerFactory.getLogger(ShiroConfig.class);
+    private final Logger  logger = LoggerFactory.getLogger(ShiroConfig.class);
 
     @Value("${spring.redis.host}")
     private String jedisHost;
@@ -49,8 +49,8 @@ public class ShiroConfig {
     private String jedisPassword;
 
     @Bean
-    public FilterRegistrationBean delegatingFilterProxy(){
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<DelegatingFilterProxy> delegatingFilterProxy(){
+        FilterRegistrationBean<DelegatingFilterProxy> filterRegistrationBean = new FilterRegistrationBean<>();
         DelegatingFilterProxy proxy = new DelegatingFilterProxy();
         proxy.setTargetFilterLifecycle(true);
         proxy.setTargetBeanName("shiroFilter");
@@ -114,7 +114,6 @@ public class ShiroConfig {
 
     /**
      * AOP式方法级权限检查
-     * @return
      */
     @Bean
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator(){
@@ -125,7 +124,6 @@ public class ShiroConfig {
 
     /**
      * 保证实现了Shiro内部lifecycle函数的bean执行
-     * @return
      */
     @Bean
     public static LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){

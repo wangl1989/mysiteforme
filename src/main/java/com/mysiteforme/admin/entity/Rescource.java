@@ -1,8 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -12,10 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-14
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_rescource")
-public class Rescource extends DataEntity<Rescource> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class Rescource extends DataEntity {
 
     /**
      * 文件名称
@@ -49,61 +55,6 @@ public class Rescource extends DataEntity<Rescource> {
 	@TableField("original_net_url")
 	private String originalNetUrl;
 
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public String getWebUrl() {
-		return webUrl;
-	}
-
-	public void setWebUrl(String webUrl) {
-		this.webUrl = webUrl;
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-
-	public String getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(String fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public String getFileType() {
-		return fileType;
-	}
-
-	public void setFileType(String fileType) {
-		this.fileType = fileType;
-	}
-
-	public String getOriginalNetUrl() {
-		return originalNetUrl;
-	}
-
-	public void setOriginalNetUrl(String originalNetUrl) {
-		this.originalNetUrl = originalNetUrl;
-	}
 
 	@Override
 	public String toString() {

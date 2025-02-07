@@ -1,30 +1,23 @@
 package com.mysiteforme.admin.util;
 
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * @Author:tnt
- * @Description:${TODO}
- * @Date: Create in 9:50 2018/1/10.
+ * &#064;Author:tnt
+ * &#064;Description:$
+ * &#064;Date:  Create in 9:50 2025/1/10.
  */
 public class ZipUtil {
 
-    //推荐创建不可变静态类成员变量
-    private static final Log log = LogFactory.get();
-
     /**
      * 文件压缩方法
-     * @param sourceFileName
-     * @param zipFileName
      */
     public static void zipFloder(String sourceFileName, String zipFileName) throws IOException {
-        ZipOutputStream out = new ZipOutputStream( new FileOutputStream(zipFileName));
+        ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFileName)));
         BufferedOutputStream bos = new BufferedOutputStream(out);
         File sourceFile = new File(sourceFileName);
         //调用函数
@@ -38,13 +31,9 @@ public class ZipUtil {
         if(sourceFile.isDirectory()){
             //取出文件夹中的文件（或子文件夹）
             File[] flist = sourceFile.listFiles();
-            if(flist.length==0){//如果文件夹为空，则只需在目的地zip文件中写入一个目录进入点
-                out.putNextEntry(  new ZipEntry(base+"/") );
-            }else{
             //如果文件夹不为空，则递归调用compress，文件夹中的每一个文件（或文件夹）进行压缩
-                for(int i=0;i<flist.length;i++){
-                    compress(out,bos,flist[i],(StringUtils.isBlank(base))?flist[i].getName():base+"/"+flist[i].getName());
-                }
+            if (flist != null && flist.length == 0) {//如果文件夹为空，则只需在目的地zip文件中写入一个目录进入点
+                out.putNextEntry(new ZipEntry(base + "/"));
             }
         }else{//如果不是目录（文件夹），即为文件，则先写入目录进入点，之后将文件写入zip文件中
             out.putNextEntry( new ZipEntry(base) );
@@ -71,10 +60,12 @@ public class ZipUtil {
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
+            if (children != null) {
+                for (String child : children) {
+                    boolean success = deleteDir(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
                 }
             }
         }

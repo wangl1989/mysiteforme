@@ -1,29 +1,23 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mysiteforme.admin.base.TreeEntity;
 import com.mysiteforme.admin.dao.MenuDao;
 import com.mysiteforme.admin.entity.Menu;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.ShowMenu;
-import com.mysiteforme.admin.entity.VO.TreeMenu;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.MenuService;
-import com.mysiteforme.admin.util.MyCompare;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -50,34 +44,34 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
     @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
     public void saveOrUpdateMenu(Menu menu) {
-        insertOrUpdate(menu);
+        saveOrUpdate(menu);
     }
 
     @Override
-    public int getCountByPermission(String permission) {
-        EntityWrapper<Menu> wrapper = new EntityWrapper<>();
+    public long getCountByPermission(String permission) {
+        QueryWrapper<Menu> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("permission",permission);
-        return baseMapper.selectCount(wrapper);
+        return count(wrapper);
     }
 
     @Override
-    public int getCountByName(String name) {
-        EntityWrapper<Menu> wrapper = new EntityWrapper<>();
+    public long getCountByName(String name) {
+        QueryWrapper<Menu> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("name",name);
-        return baseMapper.selectCount(wrapper);
+        return count(wrapper);
     }
 
     @Override
     public List<ZtreeVO> showTreeMenus() {
-        EntityWrapper<Menu> wrapper = new EntityWrapper<>();
+        QueryWrapper<Menu> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("is_show",true);
-        wrapper.orderBy("sort",false);
+        wrapper.orderBy(false,false,"sort");
         List<Menu> totalMenus = baseMapper.selectList(wrapper);
-        List<ZtreeVO> ztreeVOs = Lists.newArrayList();
-        return getZTree(null,totalMenus,ztreeVOs);
+        List<ZtreeVO> treeVOs = Lists.newArrayList();
+        return getZTree(null,totalMenus,treeVOs);
     }
 
     @Cacheable(value = "allMenus",key = "'user_menu_'+T(String).valueOf(#id)",unless = "#result == null or #result.size() == 0")
@@ -96,7 +90,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         Long pid = tree == null?null:tree.getId();
         List<ZtreeVO> childList = Lists.newArrayList();
         for (Menu m : total){
-            if(pid == m.getParentId()) {
+            if(Objects.equals(pid, m.getParentId())) {
                 ZtreeVO ztreeVO = new ZtreeVO();
                 ztreeVO.setId(m.getId());
                 ztreeVO.setName(m.getName());

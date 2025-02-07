@@ -1,10 +1,8 @@
 package com.mysiteforme.admin.base;
 
 import com.mysiteforme.admin.entity.Site;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.service.SiteService;
-import com.mysiteforme.admin.service.UserService;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,13 +19,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component
 public class BlogHandlerInterceptor implements HandlerInterceptor {
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(BlogHandlerInterceptor.class);
 
-    @Autowired
     private SiteService siteService;
 
+    public BlogHandlerInterceptor() {
+        super();
+    }
+
+    @Autowired
+    public BlogHandlerInterceptor(SiteService siteService) {
+        this.siteService = siteService;
+    }
+
     @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) {
+    public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
         if (siteService == null) {//解决service为null无法注入问题
             BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(httpServletRequest.getServletContext());
             siteService = (SiteService) factory.getBean("siteService");
@@ -42,12 +47,12 @@ public class BlogHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) {
+    public void postHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, ModelAndView modelAndView) {
 
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+    public void afterCompletion(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o, Exception e) {
 
     }
 }

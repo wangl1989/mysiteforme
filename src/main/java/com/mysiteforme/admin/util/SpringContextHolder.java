@@ -2,6 +2,7 @@ package com.mysiteforme.admin.util;
 
 
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出ApplicaitonContext.
  * 
  * @author XXXXXX
- * @date 2013-5-29 下午1:25:40
+ * &#064;date  2013-5-29 下午1:25:40
  */
 @Service
 @Lazy(false)
@@ -22,7 +23,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 
 	private static ApplicationContext applicationContext = null;
 
-	private static Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
+	private static final Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
 
 	/**
 	 * 取得存储在静态变量中的ApplicationContext.
@@ -54,7 +55,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 	 */
 	public static void clearHolder() {
 		if (logger.isDebugEnabled()){
-			logger.debug("清除SpringContextHolder中的ApplicationContext:" + applicationContext);
+			logger.debug("清除SpringContextHolder中的ApplicationContext:{}" , applicationContext);
 		}
 		applicationContext = null;
 	}
@@ -63,7 +64,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 	 * 实现ApplicationContextAware接口, 注入Context到静态变量中.
 	 */
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	public void setApplicationContext(@NotNull ApplicationContext applicationContext) {
 		SpringContextHolder.applicationContext = applicationContext;
 	}
 

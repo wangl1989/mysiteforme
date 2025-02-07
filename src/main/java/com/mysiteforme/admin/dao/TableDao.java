@@ -1,10 +1,11 @@
 package com.mysiteforme.admin.dao;
 
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.VO.TableField;
 import com.mysiteforme.admin.entity.VO.TableVO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -13,12 +14,12 @@ import java.util.Map;
  * Created by wangl on 2017/12/25.
  * todo: 数据库操作表
  */
-@Repository("tableDao")
-public interface TableDao {
+@Mapper
+public interface TableDao extends BaseMapper<TableDao> {
 
     List<TableVO> listAll();
 
-    List<TableVO> listPage(Map<String,Object> map, Page<TableVO> page);
+    List<TableVO> listPage(Map<String,Object> map, IPage<TableVO> page);
 
     Integer selectTableCount();
 
@@ -42,7 +43,7 @@ public interface TableDao {
 
     TableVO selectDetailTable(String name);
 
-    List<TableField> selectFields(Page<TableField> objectPage,Map<String,Object> map);
+    List<TableField> selectFields(IPage<TableField> objectPage,Map<String,Object> map);
 
     void changeTableName(Map<String,Object> map);
 

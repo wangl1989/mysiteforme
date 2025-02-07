@@ -1,15 +1,24 @@
 package com.mysiteforme.admin.entity.VO;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
- * @Author:tnt
- * @Description:${TODO}
- * @Date: Create in 17:55 2017/12/25.
+ * &#064;Author:tnt
+ * &#064;Description:$
+ * &#064;Date:  Create in 17:55 2017/12/25.
  */
+@Data
+@Getter
+@Setter
 public class TableVO implements Serializable{
+
+    private static final long serialVersionUID = 6962439201546719734L;
     /**
      * 表的名称
      */
@@ -42,59 +51,5 @@ public class TableVO implements Serializable{
      */
     private Date updateTime;
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<TableField> getFieldList() {
-        return fieldList;
-    }
-
-    public void setFieldList(List<TableField> fieldList) {
-        this.fieldList = fieldList;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Integer getTabletype() {
-        return tabletype;
-    }
-
-    public void setTabletype(Integer tabletype) {
-        this.tabletype = tabletype;
-    }
-
-    public Integer getTableRows() {
-        return tableRows;
-    }
-
-    public void setTableRows(Integer tableRows) {
-        this.tableRows = tableRows;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

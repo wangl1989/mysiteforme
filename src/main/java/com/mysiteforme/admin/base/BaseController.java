@@ -13,8 +13,7 @@ public class BaseController {
 		if(shiroUser == null) {
 			return null;
 		}
-		User loginUser = userService.selectById(shiroUser.getId());
-		return loginUser;
+		return userService.getById(shiroUser.getId());
 	}
 
 	@Autowired
@@ -54,10 +53,7 @@ public class BaseController {
 	protected BlogTagsService blogTagsService;
 
 	@Autowired
-	protected QuartzTaskService quartzTaskService;
-
-	@Autowired
-	protected QuartzTaskLogService quartzTaskLogService;
+	protected UserCacheService userCacheService;
 
 	@Autowired
 	protected UploadInfoService uploadInfoService;

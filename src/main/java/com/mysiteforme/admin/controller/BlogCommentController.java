@@ -1,14 +1,13 @@
 package com.mysiteforme.admin.controller;
 
-import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.mysiteforme.admin.entity.BlogComment;
 import com.mysiteforme.admin.service.BlogCommentService;
-import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -17,17 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,11 +36,15 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/blogComment")
 public class BlogCommentController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlogCommentController.class);
 
-    @Autowired
     private BlogCommentService blogCommentService;
 
+    public BlogCommentController() {}
+
+    @Autowired
+    public BlogCommentController(BlogCommentService blogCommentService) {
+        this.blogCommentService = blogCommentService;
+    }
     @GetMapping("list")
     @SysLog("跳转博客评论列表")
     public String list(){
@@ -58,9 +57,9 @@ public class BlogCommentController {
     public LayerData<BlogComment> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<BlogComment> layerData = new LayerData<>();
-        EntityWrapper<BlogComment> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogComment> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         if(!map.isEmpty()){
             String content = (String) map.get("content");
@@ -91,9 +90,9 @@ public class BlogCommentController {
             }
 
         }
-        Page<BlogComment> pageData = blogCommentService.selectPage(new Page<>(page,limit),wrapper);
+        IPage<BlogComment> pageData = blogCommentService.page(new Page<>(page,limit),wrapper);
         layerData.setData(pageData.getRecords());
-        layerData.setCount(pageData.getTotal());
+        layerData.setCount((int)pageData.getTotal());
         return layerData;
     }
 
@@ -108,13 +107,13 @@ public class BlogCommentController {
         if(StringUtils.isBlank(blogComment.getContent())){
             return RestResponse.failure("评论内容不能为空");
         }
-        blogCommentService.insert(blogComment);
+        blogCommentService.save(blogComment);
         return RestResponse.success();
     }
 
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        BlogComment blogComment = blogCommentService.selectById(id);
+        BlogComment blogComment = blogCommentService.getById(id);
         model.addAttribute("blogComment",blogComment);
         return "/admin/blogComment/edit";
     }
@@ -140,7 +139,7 @@ public class BlogCommentController {
         if(null == id || 0 == id){
             return RestResponse.failure("ID不能为空");
         }
-        BlogComment blogComment = blogCommentService.selectById(id);
+        BlogComment blogComment = blogCommentService.getById(id);
         blogComment.setDelFlag(true);
         blogCommentService.updateById(blogComment);
         return RestResponse.success();
@@ -157,7 +156,7 @@ public class BlogCommentController {
         if(StringUtils.isBlank(blogComment.getReplyContent())){
             return RestResponse.failure("回复内容不能为空");
         }
-        String content = blogComment.getReplyContent().replace("\"", "\'");
+        String content = blogComment.getReplyContent().replace("\"", "'");
         blogComment.setReplyContent(content);
         blogComment.setAdminReply(true);
         blogCommentService.saveOrUpdateBlogComment(blogComment);

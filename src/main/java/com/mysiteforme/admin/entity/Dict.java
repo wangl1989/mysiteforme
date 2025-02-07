@@ -1,12 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import java.io.Serializable;
-
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -16,11 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2017-11-26
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_dict")
-public class Dict extends DataEntity<Dict> {
-
-    private static final long serialVersionUID = 1L;
-
+@Data
+@Getter
+@Setter
+public class Dict extends DataEntity {
     /**
      * 数据值
      */
@@ -46,60 +47,6 @@ public class Dict extends DataEntity<Dict> {
      */
 	@TableField("parent_id")
 	private String parentId;
-
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-
-	public String getParentId() {
-		return parentId;
-	}
-
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
-
-	@Override
-	protected Serializable pkVal() {
-		return this.id;
-	}
 
 	@Override
 	public String toString() {

@@ -4,9 +4,12 @@
 package com.mysiteforme.admin.base;
 
 
-import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -14,17 +17,19 @@ import java.io.Serializable;
 /**
  * Entity支持类
  *
- * @param <T>
  */
 
-public abstract class BaseEntity<T extends Model> extends Model<T>  {
+@Getter
+@Setter
+@Data
+public abstract class BaseEntity implements Serializable {
 
-
+    private static final long serialVersionUID = 6962439201546719734L;
 
     /**
      * 实体编号（唯一标识）
      */
-
+    @TableId
     protected Long id;
 
 
@@ -42,29 +47,6 @@ public abstract class BaseEntity<T extends Model> extends Model<T>  {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (null == obj) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        if (!getClass().equals(obj.getClass())) {
-            return false;
-        }
-        BaseEntity<?> that = (BaseEntity<?>) obj;
-        return null != this.getId() && this.getId().equals(that.getId());
-    }
 
 
 

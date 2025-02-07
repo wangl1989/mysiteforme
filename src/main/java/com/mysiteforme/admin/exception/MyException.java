@@ -1,9 +1,14 @@
 package com.mysiteforme.admin.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Created by wangl on 2018/1/24.
  * todo:
  */
+@Setter
+@Getter
 public class MyException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -36,19 +41,4 @@ public class MyException extends RuntimeException {
         this.msg = msg;
     }
 
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 }

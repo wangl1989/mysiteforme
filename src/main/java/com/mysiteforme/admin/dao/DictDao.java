@@ -1,8 +1,8 @@
 package com.mysiteforme.admin.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Dict;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.springframework.stereotype.Component;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  * @author wangl
  * @since 2017-11-26
  */
+@Mapper
 public interface DictDao extends BaseMapper<Dict> {
 
 }

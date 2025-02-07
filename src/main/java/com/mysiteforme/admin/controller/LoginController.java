@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.controller;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -11,7 +10,6 @@ import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.VerifyCodeUtil;
-import com.xiaoleilu.hutool.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -44,9 +42,9 @@ public class LoginController extends BaseController {
 
 	@GetMapping("login")
 	public String login(HttpServletRequest request) {
-		LOGGER.info("跳到这边的路径为:"+request.getRequestURI());
+		LOGGER.info("跳到这边的路径为:{}",request.getRequestURI());
 		Subject s = SecurityUtils.getSubject();
-		LOGGER.info("是否记住登录--->"+s.isRemembered()+"<-----是否有权限登录----->"+s.isAuthenticated()+"<----");
+		LOGGER.info("是否记住登录--->{}<-----是否有权限登录----->{}",s.isRemembered(),s.isAuthenticated());
 		if(s.isAuthenticated()){
 			return "redirect:index";
 		}else {
@@ -81,12 +79,12 @@ public class LoginController extends BaseController {
 		if(StringUtils.isBlank(trueCode)){
 			return RestResponse.failure("验证码超时");
 		}
-		if(StringUtils.isBlank(code) || !trueCode.toLowerCase().equals(code.toLowerCase())){
+		if(StringUtils.isBlank(code) || !trueCode.equalsIgnoreCase(code)){
 			error = "验证码错误";
 		}else {
 			/*就是代表当前的用户。*/
 			Subject user = SecurityUtils.getSubject();
-			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.valueOf(rememberMe));
+			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.parseBoolean(rememberMe));
 			try {
 				user.login(token);
 				if (user.isAuthenticated()) {
@@ -133,7 +131,7 @@ public class LoginController extends BaseController {
 		String verifyCode = VerifyCodeUtil.generateTextCode(VerifyCodeUtil.TYPE_ALL_MIXED, 4, null);
 		//将验证码放到HttpSession里面
 		request.getSession().setAttribute(Constants.VALIDATE_CODE, verifyCode);
-		LOGGER.info("本次生成的验证码为[" + verifyCode + "],已存放到HttpSession中");
+		LOGGER.info("本次生成的验证码为[{}],已存放到HttpSession中",verifyCode);
 		//设置输出的内容的类型为JPEG图像
 		response.setContentType("image/jpeg");
 		BufferedImage bufferedImage = VerifyCodeUtil.generateImageCode(verifyCode, 116, 36, 5, true, new Color(249,205,173), null, null);
@@ -143,11 +141,11 @@ public class LoginController extends BaseController {
 
 	@GetMapping("main")
 	public String main(Model model){
-		Map map = userService.selectUserMenuCount();
-		User user = userService.findUserById(MySysUser.id());
+		Map<String,Object> map = userService.selectUserMenuCount();
+		User user = userCacheService.findUserById(MySysUser.id());
 		Set<Menu> menus = user.getMenus();
 		java.util.List<Menu> showMenus = Lists.newArrayList();
-		if(menus != null && menus.size()>0){
+		if(menus != null && !menus.isEmpty()){
 			for (Menu menu : menus){
 				if(StringUtils.isNotBlank(menu.getHref())){
 					Long result = (Long)map.get(menu.getPermission());
@@ -165,7 +163,6 @@ public class LoginController extends BaseController {
 
 	/**
 	 *  空地址请求
-	 * @return
 	 */
 	@GetMapping(value = "")
 	public String index() {

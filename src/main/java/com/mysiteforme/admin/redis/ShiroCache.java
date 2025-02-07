@@ -1,8 +1,8 @@
 package com.mysiteforme.admin.redis;
 
-/**
- * Created by wangl on 2017/11/25.
- * todo:
+/*
+  Created by wang on 2017/11/25.
+  todo:
  */
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,15 +14,13 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.springframework.data.redis.core.RedisTemplate;
 
-@SuppressWarnings("unchecked")
 public class ShiroCache<K, V> implements Cache<K, V> {
 
     private static final String REDIS_SHIRO_CACHE = "mysiteforme-shiro-cache:";
     private String cacheKey;
     private RedisTemplate<K, V> redisTemplate;
-    private long globExpire = 30;
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("unchecked")
     public ShiroCache(String name, RedisTemplate client) {
         this.cacheKey = REDIS_SHIRO_CACHE + name + ":";
         this.redisTemplate = client;
@@ -30,6 +28,7 @@ public class ShiroCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key) throws CacheException {
+        long globExpire = 30;
         redisTemplate.boundValueOps(getCacheKey(key)).expire(globExpire, TimeUnit.MINUTES);
         return redisTemplate.boundValueOps(getCacheKey(key)).get();
     }
@@ -73,6 +72,7 @@ public class ShiroCache<K, V> implements Cache<K, V> {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     private K getCacheKey(Object k) {
         return (K) (this.cacheKey + k);
     }

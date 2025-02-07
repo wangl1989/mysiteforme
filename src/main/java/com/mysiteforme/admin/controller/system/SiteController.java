@@ -37,13 +37,21 @@ public class SiteController extends BaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SiteController.class);
 
-    @Autowired
     @Qualifier("qiniuService")
     private UploadService qiniuService;
 
-    @Autowired
     @Qualifier("ossService")
     private UploadService ossService;
+
+    public SiteController() {
+        super();
+    }
+
+    @Autowired
+    public SiteController(UploadService qiniuService, UploadService ossService) {
+        this.qiniuService = qiniuService;
+        this.ossService = ossService;
+    }
 
     @RequiresPermissions("sys:site:list")
     @GetMapping("show")
@@ -77,7 +85,7 @@ public class SiteController extends BaseController{
         if(!ossService.testAccess(uploadInfo)){
             return RestResponse.failure("阿里云上传测试检测失败");
         }
-        UploadInfo oldInfo = uploadInfoService.selectById(uploadInfo.getId());
+        UploadInfo oldInfo = uploadInfoService.getById(uploadInfo.getId());
         uploadInfo.setQiniuDir(oldInfo.getQiniuDir());
         uploadInfoService.updateInfo(uploadInfo);
         site.setFileUploadType("oss");
@@ -108,7 +116,7 @@ public class SiteController extends BaseController{
         if(!qiniuService.testAccess(uploadInfo)){
             return RestResponse.failure("七牛上传测试检测失败");
         }
-        UploadInfo oldInfo = uploadInfoService.selectById(uploadInfo.getId());
+        UploadInfo oldInfo = uploadInfoService.getById(uploadInfo.getId());
         uploadInfo.setOssDir(oldInfo.getOssDir());
         uploadInfoService.updateInfo(uploadInfo);
         site.setFileUploadType("qiniu");
@@ -131,7 +139,7 @@ public class SiteController extends BaseController{
             return RestResponse.failure("站点名称不能为空");
         }
         if(StringUtils.isNotBlank(site.getRemarks())){
-            site.setRemarks(site.getRemarks().replace("\"", "\'"));
+            site.setRemarks(site.getRemarks().replace("\"", "'"));
         }
         if("oss".equals(site.getFileUploadType())){
             UploadInfo uploadInfo = uploadInfoService.getOneInfo();

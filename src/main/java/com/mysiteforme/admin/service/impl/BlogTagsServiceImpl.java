@@ -1,15 +1,11 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.mapper.Condition;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.mysiteforme.admin.dao.BlogArticleDao;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.mysiteforme.admin.dao.BlogTagsDao;
-import com.mysiteforme.admin.service.BlogArticleService;
 import com.mysiteforme.admin.service.BlogTagsService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -32,38 +28,38 @@ public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTags> impl
 
     @Override
     public Integer getCountByName(String name) {
-        EntityWrapper<BlogTags> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogTags> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("name",name);
-        return selectCount(wrapper);
+        return Math.toIntExact(count(wrapper));
     }
 
     @Override
     public void saveTag(BlogTags tags) {
-        Object o = selectObj(Condition.create()
-                .setSqlSelect("max(sort)")
-                .eq("del_flag",false));
+        QueryWrapper<BlogTags> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eqSql("sort","select max(sort) from blog_tags ")
+                .eq("del_flag",false);
+        BlogTags blogTags = getOne(queryWrapper);
         int sort = 0;
-        if(o != null){
-            sort =  (Integer)o +1;
+        if(blogTags != null){
+            sort =  blogTags.getSort() + 1;
         }
         tags.setSort(sort);
-        insert(tags);
+        save(tags);
     }
 
     @Override
     public List<BlogTags> listAll() {
-        EntityWrapper<BlogTags> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogTags> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        wrapper.orderBy("sort",false);
-        return selectList(wrapper);
+        wrapper.orderBy(false,false,"sort");
+        return list(wrapper);
     }
 
     @Cacheable(value = "blogTagsData",key = "'blog_tags_channel_'+#channelId",unless = "#result == null or #result.size() == 0")
     @Override
     public List<BlogTags> getTagsByChannelId(Long channelId) {
-        List<BlogTags> list = baseMapper.getTagsByChannelId(channelId);
-        return list;
+        return baseMapper.getTagsByChannelId(channelId);
     }
 
     @Cacheable(value = "blogTagsData",key = "'blog_tags_article_'+#articleId",unless = "#result == null or #result.size() == 0")
@@ -75,12 +71,12 @@ public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTags> impl
     @CacheEvict(value = "blogTagsData",allEntries = true)
     @Override
     public void deleteThisTag(Long id) {
-        deleteById(id);
+        removeById(id);
         baseMapper.removeArticleTagsByTagId(id);
     }
 
     @Override
-    public Page<BlogTags> selectTagsPage(Map<String, Object> map, Page<BlogTags> page) {
+    public IPage<BlogTags> selectTagsPage(Map<String, Object> map, IPage<BlogTags> page) {
         List<BlogTags> blogTagsList = baseMapper.selectTagsPage(map,page);
         page.setRecords(blogTagsList);
         return page;

@@ -1,6 +1,6 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Log;
 
 import java.util.List;
@@ -15,6 +15,6 @@ import java.util.List;
  */
 public interface LogService extends IService<Log> {
 
-    public List<Integer> selectSelfMonthData();
+    List<Integer> selectSelfMonthData();
 
 }

@@ -1,16 +1,15 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.dao.SiteDao;
 import com.mysiteforme.admin.service.SiteService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 /**
  * <p>
@@ -27,13 +26,13 @@ public class SiteServiceImpl extends ServiceImpl<SiteDao, Site> implements SiteS
     @Cacheable(value = "currentSite",key = "'currentSite'")
     @Override
     public Site getCurrentSite() {
-        EntityWrapper<Site> wrapper = new EntityWrapper<>();
+        QueryWrapper<Site> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        return selectOne(wrapper);
+        return getOne(wrapper);
     }
 
     @CacheEvict(value = "currentSite",key = "'currentSite'")
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateSite(Site site) {
         baseMapper.updateById(site);

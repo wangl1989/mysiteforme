@@ -1,12 +1,10 @@
 package com.mysiteforme.admin.dao;
 
-
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +17,7 @@ import java.util.Set;
  * @author wangl
  * @since 2017-10-31
  */
+@Mapper
 public interface UserDao extends BaseMapper<User> {
 	User selectUserByMap(Map<String, Object> map);
 
@@ -26,5 +25,5 @@ public interface UserDao extends BaseMapper<User> {
 
 	void dropUserRolesByUserId(@Param("userId")Long userId);
 
-	Map selectUserMenuCount();
+	Map<String,Object> selectUserMenuCount();
 }

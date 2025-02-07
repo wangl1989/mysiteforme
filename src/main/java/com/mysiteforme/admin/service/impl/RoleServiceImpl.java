@@ -1,7 +1,7 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RoleDao;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.Role;
@@ -32,19 +32,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
             put = {@CachePut(value = "role",key = "'role_id_'+T(String).valueOf(#result.id)",condition = "#result.id != null and #result.id != 0")},
             evict = {@CacheEvict(value = "roleAll",key = "'roleAll'" )
     })
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Role saveRole(Role role) {
+    public void saveRole(Role role) {
         baseMapper.insert(role);
         baseMapper.saveRoleMenus(role.getId(),role.getMenuSet());
-        return role;
     }
 
     @Cacheable(value = "role",key = "'role_id_'+T(String).valueOf(#id)",unless = "#result == null")
     @Override
     public Role getRoleById(Long id) {
-        Role role = baseMapper.selectRoleById(id);
-        return role;
+        return baseMapper.selectRoleById(id);
     }
 
     @Caching(evict = {
@@ -53,7 +51,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
             @CacheEvict(value = "user",allEntries=true ),
             @CacheEvict(value = "allMenus",allEntries = true)
     })
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateRole(Role role) {
         baseMapper.updateById(role);
@@ -66,7 +64,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
             @CacheEvict(value = "roleAll",key = "'roleAll'" ),
             @CacheEvict(value = "user",allEntries=true )
     })
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteRole(Role role) {
         role.setDelFlag(true);
@@ -75,21 +73,21 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
         baseMapper.dropRoleUsers(role.getId());
     }
 
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveRoleMenus(Long id, Set<Menu> menuSet) {
         baseMapper.saveRoleMenus(id,menuSet);
     }
 
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void dropRoleMenus(Long id) {
         baseMapper.dropRoleMenus(id);
     }
 
     @Override
-    public Integer getRoleNameCount(String name) {
-        EntityWrapper<Role> wrapper = new EntityWrapper<>();
+    public Long getRoleNameCount(String name) {
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
         wrapper.eq("name",name);
         return baseMapper.selectCount(wrapper);
     }
@@ -97,9 +95,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     @Cacheable(value = "roleAll",key = "'roleAll'",unless = "#result == null or #result.size() == 0")
     @Override
     public List<Role> selectAll() {
-        EntityWrapper<Role> wrapper = new EntityWrapper<>();
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        List<Role> roleList = baseMapper.selectList(wrapper);
-        return roleList;
+        return baseMapper.selectList(wrapper);
     }
 }

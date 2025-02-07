@@ -1,5 +1,8 @@
 package com.mysiteforme.admin.util;
 
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -7,8 +10,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by wangl on 2018/1/14.
@@ -16,11 +19,13 @@ import java.util.Map;
  */
 public class DigestUtil {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(ToolUtil.class);
+
     public static String getFileSha1(MultipartFile file) {
 
-        MessageDigest digest = null;
-        InputStream in = null;
-        byte buffer[] = new byte[1024];
+        MessageDigest digest;
+        InputStream in;
+        byte[] buffer = new byte[1024];
         int len;
         try {
             digest = MessageDigest.getInstance("SHA1");
@@ -30,7 +35,7 @@ public class DigestUtil {
             }
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getFileSha1 error", e);
             return null;
         }
 
@@ -39,9 +44,6 @@ public class DigestUtil {
     }
     /**
      *
-     * @param file
-     * @param algorithm 所请求算法的名称  for example: MD5, SHA1, SHA-256, SHA-384, SHA-512 etc.
-     * @return
      */
     public static String getFileMD5(File file, String algorithm) {
 
@@ -49,9 +51,9 @@ public class DigestUtil {
             return null;
         }
 
-        MessageDigest digest = null;
-        FileInputStream in = null;
-        byte buffer[] = new byte[1024];
+        MessageDigest digest;
+        FileInputStream in;
+        byte[] buffer = new byte[1024];
         int len;
 
         try {
@@ -62,7 +64,7 @@ public class DigestUtil {
             }
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getFileMD5 error", e);
             return null;
         }
 
@@ -73,10 +75,6 @@ public class DigestUtil {
     /**
      * 获取文件夹中文件的MD5值
      *
-     * @param dirFile
-     * @param algorithm 所请求算法的名称  for example: MD5, SHA1, SHA-256, SHA-384, SHA-512 etc.
-     * @param listChild 是否递归子目录中的文件
-     * @return
      */
     public static Map<String, String> getDirMD5(File dirFile, String algorithm, boolean listChild) {
 
@@ -85,18 +83,19 @@ public class DigestUtil {
         }
 
         // <filepath,algCode>
-        Map<String, String> pathAlgMap = new HashMap<String, String>();
+        Map<String, String> pathAlgMap = Maps.newHashMap();
         String algCode;
-        File files[] = dirFile.listFiles();
+        File[] files = dirFile.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory() && listChild) {
-                pathAlgMap.putAll(getDirMD5(file, algorithm, listChild));
-            } else {
-                algCode = getFileMD5(file, algorithm);
-                if (algCode != null) {
-                    pathAlgMap.put(file.getPath(), algCode);
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory() && listChild) {
+                    pathAlgMap.putAll(Objects.requireNonNull(getDirMD5(file, algorithm, true)));
+                } else {
+                    algCode = getFileMD5(file, algorithm);
+                    if (algCode != null) {
+                        pathAlgMap.put(file.getPath(), algCode);
+                    }
                 }
             }
         }

@@ -4,10 +4,10 @@ package com.mysiteforme.admin.exception;
 import com.alibaba.fastjson.JSONObject;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
 import freemarker.template.TemplateModelException;
 import org.apache.shiro.authz.UnauthorizedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.ui.Model;
@@ -28,7 +28,7 @@ import java.sql.SQLException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Log log = LogFactory.get();
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * 500 - Bad Request
@@ -58,7 +58,8 @@ public class GlobalExceptionHandler {
                 writer.flush();
                 writer.close();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                log.error("resolveException",e1);
+                throw new MyException("resolveException",e1);
             }
         }else {
             RestResponse restResponse = RestResponse.failure(unauthorizedException.getMessage());
@@ -70,11 +71,6 @@ public class GlobalExceptionHandler {
 
     /**
      * 404的拦截.
-     * @param request
-     * @param response
-     * @param ex
-     * @return
-     * @throws Exception
      */
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)

@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,10 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-24
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("quartz_task")
-public class QuartzTask extends DataEntity<QuartzTask> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class QuartzTask extends DataEntity {
 
 	/**
 	 * 任务调度参数key
@@ -49,48 +54,6 @@ public class QuartzTask extends DataEntity<QuartzTask> {
      * 任务状态 0:正常  1：暂停
      */
 	private Integer status;
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getCron() {
-		return cron;
-	}
-
-	public void setCron(String cron) {
-		this.cron = cron;
-	}
-	public String getTargetBean() {
-		return targetBean;
-	}
-
-	public void setTargetBean(String targetBean) {
-		this.targetBean = targetBean;
-	}
-	public String getTrgetMethod() {
-		return trgetMethod;
-	}
-
-	public void setTrgetMethod(String trgetMethod) {
-		this.trgetMethod = trgetMethod;
-	}
-	public String getParams() {
-		return params;
-	}
-
-	public void setParams(String params) {
-		this.params = params;
-	}
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
 
 
 	@Override

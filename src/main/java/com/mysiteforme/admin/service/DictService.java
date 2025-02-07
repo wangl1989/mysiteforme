@@ -1,7 +1,7 @@
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Dict;
-import com.baomidou.mybatisplus.service.IService;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ public interface DictService extends IService<Dict> {
 
     void saveOrUpdateDict(Dict dict);
 
-    String deleteDict(Long id);
+    void deleteDict(Long id);
 
-    List<Dict> saveDictList(String type, List<Dict> list);
+    void saveDictList(String type, List<Dict> list);
 
     void deleteByType(String s);
 

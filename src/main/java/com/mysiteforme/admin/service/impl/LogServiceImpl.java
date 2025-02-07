@@ -1,6 +1,6 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.dao.LogDao;
 import com.mysiteforme.admin.entity.Log;
@@ -28,7 +28,7 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
 
     @Override
     public List<Integer> selectSelfMonthData() {
-        List<Map> list =  baseMapper.selectSelfMonthData();
+        List<Map<String,Object>> list =  baseMapper.selectSelfMonthData();
         //补全数据库中不存在的日期，订单数为0
         List<String> dayList = Lists.newArrayList();
         for (int i=-14;i<=0;i++){
@@ -36,14 +36,14 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
             dayList.add(dateTime.toString("yyyy-MM-dd"));
         }
         List<Integer> pv = Lists.newArrayList();
-        for (int i=0;i<dayList.size();i++){
-            Integer total = 0;
-            for(Map map : list){
-                String date  = (String)map.get("days");
-                total = Integer.valueOf(map.get("total").toString());
-                if(date.equalsIgnoreCase(dayList.get(i))){
+        for (String s : dayList) {
+            int total = 0;
+            for (Map<String,Object> map : list) {
+                String date = (String) map.get("days");
+                total = Integer.parseInt(map.get("total").toString());
+                if (date.equalsIgnoreCase(s)) {
                     break;
-                }else{
+                } else {
                     total = 0;
                 }
             }

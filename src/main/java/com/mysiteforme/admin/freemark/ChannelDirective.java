@@ -1,7 +1,6 @@
 package com.mysiteforme.admin.freemark;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.service.BlogChannelService;
 import freemarker.core.Environment;
@@ -21,25 +20,34 @@ import java.util.Map;
 @Component
 public class ChannelDirective extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogChannelService blogChannelService;
 
+    public ChannelDirective(){
+        super();
+    }
+
+    @Autowired
+    public ChannelDirective(BlogChannelService blogChannelService){
+        this.blogChannelService = blogChannelService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
-        EntityWrapper<BlogChannel> wrapper = new EntityWrapper<>();
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
+        QueryWrapper<BlogChannel> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        Integer limit = 10;
+        int limit = 10;
         Long pid = null;
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("limit")){
-                limit = getInt(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("limit")){
+                limit = getInt(paramValue);
             }
-            if(paramName.toLowerCase().equals("pid")){
-                pid = getLong(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("pid")){
+                pid = getLong(paramValue);
             }
         }
         if(pid == null){
@@ -47,9 +55,9 @@ public class ChannelDirective extends BaseDirective implements TemplateDirective
         }else{
             wrapper.eq("parent_id",pid);
         }
-        wrapper.orderBy("sort",false);
+        wrapper.orderBy(false,false,"sort");
         List<BlogChannel> channelList = blogChannelService.getChannelListByWrapper(limit,wrapper);
-        if(channelList.size()<=0){
+        if(channelList.isEmpty()){
             throw new TemplateModelException("返回值为空");
         }
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_26);

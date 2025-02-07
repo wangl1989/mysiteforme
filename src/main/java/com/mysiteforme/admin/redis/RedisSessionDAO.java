@@ -1,14 +1,11 @@
 package com.mysiteforme.admin.redis;
 
-/**
- * Created by wangl on 2017/11/25.
- * todo:
+/*
+  Created by wang on 2017/11/25.
+  todo:redis实现共享session
  */
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.slf4j.Logger;
@@ -17,21 +14,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-/**
- * redis实现共享session
- */
-//@Component
+@Component
 public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
-    private static Logger logger = LoggerFactory.getLogger(RedisSessionDAO.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisSessionDAO.class);
 
     // session 在redis过期时间是30分钟30*60
-    private static int expireTime = 1800;
+    private static final int expireTime = 1800;
 
-    private static String prefix = "mysiteforme-shiro-session:";
+    private static final String prefix = "mysiteforme-shiro-session:";
+
+    private RedisTemplate<String, Object> redisTemplate;
+
+    public RedisSessionDAO() {
+        super();
+    }
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    public RedisSessionDAO(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
 
     // 创建session，保存到数据库
@@ -46,7 +48,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     // 获取session
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        logger.debug("获取session:{}", sessionId);
+        logger.debug("获取session:{},当前的时间是：{}", sessionId, System.currentTimeMillis());
         // 先从缓存中获取session，如果没有再去数据库中获取
         Session session = super.doReadSession(sessionId);
         if (session == null) {

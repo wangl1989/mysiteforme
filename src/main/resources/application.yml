@@ -16,10 +16,6 @@ spring:
         force: true
         charset: UTF-8
         enabled: true
-      multipart:
-          max-file-size: 100MB
-          max-request-size: 100MB
-          enabled: true
   #模板引擎配置
   freemarker:
       template-loader-path: classpath:/templates/
@@ -52,35 +48,46 @@ spring:
   cache:
       type: redis
       cache-names: mysiteforme
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
 #mybatisPlus
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.mysiteforme.admin.entity
 mybatis-plus:
-  mapper-locations: classpath:mapper/*.xml
+
+  mapper-locations: classpath:/mapper/**.xml
   #实体扫描，多个package用逗号或者分号隔离
-  typeAliasesPackage: com.mysiteforme.admin.entity
+  type-aliases-package: com.mysiteforme.admin.entity
+  #一起使用，仅扫描指定父类的子类。
+  type-aliases-super-type: com.mysiteforme.admin.base.BaseEntity
+  # 扫描路径，用于注册自定义类型转换器。
+  type-handlers-package: com.mysiteforme.admin.config.SysMetaObjectHandler
 
   global-config:
-    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
-    id-type: 0
-    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
-    field-strategy: 2
-    #驼峰下划线转换
-    db-column-underline: true
-    #刷新mapper 调试神器
-    refresh-mapper: true
-    #数据库大写下划线转换
-    #capital-mode: true
-    #序列接口实现类配置
-    #key-generator: com.baomidou.springboot.xxx
-    #逻辑删除配置
-    #    logic-delete-value: 1
-    #    logic-not-delete-value: 0
-    #自定义填充策略接口实现
-    metaObjectHandler: com.mysiteforme.admin.config.SysMetaObjectHandler
-    #自定义SQL注入器
-    #sql-injector: com.baomidou.springboot.xxx
+    #是否打印MyBatis-Plus 的 LOGO的banner
+    banner: false
+    db-config:
+      #逻辑删除全局值
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      #自定义填充策略接口实现
+      #meta-object-handler: com.mysiteforme.admin.config.SysMetaObjectHandler
+      #自定义SQL注入器
+      #sql-injector: com.mysiteforme.admin.config.MysqlInjector
+      #主键类型
+      id-type: auto
+      #刷新mapper 调试神器
+      #refresh-mapper: true
+      #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+      #field-strategy: 2
+      #驼峰下划线转换
+      table-underline: true
+      #数据库大写下划线转换
+      #capital-mode: true
+      #序列接口实现类配置
+      #key-generator: com.baomidou
+    enableSqlRunner: true
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
@@ -94,26 +101,27 @@ spring:
   profiles: dev
   #redis配置
   redis:
-      database: 1
-      host: 127.0.0.1
-      port: 6379
-      password:      # 密码（默认为空）
-      timeout: 6000  # 连接超时时长（毫秒）
+    database: 1
+    host: 127.0.0.1
+    port: 6379
+    password:      # 密码（默认为空）
+    timeout: 6000  # 连接超时时长（毫秒）
+    jedis:
       pool:
-        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 1000
         max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10      # 连接池中的最大空闲连接
         min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true&serverTimezone=Asia/Shanghai
     username: root
     password: tntjoy
 
 #日志
 logging:
   config: classpath:log/logback.xml
-  path: D:\log\mysiteforme
+  file:
+    path: D:\log\mysiteforme
 
 #自定义配置属性
 #源码生成文件夹
@@ -138,21 +146,22 @@ spring:
       port: 6379
       password:      # 密码（默认为空）
       timeout: 6000  # 连接超时时长（毫秒）
-      pool:
-        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
-        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10      # 连接池中的最大空闲连接
-        min-idle: 5       # 连接池中的最小空闲连接
+      jedis:
+        pool:
+          max-idle: 1000
+          max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
 
 #日志
 logging:
   config: classpath:log/logback.xml
-  path: /home/log/mysiteforme
+  file:
+    path: /home/log/mysiteforme
 
 #自定义配置属性
 #源码生成文件夹
@@ -173,26 +182,27 @@ spring:
   profiles: pro
   #redis配置
   redis:
-      database: 0
-      host: 127.0.0.1
-      port: 6379
-      password:      # 密码（默认为空）
-      timeout: 6000  # 连接超时时长（毫秒）
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:      # 密码（默认为空）
+    timeout: 6000  # 连接超时时长（毫秒）
+    jedis:
       pool:
-        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 1000
         max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10      # 连接池中的最大空闲连接
         min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    url: jdbc:mysql://127.0.0.1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
 
 #日志
 logging:
   config: classpath:log/logback.xml
-  path: /home/log/mysiteforme
+  file:
+    path: /home/log/mysiteforme
 
 #自定义配置属性
 #源码生成文件夹

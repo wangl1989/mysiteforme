@@ -1,14 +1,13 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Dict;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
@@ -26,7 +25,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("admin/system/dict")
 public class DictController extends BaseController{
-    private static final Log log = LogFactory.get();
 
     @PostMapping("deleteById")
     @ResponseBody
@@ -50,9 +48,9 @@ public class DictController extends BaseController{
     public LayerData<Dict> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                 @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                 ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<Dict> layerData = new LayerData<>();
-        EntityWrapper<Dict> wrapper = new EntityWrapper<>();
+        QueryWrapper<Dict> wrapper = new QueryWrapper<>();
         if(!map.isEmpty()){
             String type = (String) map.get("type");
             if(StringUtils.isNotBlank(type)) {
@@ -63,9 +61,9 @@ public class DictController extends BaseController{
                 wrapper.like("label",label);
             }
         }
-        wrapper.orderBy("type",false).orderBy("sort",false);
-        Page<Dict> dataPage = dictService.selectPage(new Page<>(page,limit),wrapper);
-        layerData.setCount(dataPage.getTotal());
+        wrapper.orderBy(false,false,"type","sort");
+        IPage<Dict> dataPage = dictService.page(new Page<>(page,limit),wrapper);
+        layerData.setCount((int)dataPage.getTotal());
         layerData.setData(dataPage.getRecords());
         return layerData;
     }
@@ -109,7 +107,7 @@ public class DictController extends BaseController{
 
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        Dict dict = dictService.selectById(id);
+        Dict dict = dictService.getById(id);
         model.addAttribute("dict",dict);
         return "admin/system/dict/edit";
     }
@@ -134,7 +132,7 @@ public class DictController extends BaseController{
         if(dict.getSort() == null || dict.getSort() < 0){
             return RestResponse.failure("排序值不正确");
         }
-        Dict oldDict = dictService.selectById(dict.getId());
+        Dict oldDict = dictService.getById(dict.getId());
         if(!oldDict.getType().equals(dict.getType())){
             return RestResponse.failure("字典类型不能修改");
         }

@@ -43,9 +43,9 @@ public class QuartzConfig {
         druidDataSource.setPassword(password);
         druidDataSource.setDriverClassName(driver);
         druidDataSource.setUrl(url);
-        druidDataSource.setMaxActive(Integer.valueOf(maxActive));
+        druidDataSource.setMaxActive(Integer.parseInt(maxActive));
         druidDataSource.setFilters("stat,wall,log4j");
-        druidDataSource.setInitialSize(Integer.valueOf(initialSize));
+        druidDataSource.setInitialSize(Integer.parseInt(initialSize));
         return druidDataSource;
     }
 
@@ -54,6 +54,22 @@ public class QuartzConfig {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setDataSource(dataSource());
         //quartz参数
+        Properties prop = getProperties();
+        schedulerFactoryBean.setQuartzProperties(prop);
+
+        schedulerFactoryBean.setSchedulerName("MySiteForMeScheduler");
+        //延时启动
+        schedulerFactoryBean.setStartupDelay(20);
+        schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
+        //可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
+        schedulerFactoryBean.setOverwriteExistingJobs(true);
+        //设置自动启动，默认为true
+        schedulerFactoryBean.setAutoStartup(true);
+
+        return schedulerFactoryBean;
+    }
+
+    private static Properties getProperties() {
         Properties prop = new Properties();
         prop.put("org.quartz.scheduler.instanceName", "MySiteForMeScheduler");
         prop.put("org.quartz.scheduler.instanceId", "AUTO");
@@ -70,18 +86,7 @@ public class QuartzConfig {
 
         prop.put("org.quartz.jobStore.misfireThreshold", "12000");
         prop.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
-        schedulerFactoryBean.setQuartzProperties(prop);
-
-        schedulerFactoryBean.setSchedulerName("MySiteForMeScheduler");
-        //延时启动
-        schedulerFactoryBean.setStartupDelay(20);
-        schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
-        //可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
-        schedulerFactoryBean.setOverwriteExistingJobs(true);
-        //设置自动启动，默认为true
-        schedulerFactoryBean.setAutoStartup(true);
-
-        return schedulerFactoryBean;
+        return prop;
     }
 
 }

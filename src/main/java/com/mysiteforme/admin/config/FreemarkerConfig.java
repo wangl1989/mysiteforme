@@ -14,41 +14,59 @@ import javax.annotation.PostConstruct;
 @Component
 public class FreemarkerConfig {
 
-    @Autowired
     private Configuration configuration;
 
-    @Autowired
     private SystemDirective systemDirective;
 
-    @Autowired
     private ArticleDirective articleDirective;
 
-    @Autowired
     private IndexArticleDirective indexArticleDirective;
 
-    @Autowired
     private ChannelDirective channelDirective;
 
-    @Autowired
     private ParentChannelListDirective parentChannelListDirective;
 
-    @Autowired
     private ArticleClickTempletModel articleClickTempletModel;
 
-    @Autowired
     private SysUserTempletModel sysUserTempletModel;
 
-    @Autowired
     private TagsTempletModel tagsTempletModel;
 
-    @Autowired
     private NewCommentArticleTempletModel newCommentArticleTempletModel;
 
-    @Autowired
     private LookLikeArticlesTempletModel lookLikeArticlesTempletModel;
 
-    @Autowired
+
     private CommentNumberTempletModel commentNumberTempletModel;
+
+    public FreemarkerConfig() {}
+
+    @Autowired
+    public FreemarkerConfig(Configuration configuration,
+                            SystemDirective systemDirective,
+                            ArticleDirective articleDirective,
+                            IndexArticleDirective indexArticleDirective,
+                            ChannelDirective channelDirective,
+                            ParentChannelListDirective parentChannelListDirective,
+                            ArticleClickTempletModel articleClickTempletModel,
+                            SysUserTempletModel sysUserTempletModel,
+                            TagsTempletModel tagsTempletModel,
+                            NewCommentArticleTempletModel newCommentArticleTempletModel,
+                            LookLikeArticlesTempletModel lookLikeArticlesTempletModel,
+                            CommentNumberTempletModel commentNumberTempletModel) {
+        this.configuration = configuration;
+        this.systemDirective = systemDirective;
+        this.articleDirective = articleDirective;
+        this.indexArticleDirective = indexArticleDirective;
+        this.channelDirective = channelDirective;
+        this.parentChannelListDirective = parentChannelListDirective;
+        this.articleClickTempletModel = articleClickTempletModel;
+        this.sysUserTempletModel = sysUserTempletModel;
+        this.tagsTempletModel = tagsTempletModel;
+        this.newCommentArticleTempletModel = newCommentArticleTempletModel;
+        this.lookLikeArticlesTempletModel = lookLikeArticlesTempletModel;
+        this.commentNumberTempletModel = commentNumberTempletModel;
+    }
 
     @PostConstruct
     public void setSharedVariable() {

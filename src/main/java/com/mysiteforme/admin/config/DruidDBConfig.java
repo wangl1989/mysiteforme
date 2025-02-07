@@ -14,8 +14,8 @@ import java.util.Map;
 public class DruidDBConfig {
 
     @Bean
-    public ServletRegistrationBean druidServlet() {
-        ServletRegistrationBean reg = new ServletRegistrationBean();
+    public ServletRegistrationBean<StatViewServlet> druidServlet() {
+        ServletRegistrationBean<StatViewServlet> reg = new ServletRegistrationBean<>();
         reg.setServlet(new StatViewServlet());
         reg.addUrlMappings("/druid/*");
         //reg.addInitParameter("allow", "127.0.0.1"); //白名单
@@ -24,10 +24,10 @@ public class DruidDBConfig {
     }
 
     @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<WebStatFilter> filterRegistrationBean() {
+        FilterRegistrationBean<WebStatFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new WebStatFilter());
-        Map<String, String> initParams = new HashMap<String, String>();
+        Map<String, String> initParams = new HashMap<>();
         //设置忽略请求
         initParams.put("exclusions", "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*");
         filterRegistrationBean.setInitParameters(initParams);

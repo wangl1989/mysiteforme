@@ -21,22 +21,31 @@ import java.util.Map;
 @Component
 public class LookLikeArticlesTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogArticleService blogArticleService;
+
+    public LookLikeArticlesTempletModel() {
+        super();
+    }
+
+    @Autowired
+    public LookLikeArticlesTempletModel(BlogArticleService blogArticleService) {
+        this.blogArticleService = blogArticleService;
+    }
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
-        Integer limit = 5;
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
+        int limit = 5;
         Long articleId = null;
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("articleid")){
-                articleId = getLong(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("articleid")){
+                articleId = getLong(paramValue);
             }
-            if(paramName.toLowerCase().equals("limit")){
-                int templimit = getInt(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("limit")){
+                int templimit = getInt(paramValue);
                 if(templimit>0){
                     limit = templimit;
                 }

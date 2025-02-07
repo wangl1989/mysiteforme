@@ -1,8 +1,9 @@
 package com.mysiteforme.admin.dao;
 
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.BlogTags;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -15,19 +16,16 @@ import java.util.Map;
  * @author wangl
  * @since 2018-01-17
  */
+@Mapper
 public interface BlogTagsDao extends BaseMapper<BlogTags> {
 
     /**
      * 根据栏目ID获取标签集合
-     * @param channelId
-     * @return
      */
     List<BlogTags> getTagsByChannelId(Long channelId);
 
     /**
      * 根据文章ID获取标签集合
-     * @param articleId
-     * @return
      */
     List<BlogTags> getTagsByArticleId(Long articleId);
 
@@ -39,11 +37,8 @@ public interface BlogTagsDao extends BaseMapper<BlogTags> {
 
     /**
      * 根据删选条件获取博客标签的分页列表
-     * @param map
-     * @param page
-     * @return
      */
-    List<BlogTags> selectTagsPage(Map<String, Object> map,Page<BlogTags> page);
+    List<BlogTags> selectTagsPage(Map<String, Object> map, IPage<BlogTags> page);
 
     List<BlogTags> selectTagsPage(Map<String, Object> map);
 }

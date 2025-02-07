@@ -1,38 +1,32 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
-import com.mysiteforme.admin.dao.BlogChannelDao;
 import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.dao.BlogArticleDao;
-import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.lucene.LuceneSearch;
 import com.mysiteforme.admin.service.BlogArticleService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.mysiteforme.admin.service.BlogChannelService;
-import org.apache.lucene.document.*;
-import org.apache.shiro.cache.Cache;
-import org.crazycake.shiro.RedisCacheManager;
-import org.crazycake.shiro.RedisManager;
+import com.mysiteforme.admin.util.DocumentUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.lucene.document.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.V;
 
 /**
  * <p>
@@ -46,11 +40,14 @@ import static javafx.scene.input.KeyCode.V;
 @Transactional(rollbackFor = Exception.class)
 public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArticle> implements BlogArticleService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(BlogArticleServiceImpl.class);
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private BlogChannelService blogChannelService;
+    public BlogArticleServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     /***
      * 根据栏目ID清除文章与栏目的关系
@@ -58,10 +55,10 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
      */
     @Override
     public void removeArticleChannel(Long channelId) {
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("channel_id",channelId);
-        List<BlogArticle> list = selectList(wrapper);
-        if(list.size()>0){
+        List<BlogArticle> list = list(wrapper);
+        if(!list.isEmpty()){
             for (BlogArticle blogArticle : list){
                 blogArticle.setChannelId(null);
             }
@@ -75,14 +72,14 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         Map<String,Object> map = Maps.newHashMap();
         map.put("id",id);
         List<BlogArticle> list = baseMapper.selectDetailArticle(map);
-        if(list != null && list.size()>0){
+        if(list != null && !list.isEmpty()){
             return list.get(0);
         }
         return null;
     }
 
     @Override
-    public Page<BlogArticle> selectDetailArticle(Map<String, Object> map, Page<BlogArticle> page) {
+    public IPage<BlogArticle> selectDetailArticle(Map<String, Object> map, IPage<BlogArticle> page) {
         List<BlogArticle> list = baseMapper.selectDetailArticle(map,page);
         page.setRecords(list);
         return page;
@@ -90,8 +87,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
 
     @Override
     public List<BlogArticle> selectDetailArticle(Map<String, Object> map) {
-        List<BlogArticle> list = baseMapper.selectDetailArticle(map);
-        return list;
+        return baseMapper.selectDetailArticle(map);
     }
 
     @Cacheable(value = "myarticle",key="'directive_limit_'+#paramMap['limit'].toString()+'_channelId_'+#paramMap['channelId'].toString()",unless = "#result == null or #result.size() == 0")
@@ -99,12 +95,11 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
     public List<BlogArticle> selectArticleData(Map<String, Object> paramMap) {
         Long channelId = (Long)paramMap.get("channelId");
         Integer limit = (Integer)paramMap.get("limit");
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("channel_id",channelId);
-        wrapper.orderBy("is_top",false).orderBy("is_recommend",false)
-                .orderBy("sort",false).orderBy("publist_time",false);
-        Page<BlogArticle> pageData = selectPage(new Page<BlogArticle>(1,limit),wrapper);
+        wrapper.orderBy(false,false,"is_top","is_recommend","sort","publist_time");
+        IPage<BlogArticle> pageData = page(new Page<>(1,limit),wrapper);
         return pageData.getRecords();
     }
 
@@ -133,7 +128,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
                 throw new MyException("模版传参错误");
             }
         }
-        if(orderString.size()>0){
+        if(!orderString.isEmpty()){
             paramMap.put("orderList",orderString);
         }
         paramMap.remove("order");
@@ -146,9 +141,8 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
             @CacheEvict(value = "oneArticle",allEntries = true),
     })
     @Override
-    public BlogArticle saveOrUpdateArticle(BlogArticle blogArticle) {
-        insertOrUpdate(blogArticle);
-        return blogArticle;
+    public void saveOrUpdateArticle(BlogArticle blogArticle) {
+        saveOrUpdate(blogArticle);
     }
 
     @Override
@@ -166,14 +160,14 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Integer count = (Integer)operations.get("article_click_id_"+articleId);
         if(count == null){
-            BlogArticle blogArticle = selectById(articleId);
+            BlogArticle blogArticle = getById(articleId);
             if(blogArticle.getClick() != null){
                 count = blogArticle.getClick();
             }else{
                 count = 0;
             }
         }
-        return count == null? 0 : count;
+        return count;
     }
 
     @CachePut(value = "showBlog",key = "'article_click_id_'+#articleId",unless = "#result == null")
@@ -186,12 +180,16 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
     public void createArticlIndex() {
         File fileDectory = new File(LuceneSearch.dir);
         if(!fileDectory.exists()){
-            fileDectory.mkdir();
+            if(!fileDectory.mkdir()){
+                throw new MyException("创建索引文件夹失败:"+fileDectory.getName());
+            }
         }else {
             File[] f = fileDectory.listFiles();
-            if(f.length>0){
-                for (File file : f){
-                    file.delete();
+            if (f != null) {
+                for (File file : f) {
+                    if(!file.delete()){
+                        throw new MyException("删除索引文件失败:"+file.getName());
+                    }
                 }
             }
         }
@@ -199,30 +197,27 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         map.put("isBaseChannel",true);
         List<BlogArticle> list = selectDetailArticle(map);
         for (BlogArticle blogArticle : list){
-            Document doc = new Document();
-            doc.add(new LongPoint("id",blogArticle.getId()));
-            doc.add(new TextField("title",blogArticle.getTitle(), Field.Store.YES));
-            doc.add(new TextField("marks",blogArticle.getMarks()==null?"":blogArticle.getMarks(),Field.Store.YES));
-            doc.add(new TextField("text",blogArticle.getText()==null?"":blogArticle.getText(),Field.Store.YES));
-            doc.add(new StoredField("href",blogArticle.getBlogChannel().getHref()));
-            doc.add(new StoredField("show_pic",blogArticle.getShowPic()==null?"":blogArticle.getShowPic()));
+            Document doc = DocumentUtil.writeDoc(blogArticle);
             doc.add(new StoredField("id",blogArticle.getId()));
             try {
                 LuceneSearch.write(doc);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("创建文章索引失败",e);
+                throw new MyException("创建文章索引失败");
             }
         }
     }
 
+
+
     @Cacheable(value = "myarticle",key="'time_line_channel_id_'+#id.toString()",unless = "#result == null or #result.size() == 0")
     @Override
     public List<BlogArticle> selectTimeLineList(Long id) {
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("channel_id",id);
-        wrapper.orderBy("create_date",false);
-        return selectList(wrapper);
+        wrapper.orderBy(false,false,"create_date");
+        return list(wrapper);
     }
 
 

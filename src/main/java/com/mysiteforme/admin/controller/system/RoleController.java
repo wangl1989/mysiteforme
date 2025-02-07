@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -13,8 +14,6 @@ import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,6 @@ import java.util.Set;
 @Controller
 @RequestMapping("admin/system/role")
 public class RoleController extends BaseController{
-    private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
 
     @GetMapping("list")
     @SysLog("跳转角色列表页面")
@@ -46,9 +44,9 @@ public class RoleController extends BaseController{
     public LayerData<Role> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                 @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                 ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String, Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<Role> roleLayerData = new LayerData<>();
-        EntityWrapper<Role> roleEntityWrapper = new EntityWrapper<>();
+        QueryWrapper<Role> roleEntityWrapper = new QueryWrapper<>();
         roleEntityWrapper.eq("del_flag",false);
         if(!map.isEmpty()){
             String keys = (String) map.get("key");
@@ -56,8 +54,9 @@ public class RoleController extends BaseController{
                 roleEntityWrapper.like("name", keys);
             }
         }
-        Page<Role> rolePage = roleService.selectPage(new Page<>(page,limit),roleEntityWrapper);
-        roleLayerData.setCount(rolePage.getTotal());
+        IPage<Role> rolePage = roleService.page(new Page<>(page,limit),roleEntityWrapper);
+        long total = rolePage.getTotal();
+        roleLayerData.setCount((int) total);
         roleLayerData.setData(setUserToRole(rolePage.getRecords()));
         return roleLayerData;
     }
@@ -65,14 +64,14 @@ public class RoleController extends BaseController{
     private List<Role> setUserToRole(List<Role> roles){
         for(Role r : roles){
             if(r.getCreateId() != null && r.getCreateId() != 0){
-                User u = userService.findUserById(r.getCreateId());
+                User u = userCacheService.findUserById(r.getCreateId());
                 if(StringUtils.isBlank(u.getNickName())){
                     u.setNickName(u.getLoginName());
                 }
                 r.setCreateUser(u);
             }
             if(r.getUpdateId() != null && r.getUpdateId() != 0){
-                User u  = userService.findUserById(r.getUpdateId());
+                User u  = userCacheService.findUserById(r.getUpdateId());
                 if(StringUtils.isBlank(u.getNickName())){
                     u.setNickName(u.getLoginName());
                 }
@@ -110,13 +109,11 @@ public class RoleController extends BaseController{
     @GetMapping("edit")
     public String edit(Long id,Model model){
         Role role = roleService.getRoleById(id);
-        //StringBuilder menuIds = new StringBuilder();
         List<Long> menuIds = Lists.newArrayList();
         if(role != null) {
             Set<Menu> menuSet = role.getMenuSet();
-            if (menuSet != null && menuSet.size() > 0) {
+            if (menuSet != null && !menuSet.isEmpty()) {
                 for (Menu m : menuSet) {
-                    //menuIds.append(m.getId().toString()).append(",");
                     menuIds.add(m.getId());
                 }
             }
@@ -170,7 +167,7 @@ public class RoleController extends BaseController{
     @ResponseBody
     @SysLog("多选删除角色数据")
     public RestResponse deleteSome(@RequestBody List<Role> roles){
-        if(roles == null || roles.size()==0){
+        if(roles == null || roles.isEmpty()){
             return RestResponse.failure("请选择需要删除的角色");
         }
         for (Role r : roles){

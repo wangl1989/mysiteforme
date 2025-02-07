@@ -1,9 +1,14 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -13,8 +18,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-13
  */
+@Setter
+@Getter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @TableName("sys_log")
-public class Log extends DataEntity<Log> {
+public class Log extends DataEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -94,144 +103,7 @@ public class Log extends DataEntity<Log> {
 	private String exception;
 
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getRemoteAddr() {
-		return remoteAddr;
-	}
-
-	public void setRemoteAddr(String remoteAddr) {
-		this.remoteAddr = remoteAddr;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getRequestUri() {
-		return requestUri;
-	}
-
-	public void setRequestUri(String requestUri) {
-		this.requestUri = requestUri;
-	}
-
-	public String getHttpMethod() {
-		return httpMethod;
-	}
-
-	public void setHttpMethod(String httpMethod) {
-		this.httpMethod = httpMethod;
-	}
-
-	public String getClassMethod() {
-		return classMethod;
-	}
-
-	public void setClassMethod(String classMethod) {
-		this.classMethod = classMethod;
-	}
-
-	public String getParams() {
-		return params;
-	}
-
-	public void setParams(String params) {
-		this.params = params;
-	}
-
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	public String getResponse() {
-		return response;
-	}
-
-	public void setResponse(String response) {
-		this.response = response;
-	}
-
-	public Long getUseTime() {
-		return useTime;
-	}
-
-	public void setUseTime(Long useTime) {
-		this.useTime = useTime;
-	}
-
-	public String getBrowser() {
-		return browser;
-	}
-
-	public void setBrowser(String browser) {
-		this.browser = browser;
-	}
-
-	public String getArea() {
-		return area;
-	}
-
-	public void setArea(String area) {
-		this.area = area;
-	}
-
-	public String getProvince() {
-		return province;
-	}
-
-	public void setProvince(String province) {
-		this.province = province;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getIsp() {
-		return isp;
-	}
-
-	public void setIsp(String isp) {
-		this.isp = isp;
-	}
-
-	public String getException() {
-		return exception;
-	}
-
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-
-
-	@Override
+    @Override
 	public String toString() {
 		return "Log{" +
 			", type=" + type +

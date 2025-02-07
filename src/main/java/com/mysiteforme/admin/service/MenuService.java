@@ -1,10 +1,8 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Menu;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.ShowMenu;
-import com.mysiteforme.admin.entity.VO.TreeMenu;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 
 import java.util.List;
@@ -28,8 +26,8 @@ public interface MenuService extends IService<Menu> {
 
     void saveOrUpdateMenu(Menu menu);
 
-    int getCountByPermission(String permission);
+    long getCountByPermission(String permission);
 
-    int getCountByName(String name);
+    long getCountByName(String name);
 
 }

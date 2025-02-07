@@ -1,6 +1,6 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.Role;
 
@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public interface RoleService extends IService<Role> {
 
-    Role saveRole(Role role);
+    void saveRole(Role role);
 
     Role getRoleById(Long id);
 
@@ -29,7 +29,7 @@ public interface RoleService extends IService<Role> {
 
     void dropRoleMenus(Long id);
 
-    Integer getRoleNameCount(String name);
+    Long getRoleNameCount(String name);
 
     List<Role> selectAll();
 	
