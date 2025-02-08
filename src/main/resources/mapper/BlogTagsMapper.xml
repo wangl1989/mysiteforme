@@ -55,8 +55,8 @@
         blog_tags t
         where
         t.del_flag = false
-        <if test="name != null and name !=''">
-         and t.name like CONCAT('%','${name}','%')
+        <if test="params.name != null and params.name !=''">
+         and t.name like CONCAT('%',#{params.name},'%')
         </if>
     </select>
 

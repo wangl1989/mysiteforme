@@ -249,7 +249,7 @@ public class TableServiceImpl implements TableService {
      */
     @Override
     public IPage<TableVO> selectTablePage(IPage<TableVO> objectPage, Map<String,Object> map) {
-        List<TableVO> list = tableDao.listPage(map,objectPage);
+        List<TableVO> list = tableDao.listPage(objectPage, map);
         objectPage.setRecords(list);
         return objectPage;
     }

@@ -14,7 +14,7 @@
 </head>
 <body class="childrenBody">
 <fieldset class="layui-elem-field">
-    <legend>数据库检索</legend>
+    <legend>数据库检索1</legend>
     <div class="layui-field-box">
     <form class="layui-form">
         <div class="layui-inline">
@@ -63,7 +63,7 @@
     <script type="text/html" id="barDemo">
         {{# if(d.name.indexOf('sys_') < 0 && d.name.indexOf('qrtz_')<0){ }}
         <a class="layui-btn layui-btn-xs" href="javascript:" data-url="${base}/table/edit?name={{d.name}}" lay-event="edit"><cite>编辑</cite></a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:" lay-event="del">删除</a>
+<#--  删除表影响重大，此功能暂时注解      <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:" lay-event="del">删除</a>-->
         {{# } }}
     </script>
 </div>
@@ -189,6 +189,9 @@
                 for(var i=0;i<data.length;i++){
                     if(data[i].name.indexOf("sys_")>=0){
                         return layer.msg("系统表不能生成源码");
+                    }
+                    if(data[i].name.indexOf("qrtz_")>=0){
+                        return layer.msg("定时任务表不支持生成源码");
                     }
                     var comment = data[i].comment.split(','),
                     type = comment[1];

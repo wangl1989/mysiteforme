@@ -12,10 +12,12 @@ package ${package.Controller};
 import com.xiaoleilu.hutool.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysiteforme.admin.base.BaseController;
 import ${package.Entity}.${entity};
 import ${package.Service}.${table.serviceName};
-import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -46,7 +48,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
-public class ${table.controllerName} {
+public class ${table.controllerName} extends BaseController{
     private static final Logger LOGGER = LoggerFactory.getLogger(${table.controllerName}.class);
 
     @Autowired
@@ -64,9 +66,9 @@ public class ${table.controllerName} {
     public LayerData<${entity}> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<${entity}> layerData = new LayerData<>();
-        EntityWrapper<${entity}> wrapper = new EntityWrapper<>();
+        QueryWrapper<${entity}> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         if(!map.isEmpty()){
 #foreach($field in ${table.fields})
@@ -147,9 +149,9 @@ public class ${table.controllerName} {
 #end
 #end
         }
-        Page<${entity}> pageData = ${table.entityPath}Service.selectPage(new Page<>(page,limit),wrapper);
+        IPage<${entity}> pageData = ${table.entityPath}Service.page(new Page<>(page,limit),wrapper);
         layerData.setData(pageData.getRecords());
-        layerData.setCount(pageData.getTotal());
+        layerData.setCount((int)pageData.getTotal());
         return layerData;
     }
 

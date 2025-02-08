@@ -142,7 +142,7 @@
         </tr>
         <tr>
             <td>数据库版本</td>
-            <td><input type="text" class="layui-input dataBase layui-disabled" name="database" disabled value="${site.database}" placeholder="请输入数据库版本"></td>
+            <td><input type="text" class="layui-input dataBase layui-disabled" name="myDatabase" disabled value="${site.myDatabase}" placeholder="请输入数据库版本"></td>
             <td>database</td>
         </tr>
         <tr>

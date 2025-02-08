@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.BlogTags;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public interface BlogTagsDao extends BaseMapper<BlogTags> {
     /**
      * 根据删选条件获取博客标签的分页列表
      */
-    List<BlogTags> selectTagsPage(Map<String, Object> map, IPage<BlogTags> page);
+    List<BlogTags> selectTagsPage(@Param("params") Map<String, Object> map, IPage<BlogTags> page);
 
-    List<BlogTags> selectTagsPage(Map<String, Object> map);
+    List<BlogTags> selectTagsPage(@Param("params") Map<String, Object> map);
 }

@@ -43,8 +43,8 @@
         UPDATE_TIME as "updateTime",
         TABLE_COMMENT as "comment"
         from information_schema.TABLES where TABLE_SCHEMA='mysiteforme'
-        <if test="name != null and name != ''">
-            and TABLE_NAME like CONCAT('%', '${name}', '%')
+        <if test="params.name != null and params.name != ''">
+            and TABLE_NAME like CONCAT('%', #{params.name}, '%')
         </if>
         ORDER BY CREATE_TIME DESC
     </select>

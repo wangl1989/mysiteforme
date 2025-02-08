@@ -1,6 +1,8 @@
 package com.mysiteforme.admin.base;
 
+import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.realm.AuthRealm;
 import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserService;
@@ -29,13 +31,14 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
     private  UserCacheService userCacheService;
 
     public MyHandlerInterceptor() {
+        super();
     }
 
     @Autowired
     public MyHandlerInterceptor(SiteService siteService, UserService userService, UserCacheService userCacheService) {
+        this.userCacheService = userCacheService;
         this.siteService = siteService;
         this.userService = userService;
-        this.userCacheService = userCacheService;
     }
 
     /**
@@ -45,14 +48,20 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
 //        LOGGER.info("当前请求路径.."+httpServletRequest.getRequestURI());
-        if (siteService == null || userService == null) {//解决service为null无法注入问题
+        if (siteService == null || userService == null|| userCacheService == null) {//解决service为null无法注入问题
             System.out.println("siteService is null!!!");
             BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(httpServletRequest.getServletContext());
             siteService = (SiteService) factory.getBean("siteService");
             userService = (UserService) factory.getBean("userService");
+            userCacheService = (UserCacheService) factory.getBean("userCacheService");
 
         }
-        httpServletRequest.setAttribute("site",siteService.getCurrentSite());
+        Site sysSite = siteService.getCurrentSite();
+        httpServletRequest.setAttribute("site",sysSite);
+        AuthRealm.ShiroUser shiroUser = MySysUser.ShiroUser();
+        if(shiroUser == null){
+            return false;
+        }
         User user = userCacheService.findUserById(MySysUser.id());
         if(user != null){
             httpServletRequest.setAttribute("currentUser",user);

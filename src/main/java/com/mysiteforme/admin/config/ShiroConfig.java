@@ -13,11 +13,11 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.filter.DelegatingFilterProxy;
+import redis.clients.jedis.JedisPool;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -50,6 +51,9 @@ public class ShiroConfig {
 
     @Value("${spring.redis.password}")
     private String jedisPassword;
+
+    @Value("${spring.redis.database}")
+    private String dataBase;
 
     @Bean
     public FilterRegistrationBean<DelegatingFilterProxy> delegatingFilterProxy(){
@@ -89,16 +93,24 @@ public class ShiroConfig {
         bean.setSecurityManager(securityManager(authRealm));
         bean.setSuccessUrl("/index");
         bean.setLoginUrl("/login");
+        bean.setUnauthorizedUrl("/login");
         Map<String,Filter> map = Maps.newHashMap();
         map.put("authc",new CaptchaFormAuthenticationFilter());
         bean.setFilters(map);
         //配置访问权限
         LinkedHashMap<String, String> filterChainDefinitionMap = Maps.newLinkedHashMap();
+        //配置不会被拦截的链接 顺序判断
+        //静态资源
         filterChainDefinitionMap.put("/static/**","anon");
+        //博客相关
         filterChainDefinitionMap.put("/showBlog/**","anon");
         filterChainDefinitionMap.put("/blog/**","anon");
+        //登录相关
         filterChainDefinitionMap.put("/login/main","anon");
+        filterChainDefinitionMap.put("/login","anon");
         filterChainDefinitionMap.put("/genCaptcha","anon");
+
+        //配置会被拦截的链接 顺序判断
         filterChainDefinitionMap.put("/systemLogout","authc");
         filterChainDefinitionMap.put("/**","authc");
         bean.setFilterChainDefinitionMap(filterChainDefinitionMap);
@@ -154,14 +166,16 @@ public class ShiroConfig {
     public RedisManager redisManager(){
         RedisManager manager = new RedisManager();
         manager.setHost(jedisHost);
-        manager.setPort(jedisPort);
+        manager.setDatabase(Integer.parseInt(dataBase));
+        JedisPool pool = new JedisPool(jedisHost,jedisPort);
+        manager.setJedisPool(pool);
         //这里是用户session的时长 跟上面的setGlobalSessionTimeout 应该保持一直（上面是1个小时 下面是秒做单位的 我们设置成3600）
-        manager.setExpire(60 * 60);
+        manager.setTimeout(60 * 60);
         manager.setPassword(jedisPassword);
         return manager;
     }
 
-    @Bean
+    @Bean(name = "customRedisSessionDAO")
     public RedisSessionDAO redisSessionDAO(){
         RedisSessionDAO sessionDAO = new RedisSessionDAO();
         sessionDAO.setKeyPrefix("wl_");
@@ -173,6 +187,7 @@ public class ShiroConfig {
     public RedisCacheManager cacheManager(){
         RedisCacheManager manager = new RedisCacheManager();
         manager.setRedisManager(redisManager());
+        manager.setExpire(60 * 60);
         return manager;
     }
 

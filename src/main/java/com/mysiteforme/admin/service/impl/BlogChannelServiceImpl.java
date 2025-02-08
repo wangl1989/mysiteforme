@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.dao.BlogChannelDao;
+import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.BlogChannelService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -56,10 +57,10 @@ public class BlogChannelServiceImpl extends ServiceImpl<BlogChannelDao, BlogChan
      */
     @Cacheable(value = "channelData",key = "'channelList'",unless = "#result == null or #result.size() == 0")
     @Override
-    public List<BlogChannel> selectChannelList() {
+    public List<BlogChannelVO> selectChannelList() {
         Map<String,Object> map = Maps.newHashMap();
         map.put("parentId",null);
-        List<BlogChannel> list = Lists.newArrayList();
+        List<BlogChannelVO> list = Lists.newArrayList();
         try {
             list = baseMapper.selectChannelData(map);
         }catch (Exception e){

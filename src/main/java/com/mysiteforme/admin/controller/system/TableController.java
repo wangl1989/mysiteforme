@@ -423,10 +423,10 @@ public class TableController extends BaseController{
             File baseFloder = new File(createTableFiles.baseDic);
             ZipUtil.deleteDir(baseFloder);
             if(baseTables != null && baseTables.length>0){
-                createTableFiles.createFile(baseTables,1);
+                createTableFiles.createFile(baseTables,1, siteService.getCurrentSite());
             }
             if(treeTables != null && treeTables.length>0){
-                createTableFiles.createFile(treeTables,2);
+                createTableFiles.createFile(treeTables,2, siteService.getCurrentSite());
             }
             File f = new File(createTableFiles.zipFile);
             try {

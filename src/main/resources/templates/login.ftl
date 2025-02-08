@@ -9,12 +9,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <link rel="icon" href="https://static.mysiteforme.com/866ac55f-b471-40cf-a794-db73128c8fcd.ico">
     <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
     <link rel="stylesheet" href="${base}/static/css/login.css?t=${.now?long}" media="all" />
 </head>
 <body>
-<div id="bg-body"></div>
+<div id="bg-body" class="loginBody"></div>
 <div class="login">
     <h1>孤独的旅行家</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
@@ -53,10 +52,10 @@
                 form = layui.form;
 
         $(document).ready(function() {
-            var srcBgArray = ["https://static.mysiteforme.com/chun.jpg",
-                "https://static.mysiteforme.com/xia.jpg",
-                "https://static.mysiteforme.com/qiu.jpg",
-                "https://static.mysiteforme.com/dong.jpg"];
+            var srcBgArray = ["${base}/static/images/bg1.jpg",
+                "${base}/static/images/bg2.jpg",
+                "${base}/static/images/bg3.jpg",
+                "${base}/static/images/bg4.jpg"];
             $('#bg-body').bcatBGSwitcher({
                 timeout:5000,
                 urls: srcBgArray,

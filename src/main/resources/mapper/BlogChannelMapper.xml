@@ -31,7 +31,7 @@
         order by sort desc
     </select>
 
-    <resultMap id="getChannelSelf" type="com.mysiteforme.admin.entity.BlogChannel">
+    <resultMap id="getChannelSelf" type="com.mysiteforme.admin.entity.VO.BlogChannelVO">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="parentId" column="parentId"/>
@@ -47,12 +47,6 @@
         <result property="seoTitle" column="seoTitle"/>
         <result property="seoKeywords" column="seoKeywords"/>
         <result property="seoDescription" column="seoDescription"/>
-        <result property="createId" column="createId"/>
-        <result property="createDate" column="createDate"/>
-        <result property="updateId" column="updateId"/>
-        <result property="updateDate" column="updateDate"/>
-        <result property="remarks" column="remarks"/>
-        <result property="delFlag" column="delFlag"/>
         <collection property="children" select="selectChannelData"  column="{parentId = id}">
         </collection>
     </resultMap>

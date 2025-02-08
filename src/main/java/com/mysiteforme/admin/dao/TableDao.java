@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.VO.TableField;
 import com.mysiteforme.admin.entity.VO.TableVO;
@@ -15,11 +14,11 @@ import java.util.Map;
  * todo: 数据库操作表
  */
 @Mapper
-public interface TableDao extends BaseMapper<TableDao> {
+public interface TableDao {
 
     List<TableVO> listAll();
 
-    List<TableVO> listPage(Map<String,Object> map, IPage<TableVO> page);
+    List<TableVO> listPage(IPage<TableVO> page, @Param("params")Map<String,Object> map);
 
     Integer selectTableCount();
 

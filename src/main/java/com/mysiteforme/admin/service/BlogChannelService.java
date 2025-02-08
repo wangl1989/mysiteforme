@@ -3,6 +3,7 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.BlogChannel;
+import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public interface BlogChannelService extends IService<BlogChannel> {
     /**
      * 查询栏目数据 返回树形结构数据(列表页用)
      */
-    List<BlogChannel> selectChannelList();
+    List<BlogChannelVO> selectChannelList();
 
     /**
      * 新增或者保存数据

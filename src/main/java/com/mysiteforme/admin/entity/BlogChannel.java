@@ -17,10 +17,10 @@ import lombok.Setter;
  * @since 2018-01-18
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("blog_channel")
 @Data
 @Getter
 @Setter
+@TableName("blog_channel")
 public class BlogChannel extends TreeEntity<BlogChannel> {
 
     /**

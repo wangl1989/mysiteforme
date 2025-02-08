@@ -19,10 +19,10 @@ import java.util.List;
  * @since 2018-01-18
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("blog_comment")
 @Data
 @Getter
 @Setter
+@TableName("blog_comment")
 public class BlogComment extends DataEntity {
 
     /**

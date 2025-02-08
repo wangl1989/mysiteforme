@@ -1,6 +1,7 @@
 package com.mysiteforme.admin.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,35 +21,14 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfig {
 
-    @Value("${spring.datasource.username}")
-    private String username;
 
-    @Value("${spring.datasource.password}")
-    private String password;
+    private DataSource dataSource;
 
-    @Value("${spring.datasource.driver-class-name}")
-    private String driver;
+    public QuartzConfig() {}
 
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.druid.initialSize}")
-    private String initialSize;
-
-    @Value("${spring.datasource.druid.maxActive}")
-    private String maxActive;
-
-    @Bean
-    public DataSource dataSource() throws SQLException {
-        DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setUsername(username);
-        druidDataSource.setPassword(password);
-        druidDataSource.setDriverClassName(driver);
-        druidDataSource.setUrl(url);
-        druidDataSource.setMaxActive(Integer.parseInt(maxActive));
-        druidDataSource.setFilters("stat,wall,log4j");
-        druidDataSource.setInitialSize(Integer.parseInt(initialSize));
-        return druidDataSource;
+    @Autowired
+    public QuartzConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     /**
@@ -58,7 +38,7 @@ public class QuartzConfig {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws SQLException {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-        schedulerFactoryBean.setDataSource(dataSource());
+        schedulerFactoryBean.setDataSource(dataSource);
         //quartz参数
         Properties prop = getProperties();
         schedulerFactoryBean.setQuartzProperties(prop);

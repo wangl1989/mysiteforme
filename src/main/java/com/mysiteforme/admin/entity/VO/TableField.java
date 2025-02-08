@@ -19,6 +19,8 @@ import java.util.List;
 public class TableField implements Serializable {
 
     private static final long serialVersionUID = 6962439201546719734L;
+
+    private Long id;
     private String name;
     private Integer length;
     private String type;

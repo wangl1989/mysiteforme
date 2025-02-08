@@ -47,6 +47,11 @@
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="apache-snapshots" />
+      <option name="name" value="apache-snapshots" />
+      <option name="url" value="https://maven.aliyun.com/repository/public" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="aliyunmaven" />
       <option name="name" value="aliyunmaven" />
       <option name="url" value="https://maven.aliyun.com/repository/public/" />

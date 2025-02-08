@@ -78,7 +78,21 @@ public class RescourceController extends BaseController{
             return RestResponse.failure("请求参数不正确");
         }
         for (Rescource rescource : rescources){
-            QiniuFileUtil.deleteQiniuP(rescource.getWebUrl());
+            String source = rescource.getSource();
+            String path = rescource.getWebUrl();
+            if(StringUtils.isNotEmpty(source) && StringUtils.isNotBlank(path)){
+                if("qiniu".equals(source)){
+                    qiniuService.delete(path);
+                } else if ("oss".equals(source)) {
+                    ossService.delete(path);
+                } else {
+                    localService.delete(path);
+                }
+            }else{
+                return RestResponse.failure(rescource.getFileName()+"文件类型不存在");
+            }
+
+
         }
         rescourceService.removeByIds(ids);
         return RestResponse.success();

@@ -88,13 +88,20 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public Boolean delete(String path) {
-        path = path.replaceFirst("/","classpath:");
-        File file = new File(path);
-        if(file.exists()){
-            return file.delete();
-        }else{
-            return false;
+        // 获取项目的真实路径
+        try {
+            String projectPath = ResourceUtils.getURL("classpath:").getPath();
+            path = projectPath+path;
+            File file = new File(path);
+            if(file.exists()){
+                return file.delete();
+            }else{
+                return false;
+            }
+        }catch (Exception exception){
+            throw new MyException("本地文件夹删除出现异常");
         }
+
     }
 
     /**

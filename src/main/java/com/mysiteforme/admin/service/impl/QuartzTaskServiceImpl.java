@@ -36,8 +36,9 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
     }
 
     @Autowired
-    public QuartzTaskServiceImpl(QuartzTaskDao baseMapper) {
+    public QuartzTaskServiceImpl(QuartzTaskDao baseMapper,Scheduler scheduler) {
         this.baseMapper = baseMapper;
+        this.scheduler = scheduler;
     }
 
     /**

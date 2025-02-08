@@ -29,8 +29,9 @@ public class RedisCacheConfig {
      * @param factory Redis连接工厂
      * @return RedisTemplate实例
      */
+    @SuppressWarnings("rawtypes")
     @Bean
-    public RedisTemplate<String,String> redisTemplate(RedisConnectionFactory factory) {
+    public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate redisTemplate = new StringRedisTemplate(factory);
 
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);

@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.service.UserCacheService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,17 @@ import java.util.Map;
  * 为了解决这个问题，可以将需要缓存的方法提取到一个单独的服务类中，
  * 然后在原来的服务类中注入这个新服务类并调用其方法。
  */
-@Service
-public class UserCacheServiceImpl extends ServiceImpl<UserDao, User> implements UserCacheService {
+@Service("userCacheService")
+public class UserCacheServiceImpl implements UserCacheService {
+
+    private UserDao baseMapper;
+
+    public UserCacheServiceImpl() {}
+
+    @Autowired
+    public UserCacheServiceImpl(UserDao baseMapper) {
+        this.baseMapper = baseMapper;
+    }
 
     /**
      * 根据用户ID查找用户信息

@@ -39,7 +39,8 @@ public class Site extends DataEntity {
 	private String address;
 	private String logo;
 	private String server;
-	private String database;
+	@TableField("my_database")
+	private String myDatabase;
 	@TableField("max_upload")
 	private Integer maxUpload;
 	private String keywords;
@@ -74,7 +75,7 @@ public class Site extends DataEntity {
 			", fileUploadType=" + fileUploadType +
 			", logo=" + logo +
 			", server=" + server +
-			", database=" + database +
+			", myDatabase=" + myDatabase +
 			", maxUpload=" + maxUpload +
 			", keywords=" + keywords +
 			", description=" + description +

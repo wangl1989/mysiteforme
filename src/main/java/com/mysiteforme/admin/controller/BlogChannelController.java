@@ -3,6 +3,7 @@ package com.mysiteforme.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class BlogChannelController extends BaseController{
     @RequiresPermissions("blog:channel:list")
     @GetMapping("list")
     public String list(){
+        // 这里不是跳转方法，而是跳转到页面
         return "/admin/blogChannel/list";
     }
 
@@ -47,7 +49,7 @@ public class BlogChannelController extends BaseController{
     @PostMapping("list")
     @ResponseBody
     public RestResponse list(HttpServletRequest request){
-        List<BlogChannel> blogChannels = blogChannelService.selectChannelList();
+        List<BlogChannelVO> blogChannels = blogChannelService.selectChannelList();
         return RestResponse.success().setData(blogChannels);
     }
 

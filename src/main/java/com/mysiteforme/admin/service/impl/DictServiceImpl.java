@@ -62,7 +62,7 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
     @Override
     public Integer getMaxSortByType(String type) {
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eqSql("sort","select max(sort) from dict ")
+        queryWrapper.eqSql("sort","select max(sort) from sys_dict ")
                 .eq("type",type)
                 .eq("del_flag",false);
         Dict dict = getOne(queryWrapper);

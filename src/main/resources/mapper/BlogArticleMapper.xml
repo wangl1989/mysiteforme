@@ -115,39 +115,39 @@
         blog_article a
         left join blog_channel c on c.id = a.channel_id
         where a.del_flag = false
-        <if test="id != null and id != 0">
-            and a.id = #{id}
+        <if test="params.id != null and params.id != 0">
+            and a.id = #{params.id}
         </if>
-        <if test="title != null and title != ''">
-            and a.title like concat('%',#{title},'%')
+        <if test="params.title != null and params.title != ''">
+            and a.title like concat('%',#{params.title},'%')
         </if>
-        <if test="category != null and category != ''">
-            and a.category = #{category}
+        <if test="params.category != null and params.category != ''">
+            and a.category = #{params.category}
         </if>
-        <if test="beginPublistTime != null">
-            and a.publist_time &gt;= #{beginPublistTime}
+        <if test="params.beginPublistTime != null">
+            and a.publist_time &gt;= #{params.beginPublistTime}
         </if>
-        <if test="endPublistTime != null">
-            and a.publist_time $lt;= #{endPublistTime}
+        <if test="params.endPublistTime != null">
+            and a.publist_time &lt;= #{params.endPublistTime}
         </if>
-        <if test="content != null and content != ''">
-            and a.content like concat('%',#{content},'%')
+        <if test="params.content != null and params.content != ''">
+            and a.content like concat('%',#{params.content},'%')
         </if>
-        <if test="isBaseChannel != null and isBaseChannel == true">
+        <if test="params.isBaseChannel != null and params.isBaseChannel == true">
             and c.is_base_channel = true
         </if>
-        <if test="channelId != null and channelId != 0">
+        <if test="params.channelId != null and params.channelId != 0">
             <choose>
-                <when test="channelId == -1 or channelId == 0">
+                <when test="params.channelId == -1 or params.channelId == 0">
                     and a.channel_id is null
                 </when>
                 <otherwise>
-                    and a.channel_id = #{channelId}
+                    and a.channel_id = #{params.channelId}
                 </otherwise>
             </choose>
         </if>
-        <if test="rootId != null and rootId != ''">
-            and c.parent_ids like concat(#{rootId},'%')
+        <if test="params.rootId != null and params.rootId != ''">
+            and c.parent_ids like concat(#{params.rootId},'%')
         </if>
         ORDER BY
         is_top DESC,

@@ -2,6 +2,7 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.BlogChannel;
+import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,5 +22,5 @@ public interface BlogChannelDao extends BaseMapper<BlogChannel> {
 
     List<ZtreeVO> selectZtreeData(Map<String,Object> map);
 
-    List<BlogChannel> selectChannelData(Map<String, Object> map);
+    List<BlogChannelVO> selectChannelData(Map<String, Object> map);
 }

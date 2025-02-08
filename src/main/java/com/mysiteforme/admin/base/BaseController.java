@@ -5,6 +5,7 @@ import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import com.mysiteforme.admin.service.*;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * 基础控制器
@@ -71,4 +72,14 @@ public class BaseController {
 
 	@Autowired
 	protected UploadInfoService uploadInfoService;
+
+	@Autowired
+	protected @Qualifier("localService")  UploadService localService;
+
+	@Autowired
+	protected @Qualifier("qiniuService")  UploadService qiniuService;
+
+	@Autowired
+	protected @Qualifier("ossService")  UploadService ossService;
+
 }

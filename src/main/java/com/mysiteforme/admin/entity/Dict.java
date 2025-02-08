@@ -17,10 +17,10 @@ import lombok.Setter;
  * @since 2017-11-26
  */
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_dict")
 @Data
 @Getter
 @Setter
+@TableName("sys_dict")
 public class Dict extends DataEntity {
     /**
      * 数据值

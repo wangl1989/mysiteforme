@@ -18,32 +18,37 @@ spring:
         enabled: true
   #模板引擎配置
   freemarker:
-      template-loader-path: classpath:/templates/
-      prefer-file-system-access: false
-      settings:
-        template_update_delay: 0
-        classic_compatible: true
-        number_format: 0.######
-        template_exception_handler: ignore
-      request-context-attribute: rc
-      charset: UTF-8
+    template-loader-path: classpath:/templates/
+    prefer-file-system-access: false
+    settings:
+      template_update_delay: 0
+      classic_compatible: true
+      number_format: 0.######
+      template_exception_handler: ignore
+    request-context-attribute: rc
+    charset: UTF-8
+    suffix: .ftl
+    cache: false
   #连接池配置
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     druid:
-      validationQuery: SELECT 1
       initialSize: 10
-      minIdle: 10
       maxActive: 200
-      minEvictableIdleTimeMillis: 180000
-      testOnBorrow: false
-      testWhileIdle: true
-      removeAbandoned: true
-      removeAbandonedTimeout: 1800
-      logAbandoned: true
-      poolPreparedStatements: true
-      maxOpenPreparedStatements: 100
-
+      minIdle: 10
+      minEvictableIdleTimeMillis: 1800000
+      maxEvictableIdleTimeMillis: 1800000
+      timeBetweenEvictionRunsMillis: 60000
+      keepAlive: true
+      filters: stat,slf4j
+      filter:
+        slf4j:
+          enabled: true
+        stat:
+          enabled: true
+          logSlowSql: true
+          slowSqlMillis: 2000
+    type: com.alibaba.druid.pool.DruidDataSource
   #缓存配置
   cache:
       type: redis
@@ -113,17 +118,34 @@ spring:
         min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: tntjoy
+    druid:
+      url: jdbc:mysql://localhost:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      initialSize: 10
+      maxActive: 200
+      minIdle: 10
+      keepAlive: true
+      filter:
+        filters: slf4j,stat
+        slf4j:
+          enabled: true
+          statementExecutableSqlLogEnable: true
+          statementLogEnabled: true
+          statementLogErrorEnabled: true
+          resultSetLogEnabled: false
+        stat:
+          enabled: true
+          logSlowSql: true
+          slowSqlMillis: 2000
+
 
 #日志
 logging:
   config: classpath:log/logback.xml
   file:
     path: D:\log\mysiteforme
-
-#自定义配置属性
 #源码生成文件夹
 source-code-dic:  D://mysite
 source-code-zipfile:  D://源码.rar
