@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import freemarker.template.TemplateModelException;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +69,28 @@ public class GlobalExceptionHandler {
         }
 
         return null;
+    }
+
+    /**
+     * 权限异常
+     * @param e 异常参数
+     * @return 登录界面
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public String handleAuthorizationException(AuthorizationException e) {
+        log.error("权限异常:{},类型是:{}",e.getMessage(),"AuthorizationException");
+        return "login";
+    }
+
+    /**
+     * 权限异常
+     * @param e 异常参数
+     * @return 登录界面
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public String handleAuthenticationException(AuthenticationException e) {
+        log.error("权限异常:{},类型是:{}",e.getMessage(),"AuthenticationException");
+        return "login";
     }
 
     /**

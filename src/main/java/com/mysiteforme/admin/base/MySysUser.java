@@ -2,6 +2,7 @@ package com.mysiteforme.admin.base;
 
 import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 /**
  * 系统用户工具类
@@ -15,7 +16,8 @@ public class MySysUser {
      * @return 用户头像URL
      */
     public static String icon() {
-        return ShiroUser().getIcon();
+        ShiroUser user = ShiroUser();
+        return user != null ? user.getIcon() : null;
     }
 
     /**
@@ -23,7 +25,8 @@ public class MySysUser {
      * @return 用户ID
      */
     public static Long id() {
-        return ShiroUser().getId();
+        ShiroUser user = ShiroUser();
+        return user != null ? user.getId() : null;
     }
 
     /**
@@ -31,7 +34,8 @@ public class MySysUser {
      * @return 登录名
      */
     public static String loginName() {
-        return ShiroUser().getLoginName();
+        ShiroUser user = ShiroUser();
+        return user != null ? user.getLoginName() : null;
     }
 
     /**
@@ -39,10 +43,18 @@ public class MySysUser {
      * @return 用户昵称
      */
     public static String nickName(){
-        return ShiroUser().getNickName();
+        ShiroUser user = ShiroUser();
+        return user != null ? user.getNickName() : null;
     }
 
     public static ShiroUser ShiroUser() {
-        return (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+        Subject subject = SecurityUtils.getSubject();
+        if (subject != null && subject.isAuthenticated()) {
+            Object principal = subject.getPrincipal();
+            if (principal instanceof ShiroUser) {
+                return (ShiroUser) principal;
+            }
+        }
+        return null;
     }
 }
