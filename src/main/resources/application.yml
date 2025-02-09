@@ -18,21 +18,35 @@ spring:
         enabled: true
   #模板引擎配置
   freemarker:
-    template-loader-path: classpath:/templates/
-    prefer-file-system-access: false
+    cache: false  # ✓ 开发环境禁用缓存，适合开发调试
+    template-loader-path: classpath:/templates/ # ✓ 标准模板路径
+    prefer-file-system-access: true # 改为 true，允许直接从文件系统加载
     settings:
-      template_update_delay: 0
-      classic_compatible: true
-      number_format: 0.######
-      template_exception_handler: ignore
-    request-context-attribute: rc
-    charset: UTF-8
-    suffix: .ftl
-    cache: false
+      template_update_delay: 0  # ✓ 实时更新模板
+      classic_compatible: true  # ✓ 兼容模式，处理null值
+      number_format: 0.###### # ✓ 数字格式化
+      template_exception_handler: html_debug  # 开发环境建议用这个
+    request-context-attribute: rc # ✓ 请求上下文属性名
+    charset: UTF-8  # ✓ 字符编码
+    suffix: .ftl  # ✓ 模板文件后缀
   #连接池配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     druid:
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/login,/genCaptcha,/druid/*"
+        profileEnable: true
+        principalCookieName: USER_COOKIE
+        principalSessionName:
+        aopPatterns: com.mysiteforme.admin.service
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+        login-username: admin
+        login-password: admin
       initialSize: 10
       maxActive: 200
       minIdle: 10

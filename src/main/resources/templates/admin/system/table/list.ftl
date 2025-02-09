@@ -14,7 +14,7 @@
 </head>
 <body class="childrenBody">
 <fieldset class="layui-elem-field">
-    <legend>数据库检索1</legend>
+    <legend>数据库检索</legend>
     <div class="layui-field-box">
     <form class="layui-form">
         <div class="layui-inline">
