@@ -1,7 +1,7 @@
 package com.mysiteforme.admin.controller.system;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.Condition;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
@@ -56,7 +56,7 @@ public class MenuController extends BaseController{
     @GetMapping("add")
     public String add(@RequestParam(value = "parentId",required = false) Long parentId,Model model){
         if(parentId != null){
-            Menu menu = menuService.selectById(parentId);
+            Menu menu = menuService.getById(parentId);
             model.addAttribute("parentMenu",menu);
         }
         return "admin/system/menu/add";
@@ -80,25 +80,27 @@ public class MenuController extends BaseController{
         }
         if(menu.getParentId() == null){
             menu.setLevel(1);
-            Object o = menuService.selectObj(Condition.create().setSqlSelect("max(sort)").isNull("parent_id"));
+            QueryWrapper<Menu> wrapper = new QueryWrapper<>();
+            wrapper.eqSql("sort","select max(sort) from menu where parent_id is null");
+            Menu m = menuService.getOne(wrapper);
             int sort = 0;
-            if(o != null){
-                sort =  (Integer)o +10;
+            if(m != null){
+                sort =  m.getSort() +10;
             }
             menu.setSort(sort);
         }else{
-            Menu parentMenu = menuService.selectById(menu.getParentId());
+            Menu parentMenu = menuService.getById(menu.getParentId());
             if(parentMenu==null){
                 return RestResponse.failure("父菜单不存在");
             }
             menu.setParentIds(parentMenu.getParentIds());
             menu.setLevel(parentMenu.getLevel()+1);
-            Object o = menuService.selectObj(Condition.create()
-                            .setSqlSelect("max(sort)")
-                            .eq("parent_id",menu.getParentId()));
+            QueryWrapper<Menu> wrapper = new QueryWrapper<>();
+            wrapper.eqSql("sort","select max(sort) from menu").eq("parent_id",menu.getParentId());
+            Menu m = menuService.getOne(wrapper);
             int sort = 0;
-            if(o != null){
-                sort =  (Integer)o +10;
+            if(m != null){
+                sort =  m.getSort() +10;
             }
             menu.setSort(sort);
         }
@@ -110,7 +112,7 @@ public class MenuController extends BaseController{
 
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        Menu menu = menuService.selectById(id);
+        Menu menu = menuService.getById(id);
         model.addAttribute("menu",menu);
        return "admin/system/menu/edit";
     }
@@ -126,7 +128,7 @@ public class MenuController extends BaseController{
         if (StringUtils.isBlank(menu.getName())) {
             return RestResponse.failure("菜单名称不能为空");
         }
-        Menu oldMenu = menuService.selectById(menu.getId());
+        Menu oldMenu = menuService.getById(menu.getId());
         if(!oldMenu.getName().equals(menu.getName())) {
             if(menuService.getCountByName(menu.getName())>0){
                 return RestResponse.failure("菜单名称已存在");
@@ -154,7 +156,7 @@ public class MenuController extends BaseController{
         if(id == null){
             return RestResponse.failure("菜单ID不能为空");
         }
-        Menu menu = menuService.selectById(id);
+        Menu menu = menuService.getById(id);
         menu.setDelFlag(true);
         menuService.saveOrUpdateMenu(menu);
         return RestResponse.success();
@@ -175,7 +177,7 @@ public class MenuController extends BaseController{
             }
         }
         Boolean showFalg = Boolean.valueOf(isShow);
-        Menu menu = menuService.selectById(id);
+        Menu menu = menuService.getById(id);
         menu.setIsShow(showFalg);
         menuService.saveOrUpdateMenu(menu);
         return RestResponse.success();

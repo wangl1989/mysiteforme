@@ -1,6 +1,6 @@
 body{overflow:hidden;}
 .loginHtml,.loginBody{ height:100%;}
-.loginBody{ background:url("../images/login_bg.jpg") no-repeat center center;}
+.loginBody{ background-size: cover; width: 100vw;height: 100vh;background-position: center;}
 .imgCode{ position:relative;}
 #imgCode img{ position:absolute; top:1px; right:1px; cursor:pointer;}
 .video-player{background-color: transparent;display: block;position: absolute;z-index: 1;top:0;}

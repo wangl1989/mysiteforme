@@ -1,10 +1,10 @@
 package com.mysiteforme.admin.util;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.service.RescourceService;
 import com.qiniu.common.QiniuException;
-import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
@@ -13,6 +13,7 @@ import com.qiniu.storage.model.FetchRet;
 import com.qiniu.util.Auth;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,30 +21,30 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * 七牛云文件操作工具类
+ * 提供七牛云文件上传、删除等操作
+ */
 public class QiniuFileUtil {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(QiniuFileUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(QiniuFileUtil.class);
 
-	private static String path = "https://static.mysiteforme.com/";
-	private static String qiniuAccess = "****************";
-	private static String qiniuKey = "****************";
-	private static String bucketName = "wanggg";
+	private static final String path = "https://static.mysiteforme.com/";
+	private static final String qiniuAccess = "****************";
+	private static final String qiniuKey = "****************";
+	private static final String bucketName = "wanggg";
 
 	/***
 	 * 普通上传图片
-	 * @param file
-	 * @return
-	 * @throws QiniuException
-	 * @throws IOException
 	 */
-	public static String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-		Zone z = Zone.zone0();
-		Configuration config = new Configuration(z);
-		String fileName = "", extName = "", filePath = "";
+	public static String upload(MultipartFile file, RescourceService rescourceService) throws IOException, NoSuchAlgorithmException {
+		Configuration config = new Configuration();
+		String fileName, extName, filePath = "";
 		if (null != file && !file.isEmpty()) {
-			extName = file.getOriginalFilename().substring(
+			extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
 					file.getOriginalFilename().lastIndexOf("."));
 			fileName = UUID.randomUUID() + extName;
 			UploadManager uploadManager = new UploadManager(config);
@@ -52,57 +53,58 @@ public class QiniuFileUtil {
 			byte[] data = file.getBytes();
 			QETag tag = new QETag();
 			String hash = tag.calcETag(file);
-			Rescource rescource = new Rescource();
-			EntityWrapper<RestResponse> wrapper = new EntityWrapper<>();
+			QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
 			wrapper.eq("hash",hash);
-			rescource = rescource.selectOne(wrapper);
-			if( rescource!= null){
+			Rescource rescource = rescourceService.getOne(wrapper);
+			if( rescource!= null && StringUtils.isNotBlank(rescource.getWebUrl())){
 				return rescource.getWebUrl();
 			}
 			Response r = uploadManager.put(data, fileName, token);
 			if (r.isOK()) {
 				filePath = path + fileName;
-				rescource = new Rescource();
-				rescource.setFileName(fileName);
-				rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
-				rescource.setHash(hash);
-				rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
-				rescource.setWebUrl(filePath);
+				rescource = getRescource(file, fileName, extName, hash);
+                rescource.setWebUrl(filePath);
 				rescource.setSource("qiniu");
-				rescource.insert();
+				rescourceService.save(rescource);
 			}
 		}
 		return filePath;
 	}
 
+	@NotNull
+	public static Rescource getRescource(MultipartFile file, String fileName, String extName, String hash) {
+		Rescource rescource = new Rescource();
+		rescource.setFileName(fileName);
+		rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
+		rescource.setHash(hash);
+		rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
+		return rescource;
+	}
+
 	/***
 	 * 删除已经上传的图片
-	 * @param imgPath
 	 */
 	public static void deleteQiniuP(String imgPath) {
-		Zone z = Zone.zone0();
-		Configuration config = new Configuration(z);
+		Configuration config = new Configuration();
 		Auth auth = Auth.create(qiniuAccess, qiniuKey);
 		BucketManager bucketManager = new BucketManager(auth,config);
 		imgPath = imgPath.replace(path, "");
 		try {
 			bucketManager.delete(bucketName, imgPath);
 		} catch (QiniuException e) {
-			e.printStackTrace();
+			logger.error("删除七牛云图片失败:{}",e.getMessage());
+			throw new MyException("删除七牛云图片失败");
 		}
 	}
 
 	/***
 	 * 上传网络图片
-	 * @param src
-	 * @return
 	 */
-	public static String uploadImageSrc(String src){
-		Zone z = Zone.zone0();
-		Configuration config = new Configuration(z);
+	public static String uploadImageSrc(String src,RescourceService rescourceService){
+		Configuration config = new Configuration();
 		Auth auth = Auth.create(qiniuAccess, qiniuKey);
 		BucketManager bucketManager = new BucketManager(auth, config);
-		String fileName = UUID.randomUUID().toString(),filePath="";
+		String filePath;
 		try {
 			FetchRet fetchRet = bucketManager.fetch(src, bucketName);
 			filePath = path + fetchRet.key;
@@ -113,22 +115,34 @@ public class QiniuFileUtil {
 			rescource.setFileType(fetchRet.mimeType);
 			rescource.setWebUrl(filePath);
 			rescource.setSource("qiniu");
-			rescource.insert();
+			rescourceService.save(rescource);
 		} catch (QiniuException e) {
 			filePath = src;
-			e.printStackTrace();
+			logger.error("七牛云上传网络图片失败:{}",e.getMessage());
 		}
 		return filePath;
 	}
 
+	private static Rescource getFileRescource(File file, RescourceService rescourceService) throws IOException, NoSuchAlgorithmException {
+		QETag tag = new QETag();
+		String hash = tag.calcETag(file);
+		QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
+		wrapper.eq("hash",hash);
+		Rescource rescource = rescourceService.getOne(wrapper);
+		if(rescource != null){
+			return rescource;
+		}else{
+			rescource = new Rescource();
+		}
+		rescource.setHash(hash);
+		return rescource;
+    }
+
 	/***
 	 * 上传本地图片
-	 * @param src
-	 * @return
 	 */
-	public static String uploadLocalImg(String src) throws IOException, NoSuchAlgorithmException{
-		Zone z = Zone.zone0();
-		Configuration config = new Configuration(z);
+	public static String uploadLocalImg(String src,RescourceService rescourceService) throws IOException, NoSuchAlgorithmException{
+		Configuration config = new Configuration();
 		UploadManager uploadManager = new UploadManager(config);
 		Auth auth = Auth.create(qiniuAccess, qiniuKey);
 		String token = auth.uploadToken(bucketName);
@@ -136,17 +150,12 @@ public class QiniuFileUtil {
 		if(!file.exists()){
 			throw new MyException("本地文件不存在");
 		}
-		QETag tag = new QETag();
-		String hash = tag.calcETag(file);
-		Rescource rescource = new Rescource();
-		EntityWrapper<RestResponse> wrapper = new EntityWrapper<>();
-		wrapper.eq("hash",hash);
-		rescource = rescource.selectOne(wrapper);
-		if( rescource!= null){
+		Rescource rescource = getFileRescource(file, rescourceService);
+		if(StringUtils.isNotEmpty(rescource.getWebUrl())){
 			return rescource.getWebUrl();
 		}
 		String filePath="",
-				extName = "",
+				extName,
 		name = UUID.randomUUID().toString();
 		extName = file.getName().substring(
 				file.getName().lastIndexOf("."));
@@ -155,24 +164,25 @@ public class QiniuFileUtil {
 			filePath = path + name;
 			rescource = new Rescource();
 			rescource.setFileName(name);
-			rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.length()/1024)+"kb");
-			rescource.setHash(hash);
-			rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
-			rescource.setWebUrl(filePath);
-			rescource.setSource("qiniu");
-			rescource.insert();
+            saveSource(file, rescource.getHash(), rescource, filePath, extName);
+            rescourceService.save(rescource);
 		}
 		return filePath;
 	}
 
+	public static void saveSource(File file, String hash, Rescource rescource, String filePath, String extName) {
+		rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.length()/1024)+"kb");
+		rescource.setHash(hash);
+		rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
+		rescource.setWebUrl(filePath);
+		rescource.setSource("qiniu");
+	}
+
 	/**
 	 * 上传base64位的图片
-	 * @param base64
-	 * @return
 	 */
 	public static String uploadBase64(String base64,String name) {
-		Zone z = Zone.zone0();
-		Configuration config = new Configuration(z);
+		Configuration config = new Configuration();
 		UploadManager uploadManager = new UploadManager(config);
 		Auth auth = Auth.create(qiniuAccess, qiniuKey);
 		String token = auth.uploadToken(bucketName),filePath;
@@ -181,7 +191,8 @@ public class QiniuFileUtil {
 		try {
 			uploadManager.put(data,name,token);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("上传base64图片失败:{}",e.getMessage());
+			throw new MyException("上传base64图片失败");
 		}
 		filePath = path+name;
 		return filePath;

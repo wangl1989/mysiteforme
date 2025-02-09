@@ -1,7 +1,7 @@
 package com.mysiteforme.admin.service.impl;
 
 
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.GroupDao;
 import com.mysiteforme.admin.entity.Group;
 import com.mysiteforme.admin.service.GroupService;

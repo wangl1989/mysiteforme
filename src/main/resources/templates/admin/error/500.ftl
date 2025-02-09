@@ -13,7 +13,7 @@
     <meta name="keywords" content="${site.keywords}"/>
     <meta name="author" content="${site.author}"/>
     <link rel="icon" href="${site.logo}">
-    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="${base}/static/layui/css/layui.css" media="all" />
 </head>
 <body class="childrenBody">
 <div style="text-align: center; padding:11% 0;">

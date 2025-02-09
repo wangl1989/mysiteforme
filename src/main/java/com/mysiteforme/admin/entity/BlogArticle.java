@@ -3,10 +3,13 @@ package com.mysiteforme.admin.entity;
 import java.util.Date;
 import java.util.List;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -16,15 +19,18 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-18
  */
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
+@Data
 @TableName("blog_article")
-public class BlogArticle extends DataEntity<BlogArticle> {
+public class BlogArticle extends DataEntity {
 
-    private static final long serialVersionUID = 1L;
 
     /**
      * 标题
      */
-	private String title;
+    private String title;
     /**
      * 副标题
      */
@@ -117,153 +123,6 @@ public class BlogArticle extends DataEntity<BlogArticle> {
 	 */
 	@TableField(exist = false)
 	private Date newestCommentTime;
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getSubTitle() {
-		return subTitle;
-	}
-
-	public void setSubTitle(String subTitle) {
-		this.subTitle = subTitle;
-	}
-	public String getMarks() {
-		return marks;
-	}
-
-	public void setMarks(String marks) {
-		this.marks = marks;
-	}
-	public String getShowPic() {
-		return showPic;
-	}
-
-	public void setShowPic(String showPic) {
-		this.showPic = showPic;
-	}
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-	public String getOutLinkUrl() {
-		return outLinkUrl;
-	}
-
-	public void setOutLinkUrl(String outLinkUrl) {
-		this.outLinkUrl = outLinkUrl;
-	}
-	public String getResources() {
-		return resources;
-	}
-
-	public void setResources(String resources) {
-		this.resources = resources;
-	}
-	public Date getPublistTime() {
-		return publistTime;
-	}
-
-	public void setPublistTime(Date publistTime) {
-		this.publistTime = publistTime;
-	}
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Integer getClick() {
-		return click;
-	}
-
-	public void setClick(Integer click) {
-		this.click = click;
-	}
-	public Long getChannelId() {
-		return channelId;
-	}
-
-	public void setChannelId(Long channelId) {
-		this.channelId = channelId;
-	}
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-	public Boolean getTop() {
-		return isTop;
-	}
-
-	public void setTop(Boolean isTop) {
-		this.isTop = isTop;
-	}
-	public Boolean getRecommend() {
-		return isRecommend;
-	}
-
-	public void setRecommend(Boolean isRecommend) {
-		this.isRecommend = isRecommend;
-	}
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public BlogChannel getBlogChannel() {
-		return blogChannel;
-	}
-
-	public void setBlogChannel(BlogChannel blogChannel) {
-		this.blogChannel = blogChannel;
-	}
-
-	public List<BlogTags> getBlogTags() {
-		return blogTags;
-	}
-
-	public void setBlogTags(List<BlogTags> blogTags) {
-		this.blogTags = blogTags;
-	}
-
-	public Integer getCommentCount() {
-		return commentCount;
-	}
-
-	public void setCommentCount(Integer commentCount) {
-		this.commentCount = commentCount;
-	}
-
-	public Date getNewestCommentTime() {
-		return newestCommentTime;
-	}
-
-	public void setNewestCommentTime(Date newestCommentTime) {
-		this.newestCommentTime = newestCommentTime;
-	}
 
 	@Override
 	public String toString() {

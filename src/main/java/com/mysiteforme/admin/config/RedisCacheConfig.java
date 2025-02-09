@@ -12,37 +12,47 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 /**
- * Created by wangl on 2017/11/25.
- * todo:
+ * Redis缓存配置类
+ * 配置Redis作为系统缓存
+ * @author wang
+ * @since 2017/11/25
  */
 @EnableCaching
 @Configuration
 public class RedisCacheConfig {
 
+    /**
+     * 配置Redis模板
+     * @param factory Redis连接工厂
+     * @return RedisTemplate实例
+     */
+    @SuppressWarnings("rawtypes")
     @Bean
     public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate redisTemplate = new StringRedisTemplate(factory);
 
-//        JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
-        //这里如果启用fastjson序列化对象到redis的话 启动必须加参数 -Dfastjson.parser.autoTypeSupport=true
-//        RedisSerializer fastJson = fastJson2JsonRedisSerializer();
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
+    /**
+     * 配置缓存管理器
+     * @param redisConnectionFactory Redis连接工厂
+     * @return RedisCacheManager实例
+     */
     @Bean
-    public CacheManager cacheManager(@SuppressWarnings("rawtypes") RedisTemplate redisTemplate) {
-        return new RedisCacheManager(redisTemplate);
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.builder(redisConnectionFactory);
+        return builder.build();
     }
 
 }

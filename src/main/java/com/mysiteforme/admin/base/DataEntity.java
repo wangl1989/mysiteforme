@@ -3,34 +3,37 @@
  */
 package com.mysiteforme.admin.base;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.enums.FieldFill;
-import com.baomidou.mybatisplus.enums.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mysiteforme.admin.entity.User;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
 /**
- * 数据Entity类
- *
- * @param <T>
+ * 数据实体基类
+ * 提供创建者、创建时间、更新者、更新时间等审计字段
+ * @author JeeSite
  */
-public abstract class DataEntity<T extends Model> extends BaseEntity<T> {
-
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Getter
+@Setter
+public abstract class DataEntity extends BaseEntity {
 
     /**
-     *  创建者
+     * 创建者ID
      */
+    @Getter
     @TableField(value = "create_by", fill = FieldFill.INSERT)
     protected Long createId;
 
     /**
-     * 创建日期
+     * 创建时间
      */
     @TableField(value = "create_date", fill = FieldFill.INSERT)
     protected Date createDate;
@@ -38,6 +41,7 @@ public abstract class DataEntity<T extends Model> extends BaseEntity<T> {
     /**
      * 更新者
      */
+    @Getter
     @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
     protected Long updateId;
 
@@ -50,13 +54,14 @@ public abstract class DataEntity<T extends Model> extends BaseEntity<T> {
     /**
      * 删除标记（Y：正常；N：删除；A：审核；）
      */
+    @Getter
     @TableField(value = "del_flag")
     protected Boolean delFlag;
 
     /**
      * 备注
      */
-    @TableField(strategy= FieldStrategy.IGNORED)
+    @Getter
     protected String remarks;
 
     /**
@@ -71,83 +76,38 @@ public abstract class DataEntity<T extends Model> extends BaseEntity<T> {
     @TableField(exist = false)
     protected User updateUser;
 
-
-
-
-    public Long getCreateId() {
-        return createId;
-    }
-
-    public void setCreateId(Long createId) {
-        this.createId = createId;
-    }
-
-
+    /**
+     * 获取创建时间
+     * @return 创建时间
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Long getUpdateId() {
-        return updateId;
-    }
-
-    public void setUpdateId(Long updateId) {
-        this.updateId = updateId;
-    }
-
+    /**
+     * 默认构造函数
+     * 初始化删除标记为false
+     */
     public DataEntity() {
         super();
         this.delFlag = false;
     }
 
+    /**
+     * 带ID的构造函数
+     * @param id 实体ID
+     */
     public DataEntity(Long id) {
         super(id);
     }
 
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
+    /**
+     * 获取更新时间
+     * @return 更新时间
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getUpdateDate() {
         return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public Boolean getDelFlag() {
-        return delFlag;
-    }
-
-    public void setDelFlag(Boolean delFlag) {
-        this.delFlag = delFlag;
-    }
-
-    public User getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(User createUser) {
-        this.createUser = createUser;
-    }
-
-    public User getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(User updateUser) {
-        this.updateUser = updateUser;
     }
 }

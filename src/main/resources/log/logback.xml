@@ -22,7 +22,7 @@
         </encoder>
         <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>info</level>
+            <level>DEBUG</level>
         </filter>
     </appender>
 
@@ -180,9 +180,13 @@
     <logger name="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor" level="INFO"/>
     <logger name="com.mysiteforme.admin" level="debug"/>
 
+    <logger name="druid.sql.Statement" level="DEBUG"/> <!-- SQL语句 -->
+    <logger name="druid.sql.Statement.execute" level="DEBUG"/> <!-- 执行时间 -->
+    <logger name="java.sql.ResultSet" level="OFF"/> <!-- 直接关闭结果集 -->
+
     <!--开发环境:打印控制台-->
     <springProfile name="dev">
-        <root level="info">
+        <root level="DEBUG">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="DEBUG_FILE" />
             <appender-ref ref="INFO_FILE" />

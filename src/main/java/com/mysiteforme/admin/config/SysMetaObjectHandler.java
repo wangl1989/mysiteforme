@@ -1,8 +1,7 @@
 package com.mysiteforme.admin.config;
 
-import com.baomidou.mybatisplus.mapper.MetaObjectHandler;
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.mysiteforme.admin.base.MySysUser;
-import com.sun.jmx.snmp.Timestamp;
 import org.apache.ibatis.reflection.MetaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +14,9 @@ import java.util.Date;
  * @author chen
  */
 @Component
-public class SysMetaObjectHandler extends MetaObjectHandler {
+public class SysMetaObjectHandler implements MetaObjectHandler {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     //新增填充
     @Override

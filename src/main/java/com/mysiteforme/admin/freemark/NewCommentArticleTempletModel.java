@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.freemark;
 
-import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.service.BlogArticleService;
 import freemarker.core.Environment;
@@ -16,21 +15,30 @@ import java.util.Map;
 @Component
 public class NewCommentArticleTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogArticleService blogArticleService;
 
+    public NewCommentArticleTempletModel() {
+        super();
+    }
+
+    @Autowired
+    public NewCommentArticleTempletModel(BlogArticleService blogArticleService) {
+        this.blogArticleService = blogArticleService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
-        Integer limit = 5;
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
+        int limit = 5;
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("limit")){
-                int templimit = getInt(paramName,paramValue);
-                if(templimit>0){
-                    limit = templimit;
+            if(paramName.equalsIgnoreCase("limit")){
+                int implicit = getInt(paramValue);
+                if(implicit>0){
+                    limit = implicit;
                 }
             }
         }

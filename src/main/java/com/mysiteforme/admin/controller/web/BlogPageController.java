@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.controller.web;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.BaseController;
@@ -14,20 +15,13 @@ import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.date.DateUtil;
-import com.xiaoleilu.hutool.http.HTMLFilter;
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +34,16 @@ import java.util.Map;
 @Controller
 public class BlogPageController extends BaseController{
 
-    private static Log log = LogFactory.get();
+    private LuceneSearch luceneSearch;
+
+    public BlogPageController() {
+        super();
+    }
 
     @Autowired
-    private LuceneSearch luceneSearch;
+    public BlogPageController(LuceneSearch luceneSearch) {
+        this.luceneSearch = luceneSearch;
+    }
 
     @PostMapping("click")
     @ResponseBody
@@ -62,9 +62,6 @@ public class BlogPageController extends BaseController{
 
     /**
      * 跳转首页
-     * @param httpServletRequest
-     * @param model
-     * @return
      */
     @GetMapping(value = {"index","","/"})
     public String index(HttpServletRequest httpServletRequest,Model model){
@@ -77,9 +74,6 @@ public class BlogPageController extends BaseController{
 
     /**
      * 跳转文章专栏列表页
-     * @param httpServletRequest
-     * @param model
-     * @return
      */
     @GetMapping(value = {"/wzzl","/wzzl/**"})
     public String articleParttener(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -101,18 +95,13 @@ public class BlogPageController extends BaseController{
             map.put("channelId",blogChannel.getId());
         }
         model.addAttribute("channel",blogChannel);
-        Page<BlogArticle> pageList = blogArticleService.selectDetailArticle(map,new Page<BlogArticle>(page,limit));
+        IPage<BlogArticle> pageList = blogArticleService.selectDetailArticle(map,new Page<>(page,limit));
         model.addAttribute("pagelist",pageList);
         return "blog/article";
     }
 
     /**
      * 文章搜索
-     * @param page
-     * @param limit
-     * @param key
-     * @return
-     * @throws Exception
      */
     @PostMapping("search")
     @ResponseBody
@@ -129,9 +118,6 @@ public class BlogPageController extends BaseController{
 
     /**
      * 跳转文章详情
-     * @param articleId
-     * @param model
-     * @return
      */
     @GetMapping("articleContent/{articleId}")
     public String articleContent(@PathVariable(value = "articleId",required = false)Long articleId,
@@ -149,44 +135,18 @@ public class BlogPageController extends BaseController{
 
     /**
      * 文章评论
-     * @param blogComment
-     * @param request
-     * @return
      */
     @PostMapping("saveComment")
     @ResponseBody
     public RestResponse add(BlogComment blogComment, HttpServletRequest request){
-        if(StringUtils.isBlank(blogComment.getContent())){
-            return RestResponse.failure("评论内容不能为空");
-        }
-        if(blogComment.getArticleId() == null) {
-            return RestResponse.failure("评论文章ID不能为空");
-        }
-        if(blogComment.getChannelId() == null){
-            return RestResponse.failure("文章所在栏目ID不能为空");
-        }
-        if(blogComment.getIp() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getIp())){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getFloor() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getAdminReply() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getDelFlag()){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getRemarks())){
-            return RestResponse.failure("非法请求");
+        RestResponse restResponse = checkBlogComment(blogComment);
+        if(restResponse.get("success") != null && !(Boolean)restResponse.get("success")){
+            return restResponse;
         }
         //类型隶属于文章评论
         blogComment.setType(Constants.COMMENT_TYPE_ARTICLE_COMMENT);
         String content = blogComment.getContent();
-        content = content.replace("\"", "\'");
+        content = content.replace("\"", "'");
         if(content.length()>1000){
             return RestResponse.failure("您的评论内容太多啦！系统装不下啦！");
         }
@@ -204,46 +164,42 @@ public class BlogPageController extends BaseController{
         return RestResponse.success();
     }
 
+    private RestResponse checkBlogComment(BlogComment blogComment){
+        if(StringUtils.isBlank(blogComment.getContent())){
+            return RestResponse.failure("评论内容不能为空");
+        }
+        if(StringUtils.isNotEmpty(blogComment.getIp())){
+            return RestResponse.failure("非法请求:IP地址为空");
+        }
+        if(blogComment.getArticleId() == null) {
+            return RestResponse.failure("评论文章ID不能为空");
+        }
+        if(blogComment.getChannelId() == null){
+            return RestResponse.failure("文章所在栏目ID不能为空");
+        }
+        if(blogComment.getFloor() != null && blogComment.getFloor()<=0){
+            return RestResponse.failure("非法请求：文章所在楼层错误");
+        }
+        if(blogComment.getAdminReply() != null){
+            return RestResponse.failure("非法请求:管理员是否回复字段为空");
+        }
+        return RestResponse.success();
+    }
+
     /**
      * 系统留言
-     * @param blogComment
-     * @param request
-     * @return
      */
     @PostMapping("saveMessage")
     @ResponseBody
     public RestResponse saveMessage(BlogComment blogComment, HttpServletRequest request){
-        if(StringUtils.isBlank(blogComment.getContent())){
-            return RestResponse.failure("评论内容不能为空");
-        }
-        if(blogComment.getArticleId() != null) {
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getChannelId() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getIp() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getIp())){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getFloor() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getAdminReply() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getDelFlag()){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getRemarks())){
-            return RestResponse.failure("非法请求");
+        RestResponse restResponse = checkBlogComment(blogComment);
+        if(restResponse.get("success") != null && !(Boolean)restResponse.get("success")){
+            return restResponse;
         }
         //隶属于系统留言
         blogComment.setType(Constants.COMMENT_TYPE_LEVING_A_MESSAGE);
         String content = blogComment.getContent();
-        content = content.replace("\"", "\'");
+        content = content.replace("\"", "'");
         if(content.length()>1000){
             return RestResponse.failure("您的留言内容太多啦！系统装不下啦！");
         }
@@ -257,60 +213,35 @@ public class BlogPageController extends BaseController{
             ip = "内网地址";
         }
         blogComment.setIp(ip);
-        blogCommentService.insert(blogComment);
+        blogCommentService.save(blogComment);
         return RestResponse.success();
     }
 
     /**
      * 回复留言
-     * @param blogComment
-     * @param request
-     * @return
      */
     @PostMapping("replyMessage")
     @ResponseBody
     public RestResponse replyMessage(BlogComment blogComment, HttpServletRequest request){
-        if(StringUtils.isBlank(blogComment.getContent())){
-            return RestResponse.failure("回复内容不能为空");
-        }
-        if(blogComment.getReplyId() == null){
-            return RestResponse.failure("回复ID不能为空");
-        }
-        if(blogComment.getArticleId() != null) {
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getChannelId() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getIp() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getIp())){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getFloor() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getAdminReply() != null){
-            return RestResponse.failure("非法请求");
-        }
-        if(blogComment.getDelFlag()){
-            return RestResponse.failure("非法请求");
-        }
-        if(StringUtils.isNotBlank(blogComment.getRemarks())){
-            return RestResponse.failure("非法请求");
+        RestResponse restResponse = checkBlogComment(blogComment);
+        if(restResponse.get("success") != null && !(Boolean)restResponse.get("success")){
+            return restResponse;
         }
         if(blogComment.getType() != null){
             return RestResponse.failure("非法请求");
         }
-        BlogComment targetComment = blogCommentService.selectById(blogComment.getReplyId());
+
+        if(blogComment.getReplyId() == null){
+            return RestResponse.failure("回复ID不能为空");
+        }
+        BlogComment targetComment = blogCommentService.getById(blogComment.getReplyId());
         if(targetComment == null){
             return RestResponse.failure("非法请求");
         }
         //隶属于系统留言
         blogComment.setType(targetComment.getType());
         String content = blogComment.getContent();
-        content = content.replace("\"", "\'");
+        content = content.replace("\"", "'");
         if(content.length()>1000){
             return RestResponse.failure("您的回复内容太多啦！系统装不下啦！");
         }
@@ -330,10 +261,6 @@ public class BlogPageController extends BaseController{
 
     /**
      * 获取文章评论
-     * @param page
-     * @param limit
-     * @param articleId
-     * @return
      */
     @PostMapping("articleCommentList")
     @ResponseBody
@@ -347,13 +274,12 @@ public class BlogPageController extends BaseController{
         if(type != 1 && type != 2){
             return RestResponse.failure("请求类型错误");
         }
-        Page<BlogComment> pageData = blogCommentService.getArticleComments(articleId,type,new Page<BlogComment>(page,limit));
+        IPage<BlogComment> pageData = blogCommentService.getArticleComments(articleId,type,new Page<>(page,limit));
         return RestResponse.success().setData(pageData);
     }
 
     /**
      * 关于本站 跳转到 他的第一个子栏目
-     * @return
      */
     @GetMapping(value = {"/about","/about"})
     public String redictSunChannel(){
@@ -361,7 +287,6 @@ public class BlogPageController extends BaseController{
     }
     /**
      * 关于博客
-     * @return
      */
     @GetMapping(value = {"/about/**"})
     public String toAbout(HttpServletRequest request,Model model){
@@ -375,12 +300,12 @@ public class BlogPageController extends BaseController{
             throw new MyException("地址没找到",404);
         }
         model.addAttribute("channel",blogChannel);
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("channel_id",blogChannel.getId());
-        wrapper.orderBy("is_top",false).orderBy("is_recommend",false);
-        List<BlogArticle> list = blogArticleService.selectList(wrapper);
-        if(list.size() >0){
+        wrapper.orderBy(false,false,"is_top","is_recommend");
+        List<BlogArticle> list = blogArticleService.list(wrapper);
+        if(!list.isEmpty()){
             model.addAttribute("oneArticle",list.get(0));
         }
         if(list.size()>1){
@@ -392,6 +317,7 @@ public class BlogPageController extends BaseController{
     }
 
     @GetMapping(value = {"/dddd","/dddd/"})
+    @SuppressWarnings("unchecked")
     public String dddd(HttpServletRequest request,Model model){
         String href = request.getRequestURI();
         href = href.replaceFirst("/showBlog","");
@@ -404,28 +330,28 @@ public class BlogPageController extends BaseController{
         }
         model.addAttribute("channel",blogChannel);
         List<BlogArticle> list = blogArticleService.selectTimeLineList(blogChannel.getId());
-        if(list.size()>0){
+        if(!list.isEmpty()){
             Map<Object,Object> yearMap = Maps.newLinkedHashMap();
             for(BlogArticle blogArticle : list){
                 Date  d= blogArticle.getCreateDate();
-                Integer year = DateUtil.year(d);
-                Integer monthe = DateUtil.month(d)+1;
-                if(yearMap.containsKey(year.toString())){
-                    Map<String,List<BlogArticle>> monthMap = (Map<String,List<BlogArticle>>) yearMap.get(year.toString());
-                    if(monthMap.containsKey(monthe.toString())){
-                        List<BlogArticle> blogArticles = monthMap.get(monthe.toString());
+                int year = DateUtil.year(d);
+                int monthe = DateUtil.month(d)+1;
+                if(yearMap.containsKey(Integer.toString(year))){
+                    Map<String,List<BlogArticle>> monthMap = (Map<String,List<BlogArticle>>) yearMap.get(Integer.toString(year));
+                    if(monthMap.containsKey(Integer.toString(monthe))){
+                        List<BlogArticle> blogArticles = monthMap.get(Integer.toString(monthe));
                         blogArticles.add(blogArticle);
                     }else{
                         List<BlogArticle> blogArticles = Lists.newArrayList();
                         blogArticles.add(blogArticle);
-                        monthMap.put(monthe.toString(),blogArticles);
+                        monthMap.put(Integer.toString(monthe),blogArticles);
                     }
                 }else{
                     Map<String,List<BlogArticle>> monthMap = Maps.newLinkedHashMap();
                     List<BlogArticle> blogArticles = Lists.newArrayList();
                     blogArticles.add(blogArticle);
-                    monthMap.put(monthe.toString(),blogArticles);
-                    yearMap.put(year.toString(),monthMap);
+                    monthMap.put(Integer.toString(monthe),blogArticles);
+                    yearMap.put(Integer.toString(year),monthMap);
                 }
             }
             model.addAttribute("year",yearMap);

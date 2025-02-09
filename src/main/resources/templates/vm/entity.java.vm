@@ -5,11 +5,10 @@ import ${pkg};
 #end
 #if(${entityLombokModel})
 
-import com.baomidou.mybatisplus.annotations.Version;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.Setter;
 #end
 
 #set($tablecomment = "")

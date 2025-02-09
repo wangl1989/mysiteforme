@@ -8,46 +8,49 @@ import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.Encodes;
-import com.mysiteforme.admin.util.ToolUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.session.InvalidSessionException;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 /**
- * Created by wangl on 2017/11/22.
+ * Created by wang on 2017/11/22.
  * todo:
  */
+@Setter
 @Component(value = "authRealm")
 public class AuthRealm extends AuthorizingRealm {
 
+    private UserService userService;
+
+    public AuthRealm() {
+        super();
+    }
+
     @Autowired
     @Lazy
-    private UserService userService;
+    public AuthRealm(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         ShiroUser shiroUser = (ShiroUser)principalCollection.getPrimaryPrincipal();
-        User user = userService.findUserByLoginName(shiroUser.getloginName());
+        User user = userService.findUserByLoginName(shiroUser.getLoginName());
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         Set<Role> roles = user.getRoleLists();
         Set<String> roleNames = Sets.newHashSet();
@@ -81,13 +84,14 @@ public class AuthRealm extends AuthorizingRealm {
             throw new LockedAccountException(); //帐号锁定
         }
         byte[] salt = Encodes.decodeHex(user.getSalt());
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+        //密码
+        //realm name
+        return new SimpleAuthenticationInfo(
                 new ShiroUser(user.getId(),user.getLoginName(),user.getNickName(), user.getIcon()),
                 user.getPassword(), //密码
                 ByteSource.Util.bytes(salt),
                 getName()  //realm name
         );
-        return authenticationInfo;
     }
 
     public void removeUserAuthorizationInfoCache(String username) {
@@ -106,13 +110,11 @@ public class AuthRealm extends AuthorizingRealm {
         setCredentialsMatcher(matcher);
     }
 
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
     /**
      * 自定义Authentication对象，使得Subject除了携带用户的登录名外还可以携带更多信息.
      */
+    @Getter
+    @Setter
     public static class ShiroUser implements Serializable {
         private static final long serialVersionUID = -1373760761780840081L;
         public Long id;
@@ -126,20 +128,6 @@ public class AuthRealm extends AuthorizingRealm {
             this.nickName = nickName;
             this.icon=icon;
         }
-
-        public String getloginName() {
-            return loginName;
-        }
-        public String getNickName() {
-            return nickName;
-        }
-        public String getIcon() {
-            return icon;
-        }
-        public Long getId() {
-            return id;
-        }
-
 
 
         /**
@@ -177,5 +165,6 @@ public class AuthRealm extends AuthorizingRealm {
                 return other.loginName == null;
             } else return loginName.equals(other.loginName);
         }
+
     }
 }

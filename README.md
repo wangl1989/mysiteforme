@@ -1,11 +1,13 @@
 # mysiteforme
-系统后台预览地址: https://admin.mysiteforme.com 用户名:`admin`  密码:`123456`(<del>该账户不能修改密码</del>)<br/>
-技术交流QQ群：`692984846`<br/>
+
+[//]: # (系统后台预览地址: https://admin.mysiteforme.com 用户名:`admin`  密码:`123456`&#40;<del>该账户不能修改密码</del>&#41;<br/>)
+
+[//]: # (技术交流QQ群：`692984846`<br/>)
 ## 系统更新
-* 原系统使用的七牛云上传的密钥已经失效不能使用
-* 可以更新代码选择系统默认的本地上传
-* 如继续使用旧版也可以去七牛申请10G免费的云存储空间,然后获得密钥,更新到你的配置文件中(<a href="https://portal.qiniu.com/signup?code=3l8cqxdoe8jf6" target="_blank">点我申请</a>)
-* 旧版配置文件位于`util/QiniuFileUtil`
+* springboot升级到2.2.13.RELEASE
+* 代码生成器使用MybatisPlus最新工具FastAutoGenerator
+* 修改了项目中大量的不规范代码,少量修复前端ftl代码
+* durid现在能正常使用,且把代码移除改为配置文件
 ## 主要功能
 * 系统用户,角色,权限增删改查,权限分配，权限配色<br/>
 * 文件上传可自由选择本地存储,七牛云存储,阿里云存储
@@ -16,13 +18,13 @@
 * 系统定时任务的新增改查 立即启动 暂停 恢复<br/>
 
 ## 技术框架
-* 核心框架：`SpringBoot`
-* 安全框架：`Apache Shiro 1.3.2`
+* 核心框架：`SpringBoot 1.5` ——> `SpringBoot 2.2.13.RELEASE`
+* 安全框架：`Apache Shiro 1.3.2` ——> `Apache Shiro 1.9.1`
 * 缓存框架：`Redis 4.0`
 * 搜索框架：`Lucene 7.1`
-* 任务调度：`quartz 2.3`
-* 持久层框架：`MyBatis 3` <a href="http://baomidou.oschina.io/mybatis-plus-doc/#/" target="_blank">mybatisplus</a> 2.1.4
-* 数据库连接池：`Alibaba Druid 1.0.2`
+* 任务调度：`quartz 2.3` 
+* 持久层框架：`MyBatis 3` <a href="http://baomidou.oschina.io/mybatis-plus-doc/#/" target="_blank">MyBatisPlus</a> 2.1.4 ——> `MyBatisPlus 3.5.10.1`
+* 数据库连接池：`Alibaba Druid 1.0.2` ——> `Alibaba Druid 1.2.20`
 * 日志管理：`SLF4J 1.7`、`Log4j`
 * 前端框架：`layui`
 * 后台模板：<a href="http://layuicms.gitee.io/layuicms2.0/index.html" target="_blank">layuicms 2.0。</a>
@@ -60,6 +62,7 @@
 * 注册redis系统服务 打开cmd--->切换到安装redis的目录--->`redis-server.exe --service-install redis.windows-service.conf`
 * 启动系统 预览地址为:`http://localhost:8080`  管理员用户名：`test` 密码：`1`
 
-# 技术交流<br/>
-![](https://static.mysiteforme.com/28104140.png?raw=true)
+[//]: # (# 技术交流<br/>)
+
+[//]: # (![]&#40;https://static.mysiteforme.com/28104140.png?raw=true&#41;)
 

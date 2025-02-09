@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Rescource;
@@ -41,9 +42,9 @@ public class RescourceController extends BaseController{
     public LayerData<Rescource> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                      @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                      ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<Rescource> layerData = new LayerData<>();
-        EntityWrapper<Rescource> wrapper = new EntityWrapper<>();
+        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
         if(!map.isEmpty()){
             String type = (String) map.get("type");
             if(StringUtils.isNotBlank(type)) {
@@ -58,8 +59,8 @@ public class RescourceController extends BaseController{
                 wrapper.eq("source",source);
             }
         }
-        Page<Rescource> dataPage = rescourceService.selectPage(new Page<>(page,limit),wrapper);
-        layerData.setCount(dataPage.getTotal());
+        IPage<Rescource> dataPage = rescourceService.page(new Page<>(page,limit),wrapper);
+        layerData.setCount((int)dataPage.getTotal());
         layerData.setData(dataPage.getRecords());
         return layerData;
     }
@@ -69,17 +70,31 @@ public class RescourceController extends BaseController{
     @SysLog("删除系统资源")
     @ResponseBody
     public RestResponse delete(@RequestParam("ids[]") List<Long> ids){
-        if(ids == null || ids.size() == 0){
+        if(ids == null || ids.isEmpty()){
             return RestResponse.failure("删除ID不能为空");
         }
-        List<Rescource> rescources = rescourceService.selectBatchIds(ids);
-        if(rescources == null || rescources.size()==0){
+        List<Rescource> rescources = rescourceService.listByIds(ids);
+        if(rescources == null || rescources.isEmpty()){
             return RestResponse.failure("请求参数不正确");
         }
         for (Rescource rescource : rescources){
-            QiniuFileUtil.deleteQiniuP(rescource.getWebUrl());
+            String source = rescource.getSource();
+            String path = rescource.getWebUrl();
+            if(StringUtils.isNotEmpty(source) && StringUtils.isNotBlank(path)){
+                if("qiniu".equals(source)){
+                    qiniuService.delete(path);
+                } else if ("oss".equals(source)) {
+                    ossService.delete(path);
+                } else {
+                    localService.delete(path);
+                }
+            }else{
+                return RestResponse.failure(rescource.getFileName()+"文件类型不存在");
+            }
+
+
         }
-        rescourceService.deleteBatchIds(ids);
+        rescourceService.removeByIds(ids);
         return RestResponse.success();
     }
 

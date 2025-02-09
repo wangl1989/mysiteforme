@@ -4,52 +4,77 @@ import com.mysiteforme.admin.freemark.*;
 import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import freemarker.template.TemplateModelException;
 
 import javax.annotation.PostConstruct;
 
 /**
- * Created by wangl on 2017/11/26.
- * todo:
+ * Freemarker模板引擎配置类
+ * 配置自定义标签和模型
+ * @author wangl
+ * @since 2017/11/26
  */
 @Component
 public class FreemarkerConfig {
 
-    @Autowired
     private Configuration configuration;
 
-    @Autowired
     private SystemDirective systemDirective;
 
-    @Autowired
     private ArticleDirective articleDirective;
 
-    @Autowired
     private IndexArticleDirective indexArticleDirective;
 
-    @Autowired
     private ChannelDirective channelDirective;
 
-    @Autowired
     private ParentChannelListDirective parentChannelListDirective;
 
-    @Autowired
     private ArticleClickTempletModel articleClickTempletModel;
 
-    @Autowired
     private SysUserTempletModel sysUserTempletModel;
 
-    @Autowired
     private TagsTempletModel tagsTempletModel;
 
-    @Autowired
     private NewCommentArticleTempletModel newCommentArticleTempletModel;
 
-    @Autowired
     private LookLikeArticlesTempletModel lookLikeArticlesTempletModel;
 
-    @Autowired
+
     private CommentNumberTempletModel commentNumberTempletModel;
 
+    public FreemarkerConfig() {}
+
+    @Autowired
+    public FreemarkerConfig(Configuration configuration,
+                            SystemDirective systemDirective,
+                            ArticleDirective articleDirective,
+                            IndexArticleDirective indexArticleDirective,
+                            ChannelDirective channelDirective,
+                            ParentChannelListDirective parentChannelListDirective,
+                            ArticleClickTempletModel articleClickTempletModel,
+                            SysUserTempletModel sysUserTempletModel,
+                            TagsTempletModel tagsTempletModel,
+                            NewCommentArticleTempletModel newCommentArticleTempletModel,
+                            LookLikeArticlesTempletModel lookLikeArticlesTempletModel,
+                            CommentNumberTempletModel commentNumberTempletModel) {
+        this.configuration = configuration;
+        this.systemDirective = systemDirective;
+        this.articleDirective = articleDirective;
+        this.indexArticleDirective = indexArticleDirective;
+        this.channelDirective = channelDirective;
+        this.parentChannelListDirective = parentChannelListDirective;
+        this.articleClickTempletModel = articleClickTempletModel;
+        this.sysUserTempletModel = sysUserTempletModel;
+        this.tagsTempletModel = tagsTempletModel;
+        this.newCommentArticleTempletModel = newCommentArticleTempletModel;
+        this.lookLikeArticlesTempletModel = lookLikeArticlesTempletModel;
+        this.commentNumberTempletModel = commentNumberTempletModel;
+    }
+
+    /**
+     * 初始化Freemarker配置
+     */
     @PostConstruct
     public void setSharedVariable() {
         //系统字典标签
@@ -76,4 +101,5 @@ public class FreemarkerConfig {
         //当前文章相似的文章
         configuration.setSharedVariable("same",lookLikeArticlesTempletModel);
     }
+
 }

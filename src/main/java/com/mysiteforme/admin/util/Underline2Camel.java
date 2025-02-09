@@ -15,10 +15,10 @@ public class Underline2Camel {
      * @return 转换后的字符串
      */
     public static String underline2Camel(String line,boolean smallCamel){
-        if(line==null||"".equals(line)){
+        if(line==null|| line.isEmpty()){
             return "";
         }
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         Pattern pattern=Pattern.compile("([A-Za-z\\d]+)(_)?");
         Matcher matcher=pattern.matcher(line);
         while(matcher.find()){
@@ -39,11 +39,11 @@ public class Underline2Camel {
      * @return 转换后的字符串
      */
     public static String camel2Underline(String line){
-        if(line==null||"".equals(line)){
+        if(line==null|| line.isEmpty()){
             return "";
         }
         line=String.valueOf(line.charAt(0)).toUpperCase().concat(line.substring(1));
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         Pattern pattern=Pattern.compile("[A-Z]([a-z\\d]+)?");
         Matcher matcher=pattern.matcher(line);
         while(matcher.find()){

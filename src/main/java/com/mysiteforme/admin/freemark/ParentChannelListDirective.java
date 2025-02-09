@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.freemark;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.service.BlogChannelService;
 import freemarker.core.Environment;
@@ -20,18 +19,28 @@ import java.util.Map;
 @Component
 public class ParentChannelListDirective extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogChannelService blogChannelService;
+
+    public ParentChannelListDirective() {
+        super();
+    }
+
+    @Autowired
+    public ParentChannelListDirective(BlogChannelService blogChannelService) {
+        this.blogChannelService = blogChannelService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         Long cid = null;
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("cid")){
-                cid = getLong(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("cid")){
+                cid = getLong(paramValue);
             }
         }
         if(cid == null){

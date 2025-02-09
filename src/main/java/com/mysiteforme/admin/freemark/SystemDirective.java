@@ -1,6 +1,6 @@
 package com.mysiteforme.admin.freemark;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.entity.Dict;
 import com.mysiteforme.admin.service.DictService;
@@ -22,20 +22,28 @@ import java.util.Map;
 @Component
 public class SystemDirective extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private DictService dictService;
 
+    public SystemDirective() {
+        super();
+    }
+
+    @Autowired
+    public SystemDirective(DictService dictService) {
+        this.dictService = dictService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
-        EntityWrapper<Dict> wrapper = new EntityWrapper<>();
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         List<Dict> dictList = Lists.newArrayList();
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("type")){
-                String dicType = getString(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("type")){
+                String dicType = getString(paramValue);
                 if(StringUtils.isBlank(dicType)){
                     throw new TemplateModelException("参数名称不正确");
                 }else{
@@ -44,7 +52,7 @@ public class SystemDirective extends BaseDirective implements TemplateDirectiveM
             }
 
         }
-        if(dictList.size()<=0){
+        if(dictList.isEmpty()){
             throw new TemplateModelException("返回值为空");
         }
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_26);

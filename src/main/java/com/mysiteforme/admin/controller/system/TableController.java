@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -23,13 +24,14 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @Author:tnt
- * @Description:${TODO}
- * @Date: Create in 17:51 2017/12/25.
+ * &#064;Author:tnt
+ * &#064;Description:$
+ * &#064;Date:  Create in 17:51 2017/12/25.
  */
 @Controller
 @RequestMapping("admin/system/table")
@@ -42,11 +44,18 @@ public class TableController extends BaseController{
     "case","default","do","break","continue","return","instanceof","static","final","super","this","native","strictfp","synchronized","transient","volatile",
     "catch","try","finally","throw","throws","enum","assert","throw","throws","this"};
 
-    @Autowired
     private CreateTableFiles createTableFiles;
+
+    public TableController() {
+        super();
+    }
+
+    @Autowired
+    public TableController(CreateTableFiles createTableFiles) {
+        this.createTableFiles = createTableFiles;
+    }
+
     /**
-     *
-     * @return
      */
     @GetMapping("list")
     @SysLog("跳转数据表列表页面")
@@ -56,10 +65,6 @@ public class TableController extends BaseController{
 
     /***
      * 所有数据表分页查询
-     * @param page
-     * @param limit
-     * @param request
-     * @return
      */
     @RequiresPermissions("sys:table:list")
     @PostMapping("list")
@@ -75,8 +80,8 @@ public class TableController extends BaseController{
                 map.remove("name");
             }
         }
-        Page<TableVO> tablePage = tableService.selectTablePage(new Page<>(page,limit),map);
-        tableLayerData.setCount(tablePage.getTotal());
+        IPage<TableVO> tablePage = tableService.selectTablePage(new Page<>(page,limit),map);
+        tableLayerData.setCount((int)tablePage.getTotal());
         tableLayerData.setData(tablePage.getRecords());
         return tableLayerData;
     }
@@ -100,7 +105,7 @@ public class TableController extends BaseController{
         if(StringUtils.isBlank(tableVO.getComment())){
             return RestResponse.failure("表的备注不能为空");
         }
-        if(tableVO.getFieldList() == null || tableVO.getFieldList().size() == 0){
+        if(tableVO.getFieldList() == null || tableVO.getFieldList().isEmpty()){
             return RestResponse.failure("表的字段不能为空");
         }
         if(tableService.existTable(tableVO.getName().toLowerCase())>0){
@@ -119,7 +124,7 @@ public class TableController extends BaseController{
         TableVO tableVO = tableService.detailTable(name);
         String[] comments = tableVO.getComment().split(",");
         tableVO.setComment(comments[0]);
-        Integer tabletype = comments.length>1?Integer.valueOf(comments[1]):0;
+        int tabletype = comments.length>1?Integer.parseInt(comments[1]):0;
         tableVO.setTabletype(tabletype);
 
         String base  = "id,create_by,create_date,update_by,update_date,del_flag";
@@ -196,10 +201,10 @@ public class TableController extends BaseController{
                 map.put("tableType",Integer.valueOf(tableType));
             }
         }
-        Page<TableField> tablePage = tableService.selectTableFieldPage(new Page<>(page,limit),map);
+        IPage<TableField> tablePage = tableService.selectTableFieldPage(new Page<>(page,limit),map);
         LayerData<TableField> layerData = new LayerData<>();
         layerData.setData(tablePage.getRecords());
-        layerData.setCount(tablePage.getTotal());
+        layerData.setCount((int)tablePage.getTotal());
         return layerData;
     }
 
@@ -418,24 +423,26 @@ public class TableController extends BaseController{
             File baseFloder = new File(createTableFiles.baseDic);
             ZipUtil.deleteDir(baseFloder);
             if(baseTables != null && baseTables.length>0){
-                createTableFiles.createFile(baseTables,1);
+                createTableFiles.createFile(baseTables,1, siteService.getCurrentSite());
             }
             if(treeTables != null && treeTables.length>0){
-                createTableFiles.createFile(treeTables,2);
+                createTableFiles.createFile(treeTables,2, siteService.getCurrentSite());
             }
             File f = new File(createTableFiles.zipFile);
             try {
                 if(f.exists()){
-                    f.delete();
+                    if(!f.delete()){
+                        LOGGER.error("删除文件失败:{}",f.getName());
+                    }
                 }
                 com.xiaoleilu.hutool.util.ZipUtil.zip(createTableFiles.baseDic,createTableFiles.zipFile);
             }catch (Exception e){
-                e.printStackTrace();
+                LOGGER.error("压缩文件失败:{}",e.getMessage());
             }
             String filename = new String(f.getName().getBytes("GB2312"),"ISO8859-1");
-            BufferedInputStream br = new BufferedInputStream(new FileInputStream(f));
+            BufferedInputStream br = new BufferedInputStream(Files.newInputStream(f.toPath()));
             byte[] buf = new byte[1024];
-            int len = 0;
+            int len;
             response.setCharacterEncoding("UTF-8");
             response.setContentLength((int) f.length());
             response.setContentType("application/zip");
@@ -445,7 +452,9 @@ public class TableController extends BaseController{
             br.close();
             out.flush();
             out.close();
-            f.delete();
+            if(!f.delete()){
+                LOGGER.error("删除文件失败:{}",f.getName());
+            }
         }
         return RestResponse.success();
     }

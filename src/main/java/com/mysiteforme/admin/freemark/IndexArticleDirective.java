@@ -1,12 +1,8 @@
 package com.mysiteforme.admin.freemark;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.BlogArticle;
-import com.mysiteforme.admin.entity.BlogChannel;
-import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.BlogArticleService;
-import com.mysiteforme.admin.service.BlogChannelService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +20,33 @@ import java.util.Map;
 @Component
 public class IndexArticleDirective extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogArticleService blogArticleService;
 
+    public IndexArticleDirective() {
+        super();
+    }
+
+    @Autowired
+    public IndexArticleDirective(BlogArticleService blogArticleService) {
+        this.blogArticleService = blogArticleService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         Map<String,Object> paramMap = Maps.newHashMap();
-        Integer limit = 10;
+        int limit = 10;
         String order = "top,recommend,publish,sort,view";
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param = iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("limit")){
-                limit = getInt(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("limit")){
+                limit = getInt(paramValue);
             }
-            if(paramName.toLowerCase().equals("order")){
-                order = getString(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("order")){
+                order = getString(paramValue);
             }
         }
         paramMap.put("limit",limit);

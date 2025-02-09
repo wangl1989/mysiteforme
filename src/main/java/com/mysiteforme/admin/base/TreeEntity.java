@@ -1,22 +1,26 @@
 package com.mysiteforme.admin.base;
 
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotation.TableField;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
 /**
- * 数据Entity类
- *
+ * 树形结构实体基类
+ * 提供树形结构所需的父子关系字段
  * @author chenjianann
- *
- * @version 2014-05-16
+ * @since 2014-05-16
  */
-public abstract class TreeEntity<T extends Model> extends DataEntity<T> {
-
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
+@Data
+public class TreeEntity<T> extends DataEntity {
 
     /**
      * varchar(64) NULL父id
@@ -44,61 +48,30 @@ public abstract class TreeEntity<T extends Model> extends DataEntity<T> {
     @TableField(exist = false)
     protected T parentTree;
 
+    /**
+     * 获取父节点ID路径
+     * @return 父节点ID路径字符串
+     */
+    @Length(max = 1000, message = "路径长度必须介于 1 和 1000 之间")
+    public String getParentIds() {
+        return parentIds;
+    }
+
+    /**
+     * 默认构造函数
+     * 初始化排序值为30
+     */
     public TreeEntity() {
         super();
         this.sort = 30;
     }
 
+    /**
+     * 带ID的构造函数
+     * @param id 实体ID
+     */
     public TreeEntity(Long id) {
         super(id);
     }
 
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    @Length( max = 1000, message = "路径长度必须介于 1 和 1000 之间")
-    public String getParentIds() {
-        return parentIds;
-    }
-
-    public void setParentIds(String parentIds) {
-        this.parentIds = parentIds;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public List<T> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<T> children) {
-        this.children = children;
-    }
-
-    public T getParentTree() {
-        return parentTree;
-    }
-
-    public void setParentTree(T parentTree) {
-        this.parentTree = parentTree;
-    }
 }

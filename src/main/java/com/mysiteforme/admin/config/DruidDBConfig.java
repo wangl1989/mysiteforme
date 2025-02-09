@@ -1,41 +1,60 @@
 package com.mysiteforme.admin.config;
 
-import com.alibaba.druid.support.http.StatViewServlet;
-import com.alibaba.druid.support.http.WebStatFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.sql.DataSource;
+import com.alibaba.druid.pool.DruidDataSource;
+import java.sql.SQLException;
 
+/**
+ * Druid数据源配置类
+ * 配置Druid监控统计功能
+ */
 @Configuration
 public class DruidDBConfig {
 
+    @Value("${spring.datasource.druid.username}")
+    private String username;
+
+    @Value("${spring.datasource.druid.password}")
+    private String password;
+
+    @Value("${spring.datasource.druid.driver-class-name}")
+    private String driver;
+
+    @Value("${spring.datasource.druid.url}")
+    private String url;
+
+    @Value("${spring.datasource.druid.initialSize}")
+    private String initialSize;
+
+    @Value("${spring.datasource.druid.maxActive}")
+    private String maxActive;
+
+    /**
+     * 配置Druid数据源
+     * @return DruidDataSource实例
+     */
     @Bean
-    public ServletRegistrationBean druidServlet() {
-        ServletRegistrationBean reg = new ServletRegistrationBean();
-        reg.setServlet(new StatViewServlet());
-        reg.addUrlMappings("/druid/*");
-        //reg.addInitParameter("allow", "127.0.0.1"); //白名单
-        reg.addInitParameter("resetEnable","false");
-        return reg;
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource.druid")
+    public DataSource dataSource() throws SQLException {
+        DruidDataSource druidDataSource = new DruidDataSource();
+        druidDataSource.setUsername(username);
+        druidDataSource.setPassword(password);
+        druidDataSource.setDriverClassName(driver);
+        druidDataSource.setUrl(url);
+        druidDataSource.setMaxActive(Integer.parseInt(maxActive));
+        druidDataSource.setFilters("stat,wall,slf4j");
+        druidDataSource.setInitialSize(Integer.parseInt(initialSize));
+        return druidDataSource;
     }
 
-    @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new WebStatFilter());
-        Map<String, String> initParams = new HashMap<String, String>();
-        //设置忽略请求
-        initParams.put("exclusions", "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*");
-        filterRegistrationBean.setInitParameters(initParams);
-        filterRegistrationBean.addInitParameter("profileEnable", "true");
-        filterRegistrationBean.addInitParameter("principalCookieName","USER_COOKIE");
-        filterRegistrationBean.addInitParameter("principalSessionName","");
-        filterRegistrationBean.addInitParameter("aopPatterns","com.mysiteforme.admin.service");
-        filterRegistrationBean.addUrlPatterns("/*");
-        return filterRegistrationBean;
-    }
+
 }

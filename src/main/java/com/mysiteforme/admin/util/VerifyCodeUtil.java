@@ -4,23 +4,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 
 /**
  * 验证码生成器
- * @see --------------------------------------------------------------------------------------------------------------
- * @see 可生成数字、大写、小写字母及三者混合类型的验证码
- * @see 支持自定义验证码字符数量,支持自定义验证码图片的大小,支持自定义需排除的特殊字符,支持自定义干扰线的数量,支持自定义验证码图文颜色
- * @see --------------------------------------------------------------------------------------------------------------
- * @see 另外,给Shiro加入验证码有多种方式,也可以通过继承修改FormAuthenticationFilter类,通过Shiro去验证验证码
- * @see 而这里既然使用了SpringMVC,也为了简化操作,就使用此工具生成验证码,并在Controller中处理验证码的校验
- * @see --------------------------------------------------------------------------------------------------------------
- * @create Sep 29, 2013 4:23:13 PM
- * @author 玄玉<http://blog.csdn.net/jadyer>
+ * 可生成数字、大写、小写字母及三者混合类型的验证码
+ * 支持自定义验证码字符数量,支持自定义验证码图片的大小,支持自定义需排除的特殊字符,支持自定义干扰线的数量,支持自定义验证码图文颜色
+ * 另外,给Shiro加入验证码有多种方式,也可以通过继承修改FormAuthenticationFilter类,通过Shiro去验证验证码
+ * 而这里既然使用了SpringMVC,也为了简化操作,就使用此工具生成验证码,并在Controller中处理验证码的校验
+ * &#064;create  Sep 29, 2013 4:23:13 PM
+ * @author 玄玉
  */
 public class VerifyCodeUtil {
     /**
@@ -100,7 +94,7 @@ public class VerifyCodeUtil {
         if(length <= 0){
             return "";
         }
-        StringBuffer verifyCode = new StringBuffer();
+        StringBuilder verifyCode = new StringBuilder();
         int i = 0;
         Random random = new Random();
         switch(type){
@@ -108,7 +102,7 @@ public class VerifyCodeUtil {
                 while(i < length){
                     int t = random.nextInt(10);
                     //排除特殊字符
-                    if(null==excludeString || excludeString.indexOf(t+"")<0) {
+                    if(null==excludeString || !excludeString.contains(t + "")) {
                         verifyCode.append(t);
                         i++;
                     }
@@ -195,27 +189,27 @@ public class VerifyCodeUtil {
         //画干扰线
         Random random = new Random();
         if(interLine > 0){
-            int x = 0, y = 0, x1 = width, y1 = 0;
+            int x = 0, y, y1 = 0;
             for(int i=0; i<interLine; i++){
                 graphics.setColor(null==lineColor ? generateRandomColor() : lineColor);
                 y = random.nextInt(height);
                 y1 = random.nextInt(height);
-                graphics.drawLine(x, y, x1, y1);
+                graphics.drawLine(x, y, width, y1);
             }
         }
         //字体大小为图片高度的80%
-        int fsize = (int)(height * 0.8);
-        int fx = height - fsize;
-        int fy = fsize;
+        int size = (int)(height * 0.8);
+        int fx = height - size;
+        int fy = size;
         //设定字体
-        graphics.setFont(new Font("微软雅黑", Font.BOLD, fsize));
+        graphics.setFont(new Font("微软雅黑", Font.BOLD, size));
         //写验证码字符
         for(int i=0; i<textCode.length(); i++){
             fy = randomLocation ? (int)((Math.random()*0.3+0.6)*height) : fy;
             graphics.setColor(null==foreColor ? generateRandomColor() : foreColor);
             //将验证码字符显示到图象中
             graphics.drawString(textCode.charAt(i)+"", fx, fy);
-            fx += fsize * 0.9;
+            fx += (int) (size * 0.9);
         }
         graphics.dispose();
         return bufferedImage;

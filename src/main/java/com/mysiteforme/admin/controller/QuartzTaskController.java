@@ -1,13 +1,13 @@
 package com.mysiteforme.admin.controller;
 
-import com.xiaoleilu.hutool.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.service.QuartzTaskService;
-import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
@@ -39,27 +36,41 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/quartzTask")
 public class QuartzTaskController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(QuartzTaskController.class);
 
-
-    @Autowired
     private QuartzTaskService quartzTaskService;
 
+    public QuartzTaskController() {}
+
+    @Autowired
+    public QuartzTaskController(QuartzTaskService quartzTaskService) {
+        this.quartzTaskService = quartzTaskService;
+    }
+
+    /**
+     * 显示任务列表页面
+     * @return 列表页面路径
+     */
     @GetMapping("list")
     @SysLog("跳转定时任务列表")
     public String list(){
         return "/admin/quartzTask/list";
     }
 
+    /**
+     * 获取任务列表数据
+     * @param limit 每页数量
+     * @param page 分页参数
+     * @return 分页数据
+     */
     @RequiresPermissions("quartz:task:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<QuartzTask> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                       @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                       ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<QuartzTask> layerData = new LayerData<>();
-        EntityWrapper<QuartzTask> wrapper = new EntityWrapper<>();
+        QueryWrapper<QuartzTask> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         if(!map.isEmpty()){
             String name = (String) map.get("name");
@@ -77,17 +88,26 @@ public class QuartzTaskController {
             }
 
         }
-        Page<QuartzTask> pageData = quartzTaskService.queryList(wrapper,new Page<>(page,limit));
+        IPage<QuartzTask> pageData = quartzTaskService.queryList(wrapper,new Page<>(page,limit));
         layerData.setData(pageData.getRecords());
-        layerData.setCount(pageData.getTotal());
+        layerData.setCount((int)pageData.getTotal());
         return layerData;
     }
 
+    /**
+     * 显示任务添加页面
+     * @return 添加页面路径
+     */
     @GetMapping("add")
     public String add(){
         return "/admin/quartzTask/add";
     }
 
+    /**
+     * 保存任务
+     * @param quartzTask 任务对象
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:add")
     @PostMapping("add")
     @SysLog("保存新增定时任务数据")
@@ -97,13 +117,24 @@ public class QuartzTaskController {
         return RestResponse.success();
     }
 
+    /**
+     * 编辑任务
+     * @param id 任务ID
+     * @param model 模型对象
+     * @return 编辑页面路径
+     */
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        QuartzTask quartzTask = quartzTaskService.selectById(id);
+        QuartzTask quartzTask = quartzTaskService.getById(id);
         model.addAttribute("quartzTask",quartzTask);
         return "/admin/quartzTask/edit";
     }
 
+    /**
+     * 更新任务
+     * @param quartzTask 任务对象
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:edit")
     @PostMapping("edit")
     @ResponseBody
@@ -116,12 +147,17 @@ public class QuartzTaskController {
         return RestResponse.success();
     }
 
+    /**
+     * 删除任务
+     * @param ids 任务ID集合
+     * @return 操作结果
+     */
     @RequiresPermissions("quartz:task:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除定时任务数据")
     public RestResponse delete(@RequestParam(value = "ids[]",required = false)List<Long> ids){
-        if(null == ids || 0 == ids.size()){
+        if(null == ids || ids.isEmpty()){
             return RestResponse.failure("ID不能为空");
         }
         quartzTaskService.deleteBatchTasks(ids);
@@ -131,13 +167,12 @@ public class QuartzTaskController {
     /**
      * 暂停选中的定时任务
      * @param ids 任务ID List
-     * @return
      */
     @RequiresPermissions("quartz:task:paush")
     @PostMapping("paush")
     @ResponseBody
     public RestResponse paush(@RequestParam(value = "ids[]",required = false)List<Long> ids){
-        if(null == ids || 0 == ids.size()){
+        if(null == ids || ids.isEmpty()){
             return RestResponse.failure("ID不能为空");
         }
         quartzTaskService.paush(ids);
@@ -147,13 +182,12 @@ public class QuartzTaskController {
     /**
      * 恢复选中的定时任务运行
      * @param ids 任务ID List
-     * @return
      */
     @RequiresPermissions("quartz:task:resume")
     @PostMapping("resume")
     @ResponseBody
     public RestResponse resume(@RequestParam(value = "ids[]",required = false)List<Long> ids){
-        if(null == ids || 0 == ids.size()){
+        if(null == ids || ids.isEmpty()){
             return RestResponse.failure("ID不能为空");
         }
         quartzTaskService.resume(ids);
@@ -163,13 +197,12 @@ public class QuartzTaskController {
     /**
      * 立即执行选中的定时任务
      * @param ids 任务ID List
-     * @return
      */
     @RequiresPermissions("quartz:task:run")
     @PostMapping("run")
     @ResponseBody
     public RestResponse run(@RequestParam(value = "ids[]",required = false)List<Long> ids){
-        if(null == ids || 0 == ids.size()){
+        if(null == ids || ids.isEmpty()){
             return RestResponse.failure("ID不能为空");
         }
         quartzTaskService.run(ids);

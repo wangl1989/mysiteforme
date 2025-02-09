@@ -4,18 +4,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.exception.MyException;
 import com.xiaoleilu.hutool.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,14 +40,12 @@ public class ToolUtil {
 	/**
 	 *
 	 * @param paramStr 输入需要加密的字符串
-	 * @return
-	 */
+     */
 	public static String entryptPassword(String paramStr,String salt) {
 		if(StringUtils.isNotEmpty(paramStr)){
 			byte[] saltStr = Encodes.decodeHex(salt);
 			byte[] hashPassword = Digests.sha1(paramStr.getBytes(), saltStr, Constants.HASH_INTERATIONS);
-			String password = Encodes.encodeHex(hashPassword);
-			return password;
+            return Encodes.encodeHex(hashPassword);
 		}else{
 			return null;
 		}
@@ -51,34 +53,48 @@ public class ToolUtil {
 	}
 
 	/**
-	 * 获取客户端的ip信息
-	 * 
-	 * @param request
-	 * @return
+	 * 通过泛型检查工具方法封装
 	 */
+	@SuppressWarnings("unchecked")
+	public static <K, V> Map<K, V> getSessionMapAttribute(HttpSession session, String attributeName, Class<K> keyType, Class<V> valueType) {
+		Object attr = session.getAttribute(attributeName);
+		if (attr instanceof Map) {
+			Map<?, ?> rawMap = (Map<?, ?>) attr;
+			for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+				if (!keyType.isInstance(entry.getKey()) || !valueType.isInstance(entry.getValue())) {
+					return null;
+				}
+			}
+			return Collections.checkedMap((Map<K, V>) rawMap, keyType, valueType);
+		}
+		return null;
+	}
+
+	/**
+	 * 获取客户端的ip信息
+	 *
+     */
 	public static String getClientIp(HttpServletRequest request) {
 		String ip = request.getHeader("X-Real-IP");
-		LOGGER.info("ipadd : " + ip);
+		LOGGER.info("ipadd : {}" , ip);
 		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("X-Forwarded-For");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
 		}
-		if (ip == null || ip.length() == 0 || "unknow".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isEmpty() || "unknow".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("WL-Proxy-Client-IP");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
-		LOGGER.info(" ip --> " + ip);
+		LOGGER.info(" ip --> {}" , ip);
 		return ip;
 	}
 	
 	/**
      * 将bean转换成map
-     * @param condition
-     * @return
      */
     @SuppressWarnings("unchecked")
 	public static Map<String, Object> convertBeanToMap(Object condition) {
@@ -88,12 +104,13 @@ public class ToolUtil {
 		if (condition instanceof Map) {
 			return (Map<String, Object>) condition;
 		}
-		Map<String, Object> objectAsMap = new HashMap<String, Object>();
-		BeanInfo info = null;
+		Map<String, Object> objectAsMap = new HashMap<>();
+		BeanInfo info;
 		try {
 			info = Introspector.getBeanInfo(condition.getClass());
 		} catch (IntrospectionException e) {
-			e.printStackTrace();
+			LOGGER.error("转换bean为map失败", e);
+			throw new MyException("转换bean为map失败");
 		}
 
 		for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
@@ -102,11 +119,11 @@ public class ToolUtil {
 				try {
 					objectAsMap.put(pd.getName(), reader.invoke(condition));
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
+					LOGGER.error("出现IllegalArgumentException异常", e);
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					LOGGER.error("出现IllegalAccessException异常", e);
 				} catch (InvocationTargetException e) {
-					e.printStackTrace();
+					LOGGER.error("出现InvocationTargetException异常", e);
 				}
 		}
 		return objectAsMap;
@@ -142,9 +159,7 @@ public class ToolUtil {
 
 	/**
 	 * 判断请求是否是ajax请求
-	 * @param request
-	 * @return
-	 */
+     */
 	public static boolean isAjax(HttpServletRequest request){
 		String accept = request.getHeader("accept");
         return accept != null && accept.contains("application/json") || (request.getHeader("X-Requested-With") != null && request.getHeader("X-Requested-With").contains("XMLHttpRequest"));
@@ -152,16 +167,13 @@ public class ToolUtil {
 
 	/**
 	 * 获取操作系统,浏览器及浏览器版本信息
-	 * @param request
-	 * @return
-	 */
+     */
 	public static Map<String,String> getOsAndBrowserInfo(HttpServletRequest request){
 		Map<String,String> map = Maps.newHashMap();
-		String  browserDetails  =   request.getHeader("User-Agent");
-		String  userAgent       =   browserDetails;
+        String  userAgent       = request.getHeader("User-Agent");
 		String  user            =   userAgent.toLowerCase();
 
-		String os = "";
+		String os;
 		String browser = "";
 
 		//=================OS Info=======================
@@ -225,44 +237,42 @@ public class ToolUtil {
 		{
 			browser = "UnKnown, More-Info: "+userAgent;
 		}
-		map.put("os",os);
-		map.put("browser",browser);
+		map.put("os", HtmlUtils.htmlEscape(os));
+		map.put("browser",HtmlUtils.htmlEscape(browser));
 		return map;
 	}
 
-	/***
-	 * @param ip
-	 * @return
-	 */
+	/**
+     */
+	@SuppressWarnings("unchecked")
 	public static Map<String,String> getAddressByIP(String ip) {
-		String area = "";
-		String province = "";
-		String city = "";
+		String area;
+		String province;
+		String city;
 		String isp = "";
-		Map finalMap = Maps.newHashMap();
+		Map<String,String> finalMap = Maps.newHashMap();
 		try{
 			if("0:0:0:0:0:0:0:1".equals(ip)){
 				ip = "0.0.0.0";
 			}
-			StringBuilder sb = new StringBuilder("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=");
-			sb.append(ip);
-			String result= HttpUtil.get(sb.toString(), "GBK");
-			Map resultMap = JSON.parseObject(result,Map.class);
-			String status = (String) resultMap.get("err");
+            String result= HttpUtil.get("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip, "GBK");
+			Map<String,String> resultMap = JSON.parseObject(result,Map.class);
+			String status = resultMap.get("err");
 
-			province = (String) resultMap.get("pro");
-			city = (String) resultMap.get("city");
+			province = resultMap.get("pro");
+			city = resultMap.get("city");
 			if("noprovince".equalsIgnoreCase(status)){
-				area = (String) resultMap.get("addr");
+				area = resultMap.get("addr");
 			}else{
 				area = "中国";
-				String addr = (String) resultMap.get("addr");
+				String addr = resultMap.get("addr");
 				if(StringUtils.isNotBlank(addr)){
 					isp = addr.split(" ")[1];
 				}
 			}
 		}catch (Exception e){
-			e.printStackTrace();
+			LOGGER.error("获取地理位置异常",e);
+			throw new MyException("获取地理位置异常:"+e.getMessage());
 		}
 
 
@@ -273,28 +283,8 @@ public class ToolUtil {
 		return finalMap;
 	}
 
-	public static void main(String args[]) throws Exception {
-		//long t1 = System.currentTimeMillis();
-		//Map<String,String> map = getAddressByIP("0.0.0.0");
-		//LOGGER.info("地区："+map.get("country"));
-		//LOGGER.info("省："+map.get("province"));
-		//LOGGER.info("市："+map.get("city"));
-		//LOGGER.info("互联网服务提供商："+map.get("isp"));
-		//long t2 = System.currentTimeMillis();
-		//System.out.println("执行时间为"+(t2-t1));
-
-		//StringBuilder sb = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?ip=117.82.187.111&key=N7XBZ-NX764-OFOUH-D5LJY-KZ3QK-6WFNX");
-		//String result= HttpUtil.get(sb.toString(), "UTF-8");
-		//Map<String,String> map = Maps.newHashMap();
-		//Map resultMap = JSON.parseObject(result,Map.class);
-		//Map m = (Map) resultMap.get("result");
-		//Map r = (Map) m.get("ad_info");
-		//Integer code = (Integer) resultMap.get("code");
-		//if(code == 0){
-		//	Map<String,String> detail = (Map<String,String>)resultMap.get("data");
-		//	String country = detail.get("country");
-		//}
-		Map maps = getAddressByIP("117.82.187.111");
+	public static void main(String[] args) throws Exception {
+		Map<String,String> maps = getAddressByIP("117.82.187.111");
 		System.out.println(JSONObject.toJSONString(maps));
 	}
 }

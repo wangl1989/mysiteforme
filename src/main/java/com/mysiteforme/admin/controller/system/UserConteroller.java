@@ -1,7 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
@@ -25,6 +26,7 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -48,17 +50,17 @@ public class UserConteroller extends BaseController{
     public LayerData<User> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                 @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                 ServletRequest request){
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<User> userLayerData = new LayerData<>();
-        EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
+        QueryWrapper<User> userEntityWrapper = new QueryWrapper<>();
         if(!map.isEmpty()){
             String keys = (String) map.get("key");
             if(StringUtils.isNotBlank(keys)) {
                 userEntityWrapper.like("login_name", keys).or().like("tel", keys).or().like("email", keys);
             }
         }
-        Page<User> userPage = userService.selectPage(new Page<>(page,limit),userEntityWrapper);
-        userLayerData.setCount(userPage.getTotal());
+        IPage<User> userPage = userService.page(new Page<>(page,limit),userEntityWrapper);
+        userLayerData.setCount((int)userPage.getTotal());
         userLayerData.setData(userPage.getRecords());
         return  userLayerData;
     }
@@ -78,7 +80,7 @@ public class UserConteroller extends BaseController{
         if(StringUtils.isBlank(user.getLoginName())){
             return RestResponse.failure("登录名不能为空");
         }
-        if(user.getRoleLists() == null || user.getRoleLists().size() == 0){
+        if(user.getRoleLists() == null || user.getRoleLists().isEmpty()){
             return  RestResponse.failure("用户角色至少选择一个");
         }
         if(userService.userCount(user.getLoginName())>0){
@@ -104,11 +106,11 @@ public class UserConteroller extends BaseController{
 
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        User user = userService.findUserById(id);
+        User user = userCacheService.findUserById(id);
         List<Long> roleIdList = Lists.newArrayList();
         if(user != null) {
             Set<Role> roleSet = user.getRoleLists();
-            if (roleSet != null && roleSet.size() > 0) {
+            if (roleSet != null && !roleSet.isEmpty()) {
                 for (Role r : roleSet) {
                     roleIdList.add(r.getId());
                 }
@@ -132,10 +134,10 @@ public class UserConteroller extends BaseController{
         if(StringUtils.isBlank(user.getLoginName())){
             return RestResponse.failure("登录名不能为空");
         }
-        if(user.getRoleLists() == null || user.getRoleLists().size() == 0){
+        if(user.getRoleLists() == null || user.getRoleLists().isEmpty()){
             return  RestResponse.failure("用户角色至少选择一个");
         }
-        User oldUser = userService.findUserById(user.getId());
+        User oldUser = userCacheService.findUserById(user.getId());
         if(StringUtils.isNotBlank(user.getEmail())){
             if(!user.getEmail().equals(oldUser.getEmail())){
                 if(userService.userCount(user.getEmail())>0){
@@ -170,7 +172,7 @@ public class UserConteroller extends BaseController{
         if(id == null || id == 0 || id == 1){
             return RestResponse.failure("参数错误");
         }
-        User user = userService.findUserById(id);
+        User user = userCacheService.findUserById(id);
         if(user == null){
             return RestResponse.failure("用户不存在");
         }
@@ -183,7 +185,7 @@ public class UserConteroller extends BaseController{
     @ResponseBody
     @SysLog("删除系统用户数据(多个)")
     public RestResponse deleteSome(@RequestBody List<User> users){
-        if(users == null || users.size()==0){
+        if(users == null || users.isEmpty()){
             return RestResponse.failure("请选择需要删除的用户");
         }
         for (User u : users){
@@ -198,20 +200,18 @@ public class UserConteroller extends BaseController{
 
     /***
      * 获得用户所拥有的菜单列表
-     * @return
      */
     @GetMapping("getUserMenu")
     @ResponseBody
     public List<ShowMenu> getUserMenu(){
         Long userId = MySysUser.id();
-        List<ShowMenu> list = menuService.getShowMenuByUser(userId);
-        return list;
+        return menuService.getShowMenuByUser(userId);
     }
 
     @GetMapping("userinfo")
     public String toEditMyInfo(Model model){
         Long userId = MySysUser.id();
-        User user = userService.findUserById(userId);
+        User user = userCacheService.findUserById(userId);
         model.addAttribute("userinfo",user);
         model.addAttribute("userRole",user.getRoleLists());
         return "admin/system/user/userInfo";
@@ -227,7 +227,7 @@ public class UserConteroller extends BaseController{
         if(StringUtils.isBlank(user.getLoginName())){
             return RestResponse.failure("登录名不能为空");
         }
-        User oldUser = userService.findUserById(user.getId());
+        User oldUser = userCacheService.findUserById(user.getId());
         if(StringUtils.isNotBlank(user.getEmail())){
             if(!user.getEmail().equals(oldUser.getEmail())){
                 if(userService.userCount(user.getEmail())>0){
@@ -271,10 +271,10 @@ public class UserConteroller extends BaseController{
         if(!confirmPwd.equals(newPwd)){
             return RestResponse.failure("确认密码与新密码不一致");
         }
-        User user = userService.findUserById(MySysUser.id());
+        User user = userCacheService.findUserById(MySysUser.id());
 
         //旧密码不能为空
-        String pw = ToolUtil.entryptPassword(oldPwd,user.getSalt()).split(",")[0];
+        String pw = Objects.requireNonNull(ToolUtil.entryptPassword(oldPwd, user.getSalt())).split(",")[0];
         if(!user.getPassword().equals(pw)){
             return RestResponse.failure("旧密码错误");
         }

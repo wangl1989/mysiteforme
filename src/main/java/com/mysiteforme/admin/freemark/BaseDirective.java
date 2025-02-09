@@ -8,20 +8,19 @@ import freemarker.template.*;
  */
 public class BaseDirective {
 
-    public String getString(String paramName, TemplateModel paramValue) throws TemplateModelException {
+    public String getString(TemplateModel paramValue) throws TemplateModelException {
         if(paramValue == null){
             return "";
         }else{
             if(paramValue instanceof TemplateScalarModel){  //是字符串
-                String value=((TemplateScalarModel)paramValue).getAsString();
-                return value;
+                return ((TemplateScalarModel)paramValue).getAsString();
             }else{
                 throw new TemplateModelException("String转换异常!");
             }
         }
     }
 
-    public long getLong(String paramName, TemplateModel paramValue) throws TemplateModelException{
+    public long getLong(TemplateModel paramValue) throws TemplateModelException{
         // TODO Auto-generated method stub
         if(paramValue==null)
         {
@@ -32,7 +31,7 @@ public class BaseDirective {
             if(paramValue instanceof TemplateScalarModel)  //是字符串
             {
                 String value=((TemplateScalarModel)paramValue).getAsString();
-                return Long.valueOf(value);
+                return Long.parseLong(value);
             }
             else if(paramValue instanceof TemplateNumberModel)  //数字
             {
@@ -45,7 +44,7 @@ public class BaseDirective {
         }
     }
 
-    public	int getInt(String paramName,TemplateModel paramValue) throws TemplateModelException
+    public	int getInt(TemplateModel paramValue) throws TemplateModelException
     {
         if(paramValue==null)
         {
@@ -56,7 +55,7 @@ public class BaseDirective {
             if(paramValue instanceof TemplateScalarModel)  //是字符串
             {
                 String value=((TemplateScalarModel)paramValue).getAsString();
-                return Integer.valueOf(value);
+                return Integer.parseInt(value);
             }
             else if(paramValue instanceof TemplateNumberModel)  //数字
             {
@@ -69,7 +68,7 @@ public class BaseDirective {
         }
     }
 
-    public  boolean getBoolean(String paramName,TemplateModel paramValue) throws TemplateModelException
+    public  boolean getBoolean(TemplateModel paramValue) throws TemplateModelException
     {
         if(paramValue==null)
         {
@@ -80,7 +79,7 @@ public class BaseDirective {
             if(paramValue instanceof TemplateScalarModel)  //是字符串
             {
                 String value=((TemplateScalarModel)paramValue).getAsString();
-                return Boolean.valueOf(value);
+                return Boolean.parseBoolean(value);
             }
             else if(paramValue instanceof TemplateBooleanModel)  //boolean
             {

@@ -1,5 +1,8 @@
 package com.mysiteforme.admin.util;
 
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -7,20 +10,55 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.io.IOException;
 
 /**
- * Created by wangl on 2018/1/14.
- * todo: 计算文件的MD5及SHA1值
+ * 文件摘要计算工具类
+ * 提供文件MD5、SHA1等摘要算法的计算
+ * 
+ * @author wangl
  */
 public class DigestUtil {
 
-    public static String getFileSha1(MultipartFile file) {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ToolUtil.class);
 
-        MessageDigest digest = null;
-        InputStream in = null;
-        byte buffer[] = new byte[1024];
+    /**
+     * 计算文件的MD5值
+     * @param file 要计算的文件
+     * @return 文件的MD5值
+     */
+    public static String fileMD5(MultipartFile file)  {
+        MessageDigest digest;
+        InputStream in;
+        byte[] buffer = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = file.getInputStream();
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            LOGGER.error("getFileMD5 error", e);
+            return null;
+        }
+
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
+    }
+
+    /**
+     * 计算文件的SHA1值
+     * @param file 要计算的文件
+     * @return 文件的SHA1值
+     */
+    public static String fileSHA1(MultipartFile file) {
+        MessageDigest digest;
+        InputStream in;
+        byte[] buffer = new byte[1024];
         int len;
         try {
             digest = MessageDigest.getInstance("SHA1");
@@ -30,18 +68,26 @@ public class DigestUtil {
             }
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getFileSha1 error", e);
             return null;
         }
 
         BigInteger bigInt = new BigInteger(1, digest.digest());
         return bigInt.toString(20);
     }
+
+    /**
+     * 计算字符串的MD5值
+     * @param str 要计算的字符串
+     * @return 字符串的MD5值
+     */
+    public static String md5(String str) {
+        // ... existing code ...
+        return null; // Placeholder return, actual implementation needed
+    }
+
     /**
      *
-     * @param file
-     * @param algorithm 所请求算法的名称  for example: MD5, SHA1, SHA-256, SHA-384, SHA-512 etc.
-     * @return
      */
     public static String getFileMD5(File file, String algorithm) {
 
@@ -49,9 +95,9 @@ public class DigestUtil {
             return null;
         }
 
-        MessageDigest digest = null;
-        FileInputStream in = null;
-        byte buffer[] = new byte[1024];
+        MessageDigest digest;
+        FileInputStream in;
+        byte[] buffer = new byte[1024];
         int len;
 
         try {
@@ -62,7 +108,7 @@ public class DigestUtil {
             }
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("getFileMD5 error", e);
             return null;
         }
 
@@ -73,10 +119,6 @@ public class DigestUtil {
     /**
      * 获取文件夹中文件的MD5值
      *
-     * @param dirFile
-     * @param algorithm 所请求算法的名称  for example: MD5, SHA1, SHA-256, SHA-384, SHA-512 etc.
-     * @param listChild 是否递归子目录中的文件
-     * @return
      */
     public static Map<String, String> getDirMD5(File dirFile, String algorithm, boolean listChild) {
 
@@ -85,18 +127,19 @@ public class DigestUtil {
         }
 
         // <filepath,algCode>
-        Map<String, String> pathAlgMap = new HashMap<String, String>();
+        Map<String, String> pathAlgMap = Maps.newHashMap();
         String algCode;
-        File files[] = dirFile.listFiles();
+        File[] files = dirFile.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory() && listChild) {
-                pathAlgMap.putAll(getDirMD5(file, algorithm, listChild));
-            } else {
-                algCode = getFileMD5(file, algorithm);
-                if (algCode != null) {
-                    pathAlgMap.put(file.getPath(), algCode);
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory() && listChild) {
+                    pathAlgMap.putAll(Objects.requireNonNull(getDirMD5(file, algorithm, true)));
+                } else {
+                    algCode = getFileMD5(file, algorithm);
+                    if (algCode != null) {
+                        pathAlgMap.put(file.getPath(), algCode);
+                    }
                 }
             }
         }

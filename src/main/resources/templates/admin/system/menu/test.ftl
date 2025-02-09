@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
     <link href="" rel="stylesheet">
-    <link rel="stylesheet" href="https://static.mysiteforme.com/layui-treetable/layui/css/layui.css">
+    <link rel="stylesheet" href="${base}/static/layui-treetable/layui/css/layui.css">
     <style>
         .layui-table .value_col{
             text-align: center;
@@ -29,7 +29,7 @@
     <div id="demo"></div>
 </div>
 </body>
-<script src="https://static.mysiteforme.com/layui-treetable/layui/layui.js"></script>
+<script src="${base}/static/layui-treetable/layui/layui.js"></script>
 <script type="text/javascript" src="${base}/static/js/jquery.min.js"></script>
 
 <script type="text/javascript">

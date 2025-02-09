@@ -1115,7 +1115,7 @@ CREATE TABLE `sys_site` (
   `address` varchar(255) DEFAULT NULL,
   `logo` varchar(255) DEFAULT NULL,
   `server` varchar(255) DEFAULT NULL,
-  `database` varchar(255) DEFAULT NULL,
+  `my_database` varchar(255) DEFAULT NULL,
   `max_upload` int(11) DEFAULT NULL,
   `keywords` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,

@@ -8,15 +8,14 @@ import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -42,8 +41,8 @@ import java.util.Map;
 @RequestMapping("file")
 public class FileController {
 
-    //推荐创建不可变静态类成员变量
-    private static final Log log = LogFactory.get();
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
 
     @Value("uploadType")
     private String uploadType;
@@ -51,17 +50,20 @@ public class FileController {
     @Value("localUploadPath")
     private String localUploadPath;
 
-    @Autowired
-    @Qualifier("qiniuService")
     private UploadService qiniuService;
 
-    @Autowired
-    @Qualifier("ossService")
     private UploadService ossService;
 
-    @Autowired
-    @Qualifier("localService")
     private UploadService localService;
+
+    public FileController() {}
+
+    @Autowired
+    public FileController(UploadService qiniuService, UploadService ossService, UploadService localService) {
+        this.qiniuService = qiniuService;
+        this.ossService = ossService;
+        this.localService = localService;
+    }
 
     @PostMapping("upload")
     @ResponseBody
@@ -76,7 +78,7 @@ public class FileController {
             return RestResponse.failure("上传文件为空 ");
         }
         String url = null;
-        Map m = Maps.newHashMap();
+        Map<String,String> m = Maps.newHashMap();
         try {
             if("local".equals(site.getFileUploadType())){
                 url = localService.upload(file);
@@ -90,7 +92,7 @@ public class FileController {
             m.put("url", url);
             m.put("name", file.getOriginalFilename());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("文件上传失败",e);
             return RestResponse.failure(e.getMessage());
         }
         return RestResponse.success().setData(m);
@@ -113,9 +115,6 @@ public class FileController {
 
     /**
      * wangEditor批量上传图片
-     * @param file
-     * @return
-     * @throws Exception
      */
     @PostMapping("uploadWang")
     @ResponseBody
@@ -130,24 +129,26 @@ public class FileController {
         }
         List<String> data = Lists.newArrayList();
         Map<String,Object> m = Maps.newHashMap();
+        String fileUploadType = site.getFileUploadType();
         try {
-            for (int i=0;i<file.length;i++) {
+            for (MultipartFile multipartFile : file) {
                 String url = null;
-                if("local".equals(site.getFileUploadType())){
-                    url = localService.upload(file[i]);
+                if ("local".equals(fileUploadType)) {
+                    url = localService.upload(multipartFile);
                 }
-                if("qiniu".equals(site.getFileUploadType())){
-                    url = qiniuService.upload(file[i]);
+                if ("qiniu".equals(fileUploadType)) {
+                    url = qiniuService.upload(multipartFile);
                 }
-                if("oss".equals(site.getFileUploadType())){
-                    url = ossService.upload(file[i]);
+                if ("oss".equals(fileUploadType)) {
+                    url = ossService.upload(multipartFile);
                 }
                 data.add(url);
             }
             m.put("errno",0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("文件上传失败",e);
             m.put("errno",1);
+            return RestResponse.failure(e.getMessage());
         }
         m.put("data",data);
         return m;
@@ -155,7 +156,6 @@ public class FileController {
 
     /**
      * wangEditor复制新闻中包含图片的话吧图片上传到七牛上并更换图片地址
-     * @return
      */
     @PostMapping("doContent")
     @ResponseBody
@@ -175,7 +175,7 @@ public class FileController {
             String imgSrc = e.attr("abs:src");
             if("local".equals(site.getFileUploadType())){
                 if(imgSrc.contains("file:")){
-                    imgSrc.replace("\\","/");
+                    imgSrc = imgSrc.replace("\\","/");
                     e.attr("src",localService.uploadLocalImg(imgSrc.substring(6)));
                 }else{
                     e.attr("src",localService.uploadNetFile(imgSrc));
@@ -183,7 +183,7 @@ public class FileController {
             }
             if("qiniu".equals(site.getFileUploadType())){
                 if(imgSrc.contains("file:")){
-                    imgSrc.replace("\\","/");
+                    imgSrc = imgSrc.replace("\\","/");
                     e.attr("src",qiniuService.uploadLocalImg(imgSrc.substring(6)));
                 }else{
                     e.attr("src",qiniuService.uploadNetFile(imgSrc));
@@ -191,7 +191,7 @@ public class FileController {
             }
             if("oss".equals(site.getFileUploadType())){
                 if(imgSrc.contains("file:")){
-                    imgSrc.replace("\\","/");
+                    imgSrc = imgSrc.replace("\\","/");
                     e.attr("src",ossService.uploadLocalImg(imgSrc.substring(6)));
                 }else{
                     e.attr("src",ossService.uploadNetFile(imgSrc));
@@ -236,7 +236,7 @@ public class FileController {
         conn.connect();
         BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
         byte[] buf = new byte[1024];
-        int len = 0;
+        int len;
         response.reset();
         response.setHeader("Content-type","application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename="+name);
@@ -262,13 +262,13 @@ public class FileController {
                     file.transferTo(new File(filePath));
                     return filePath;
                 } else {
-                    Long t = System.currentTimeMillis();
+                    long t = System.currentTimeMillis();
                     String filePath = localUploadPath + t + "/" + file.getOriginalFilename();
                     file.transferTo(new File(filePath));
                     return "/upload/" + t + filePath;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("文件上传失败", e);
                 return  null;
             }
         }else{

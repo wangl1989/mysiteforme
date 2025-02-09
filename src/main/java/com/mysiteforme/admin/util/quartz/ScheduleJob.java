@@ -3,14 +3,13 @@ package com.mysiteforme.admin.util.quartz;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
 import com.mysiteforme.admin.service.QuartzTaskLogService;
-import com.mysiteforme.admin.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -21,12 +20,22 @@ import java.util.concurrent.Future;
 /**
  * 类ScheduleJob的功能描述:
  * 定时任务
- * @auther hxy
- * @date 2017-08-25 11:48:34
+ * &#064;auther  hxy
+ * &#064;date  2017-08-25 11:48:34
  */
+@Component
 public class ScheduleJob extends QuartzJobBean {
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private ExecutorService service = Executors.newSingleThreadExecutor();
+	private static final Logger logger = LoggerFactory.getLogger(ScheduleJob.class);
+	private final ExecutorService service = Executors.newSingleThreadExecutor();
+
+	private QuartzTaskLogService quartzTaskLogService;
+
+	public ScheduleJob() {}
+
+	@Autowired
+	public ScheduleJob(QuartzTaskLogService quartzTaskLogService){
+		this.quartzTaskLogService = quartzTaskLogService;
+	}
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
@@ -53,7 +62,7 @@ public class ScheduleJob extends QuartzJobBean {
         
         try {
             //执行任务
-        	logger.info("任务准备执行，任务ID：" + scheduleJob.getId());
+        	logger.info("任务准备执行，任务ID：{}" , scheduleJob.getId());
             ScheduleRunnable task = new ScheduleRunnable(scheduleJob.getTargetBean(),
             		scheduleJob.getTrgetMethod(), scheduleJob.getParams());
             Future<?> future = service.submit(task);
@@ -65,10 +74,10 @@ public class ScheduleJob extends QuartzJobBean {
 			log.setTimes((int)times);
 			//任务状态    0：成功    1：失败
 			log.setStatus(0);
-			
-			logger.info("任务执行完毕，任务ID：" + scheduleJob.getId() + "  总共耗时：" + times + "毫秒");
+
+            logger.info("任务执行完毕，任务ID：{}  总共耗时：{}毫秒", scheduleJob.getId(), times);
 		} catch (Exception e) {
-			logger.error("任务执行失败，任务ID：" + scheduleJob.getId(), e);
+            logger.error("任务执行失败，任务ID：{}", scheduleJob.getId(), e);
 			
 			//任务执行总时长
 			long times = System.currentTimeMillis() - startTime;
@@ -78,7 +87,8 @@ public class ScheduleJob extends QuartzJobBean {
 			log.setStatus(1);
 			log.setError(e.getMessage());
 		}finally {
-			log.insert();
+            logger.error("任务执行结束，任务ID：{}", scheduleJob.getId());
+			quartzTaskLogService.save(log);
 		}
     }
 }

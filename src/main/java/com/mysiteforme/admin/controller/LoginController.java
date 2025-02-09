@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.controller;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -11,7 +10,6 @@ import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.VerifyCodeUtil;
-import com.xiaoleilu.hutool.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -35,6 +33,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * 登录控制器
+ * 处理用户登录、登出等认证相关操作
+ */
 @Controller
 public class LoginController extends BaseController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
@@ -42,11 +44,15 @@ public class LoginController extends BaseController {
 	@Value("${server.port}")
 	private String port;
 
+	/**
+	 * 跳转到登录页面
+	 * @return 登录页面路径
+	 */
 	@GetMapping("login")
 	public String login(HttpServletRequest request) {
-		LOGGER.info("跳到这边的路径为:"+request.getRequestURI());
+		LOGGER.info("跳到这边的路径为:{}",request.getRequestURI());
 		Subject s = SecurityUtils.getSubject();
-		LOGGER.info("是否记住登录--->"+s.isRemembered()+"<-----是否有权限登录----->"+s.isAuthenticated()+"<----");
+		LOGGER.info("是否记住登录--->{}<-----是否有权限登录----->{}",s.isRemembered(),s.isAuthenticated());
 		if(s.isAuthenticated()){
 			return "redirect:index";
 		}else {
@@ -54,6 +60,11 @@ public class LoginController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 用户登录
+	 * @param request HTTP请求对象
+	 * @return 登录结果
+	 */
 	@PostMapping("login/main")
 	@ResponseBody
 	@SysLog("用户登录")
@@ -81,12 +92,12 @@ public class LoginController extends BaseController {
 		if(StringUtils.isBlank(trueCode)){
 			return RestResponse.failure("验证码超时");
 		}
-		if(StringUtils.isBlank(code) || !trueCode.toLowerCase().equals(code.toLowerCase())){
+		if(StringUtils.isBlank(code) || !trueCode.equalsIgnoreCase(code)){
 			error = "验证码错误";
 		}else {
 			/*就是代表当前的用户。*/
 			Subject user = SecurityUtils.getSubject();
-			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.valueOf(rememberMe));
+			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.parseBoolean(rememberMe));
 			try {
 				user.login(token);
 				if (user.isAuthenticated()) {
@@ -115,14 +126,19 @@ public class LoginController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 登录成功后跳转到首页
+	 * @param model 模型对象
+	 * @return 首页路径
+	 */
 	@GetMapping("index")
 	public String showView(Model model){
 		return "index";
 	}
 
-
 	/**
-	 * 获取验证码图片和文本(验证码文本会保存在HttpSession中)
+	 * 生成验证码
+	 * @param response HTTP响应对象
 	 */
 	@GetMapping("/genCaptcha")
 	public void genCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -133,7 +149,7 @@ public class LoginController extends BaseController {
 		String verifyCode = VerifyCodeUtil.generateTextCode(VerifyCodeUtil.TYPE_ALL_MIXED, 4, null);
 		//将验证码放到HttpSession里面
 		request.getSession().setAttribute(Constants.VALIDATE_CODE, verifyCode);
-		LOGGER.info("本次生成的验证码为[" + verifyCode + "],已存放到HttpSession中");
+		LOGGER.info("本次生成的验证码为[{}],已存放到HttpSession中",verifyCode);
 		//设置输出的内容的类型为JPEG图像
 		response.setContentType("image/jpeg");
 		BufferedImage bufferedImage = VerifyCodeUtil.generateImageCode(verifyCode, 116, 36, 5, true, new Color(249,205,173), null, null);
@@ -141,13 +157,18 @@ public class LoginController extends BaseController {
 		ImageIO.write(bufferedImage, "JPEG", response.getOutputStream());
 	}
 
+	/**
+	 * 登录成功后跳转到首页
+	 * @param model 模型对象
+	 * @return 首页路径
+	 */
 	@GetMapping("main")
 	public String main(Model model){
-		Map map = userService.selectUserMenuCount();
-		User user = userService.findUserById(MySysUser.id());
+		Map<String,Object> map = userService.selectUserMenuCount();
+		User user = userCacheService.findUserById(MySysUser.id());
 		Set<Menu> menus = user.getMenus();
 		java.util.List<Menu> showMenus = Lists.newArrayList();
-		if(menus != null && menus.size()>0){
+		if(menus != null && !menus.isEmpty()){
 			for (Menu menu : menus){
 				if(StringUtils.isNotBlank(menu.getHref())){
 					Long result = (Long)map.get(menu.getPermission());
@@ -165,7 +186,6 @@ public class LoginController extends BaseController {
 
 	/**
 	 *  空地址请求
-	 * @return
 	 */
 	@GetMapping(value = "")
 	public String index() {
@@ -174,6 +194,10 @@ public class LoginController extends BaseController {
 		return s.isAuthenticated() ? "redirect:index" : "login";
 	}
 
+	/**
+	 * 用户登出
+	 * @return 登出结果
+	 */
 	@GetMapping("systemLogout")
 	@SysLog("退出系统")
 	public String logOut(){

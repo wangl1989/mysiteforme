@@ -1,18 +1,14 @@
 package com.mysiteforme.admin.util.quartz.task;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.service.BlogArticleService;
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -21,28 +17,30 @@ import java.util.List;
  */
 @Component("systemTask")
 public class SystemTask {
-    private static Log log = LogFactory.get();
+
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final BlogArticleService blogArticleService;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private BlogArticleService blogArticleService;
+    public SystemTask(RedisTemplate<String, Object> redisTemplate, BlogArticleService blogArticleService) {
+        this.redisTemplate = redisTemplate;
+        this.blogArticleService = blogArticleService;
+    }
 
     /**
      * 同步文章点击量
-     * @param params
      */
     public void  synchronizationArticleView(String params){
         ValueOperations<String, Object> operations=redisTemplate.opsForValue();
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        List<BlogArticle> list = blogArticleService.selectList(wrapper);
+        List<BlogArticle> list = blogArticleService.list(wrapper);
         for (BlogArticle article : list){
             String key = "article_click_id_"+article.getId();
             if(redisTemplate.hasKey(key)){
                 Integer count = (Integer)operations.get(key);
-                if(count > 0){
+                if(count != null && count > 0){
                     article.setClick(blogArticleService.getArticleClick(article.getId()));
                     if(StringUtils.isNotBlank(params)){
                         article.setUpdateId(Long.valueOf(params));

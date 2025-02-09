@@ -1,181 +1,145 @@
 package com.mysiteforme.admin.util;
 
-
-import com.baomidou.mybatisplus.generator.AutoGenerator;
-import com.baomidou.mybatisplus.generator.InjectionConfig;
-import com.baomidou.mybatisplus.generator.config.*;
-import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.generator.FastAutoGenerator;
+import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
-import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
-import com.baomidou.mybatisplus.generator.config.rules.DbType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
-import com.google.common.collect.Lists;
-import com.xiaoleilu.hutool.util.ZipUtil;
+import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.base.DataEntity;
+import com.mysiteforme.admin.base.TreeEntity;
+import com.mysiteforme.admin.entity.Site;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * 数据库表生成文件工具类
+ * 用于根据数据库表结构自动生成相关的实体类、Mapper、Service等文件
+ * 
+ * @author wangl
+ */
 @Component
 public class CreateTableFiles {
-    @Value("${spring.datasource.driver-class-name}")
+    @Value("${spring.datasource.druid.driver-class-name}")
     private String driverName;
-    @Value("${spring.datasource.username}")
+    @Value("${spring.datasource.druid.username}")
     private String userName;
-    @Value("${spring.datasource.password}")
+    @Value("${spring.datasource.druid.password}")
     private String password;
-    @Value("${spring.datasource.url}")
+    @Value("${spring.datasource.druid.url}")
     private String dataBaseUrl;
     @Value("${source-code-dic}")
     public  String baseDic;
     @Value("${source-code-zipfile}")
     public  String zipFile;
 
-    public void createFile(String[] tableNames,Integer type) {
-        AutoGenerator mpg = new AutoGenerator();
-        // 全局配置
-        GlobalConfig gc = new GlobalConfig();
-        //执行完成后是否自动打开文件夹
-        gc.setOpen(false);
-        gc.setOutputDir(baseDic);
-        gc.setFileOverride(true);
-        gc.setActiveRecord(true);
-        gc.setEnableCache(false);// XML 二级缓存
-        gc.setBaseResultMap(true);// XML ResultMap
-        gc.setBaseColumnList(false);// XML columList
-        gc.setAuthor("wangl");
+    private static final String author = "wangl";
 
-        // 自定义文件命名，注意 %s 会自动填充表实体属性！
-        gc.setMapperName("%sDao");
-        gc.setXmlName("%sDao");
-        gc.setServiceName("%sService");
-        gc.setServiceImplName("%sServiceImpl");
-        // gc.setControllerName("%sAction");
-        mpg.setGlobalConfig(gc);
 
-        // 数据源配置
-        DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setDbType(DbType.MYSQL);
-        dsc.setTypeConvert(new MySqlTypeConvert(){
-            // 自定义数据库表字段类型转换【可选】
-            @Override
-            public DbColumnType processTypeConvert(String fieldType) {
-                return super.processTypeConvert(fieldType);
-            }
-        });
-        dsc.setDriverName(driverName);
-        dsc.setUsername(userName);
-        dsc.setPassword(password);
-        dsc.setUrl(dataBaseUrl);
-        mpg.setDataSource(dsc);
+    private static final String[] superEntityColumnsTypeOne = new String[] { "id","create_date","create_by","update_date","update_by","remarks","del_flag" };
+    private static final String[] superEntityColumnsTypeTwo = new String[] { "id","parent_id","level","parent_ids","sort","create_date","create_by","update_date","update_by","remarks","del_flag" };
 
-        // 策略配置
-        StrategyConfig strategy = new StrategyConfig();
-        // strategy.setCapitalMode(true);// 全局大写命名 ORACLE 注意
-//        strategy.setTablePrefix(new String[] { ""});// 此处可以修改为您的表前缀
+    public void createFile(String[] tableNames, int type, Site site) {
+        if(site == null){
+            // 伪造一个site数据
+            site = new Site();
+            site.setName("默认站点");
+            site.setDescription("这是一个默认站点");
+            site.setAuthor("wang");
 
-        strategy.setNaming(NamingStrategy.underline_to_camel);// 表名生成策略
-        strategy.setInclude(tableNames); // 需要生成的表
-//        strategy.setExclude(new String[]{"sys_user_role","sys_role_menu","sys_group_ur"}); // 排除生成的表
-        // 自定义实体父类
-        if(type == 1){
-            strategy.setSuperEntityClass("com.mysiteforme.admin.base.DataEntity");
-            // 自定义实体，公共字段
-            strategy.setSuperEntityColumns(new String[] { "id","create_date","create_by","update_date","update_by","remarks","del_flag" });
         }
-        if(type == 2){
-            strategy.setSuperEntityClass("com.mysiteforme.admin.base.TreeEntity");
-            // 自定义实体，公共字段
-            strategy.setSuperEntityColumns(new String[] { "id","parent_id","level","parent_ids","sort","create_date","create_by","update_date","update_by","remarks","del_flag" });
-        }
-//        strategy.setSuperEntityColumns(new String[] { "id" });
-        // 自定义 mapper 父类
-        // strategy.setSuperMapperClass("com.baomidou.demo.TestMapper");
-        // 自定义 service 父类
-        // strategy.setSuperServiceClass("com.baomidou.demo.TestService");
-        // 自定义 service 实现类父类
-        // strategy.setSuperServiceImplClass("com.baomidou.demo.TestServiceImpl");
-        // 自定义 controller 父类
-        // strategy.setSuperControllerClass("com.baomidou.demo.TestController");
-        // 【实体】是否生成字段常量（默认 false）
-        // public static final String ID = "test_id";
-        // strategy.setEntityColumnConstant(true);
-        // 【实体】是否为构建者模型（默认 false）
-        // public User setName(String name) {this.name = name; return this;}
-        // strategy.setEntityBuliderModel(true);
-        mpg.setStrategy(strategy);
+        createFile(tableNames,type,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author,site);
+    }
 
-        // 包配置
-        PackageConfig pc = new PackageConfig();
-        pc.setParent("com.mysiteforme");
-        pc.setModuleName("admin");
-        pc.setMapper("dao");
-        pc.setController("controller");
-        mpg.setPackageInfo(pc);
-
-
-        // 注入自定义配置，可以在 VM 中使用 cfg.abc 【可无】
-        InjectionConfig cfg = new InjectionConfig() {
-            @Override
-            public void initMap() {
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("abc", this.getConfig().getGlobalConfig().getAuthor() + "-mp");
-                this.setMap(map);
-            }
-        };
-        // 自定义 xxList.jsp 生成
-        List<FileOutConfig> focList = Lists.newArrayList();
-        focList.add(new FileOutConfig("/templates/vm/list.jsp.vm") {
-            @Override
-            public String outputFile(TableInfo tableInfo) {
-                // 自定义输入文件名称
-                return baseDic+ "/"  + tableInfo.getEntityPath() + "/list.ftl";
-            }
+    public void createFile(String[] tableNames,int type,String driverName,String userName,String password,String dataBaseUrl,String baseDic,String zipFile,String author, Site site) {
+        // 使用 FastAutoGenerator 快速配置代码生成器
+        FastAutoGenerator fastAutoGenerator = FastAutoGenerator.create(dataBaseUrl, userName, password);
+        fastAutoGenerator.globalConfig(builder -> {
+            builder.author(author) // 设置作者
+                    .disableOpenDir()   // 执行完成后是否自动打开输出目录
+                    .outputDir(baseDic); // 输出目录
         });
-        focList.add(new FileOutConfig("/templates/vm/add.jsp.vm") {
-            @Override
-            public String outputFile(TableInfo tableInfo) {
-                // 自定义输入文件名称
-                return baseDic+ "/" + tableInfo.getEntityPath() + "/add.ftl";
-            }
+        fastAutoGenerator.packageConfig(builder -> {
+            builder.parent("com.mysiteforme.admin") // 设置父包名
+                    .entity("entity") // 设置实体类包名
+                    .controller("controller") // 设置 Controller 类包名
+                    .mapper("dao") // 设置 Mapper 接口包名
+                    .service("service") // 设置 Service 接口包名
+                    .serviceImpl("service.impl") // 设置 Service 实现类包名
+                    .xml("mappers"); // 设置 Mapper XML 文件包名
         });
-        focList.add(new FileOutConfig("/templates/vm/edit.jsp.vm") {
-            @Override
-            public String outputFile(TableInfo tableInfo) {
-                // 自定义输入文件名称
-                return baseDic+ "/"  + tableInfo.getEntityPath() + "/edit.ftl";
-            }
+        fastAutoGenerator.strategyConfig(builder -> {
+            builder.addInclude(tableNames) // 设置需要生成的表名
+                    .addTablePrefix("sys_")
+                    .entityBuilder()
+                    .columnNaming(NamingStrategy.underline_to_camel) // 设置列名下划线转驼峰命名
+                    .superClass(type == 1 ? DataEntity.class.getName() : TreeEntity.class.getName()) // 设置实体类父类
+                    .addSuperEntityColumns(type == 1 ? superEntityColumnsTypeOne : superEntityColumnsTypeTwo) // 设置实体类公共字段
+                    .javaTemplate("/templates/vm/entity.java.vm") // 设置实体类模板文件
+                    .enableLombok() // 启用 Lombok
+                    .enableTableFieldAnnotation() // 启用字段注解
+                    .enableFileOverride() // 允许覆盖已有文件
+                    .controllerBuilder()
+                    .enableRestStyle()  // 启用 REST 风格
+                    .formatFileName("%sController")
+                    .template("/templates/vm/controller.java.vm")
+                    .enableFileOverride()
+                    .serviceBuilder()
+                    //service
+                    .superServiceClass(IService.class.getName())
+                    .formatServiceFileName("%sService")
+                    .serviceTemplate("/templates/vm/service.java.vm")
+                    //serviceImpl
+                    .superServiceImplClass(ServiceImpl.class.getName())
+                    .formatServiceImplFileName("%sServiceImpl")
+                    .serviceImplTemplate("/templates/vm/serviceImpl.java.vm")
+                    .enableFileOverride()
+                    .mapperBuilder()
+                    .formatMapperFileName("%sDao")
+                    .formatXmlFileName("%sDao")
+                    .mapperTemplate("/templates/vm/mapper.java.vm")
+                    .enableFileOverride();
         });
-        cfg.setFileOutConfigList(focList);
-        mpg.setCfg(cfg);
-
-        // 关闭默认 xml 生成，调整生成 至 根目录
-        TemplateConfig tc = new TemplateConfig();
-        tc.setEntity("/templates/vm/entity.java.vm");
-        tc.setService("/templates/vm/service.java.vm");
-        tc.setServiceImpl("/templates/vm/serviceImpl.java.vm");
-        tc.setController("/templates/vm/controller.java.vm");
-        tc.setMapper("/templates/vm/mapper.java.vm");
-        tc.setXml(null);
-        mpg.setTemplate(tc);
-
-        // 自定义模板配置，可以 copy 源码 mybatis-plus/src/main/resources/template 下面内容修改，
-        // 放置自己项目的 src/main/resources/template 目录下, 默认名称一下可以不配置，也可以自定义模板名称
-        // TemplateConfig tc = new TemplateConfig();
-        // tc.setController("...");
-        // tc.setEntity("...");
-        // tc.setMapper("...");
-        // tc.setXml("...");
-        // tc.setService("...");
-        // tc.setServiceImpl("...");
-        // 如上任何一个模块如果设置 空 OR Null 将不生成该模块。
-        // mpg.setTemplate(tc);
-
-        // 执行生成
-        mpg.execute();
-
+        fastAutoGenerator.injectionConfig((tableInfo, builder) -> {
+            builder.customMap(Collections.singletonMap("abc", author + "-mp")) // 自定义参数
+                    .beforeOutputFile((t, objectMap) -> {
+                        System.out.println("准备生成文件: " + t.getEntityName());
+                        // 可以在这里添加自定义逻辑，如修改 objectMap 中的配置
+                        objectMap.put("site", site);
+                        objectMap.put("entityName", t.getEntityName());
+                    }).customFile(new ArrayList<CustomFile>() {{
+                        // 通过格式化函数添加文件最后缀
+                        add(new CustomFile.Builder()
+                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
+                                .enableFileOverride()
+                                .filePath(baseDic + "/")
+                                .fileName("list.ftl")
+                                .templatePath("/templates/vm/list.jsp.vm")
+                                .packageName("front")
+                                .build());
+                        add(new CustomFile.Builder()
+                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
+                                .enableFileOverride()
+                                .filePath(baseDic + "/")
+                                .fileName("add.ftl")
+                                .templatePath("/templates/vm/add.jsp.vm")
+                                .packageName("front")
+                                .build());
+                        add(new CustomFile.Builder()
+                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
+                                .enableFileOverride()
+                                .filePath(baseDic + "/")
+                                .fileName("edit.ftl")
+                                .templatePath("/templates/vm/edit.jsp.vm")
+                                .packageName("front")
+                                .build());
+                    }});
+        });
+        fastAutoGenerator.templateEngine(new VelocityTemplateEngine()); // 使用 Freemarker 模板引擎
+        fastAutoGenerator.execute(); // 执行生成
     }
 }

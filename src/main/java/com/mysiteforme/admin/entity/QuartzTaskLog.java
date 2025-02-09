@@ -1,9 +1,12 @@
 package com.mysiteforme.admin.entity;
 
-import com.baomidou.mybatisplus.annotations.TableField;
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -13,10 +16,12 @@ import com.mysiteforme.admin.base.DataEntity;
  * @author wangl
  * @since 2018-01-25
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("quartz_task_log")
-public class QuartzTaskLog extends DataEntity<QuartzTaskLog> {
-
-    private static final long serialVersionUID = 1L;
+@Data
+@Getter
+@Setter
+public class QuartzTaskLog extends DataEntity {
 
     /**
      * 任务ID
@@ -54,62 +59,6 @@ public class QuartzTaskLog extends DataEntity<QuartzTaskLog> {
      */
 	private Integer times;
 
-	public Long getJobId() {
-		return jobId;
-	}
-
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getTargetBean() {
-		return targetBean;
-	}
-
-	public void setTargetBean(String targetBean) {
-		this.targetBean = targetBean;
-	}
-	public String getTrgetMethod() {
-		return trgetMethod;
-	}
-
-	public void setTrgetMethod(String trgetMethod) {
-		this.trgetMethod = trgetMethod;
-	}
-	public String getParams() {
-		return params;
-	}
-
-	public void setParams(String params) {
-		this.params = params;
-	}
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
-	}
-	public Integer getTimes() {
-		return times;
-	}
-
-	public void setTimes(Integer times) {
-		this.times = times;
-	}
 
 
 	@Override

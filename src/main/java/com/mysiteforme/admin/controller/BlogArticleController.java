@@ -1,22 +1,18 @@
 package com.mysiteforme.admin.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.Condition;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
-import com.mysiteforme.admin.lucene.LuceneSearch;
-import com.mysiteforme.admin.service.BlogChannelService;
 import com.xiaoleilu.hutool.date.DateUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.mysiteforme.admin.entity.BlogArticle;
-import com.mysiteforme.admin.service.BlogArticleService;
-import com.baomidou.mybatisplus.plugins.Page;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -25,11 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
@@ -49,14 +42,23 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/blogArticle")
 public class BlogArticleController extends BaseController{
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlogArticleController.class);
 
+    /**
+     * 显示文章列表页面
+     * @return 列表页面路径
+     */
+    @RequiresPermissions("blog:article:list")
     @GetMapping("list")
-    @SysLog("跳转博客内容列表")
     public String list(){
         return "/admin/blogArticle/list";
     }
 
+    /**
+     * 获取文章列表数据
+     * @param limit 每页条数
+     * @param page 分页参数
+     * @return 分页数据
+     */
     @RequiresPermissions("blog:article:list")
     @PostMapping("list")
     @ResponseBody
@@ -65,7 +67,7 @@ public class BlogArticleController extends BaseController{
                                       ServletRequest request){
         Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<BlogArticle> layerData = new LayerData<>();
-        EntityWrapper<BlogArticle> wrapper = new EntityWrapper<>();
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         if(!map.isEmpty()){
             String title = (String) map.get("title");
@@ -100,15 +102,21 @@ public class BlogArticleController extends BaseController{
             }
 
         }
-        Page<BlogArticle> pageData = blogArticleService.selectDetailArticle(map,new Page<>(page,limit));
+        IPage<BlogArticle> pageData = blogArticleService.selectDetailArticle(map,new Page<>(page,limit));
         layerData.setData(pageData.getRecords());
-        layerData.setCount(pageData.getTotal());
+        layerData.setCount((int)pageData.getTotal());
         return layerData;
     }
 
+    /**
+     * 显示文章添加页面
+     * @param model 模型对象
+     * @return 添加页面路径
+     */
+    @RequiresPermissions("blog:article:add")
     @GetMapping("add")
     public String add(@RequestParam(value = "channelId",required = false)Long channelId, Model model){
-        BlogChannel blogChannel = blogChannelService.selectById(channelId);
+        BlogChannel blogChannel = blogChannelService.getById(channelId);
         if(blogChannel != null){
             model.addAttribute("channel",blogChannel);
         }
@@ -119,9 +127,14 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/add";
     }
 
+    /**
+     * 保存文章
+     * @param blogArticle 文章对象
+     * @return 操作结果
+     */
     @RequiresPermissions("blog:article:add")
     @PostMapping("add")
-    @SysLog("保存新增博客内容数据")
+    @SysLog("保存新增博客文章数据")
     @ResponseBody
     public RestResponse add(@RequestBody BlogArticle blogArticle){
         if(StringUtils.isBlank(blogArticle.getTitle())){
@@ -133,17 +146,18 @@ public class BlogArticleController extends BaseController{
         if(blogArticle.getChannelId() == null){
             return RestResponse.failure("栏目ID不能为空");
         }
-        Object o = blogArticleService.selectObj(Condition.create()
-                .setSqlSelect("max(sort)")
+        QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
+        wrapper.eqSql("sort","select max(sort) from blog_article")
                 .eq("channel_id",blogArticle.getChannelId())
-                .eq("del_flag",false));
+                .eq("del_flag",false);
+        BlogArticle article = blogArticleService.getOne(wrapper);
         int sort = 0;
-        if(o != null){
-            sort =  (Integer)o +1;
+        if(article != null){
+            sort =  article.getSort() +1;
         }
         blogArticle.setSort(sort);
         blogArticleService.saveOrUpdateArticle(blogArticle);
-        if(blogArticle.getBlogTags() != null && blogArticle.getBlogTags().size()>0){
+        if(blogArticle.getBlogTags() != null && !blogArticle.getBlogTags().isEmpty()){
             Map<String,Object> map = Maps.newHashMap();
             map.put("articleId",blogArticle.getId());
             map.put("tags",blogArticle.getBlogTags());
@@ -182,7 +196,7 @@ public class BlogArticleController extends BaseController{
         }
         blogArticleService.saveOrUpdateArticle(blogArticle);
         blogArticleService.removeArticleTags(blogArticle.getId());
-        if(blogArticle.getBlogTags() != null && blogArticle.getBlogTags().size()>0){
+        if(blogArticle.getBlogTags() != null && !blogArticle.getBlogTags().isEmpty()){
             Map<String,Object> map = Maps.newHashMap();
             map.put("articleId",blogArticle.getId());
             map.put("tags",blogArticle.getBlogTags());
@@ -199,7 +213,7 @@ public class BlogArticleController extends BaseController{
         if(null == id || 0 == id){
             return RestResponse.failure("ID不能为空");
         }
-        BlogArticle blogArticle = blogArticleService.selectById(id);
+        BlogArticle blogArticle = blogArticleService.getById(id);
         blogArticle.setDelFlag(true);
         blogArticleService.saveOrUpdateArticle(blogArticle);
         return RestResponse.success();

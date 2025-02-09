@@ -5,21 +5,35 @@ import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import com.mysiteforme.admin.service.*;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+/**
+ * 基础控制器
+ * 提供通用的Controller功能
+ */
 public class BaseController {
 	
+	/**
+	 * 获取当前登录用户
+	 * @return 当前登录的用户对象,未登录返回null
+	 */
 	public User getCurrentUser() {
 		ShiroUser shiroUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
 		if(shiroUser == null) {
 			return null;
 		}
-		User loginUser = userService.selectById(shiroUser.getId());
-		return loginUser;
+		return userService.getById(shiroUser.getId());
 	}
 
+	/**
+	 * 用户服务接口
+	 */
 	@Autowired
 	protected UserService userService;
 
+	/**
+	 * 菜单服务接口
+	 */
 	@Autowired
 	protected MenuService menuService;
 
@@ -54,11 +68,18 @@ public class BaseController {
 	protected BlogTagsService blogTagsService;
 
 	@Autowired
-	protected QuartzTaskService quartzTaskService;
-
-	@Autowired
-	protected QuartzTaskLogService quartzTaskLogService;
+	protected UserCacheService userCacheService;
 
 	@Autowired
 	protected UploadInfoService uploadInfoService;
+
+	@Autowired
+	protected @Qualifier("localService")  UploadService localService;
+
+	@Autowired
+	protected @Qualifier("qiniuService")  UploadService qiniuService;
+
+	@Autowired
+	protected @Qualifier("ossService")  UploadService ossService;
+
 }

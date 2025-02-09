@@ -1,9 +1,10 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Log;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -15,6 +16,10 @@ import java.util.List;
  */
 public interface LogService extends IService<Log> {
 
-    public List<Integer> selectSelfMonthData();
+    /**
+     * 查询最近15天的日志数量统计
+     * @return 每日日志数量列表
+     */
+    List<Integer> selectSelfMonthData();
 
 }

@@ -1,9 +1,9 @@
 package com.mysiteforme.admin.service;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.BlogChannel;
-import com.baomidou.mybatisplus.service.IService;
+import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
 
 import java.util.List;
@@ -20,15 +20,14 @@ public interface BlogChannelService extends IService<BlogChannel> {
 
     /**
      * 获取ztree格式的树结构数据
-     * @return
+     * @return ztree格式的栏目列表
      */
     List<ZtreeVO> selectZtreeData();
 
     /**
      * 查询栏目数据 返回树形结构数据(列表页用)
-     * @return
      */
-    List<BlogChannel> selectChannelList();
+    List<BlogChannelVO> selectChannelList();
 
     /**
      * 新增或者保存数据
@@ -37,11 +36,11 @@ public interface BlogChannelService extends IService<BlogChannel> {
     void saveOrUpdateChannel(BlogChannel blogChannel);
 
     /**
-     * 获取栏目名称的数量
+     * 根据栏目名称获取数量
      * @param name 栏目名称
-     * @return
+     * @return 栏目数量
      */
-    int getCountByName(String name);
+    long getCountByName(String name);
 
     /**
      * 获取指定数量的栏目数据
@@ -49,18 +48,19 @@ public interface BlogChannelService extends IService<BlogChannel> {
      * @param wrapper 参数集合
      * @return 栏目list集合
      */
-    List<BlogChannel> getChannelListByWrapper(int limit, EntityWrapper<BlogChannel> wrapper);
+    List<BlogChannel> getChannelListByWrapper(int limit, QueryWrapper<BlogChannel> wrapper);
+
     /**
      * 获得当前栏目的所有父栏目集合
      * @param channelId 当前栏目ID
-     * @return
+     * @return 父栏目列表
      */
     List<BlogChannel> getParentsChannel(Long channelId);
 
     /**
      * 根据地址获取栏目对象
-     * @param href
-     * @return
+     * @param href 栏目链接地址
+     * @return 栏目对象
      */
     BlogChannel getChannelByHref(String href);
 }

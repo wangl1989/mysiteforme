@@ -14,29 +14,38 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by wangl on 2018/2/4.
+ * Created by wang on 2018/2/4.
  * todo: 获取文章的标签集合
  */
 @Component
 public class TagsTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
-    @Autowired
     private BlogTagsService blogTagsService;
 
+    public TagsTempletModel() {
+        super();
+    }
+
+    @Autowired
+    public TagsTempletModel(BlogTagsService blogTagsService) {
+        this.blogTagsService = blogTagsService;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        Iterator iterator = map.entrySet().iterator();
+        Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         Long aid = null;
         Long cid = null;
         while (iterator.hasNext()) {
-            Map.Entry<String, TemplateModel> param = (Map.Entry<String, TemplateModel>) iterator.next();
+            Map.Entry<String, TemplateModel> param =  iterator.next();
             String paramName = param.getKey();
             TemplateModel paramValue = param.getValue();
-            if(paramName.toLowerCase().equals("aid")){
-                aid = getLong(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("aid")){
+                aid = getLong(paramValue);
             }
-            if(paramName.toLowerCase().equals("cid")){
-                cid = getLong(paramName,paramValue);
+            if(paramName.equalsIgnoreCase("cid")){
+                cid = getLong(paramValue);
             }
         }
         if(aid != null && cid != null){
