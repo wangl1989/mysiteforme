@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.CaptchaFormAuthenticationFilter;
 import com.mysiteforme.admin.realm.AuthRealm;
 import org.apache.shiro.codec.Base64;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -72,7 +71,7 @@ public class ShiroConfig {
      * @return SecurityManager实例
      */
     @Bean
-    public SecurityManager securityManager(@Qualifier("authRealm")AuthRealm authRealm){
+    public DefaultWebSecurityManager securityManager(@Qualifier("authRealm")AuthRealm authRealm){
         logger.info("- - - - - - -shiro开始加载- - - - - - ");
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
         defaultWebSecurityManager.setRealm(authRealm);
@@ -84,13 +83,13 @@ public class ShiroConfig {
 
     /**
      * 配置Shiro过滤器
-     * @param authRealm 安全管理器
+     * @param securityManager securityManager
      * @return ShiroFilterFactoryBean实例
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("authRealm")AuthRealm authRealm){
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager){
         ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
-        bean.setSecurityManager(securityManager(authRealm));
+        bean.setSecurityManager(securityManager);
         bean.setSuccessUrl("/index");
         bean.setLoginUrl("/login");
         bean.setUnauthorizedUrl("/login");
@@ -131,7 +130,9 @@ public class ShiroConfig {
     public CookieRememberMeManager rememberMeManager(){
         CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
         rememberMeManager.setCookie(rememberMeCookie());
-        rememberMeManager.setCipherKey(Base64.decode("2AvVhdsgUs0FSA3SDFAdag=="));
+        // 1.13.0 版本中不再使用 Base64.decode
+        // 建议使用更安全的密钥生成方式
+        rememberMeManager.setCipherKey("2AvVhdsgUs0FSA3SDFAdag==".getBytes());
         return rememberMeManager;
     }
 
@@ -146,7 +147,7 @@ public class ShiroConfig {
 
     @Bean
     public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(@Qualifier("authRealm")AuthRealm authRealm) {
-        SecurityManager manager= securityManager(authRealm);
+        DefaultWebSecurityManager manager= securityManager(authRealm);
         AuthorizationAttributeSourceAdvisor advisor=new AuthorizationAttributeSourceAdvisor();
         advisor.setSecurityManager(manager);
         return advisor;

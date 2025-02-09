@@ -4,6 +4,7 @@ import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
 import com.mysiteforme.admin.service.*;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -18,11 +19,17 @@ public class BaseController {
 	 * @return 当前登录的用户对象,未登录返回null
 	 */
 	public User getCurrentUser() {
-		ShiroUser shiroUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-		if(shiroUser == null) {
+
+		Subject subject = SecurityUtils.getSubject();
+		if (subject == null || !subject.isAuthenticated()) {
 			return null;
 		}
-		return userService.getById(shiroUser.getId());
+		Object principal = subject.getPrincipal();
+		if (principal instanceof ShiroUser) {
+			ShiroUser shiroUser = (ShiroUser) principal;
+			return userService.getById(shiroUser.getId());
+		}
+		return null;
 	}
 
 	/**
