@@ -132,7 +132,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
             is.close();
         } catch (Exception e) {
             logger.error("上传阿里云OSS服务器异常.{}", e.getMessage(), e);
-            throw new MyException("上传阿里云OSS服务器异常." + e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传阿里云OSS服务器异常:" + e.getMessage()).build();
         }
         return returnUrl.toString();
     }
@@ -159,7 +159,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
             return rescourceService.remove(wrapper);
         }catch (Exception e){
             logger.error("删除阿里云文件出现异常.{}", e.getMessage(), e);
-            throw new MyException("删除阿里云文件出现异常." + e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除阿里云OSS文件出现异常:" + e.getMessage()).build();
         }
     }
 
@@ -213,7 +213,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         File file = new File(localPath);
         if(!file.exists()){
             logger.error("本地文件不存在");
-            throw new MyException("本地文件不存在");
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
         }
         QETag tag = new QETag();
         String hash = null;

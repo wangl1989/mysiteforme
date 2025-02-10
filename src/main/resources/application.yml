@@ -10,6 +10,7 @@ spring:
   #视图配置
   mvc:
     static-path-pattern: /static/**
+    throw-exception-if-no-handler-found: true  # 出现错误时抛出异常(所有未定义页面都要抛出异常，这样才能重新定义404地址)
   #网络请求配置
   http:
       encoding:

@@ -74,7 +74,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     private Auth getAuth(){
         if(getUploadInfo() == null){
-            throw new MyException("上传信息配置不存在");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("上传信息配置不存在").build();
         }
         return Auth.create(getUploadInfo().getQiniuAccessKey(), getUploadInfo().getQiniuSecretKey());
     }
@@ -207,7 +207,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             save(rescource);
         } catch (QiniuException e) {
             logger.error("上传网络文件失败",e);
-            throw new MyException("上传网络文件失败"+e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传网络文件失败"+e.getMessage()).build();
         }
         return returnUrl.toString();
     }
@@ -222,7 +222,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
     public String uploadLocalImg(String localPath) {
         File file = new File(localPath);
         if(!file.exists()){
-            throw new MyException("本地文件不存在");
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
         }
         QETag tag = new QETag();
         String hash;
@@ -230,7 +230,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             hash = tag.calcETag(file);
         } catch (IOException | NoSuchAlgorithmException e) {
             logger.error("计算文件hash失败",e);
-            throw new MyException("计算文件hash失败"+e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("计算文件hash失败"+e.getMessage()).build();
         }
         LambdaQueryWrapper<Rescource> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Rescource::getHash,hash);
@@ -258,7 +258,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             response = getUploadManager().put(file,key.toString(),getToken());
         } catch (QiniuException e) {
             logger.error("上传文件失败",e);
-            throw new MyException("七牛上传文件失败"+e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("七牛上传文件失败"+e.getMessage()).build();
         }
         if(response.isOK()){
             filePath = returnUrl.toString();
@@ -293,7 +293,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             getUploadManager().put(data,key.toString(),getToken());
         } catch (IOException e) {
             logger.error("七牛使用Base64方法上传文件失败",e);
-            throw new MyException("七牛使用Base64方法上传文件失败"+e.getMessage());
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("七牛使用Base64方法上传文件失败"+e.getMessage()).build();
         }
         return returnUrl.toString();
     }

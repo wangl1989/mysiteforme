@@ -49,7 +49,7 @@ public class TagsTempletModel extends BaseDirective implements TemplateDirective
             }
         }
         if(aid != null && cid != null){
-            throw new MyException("文章ID跟栏目ID不能同时存在");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("文章ID跟栏目ID不能同时存在").build();
         }
         List<BlogTags> list  = null;
         if(aid != null){

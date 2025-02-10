@@ -161,7 +161,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
                 }
                 orderString.add(list[i]);
             }else {
-                throw new MyException("模版传参错误");
+                throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("模版传参错误:selectBlogIndexArticles").build();
             }
         }
         if(!orderString.isEmpty()){
@@ -244,14 +244,14 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         File fileDectory = new File(LuceneSearch.dir);
         if(!fileDectory.exists()){
             if(!fileDectory.mkdir()){
-                throw new MyException("创建索引文件夹失败:"+fileDectory.getName());
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建索引文件夹失败:"+fileDectory.getName()).build();
             }
         }else {
             File[] f = fileDectory.listFiles();
             if (f != null) {
                 for (File file : f) {
                     if(!file.delete()){
-                        throw new MyException("删除索引文件失败:"+file.getName());
+                        throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除索引文件失败:"+file.getName()).build();
                     }
                 }
             }
@@ -266,7 +266,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
                 LuceneSearch.write(doc);
             } catch (IOException e) {
                 logger.error("创建文章索引失败",e);
-                throw new MyException("创建文章索引失败");
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文章索引失败").build();
             }
         }
     }

@@ -32,7 +32,7 @@ public class QiniuFileUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(QiniuFileUtil.class);
 
-	private static final String path = "https://static.mysiteforme.com/";
+	private static final String path = "你的域名";
 	private static final String qiniuAccess = "****************";
 	private static final String qiniuKey = "****************";
 	private static final String bucketName = "wanggg";
@@ -93,7 +93,7 @@ public class QiniuFileUtil {
 			bucketManager.delete(bucketName, imgPath);
 		} catch (QiniuException e) {
 			logger.error("删除七牛云图片失败:{}",e.getMessage());
-			throw new MyException("删除七牛云图片失败");
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除七牛云图片失败").build();
 		}
 	}
 
@@ -117,8 +117,8 @@ public class QiniuFileUtil {
 			rescource.setSource("qiniu");
 			rescourceService.save(rescource);
 		} catch (QiniuException e) {
-			filePath = src;
 			logger.error("七牛云上传网络图片失败:{}",e.getMessage());
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("七牛云上传网络图片失败").throwable(e).build();
 		}
 		return filePath;
 	}
@@ -148,7 +148,7 @@ public class QiniuFileUtil {
 		String token = auth.uploadToken(bucketName);
 		File file = new File(src);
 		if(!file.exists()){
-			throw new MyException("本地文件不存在");
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
 		}
 		Rescource rescource = getFileRescource(file, rescourceService);
 		if(StringUtils.isNotEmpty(rescource.getWebUrl())){
@@ -192,7 +192,7 @@ public class QiniuFileUtil {
 			uploadManager.put(data,name,token);
 		} catch (IOException e) {
 			logger.error("上传base64图片失败:{}",e.getMessage());
-			throw new MyException("上传base64图片失败");
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传base64图片失败").build();
 		}
 		filePath = path+name;
 		return filePath;

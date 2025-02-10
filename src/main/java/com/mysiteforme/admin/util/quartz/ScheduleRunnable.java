@@ -40,7 +40,7 @@ public class ScheduleRunnable implements Runnable {
 				method.invoke(target);
 			}
 		}catch (Exception e) {
-			throw new MyException("执行定时任务失败", e);
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("执行定时任务失败").build();
 		}
 	}
 

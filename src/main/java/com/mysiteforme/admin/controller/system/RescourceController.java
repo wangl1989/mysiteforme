@@ -7,7 +7,6 @@ import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;

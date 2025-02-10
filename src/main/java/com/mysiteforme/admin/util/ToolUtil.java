@@ -110,7 +110,7 @@ public class ToolUtil {
 			info = Introspector.getBeanInfo(condition.getClass());
 		} catch (IntrospectionException e) {
 			LOGGER.error("转换bean为map失败", e);
-			throw new MyException("转换bean为map失败");
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("转换bean为map失败").build();
 		}
 
 		for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
@@ -120,10 +120,13 @@ public class ToolUtil {
 					objectAsMap.put(pd.getName(), reader.invoke(condition));
 				} catch (IllegalArgumentException e) {
 					LOGGER.error("出现IllegalArgumentException异常", e);
+					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalArgumentException异常").throwable(e).build();
 				} catch (IllegalAccessException e) {
 					LOGGER.error("出现IllegalAccessException异常", e);
+					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalAccessException异常").throwable(e).build();
 				} catch (InvocationTargetException e) {
 					LOGGER.error("出现InvocationTargetException异常", e);
+					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现InvocationTargetException异常").throwable(e).build();
 				}
 		}
 		return objectAsMap;
@@ -272,7 +275,7 @@ public class ToolUtil {
 			}
 		}catch (Exception e){
 			LOGGER.error("获取地理位置异常",e);
-			throw new MyException("获取地理位置异常:"+e.getMessage());
+			throw MyException.builder().code(MyException.SERVER_ERROR).msg("获取地理位置异常").throwable(e).build();
 		}
 
 
