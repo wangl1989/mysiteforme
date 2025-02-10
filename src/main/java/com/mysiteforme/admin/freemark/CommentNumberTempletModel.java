@@ -23,7 +23,7 @@ public class CommentNumberTempletModel implements TemplateMethodModelEx {
     @Override
     public Object exec(List list) {
         if(list == null || list.isEmpty()){
-            throw new MyException("参数为空");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("模板参数为空").build();
         }
         SimpleNumber simpleNumber = (SimpleNumber) list.get(0);
         Long articleId = simpleNumber.getAsNumber().longValue();

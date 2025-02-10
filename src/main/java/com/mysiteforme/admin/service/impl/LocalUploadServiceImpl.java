@@ -62,7 +62,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         if(!targetFile.exists()){
             if (!targetFile.mkdirs()){
                 logger.error("创建文件夹失败");
-                throw new MyException("创建文件夹失败");
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
             }
         }
         FileOutputStream out = new FileOutputStream(filePath+fileName);
@@ -99,7 +99,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
                 return false;
             }
         }catch (Exception exception){
-            throw new MyException("本地文件夹删除出现异常");
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹删除出现异常").build();
         }
 
     }
@@ -126,7 +126,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         File uploadDir = new File(filePath);
         if(!uploadDir.exists()){
             if(!uploadDir.mkdirs()){
-                throw new MyException("创建文件夹失败");
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
             }
         }
         URL neturl=new URL(url);
@@ -169,7 +169,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         File file = new File(localPath);
         if(!file.exists()){
             logger.error("本地文件不存在,上传路径为：{}",localPath);
-            throw new MyException("本地文件不存在");
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件不存在").build();
         }
         QETag tag = new QETag();
         String hash = null;
@@ -209,7 +209,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         if (uploadDir != null && !uploadDir.exists()) {
             if(!uploadDir.mkdir()){
                 logger.error("文件夹创建失败");
-                throw new MyException("文件夹创建失败");
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹创建失败").build();
             }
         }
         try {
@@ -264,7 +264,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             File targetFileDir = new File(filePath);
             if(!targetFileDir.exists()){
                 if(targetFileDir.mkdirs()){
-                    throw new MyException("创建文件夹失败");
+                    throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
                 }
             }
             StringBuilder sb = new StringBuilder(filePath);

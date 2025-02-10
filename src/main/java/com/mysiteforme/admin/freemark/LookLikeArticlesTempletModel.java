@@ -52,7 +52,7 @@ public class LookLikeArticlesTempletModel extends BaseDirective implements Templ
             }
         }
         if(articleId == null){
-            throw new MyException("模版参数错误");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("模版参数错误:文章ID未找到").build();
         }
         Map<String,Object> dataMap = Maps.newHashMap();
         dataMap.put("limit",limit);

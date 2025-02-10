@@ -19,7 +19,7 @@
 <div style="text-align: center; padding:11% 0;">
     <i class="layui-icon" style="line-height:20rem; font-size:20rem; color: #393D50;">&#xe61c;</i>
     <p style="font-size: 20px; font-weight: 300; color: #999;">页面没有找到~~</p>
-    <p style="font-size: 20px; font-weight: 300; color: #999;">您的请求地址为:${url}</p>
+    <p style="font-size: 20px; font-weight: 300; color: #999;">您的请求地址为:${requestUrl}</p>
     <#--<#if e??>-->
         <#--<pre class="layui-code">-->
             <#--${e.message}-->

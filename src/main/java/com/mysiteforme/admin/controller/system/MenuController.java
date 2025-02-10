@@ -81,7 +81,7 @@ public class MenuController extends BaseController{
         if(menu.getParentId() == null){
             menu.setLevel(1);
             QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-            wrapper.eqSql("sort","select max(sort) from menu where parent_id is null");
+            wrapper.eqSql("sort","select max(sort) from sys_menu where parent_id is null");
             Menu m = menuService.getOne(wrapper);
             int sort = 0;
             if(m != null){
@@ -96,7 +96,7 @@ public class MenuController extends BaseController{
             menu.setParentIds(parentMenu.getParentIds());
             menu.setLevel(parentMenu.getLevel()+1);
             QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-            wrapper.eqSql("sort","select max(sort) from menu").eq("parent_id",menu.getParentId());
+            wrapper.eqSql("sort","select max(sort) from sys_menu").eq("parent_id",menu.getParentId());
             Menu m = menuService.getOne(wrapper);
             int sort = 0;
             if(m != null){

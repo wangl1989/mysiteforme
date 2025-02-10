@@ -87,7 +87,7 @@ public class BlogPageController extends BaseController{
         Map<String,Object> map = Maps.newHashMap();
         BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
         if(blogChannel == null){
-            throw new MyException("地址没找到",404);
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("请求地址不存在").build();
         }
         if(blogChannel.getParentId() == null){
             map.put("rootId",blogChannel.getParentIds());
@@ -123,11 +123,11 @@ public class BlogPageController extends BaseController{
     public String articleContent(@PathVariable(value = "articleId",required = false)Long articleId,
                                  Model model){
         if(articleId == null || articleId <= 0){
-            throw new MyException("文章ID不能为空");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("文章ID不能为空").build();
         }
         BlogArticle article = blogArticleService.selectOneDetailById(articleId);
         if(article == null){
-            throw new MyException("文章ID不存在");
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("文章ID不存在").build();
         }
         model.addAttribute("article",article);
         return "blog/articleContent";
@@ -297,7 +297,8 @@ public class BlogPageController extends BaseController{
         }
         BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
         if(blogChannel == null){
-            throw new MyException("地址没找到",404);
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("请求地址不存在").build();
+
         }
         model.addAttribute("channel",blogChannel);
         QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
@@ -326,7 +327,7 @@ public class BlogPageController extends BaseController{
         }
         BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
         if(blogChannel == null){
-            throw new MyException("地址没找到",404);
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("请求地址不存在").build();
         }
         model.addAttribute("channel",blogChannel);
         List<BlogArticle> list = blogArticleService.selectTimeLineList(blogChannel.getId());
@@ -368,7 +369,7 @@ public class BlogPageController extends BaseController{
         }
         BlogChannel blogChannel = blogChannelService.getChannelByHref(href);
         if(blogChannel == null){
-            throw new MyException("地址没找到",404);
+            throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("请求地址不存在").build();
         }
         model.addAttribute("channel",blogChannel);
         return "blog/share";

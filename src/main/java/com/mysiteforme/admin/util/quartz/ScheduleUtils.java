@@ -38,7 +38,7 @@ public class ScheduleUtils {
         try {
             return (CronTrigger) scheduler.getTrigger(getTriggerKey(jobId));
         } catch (SchedulerException e) {
-            throw new MyException("获取定时任务CronTrigger出现异常", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("获取定时任务CronTrigger出现异常").build();
         }
     }
 
@@ -67,7 +67,7 @@ public class ScheduleUtils {
             	pauseJob(scheduler, scheduleJob.getId());
             }
         } catch (SchedulerException e) {
-            throw new MyException("创建定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建定时任务失败").build();
         }
     }
     
@@ -98,7 +98,7 @@ public class ScheduleUtils {
             }
             
         } catch (SchedulerException e) {
-            throw new MyException("更新定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("更新定时任务失败").throwable(e).build();
         }
     }
 
@@ -113,7 +113,7 @@ public class ScheduleUtils {
         	
             scheduler.triggerJob(getJobKey(scheduleJob.getId()), dataMap);
         } catch (SchedulerException e) {
-            throw new MyException("立即执行定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("立即执行定时任务失败").throwable(e).build();
         }
     }
 
@@ -124,7 +124,7 @@ public class ScheduleUtils {
         try {
             scheduler.pauseJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new MyException("暂停定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("暂停定时任务失败").throwable(e).build();
         }
     }
 
@@ -135,7 +135,7 @@ public class ScheduleUtils {
         try {
             scheduler.resumeJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new MyException("暂停定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("暂停定时任务失败").throwable(e).build();
         }
     }
 
@@ -146,7 +146,7 @@ public class ScheduleUtils {
         try {
             scheduler.deleteJob(getJobKey(jobId));
         } catch (SchedulerException e) {
-            throw new MyException("删除定时任务失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除定时任务失败").throwable(e).build();
         }
     }
 }

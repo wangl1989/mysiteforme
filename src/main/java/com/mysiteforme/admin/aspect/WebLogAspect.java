@@ -1,6 +1,9 @@
 package com.mysiteforme.admin.aspect;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.text.StringEscapeUtils;
 import com.mysiteforme.admin.base.MySysUser;
@@ -26,6 +29,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,13 +47,19 @@ public class WebLogAspect {
 
     private LogService logService;
 
+    /**
+     * 使用 Jackson 的 ObjectMapper
+     */
+    private ObjectMapper objectMapper;
+
     public static ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     public WebLogAspect() {}
 
     @Autowired
-    public WebLogAspect(LogService logService) {
+    public WebLogAspect(LogService logService,ObjectMapper objectMapper) {
         this.logService = logService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -67,7 +77,7 @@ public class WebLogAspect {
      * @param joinPoint 连接点,包含被拦截方法的信息
      */
     @Before("webLog()")
-    public void doBefore(JoinPoint joinPoint) {
+    public void doBefore(JoinPoint joinPoint) throws JsonProcessingException {
         startTime.set(System.currentTimeMillis());
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -79,14 +89,20 @@ public class WebLogAspect {
             sysLog.setHttpMethod(request.getMethod());
             //获取传入目标方法的参数
             Object[] args = joinPoint.getArgs();
-            for (int i = 0; i < args.length; i++) {
-                Object o = args[i];
-                if (o instanceof ServletRequest || (o instanceof ServletResponse) || o instanceof MultipartFile) {
-                    args[i] = o.toString();
+            List<Object> objs = Lists.newArrayList();
+            for (Object o : args) {
+                //排序不需要序列化的对象
+                if (!(o instanceof ServletRequest) &&
+                        !(o instanceof ServletResponse) &&
+                        !(o instanceof MultipartFile) &&
+                        !(o instanceof MultipartFile[])) {
+                    objs.add(o);
                 }
             }
-            String str = JSONObject.toJSONString(args);
-            sysLog.setParams(str.length() > 5000 ? JSONObject.toJSONString("请求参数数据过长不与显示") : str);
+            if(!objs.isEmpty()) {
+                String str = JSONObject.toJSONString(objs);
+                sysLog.setParams(str.length() > 5000 ? JSONObject.toJSONString("请求参数数据过长不与显示") : str);
+            }
             String ip = ToolUtil.getClientIp(request);
             if ("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)) {
                 ip = "127.0.0.1" ;

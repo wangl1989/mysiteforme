@@ -1,9 +1,11 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.mysiteforme.admin.util.RestResponse;
@@ -56,13 +58,16 @@ public class FileController {
 
     private UploadService localService;
 
+    private SiteService siteService;
+
     public FileController() {}
 
     @Autowired
-    public FileController(UploadService qiniuService, UploadService ossService, UploadService localService) {
+    public FileController(UploadService qiniuService, UploadService ossService, UploadService localService, SiteService siteService) {
         this.qiniuService = qiniuService;
         this.ossService = ossService;
         this.localService = localService;
+        this.siteService= siteService;
     }
 
     @PostMapping("upload")
@@ -119,19 +124,19 @@ public class FileController {
     @PostMapping("uploadWang")
     @ResponseBody
     @SysLog("富文本编辑器文件上传")
-    public Map<String,Object> uploadWang(@RequestParam("test") MultipartFile[] file,HttpServletRequest httpServletRequest) {
-        Site site = (Site)httpServletRequest.getAttribute("site");
+    public Map<String,Object> uploadWang(@RequestParam("test")MultipartFile[] test) {
+        Site site = siteService.getCurrentSite();;
         if(site == null){
             return RestResponse.failure("加载信息错误");
         }
-        if(file == null || file.length == 0){
+        if(test == null || test.length == 0){
             return RestResponse.failure("上传文件为空 ");
         }
         List<String> data = Lists.newArrayList();
         Map<String,Object> m = Maps.newHashMap();
         String fileUploadType = site.getFileUploadType();
         try {
-            for (MultipartFile multipartFile : file) {
+            for (MultipartFile multipartFile : test) {
                 String url = null;
                 if ("local".equals(fileUploadType)) {
                     url = localService.upload(multipartFile);
