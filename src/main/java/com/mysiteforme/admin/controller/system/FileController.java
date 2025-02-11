@@ -74,6 +74,11 @@ public class FileController {
         if(file == null){
             return RestResponse.failure("上传文件为空 ");
         }
+
+        String fullName = file.getOriginalFilename();
+        if (fullName != null && !ToolUtil.isImage(fullName)) {
+            return RestResponse.failure("上传文件格式不正确 ");
+        }
         String url = null;
         Map<String,String> m = Maps.newHashMap();
         try {
