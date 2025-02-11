@@ -4,9 +4,11 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.BlogHandlerInterceptor;
 import com.mysiteforme.admin.base.MyHandlerInterceptor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import javax.servlet.MultipartConfigElement;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Spring MVC配置类
@@ -50,6 +53,29 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //    public ServletListenerRegistrationBean<RequestContextListener> requestContextListenerRegistration() {
 //        return new ServletListenerRegistrationBean<>(new RequestContextListener());
 //    }
+//
+    @Bean
+    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
+        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new XssFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("xssFilter");
+
+        // 添加不需要过滤的路径
+//        Map<String, String> initParameters = Maps.newHashMap();
+//        initParameters.put("excludes", "/static/*,/assets/*");
+//        registration.setInitParameters(initParameters);
+        registration.setOrder(1);
+        return registration;
+    }
+    @Bean
+    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter() {
+        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new SecurityHeadersFilter());
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(2);
+        return registrationBean;
+    }
 
     /**
      * 配置静态资源映射

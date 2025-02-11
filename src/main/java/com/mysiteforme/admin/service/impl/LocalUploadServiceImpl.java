@@ -8,6 +8,7 @@ import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
+import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.util.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -248,8 +249,13 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
     public String uploadBase64(String base64) {
         StringBuilder webUrl=new StringBuilder("/static/upload/");
         BASE64Decoder decoder = new BASE64Decoder();
+        String fileFormat = ToolUtil.getFileFormat(base64);
         try
         {
+            // 去除base64字符串的前缀（如果有）
+            if (base64.contains(",")) {
+                base64 = base64.split(",")[1];
+            }
             //Base64解码
             byte[] b = decoder.decodeBuffer(base64);
             for(int i=0;i<b.length;++i)
@@ -267,18 +273,20 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
                     throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
                 }
             }
-            StringBuilder sb = new StringBuilder(filePath);
-            sb.append(RandomUtil.randomUUID());
-            sb.append(".jpg");
+            StringBuilder sb = new StringBuilder(targetFileDir.getPath());
+            sb.append(File.separator);
+            String fileName = RandomUtil.randomUUID()+"."+ fileFormat;
+            sb.append(fileName);
             String imgFilePath = sb.toString();//新生成的图片
             OutputStream out = Files.newOutputStream(Paths.get(imgFilePath));
             out.write(b);
             out.flush();
             out.close();
-            return webUrl.append(sb).toString();
+            return webUrl.append(fileName).toString();
         }
         catch (Exception e)
         {
+            logger.error("上传Base64图片失败", e);
             return null;
         }
     }
