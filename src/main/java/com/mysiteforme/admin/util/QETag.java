@@ -19,17 +19,39 @@ public class QETag {
 
     private final int CHUNK_SIZE = 1 << 22;
 
+    /**
+     * 计算给定字节数组的SHA-1哈希值
+     *
+     * @param data 要计算哈希值的字节数组
+     * @return 计算得到的SHA-1哈希值的字节数组
+     * @throws NoSuchAlgorithmException 如果SHA-1算法不可用
+     */
     public byte[] sha1(byte[] data) throws NoSuchAlgorithmException {
         MessageDigest mDigest = MessageDigest.getInstance("sha1");
         return mDigest.digest(data);
     }
 
+    /**
+     * 对字节数组进行URL安全的Base64编码
+     *
+     * @param data 要编码的字节数组
+     * @return 编码后的字符串
+     */
     public String urlSafeBase64Encode(byte[] data) {
         String encodedString = DatatypeConverter.printBase64Binary(data);
         encodedString = encodedString.replace('+', '-').replace('/', '_');
         return encodedString;
     }
 
+    /**
+     * 计算输入流的ETag值
+     *
+     * @param inputStream 文件的输入流
+     * @param fileLength 文件的长度
+     * @return 计算得到的ETag值
+     * @throws IOException 如果读取文件时发生IO错误
+     * @throws NoSuchAlgorithmException 如果SHA-1算法不可用
+     */
     private String calcETag(InputStream inputStream,long fileLength) throws IOException,
             NoSuchAlgorithmException {
         String etag = "";
@@ -73,6 +95,12 @@ public class QETag {
         return etag;
     }
 
+    /**
+     * 计算MultipartFile的ETag值
+     *
+     * @param file MultipartFile对象
+     * @return 计算得到的ETag值
+     */
     public String calcETag(MultipartFile file) throws IOException,
             NoSuchAlgorithmException {
         String etag = "";
@@ -82,6 +110,12 @@ public class QETag {
         return etag;
     }
 
+    /**
+     * 计算File对象的ETag值
+     *
+     * @param file File对象
+     * @return 计算得到的ETag值
+     */
     public String calcETag(File file) throws IOException,
             NoSuchAlgorithmException {
         String tag = "";
@@ -91,6 +125,12 @@ public class QETag {
         return tag;
     }
 
+    /**
+     * 计算文件的ETag值
+     *
+     * @param fileName 文件名
+     * @return 计算得到的ETag值
+     */
     public String calcETag(String fileName) throws IOException,
             NoSuchAlgorithmException{
         String etag = "";
