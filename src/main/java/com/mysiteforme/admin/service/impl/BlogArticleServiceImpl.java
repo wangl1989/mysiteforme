@@ -64,12 +64,12 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
     public void removeArticleChannel(Long channelId) {
         QueryWrapper<BlogArticle> wrapper = new QueryWrapper<>();
         wrapper.eq("channel_id",channelId);
-        List<BlogArticle> list = list(wrapper);
+        List<BlogArticle> list = baseMapper.selectList(wrapper);
         if(!list.isEmpty()){
             for (BlogArticle blogArticle : list){
                 blogArticle.setChannelId(null);
             }
-            updateBatchById(list);
+            baseMapper.insertOrUpdate(list);
         }
     }
 
@@ -82,13 +82,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
     @Cacheable(value = "oneArticle",key = "'article_id_'+#id",unless = "#result == null ")
     @Override
     public BlogArticle selectOneDetailById(Long id) {
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("id",id);
-        List<BlogArticle> list = baseMapper.selectDetailArticle(map);
-        if(list != null && !list.isEmpty()){
-            return list.get(0);
-        }
-        return null;
+        return baseMapper.selectById(id);
     }
 
     /**
@@ -214,7 +208,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         Integer count = (Integer)operations.get("article_click_id_"+articleId);
         if(count == null){
-            BlogArticle blogArticle = getById(articleId);
+            BlogArticle blogArticle = baseMapper.selectById(articleId);
             if(blogArticle.getClick() != null){
                 count = blogArticle.getClick();
             }else{
@@ -284,7 +278,7 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
         wrapper.eq("del_flag",false);
         wrapper.eq("channel_id",id);
         wrapper.orderBy(false,false,"create_date");
-        return list(wrapper);
+        return baseMapper.selectList(wrapper);
     }
 
     /**

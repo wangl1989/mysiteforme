@@ -7,6 +7,7 @@ import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.exception.MyException;
 import com.xiaoleilu.hutool.http.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
@@ -19,9 +20,13 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ToolUtil {
 
@@ -51,6 +56,79 @@ public class ToolUtil {
 		}
 
 	}
+
+	/**
+	 * 验证上传图片类型
+	 * @param imgSrc 图片路径
+	 * @return 图片来源类型，local：本地图片，web：网络图片，unknown：未知图片
+	 */
+	@NotNull
+	public static String parseImageUrl(@NotNull String imgSrc) {
+		if (imgSrc.contains("file:")) {
+			return "local";
+		} else if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) {
+			return "web";
+		} else if (imgSrc.startsWith("data:image")) {
+			return "base64";
+		} else {
+			return "unknown";
+		}
+	}
+
+	/**
+	 * 判断是否为图片
+	 * @param url 图片地址
+	 * @return 是否为图片
+	 */
+	public static boolean isImage(@NotNull String url) {
+		try {
+			if(url.startsWith("data:image")){
+				return false;
+			}
+			URL u = new URL(url);
+			String file = u.getFile();
+			return file == null || !file.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg|ico)$");
+		} catch (MalformedURLException e) {
+			LOGGER.error("URL格式错误", e);
+			return true;
+		}
+	}
+
+	/**
+	 * 判断是否为图片
+	 * @param url 图片地址
+	 * @return 是否为图片
+	 */
+	public static boolean imageEasyCheck(@NotNull String url) {
+		if(StringUtils.isEmpty(url)){
+			return true;
+		}
+		return !url.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg|ico)$");
+	}
+
+	/**
+	 * 从base64字符串中提取文件格式
+	 * @param base64String base64字符串
+	 * @return 文件格式（如 "jpg", "png" 等）
+	 */
+	public static String getFileFormat(String base64String) {
+		// 匹配data:image/xxx;base64,格式的正则表达式
+		Pattern pattern = Pattern.compile("data:image/(.*?);base64,");
+		Matcher matcher = pattern.matcher(base64String);
+
+		if (matcher.find()) {
+			String format = matcher.group(1);
+			// 处理特殊情况
+			if (format.equals("jpeg")) {
+				return "jpg";
+			}
+			return format.toLowerCase();
+		}
+
+		// 如果没有找到格式，默认返回jpg
+		return "jpg";
+	}
+
 
 	/**
 	 * 通过泛型检查工具方法封装
