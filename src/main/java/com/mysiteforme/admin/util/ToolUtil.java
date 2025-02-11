@@ -83,15 +83,27 @@ public class ToolUtil {
 	public static boolean isImage(@NotNull String url) {
 		try {
 			if(url.startsWith("data:image")){
-				return true;
+				return false;
 			}
 			URL u = new URL(url);
 			String file = u.getFile();
-			return file != null && file.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg)$");
+			return file == null || !file.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg|ico)$");
 		} catch (MalformedURLException e) {
 			LOGGER.error("URL格式错误", e);
-			return false;
+			return true;
 		}
+	}
+
+	/**
+	 * 判断是否为图片
+	 * @param url 图片地址
+	 * @return 是否为图片
+	 */
+	public static boolean imageEasyCheck(@NotNull String url) {
+		if(StringUtils.isEmpty(url)){
+			return true;
+		}
+		return !url.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg|ico)$");
 	}
 
 	/**

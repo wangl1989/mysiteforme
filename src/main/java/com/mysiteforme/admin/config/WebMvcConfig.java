@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.mysiteforme.admin.base.BlogHandlerInterceptor;
 import com.mysiteforme.admin.base.MyHandlerInterceptor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -49,6 +50,25 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //    @Bean
 //    public ServletListenerRegistrationBean<RequestContextListener> requestContextListenerRegistration() {
 //        return new ServletListenerRegistrationBean<>(new RequestContextListener());
+//    }
+
+//    @Bean
+//    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
+//        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(new XssFilter());
+//        registration.addUrlPatterns("/*");
+//        registration.setName("xssFilter");
+//        registration.setOrder(1);
+//        return registration;
+//    }
+//
+//    @Bean
+//    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter() {
+//        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+//        registrationBean.setFilter(new SecurityHeadersFilter());
+//        registrationBean.addUrlPatterns("/*");
+//        registrationBean.setOrder(2);
+//        return registrationBean;
 //    }
 
     /**

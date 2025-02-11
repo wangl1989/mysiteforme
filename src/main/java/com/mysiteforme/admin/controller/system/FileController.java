@@ -76,7 +76,7 @@ public class FileController {
         }
 
         String fullName = file.getOriginalFilename();
-        if (fullName != null && !ToolUtil.isImage(fullName)) {
+        if (fullName != null && ToolUtil.imageEasyCheck(fullName)) {
             return RestResponse.failure("上传文件格式不正确 ");
         }
         String url = null;
@@ -148,6 +148,10 @@ public class FileController {
         String fileUploadType = site.getFileUploadType();
         try {
             for (MultipartFile multipartFile : test) {
+                String fullName = multipartFile.getOriginalFilename();
+                if (fullName != null && ToolUtil.imageEasyCheck(fullName)) {
+                    return RestResponse.failure("上传文件格式不正确 ");
+                }
                 String url = null;
                 if ("local".equals(fileUploadType)) {
                     url = localService.upload(multipartFile);
@@ -190,7 +194,7 @@ public class FileController {
         for(Element e : links){
             String imgSrc = e.attr("src");
             // 过滤掉非图片文件
-            if(!ToolUtil.isImage(imgSrc)){
+            if(ToolUtil.isImage(imgSrc)){
                 continue;
             }
             String urlType = ToolUtil.parseImageUrl(imgSrc);
@@ -240,7 +244,7 @@ public class FileController {
     @ResponseBody
     public RestResponse downCheck(@RequestParam(value="url",required = false) String url,
                                   @RequestParam(value="name",required = false) String name){
-        if(!ToolUtil.isImage(url)){
+        if(ToolUtil.isImage(url)){
             return RestResponse.failure("图片格式不正确");
         }
         if(StringUtils.isBlank(url)){
