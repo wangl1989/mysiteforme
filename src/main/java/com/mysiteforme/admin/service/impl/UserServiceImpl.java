@@ -66,13 +66,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 			@CachePut(value = "user", key = "'user_tel_'+#user.tel", condition = "#user.tel != null and #user.tel != ''")
 	})
 	@Transactional(rollbackFor = Exception.class)
-	public void saveUser(User user) {
+	public User saveUser(User user) {
 		ToolUtil.entryptPassword(user);
 		user.setLocked(false);
 		baseMapper.insert(user);
 		//保存用户角色关系
 		this.saveUserRoles(user.getId(),user.getRoleLists());
-		userCacheService.findUserById(user.getId());
+		return user;
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	})
 	public void deleteUser(User user) {
 		user.setDelFlag(true);
-		updateUser(user);
+		baseMapper.updateById(user);
 	}
 
 	/**

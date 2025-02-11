@@ -24,7 +24,7 @@ public interface UserService extends IService<User> {
 	 * 包含密码加密、角色关系保存
 	 * @param user 用户对象，包含角色列表
 	 */
-	void saveUser(User user);
+	User saveUser(User user);
 
 	/**
 	 * 更新用户信息
