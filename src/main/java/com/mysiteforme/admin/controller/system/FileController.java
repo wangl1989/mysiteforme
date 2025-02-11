@@ -1,13 +1,11 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.service.UploadService;
-import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +16,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +34,8 @@ import java.util.Map;
 
 /**
  * Created by tnt on 2017/12/7.
- * ${TODO}
+ * updated by wangl on 2018/1/10
+ * 文件上传下载
  */
 @Controller
 @RequestMapping("file")
@@ -45,12 +43,6 @@ public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
-
-    @Value("uploadType")
-    private String uploadType;
-
-    @Value("localUploadPath")
-    private String localUploadPath;
 
     private UploadService qiniuService;
 
@@ -108,13 +100,27 @@ public class FileController {
     @SysLog("base64格式文件上传")
     public RestResponse uploadBase64(@RequestParam(value = "file",required = false) String file,
                                      @RequestParam(value = "name",required= false)String name){
+        Site site = siteService.getCurrentSite();
+        if(site == null){
+            return RestResponse.failure("加载信息错误");
+        }
         if(StringUtils.isBlank(file)){
             return RestResponse.failure("图片不能为空");
         }
         if(StringUtils.isBlank(name)){
             return RestResponse.failure("图片名称不能为空");
         }
-        String url = QiniuFileUtil.uploadBase64(file,name);
+        String url = null;
+        String fileUploadType = site.getFileUploadType();
+        if ("local".equals(fileUploadType)) {
+            url = localService.uploadBase64(file);
+        }
+        if ("qiniu".equals(fileUploadType)) {
+            url = qiniuService.uploadBase64(file);
+        }
+        if ("oss".equals(fileUploadType)) {
+            url = ossService.uploadBase64(file);
+        }
         return RestResponse.success().setData(url);
     }
 
@@ -125,7 +131,7 @@ public class FileController {
     @ResponseBody
     @SysLog("富文本编辑器文件上传")
     public Map<String,Object> uploadWang(@RequestParam("test")MultipartFile[] test) {
-        Site site = siteService.getCurrentSite();;
+        Site site = siteService.getCurrentSite();
         if(site == null){
             return RestResponse.failure("加载信息错误");
         }
@@ -177,46 +183,68 @@ public class FileController {
         Document doc = Jsoup.parseBodyFragment(content);
         Elements links = doc.select("img[src]");
         for(Element e : links){
-            String imgSrc = e.attr("abs:src");
+            String imgSrc = e.attr("src");
+            // 过滤掉非图片文件
+            if(!ToolUtil.isImage(imgSrc)){
+                continue;
+            }
+            String urlType = ToolUtil.parseImageUrl(imgSrc);
+            // 如果当前网站设置的是本地上传模式
             if("local".equals(site.getFileUploadType())){
-                if(imgSrc.contains("file:")){
-                    imgSrc = imgSrc.replace("\\","/");
-                    e.attr("src",localService.uploadLocalImg(imgSrc.substring(6)));
-                }else{
-                    e.attr("src",localService.uploadNetFile(imgSrc));
+                if(!uploadResult(localService,urlType,e,imgSrc)){
+                    continue;
                 }
             }
+            // 如果当前系统设置的是七牛上传模式
             if("qiniu".equals(site.getFileUploadType())){
-                if(imgSrc.contains("file:")){
-                    imgSrc = imgSrc.replace("\\","/");
-                    e.attr("src",qiniuService.uploadLocalImg(imgSrc.substring(6)));
-                }else{
-                    e.attr("src",qiniuService.uploadNetFile(imgSrc));
+                if(!uploadResult(qiniuService,urlType,e,imgSrc)){
+                    continue;
                 }
             }
+            // 如果当前系统设置的是阿里云上传模式
             if("oss".equals(site.getFileUploadType())){
-                if(imgSrc.contains("file:")){
-                    imgSrc = imgSrc.replace("\\","/");
-                    e.attr("src",ossService.uploadLocalImg(imgSrc.substring(6)));
-                }else{
-                    e.attr("src",ossService.uploadNetFile(imgSrc));
-                }
+                uploadResult(ossService,urlType,e,imgSrc);
             }
         }
-        String outHtml = doc.body().toString();
-        return RestResponse.success().setData(outHtml.replace("<body>","").replace("</body>",""));
+        return RestResponse.success().setData(doc.body().html());
     }
+
+    private boolean uploadResult(UploadService service,String urlType ,Element e, String imgSrc) throws IOException, NoSuchAlgorithmException {
+        //区分文件的来源类型
+        if("local".equals(urlType)){
+            imgSrc = imgSrc.substring(6);
+            File file = new File(imgSrc);
+            if(!file.exists()){
+                return false;
+            }
+            e.attr("src",service.uploadLocalImg(imgSrc));
+        }else if("web".equals(urlType)){
+            e.attr("src",service.uploadNetFile(imgSrc));
+        }else if("base64".equals(urlType)){
+            e.attr("src",service.uploadBase64(imgSrc));
+        }else {
+            // 未知的文件来源类型过滤掉
+            return false;
+        }
+        return true;
+    }
+
+
 
     @PostMapping("downCheck")
     @ResponseBody
     public RestResponse downCheck(@RequestParam(value="url",required = false) String url,
                                   @RequestParam(value="name",required = false) String name){
+        if(!ToolUtil.isImage(url)){
+            return RestResponse.failure("图片格式不正确");
+        }
         if(StringUtils.isBlank(url)){
             return RestResponse.failure("图片地址不能为空");
         }
         if(StringUtils.isBlank(name)){
             return RestResponse.failure("图片名称不能为空");
         }
+        // 此功能未来版本会实现
         return RestResponse.success();
     }
 
@@ -227,13 +255,13 @@ public class FileController {
                                  @RequestParam(value="name",required = false) String name,
                                  HttpServletResponse response) throws IOException {
         if(StringUtils.isBlank(realurl)){
-            return RestResponse.failure("图片地址不能为空");
+            return RestResponse.failure("下载地址不能为空");
         }
         if(StringUtils.isBlank(name)){
-            return RestResponse.failure("图片名称不能为空");
+            return RestResponse.failure("文件名称不能为空");
         }
         if("text/html".equals(ToolUtil.getContentType(name))){
-            return RestResponse.failure("图片格式不正确");
+            return RestResponse.failure("文件格式不正确");
         }
         name = new String(name.getBytes("GB2312"),"ISO8859-1");
         URL url=new URL(realurl);
@@ -254,30 +282,4 @@ public class FileController {
         return RestResponse.success();
     }
 
-
-
-
-    public String localUpload(HttpServletRequest request, MultipartFile file) {
-        if (!file.isEmpty()) {
-            try {
-                // 文件保存路径
-                if (StringUtils.isBlank(localUploadPath)) {
-                    localUploadPath = request.getSession().getServletContext().getRealPath("/") + "/static/upload/" + System.currentTimeMillis() + "/";
-                    String filePath = localUploadPath + file.getOriginalFilename();
-                    file.transferTo(new File(filePath));
-                    return filePath;
-                } else {
-                    long t = System.currentTimeMillis();
-                    String filePath = localUploadPath + t + "/" + file.getOriginalFilename();
-                    file.transferTo(new File(filePath));
-                    return "/upload/" + t + filePath;
-                }
-            } catch (Exception e) {
-                logger.error("文件上传失败", e);
-                return  null;
-            }
-        }else{
-            return null;
-        }
-    }
 }
