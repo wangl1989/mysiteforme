@@ -2,7 +2,6 @@ package com.mysiteforme.admin.aspect;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.text.StringEscapeUtils;
@@ -47,19 +46,14 @@ public class WebLogAspect {
 
     private LogService logService;
 
-    /**
-     * 使用 Jackson 的 ObjectMapper
-     */
-    private ObjectMapper objectMapper;
 
     public static ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     public WebLogAspect() {}
 
     @Autowired
-    public WebLogAspect(LogService logService,ObjectMapper objectMapper) {
+    public WebLogAspect(LogService logService) {
         this.logService = logService;
-        this.objectMapper = objectMapper;
     }
 
 

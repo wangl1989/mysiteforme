@@ -6,12 +6,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Rescource;
+import com.mysiteforme.admin.service.RescourceService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
@@ -27,7 +26,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/system/rescource")
 public class RescourceController extends BaseController{
-    private static final Logger LOGGER = LoggerFactory.getLogger(RescourceController.class);
+
+    public RescourceController(RescourceService rescourceService) {
+        this.rescourceService = rescourceService;
+    }
 
     @GetMapping("list")
     @SysLog("跳转资源展示列表")
@@ -80,18 +82,20 @@ public class RescourceController extends BaseController{
             String source = rescource.getSource();
             String path = rescource.getWebUrl();
             if(StringUtils.isNotEmpty(source) && StringUtils.isNotBlank(path)){
-                if("qiniu".equals(source)){
-                    qiniuService.delete(path);
-                } else if ("oss".equals(source)) {
-                    ossService.delete(path);
-                } else {
-                    localService.delete(path);
+                switch (source) {
+                    case "qiniu":
+                        qiniuService.delete(path);
+                        break;
+                    case "oss":
+                        ossService.delete(path);
+                        break;
+                    default:
+                        localService.delete(path);
+                        break;
                 }
-            }else{
+            } else {
                 return RestResponse.failure(rescource.getFileName()+"文件类型不存在");
             }
-
-
         }
         rescourceService.removeByIds(ids);
         return RestResponse.success();

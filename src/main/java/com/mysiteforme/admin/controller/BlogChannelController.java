@@ -5,6 +5,9 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.entity.VO.BlogChannelVO;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
+import com.mysiteforme.admin.service.BlogChannelService;
+import com.mysiteforme.admin.service.BlogArticleService;
+import com.mysiteforme.admin.service.SiteService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogChannel;
@@ -33,6 +36,12 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin/blogChannel")
 public class BlogChannelController extends BaseController{
+
+    public BlogChannelController(BlogChannelService blogChannelService, BlogArticleService blogArticleService, SiteService siteService) {
+        this.blogChannelService = blogChannelService;
+        this.blogArticleService = blogArticleService;
+        this.siteService = siteService;
+    }
 
     /**
      * 显示栏目列表页面

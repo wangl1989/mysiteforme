@@ -1,20 +1,16 @@
 package com.mysiteforme.admin.exception;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * Created by wangl on 2018/1/24.
- * todo:
+ * todo: 使用lombok注解代替builder模式
+ * update by wangl on 2025/02/11
  */
-@Data
-@Builder
-@EqualsAndHashCode(callSuper = false)
-public class MyException extends RuntimeException implements Serializable {
+@Getter
+@Setter
+public class MyException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +29,7 @@ public class MyException extends RuntimeException implements Serializable {
     // 未发现视图地址
     public static final String NOT_FOUND_PAGE = "admin/error/404";
 
-    /**
+   /**
      * 错误信息
      */
     private String msg;
@@ -58,4 +54,53 @@ public class MyException extends RuntimeException implements Serializable {
      */
     private Throwable throwable;
 
+    private MyException(Builder builder) {
+        super(builder.msg);
+        this.msg = builder.msg;
+        this.code = builder.code;
+        this.errorType = builder.errorType;
+        this.viewName = builder.viewName;
+        this.throwable = builder.throwable;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String msg;
+        private int code;
+        private String errorType;
+        private String viewName;
+        private Throwable throwable;
+
+        public Builder msg(String msg) {
+            this.msg = msg;
+            return this;
+        }
+
+        public Builder code(int code) {
+            this.code = code;
+            return this;
+        }
+
+        public Builder errorType(String errorType) {
+            this.errorType = errorType;
+            return this;
+        }
+
+        public Builder viewName(String viewName) {
+            this.viewName = viewName;
+            return this;
+        }
+
+        public Builder throwable(Throwable throwable) {
+            this.throwable = throwable;
+            return this;
+        }   
+
+        public MyException build() {
+            return new MyException(this);
+        }
+    }
 }

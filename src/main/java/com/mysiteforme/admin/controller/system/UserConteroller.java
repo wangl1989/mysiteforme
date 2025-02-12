@@ -10,14 +10,16 @@ import com.mysiteforme.admin.base.MySysUser;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.ShowMenu;
+import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.RoleService;
+import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +38,13 @@ import java.util.Set;
 @Controller
 @RequestMapping("admin/system/user")
 public class UserConteroller extends BaseController{
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserConteroller.class);
+
+    public UserConteroller(UserService userService, UserCacheService userCacheService, RoleService roleService, MenuService menuService) {
+        this.userService = userService; 
+        this.userCacheService = userCacheService;
+        this.roleService = roleService;
+        this.menuService = menuService;
+    }
 
     @GetMapping("list")
     @SysLog("跳转系统用户列表页面")

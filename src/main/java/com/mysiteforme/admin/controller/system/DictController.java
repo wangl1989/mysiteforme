@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Dict;
+import com.mysiteforme.admin.service.DictService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("admin/system/dict")
 public class DictController extends BaseController{
+
+    public DictController(DictService dictService) {
+        this.dictService = dictService;
+    }
 
     @PostMapping("deleteById")
     @ResponseBody

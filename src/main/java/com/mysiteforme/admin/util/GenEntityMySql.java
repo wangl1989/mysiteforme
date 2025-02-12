@@ -15,7 +15,7 @@ public class GenEntityMySql {
 
 
         CreateTableFiles createTableFiles = new CreateTableFiles();
-        Site site = site = new Site();
+        Site site = new Site();
         site.setName("默认站点");
         site.setDescription("这是一个默认站点");
         site.setAuthor("wang");

@@ -5,13 +5,12 @@ import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.entity.UploadInfo;
+import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UploadInfoService;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,22 +34,16 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/admin/system/site")
 public class SiteController extends BaseController{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SiteController.class);
-
-    @Qualifier("qiniuService")
-    private UploadService qiniuService;
-
-    @Qualifier("ossService")
-    private UploadService ossService;
-
-    public SiteController() {
-        super();
-    }
-
-    @Autowired
-    public SiteController(UploadService qiniuService, UploadService ossService) {
+    public SiteController(
+            @Qualifier("qiniuService") UploadService qiniuService,
+            @Qualifier("ossService") UploadService ossService,
+            SiteService siteService,
+            UploadInfoService uploadInfoService
+    ) {
         this.qiniuService = qiniuService;
         this.ossService = ossService;
+        this.siteService = siteService;
+        this.uploadInfoService = uploadInfoService;
     }
 
     @RequiresPermissions("sys:site:list")

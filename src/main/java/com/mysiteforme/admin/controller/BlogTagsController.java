@@ -7,6 +7,7 @@ import com.xiaoleilu.hutool.http.HTMLFilter;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogTags;
+import com.mysiteforme.admin.service.BlogTagsService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -34,6 +35,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/blogTags")
 public class BlogTagsController extends BaseController{
+
+    public BlogTagsController(BlogTagsService blogTagsService) {
+        this.blogTagsService = blogTagsService;
+    }   
 
     /**
      * 显示标签列表页面

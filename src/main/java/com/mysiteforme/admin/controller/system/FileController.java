@@ -1,13 +1,18 @@
 package com.mysiteforme.admin.controller.system;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.entity.Site;
-import com.mysiteforme.admin.service.SiteService;
-import com.mysiteforme.admin.service.UploadService;
-import com.mysiteforme.admin.util.RestResponse;
-import com.mysiteforme.admin.util.ToolUtil;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,20 +22,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import sun.net.www.protocol.http.HttpURLConnection;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.annotation.SysLog;
+import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UploadService;
+import com.mysiteforme.admin.util.RestResponse;
+import com.mysiteforme.admin.util.ToolUtil;
 
 /**
  * Created by tnt on 2017/12/7.
@@ -39,18 +46,10 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("file")
-public class FileController {
+public class FileController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
-
-    private UploadService qiniuService;
-
-    private UploadService ossService;
-
-    private UploadService localService;
-
-    private SiteService siteService;
 
     public FileController() {}
 
@@ -65,7 +64,7 @@ public class FileController {
     @PostMapping("upload")
     @ResponseBody
     @SysLog("文件上传")
-    public RestResponse uploadFile(@RequestParam("test") MultipartFile file,HttpServletRequest httpServletRequest) {
+    public RestResponse uploadFile(@RequestParam("test") MultipartFile file,HttpServletRequest httpServletRequest) throws IOException, NoSuchAlgorithmException{
         Site site = (Site)httpServletRequest.getAttribute("site");
         if(site == null){
             return RestResponse.failure("加载信息错误");
@@ -93,8 +92,11 @@ public class FileController {
             }
             m.put("url", url);
             m.put("name", file.getOriginalFilename());
-        } catch (Exception e) {
-            logger.error("文件上传失败",e);
+        } catch (IOException e) {
+            logger.error("文件上传失败: IO异常", e);
+            return RestResponse.failure(e.getMessage());
+        } catch (IllegalStateException e) {
+            logger.error("文件上传失败: 非法状态", e);
             return RestResponse.failure(e.getMessage());
         }
         return RestResponse.success().setData(m);
@@ -135,7 +137,7 @@ public class FileController {
     @PostMapping("uploadWang")
     @ResponseBody
     @SysLog("富文本编辑器文件上传")
-    public Map<String,Object> uploadWang(@RequestParam("test")MultipartFile[] test) {
+    public Map<String,Object> uploadWang(@RequestParam("test")MultipartFile[] test) throws IOException, NoSuchAlgorithmException{
         Site site = siteService.getCurrentSite();
         if(site == null){
             return RestResponse.failure("加载信息错误");
@@ -146,30 +148,24 @@ public class FileController {
         List<String> data = Lists.newArrayList();
         Map<String,Object> m = Maps.newHashMap();
         String fileUploadType = site.getFileUploadType();
-        try {
-            for (MultipartFile multipartFile : test) {
-                String fullName = multipartFile.getOriginalFilename();
-                if (fullName != null && ToolUtil.imageEasyCheck(fullName)) {
-                    return RestResponse.failure("上传文件格式不正确 ");
-                }
-                String url = null;
-                if ("local".equals(fileUploadType)) {
-                    url = localService.upload(multipartFile);
-                }
-                if ("qiniu".equals(fileUploadType)) {
-                    url = qiniuService.upload(multipartFile);
-                }
-                if ("oss".equals(fileUploadType)) {
-                    url = ossService.upload(multipartFile);
-                }
-                data.add(url);
+        for (MultipartFile multipartFile : test) {
+            String fullName = multipartFile.getOriginalFilename();
+            if (fullName != null && ToolUtil.imageEasyCheck(fullName)) {
+                return RestResponse.failure("上传文件格式不正确 ");
             }
-            m.put("errno",0);
-        } catch (Exception e) {
-            logger.error("文件上传失败",e);
-            m.put("errno",1);
-            return RestResponse.failure(e.getMessage());
+            String url = null;
+            if ("local".equals(fileUploadType)) {
+                url = localService.upload(multipartFile);
+            }
+            if ("qiniu".equals(fileUploadType)) {
+                url = qiniuService.upload(multipartFile);
+            }
+            if ("oss".equals(fileUploadType)) {
+                url = ossService.upload(multipartFile);
+            }
+            data.add(url);
         }
+        m.put("errno",0);
         m.put("data",data);
         return m;
     }
@@ -220,20 +216,23 @@ public class FileController {
 
     private boolean uploadResult(UploadService service,String urlType ,Element e, String imgSrc) throws IOException, NoSuchAlgorithmException {
         //区分文件的来源类型
-        if("local".equals(urlType)){
-            imgSrc = imgSrc.substring(6);
-            File file = new File(imgSrc);
-            if(!file.exists()){
+        switch (urlType) {
+            case "local":
+                imgSrc = imgSrc.substring(6);
+                File file = new File(imgSrc);
+                if(!file.exists()){
+                    return false;
+                }
+                e.attr("src",service.uploadLocalImg(imgSrc));
+                break;
+            case "web":
+                e.attr("src",service.uploadNetFile(imgSrc));
+                break;
+            case "base64":
+                e.attr("src",service.uploadBase64(imgSrc));
+                break;
+            default:
                 return false;
-            }
-            e.attr("src",service.uploadLocalImg(imgSrc));
-        }else if("web".equals(urlType)){
-            e.attr("src",service.uploadNetFile(imgSrc));
-        }else if("base64".equals(urlType)){
-            e.attr("src",service.uploadBase64(imgSrc));
-        }else {
-            // 未知的文件来源类型过滤掉
-            return false;
         }
         return true;
     }
@@ -273,21 +272,25 @@ public class FileController {
             return RestResponse.failure("文件格式不正确");
         }
         name = new String(name.getBytes("GB2312"),"ISO8859-1");
-        URL url=new URL(realurl);
-        HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+        URL url = new URL(realurl);
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
         conn.connect();
-        BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
-        byte[] buf = new byte[1024];
-        int len;
+        
         response.reset();
         response.setHeader("Content-type","application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename="+name);
-        ServletOutputStream out = response.getOutputStream();
-        while ((len = br.read(buf)) > 0) out.write(buf, 0, len);
-        br.close();
-        out.flush();
-        out.close();
-        conn.disconnect();
+        
+        try (BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
+             ServletOutputStream out = response.getOutputStream()) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = br.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+        } finally {
+            conn.disconnect();
+        }
         return RestResponse.success();
     }
 

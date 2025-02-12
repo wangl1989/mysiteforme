@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -76,7 +77,7 @@ public class ScheduleJob extends QuartzJobBean {
 			log.setStatus(0);
 
             logger.info("任务执行完毕，任务ID：{}  总共耗时：{}毫秒", scheduleJob.getId(), times);
-		} catch (Exception e) {
+		} catch (InterruptedException | ExecutionException | NoSuchMethodException e) {
             logger.error("任务执行失败，任务ID：{}", scheduleJob.getId(), e);
 			
 			//任务执行总时长

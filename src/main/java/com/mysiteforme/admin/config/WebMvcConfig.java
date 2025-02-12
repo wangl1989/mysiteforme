@@ -1,31 +1,29 @@
 package com.mysiteforme.admin.config;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.base.BlogHandlerInterceptor;
-import com.mysiteforme.admin.base.MyHandlerInterceptor;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import javax.servlet.MultipartConfigElement;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.unit.DataSize;
-import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.MultipartConfigElement;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.google.common.collect.Lists;
+import com.mysiteforme.admin.base.BlogHandlerInterceptor;
+import com.mysiteforme.admin.base.MyHandlerInterceptor;
 
 /**
  * Spring MVC配置类

@@ -165,13 +165,13 @@ public class GlobalExceptionHandler {
 
         // 处理Ajax请求
         if (ToolUtil.isAjax(request)) {
-            response.setContentType("application/json;charset=UTF-8"); // 设置响应内容类型为JSON
-            PrintWriter writer = response.getWriter();
-            RestResponse failResponse = RestResponse.failure(errorInfo.getMsg()); // 创建失败的Rest响应对象
-            writer.write(JSONObject.toJSONString(failResponse)); // 将响应对象转换为JSON字符串并写入响应
-            writer.flush(); // 刷新输出流
-            writer.close(); // 关闭输出流
-            return null; // 对于Ajax请求，不返回视图
+            response.setContentType("application/json;charset=UTF-8");
+            try (PrintWriter writer = response.getWriter()) {
+                RestResponse failResponse = RestResponse.failure(errorInfo.getMsg());
+                writer.write(JSONObject.toJSONString(failResponse));
+                writer.flush();
+            }
+            return null;
         }
 
         // 返回错误视图

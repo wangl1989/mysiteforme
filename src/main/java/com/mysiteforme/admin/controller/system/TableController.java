@@ -9,6 +9,8 @@ import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.VO.TableField;
 import com.mysiteforme.admin.entity.VO.TableVO;
+import com.mysiteforme.admin.service.TableService;
+import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,12 @@ import java.util.Map;
 public class TableController extends BaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableController.class);
+
+    public TableController(TableService tableService, CreateTableFiles createTableFiles, SiteService siteService) {
+        this.tableService = tableService;
+        this.createTableFiles = createTableFiles;
+        this.siteService = siteService;
+    }
 
     private static final String[] keywords = {"public","protected","private","protected","class","interface","abstract","implements","extends","new",
     "import","package","byte","char","boolean","short","int","float","long","double","void","null","true","false","if","else","while","for","switch",
@@ -430,30 +438,31 @@ public class TableController extends BaseController{
             }
             File f = new File(createTableFiles.zipFile);
             try {
-                if(f.exists()){
-                    if(!f.delete()){
-                        LOGGER.error("删除文件失败:{}",f.getName());
-                    }
+                if(f.exists() && !f.delete()){
+                    LOGGER.error("删除文件失败:{}", f.getName());
                 }
-                com.xiaoleilu.hutool.util.ZipUtil.zip(createTableFiles.baseDic,createTableFiles.zipFile);
-            }catch (Exception e){
-                LOGGER.error("压缩文件失败:{}",e.getMessage());
+                com.xiaoleilu.hutool.util.ZipUtil.zip(createTableFiles.baseDic, createTableFiles.zipFile);
+            } catch (SecurityException e) {
+                LOGGER.error("压缩文件失败:{}", e.getMessage());
             }
-            String filename = new String(f.getName().getBytes("GB2312"),"ISO8859-1");
-            BufferedInputStream br = new BufferedInputStream(Files.newInputStream(f.toPath()));
-            byte[] buf = new byte[1024];
-            int len;
+            String filename = new String(f.getName().getBytes("GB2312"), "ISO8859-1");
             response.setCharacterEncoding("UTF-8");
             response.setContentLength((int) f.length());
             response.setContentType("application/zip");
             response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-            OutputStream  out = response.getOutputStream();
-            while ((len = br.read(buf)) > 0) out.write(buf, 0, len);
-            br.close();
-            out.flush();
-            out.close();
-            if(!f.delete()){
-                LOGGER.error("删除文件失败:{}",f.getName());
+            
+            try (BufferedInputStream br = new BufferedInputStream(Files.newInputStream(f.toPath()));
+                 OutputStream out = response.getOutputStream()) {
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = br.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                out.flush();
+            }
+            
+            if(!f.delete()) {
+                LOGGER.error("删除文件失败:{}", f.getName());
             }
         }
         return RestResponse.success();

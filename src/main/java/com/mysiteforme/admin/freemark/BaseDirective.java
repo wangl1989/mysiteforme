@@ -21,7 +21,6 @@ public class BaseDirective {
     }
 
     public long getLong(TemplateModel paramValue) throws TemplateModelException{
-        // TODO Auto-generated method stub
         if(paramValue==null)
         {
             return 0;

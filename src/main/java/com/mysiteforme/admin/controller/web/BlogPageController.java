@@ -11,6 +11,9 @@ import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.entity.BlogComment;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.lucene.LuceneSearch;
+import com.mysiteforme.admin.service.BlogArticleService;
+import com.mysiteforme.admin.service.BlogChannelService;
+import com.mysiteforme.admin.service.BlogCommentService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
@@ -41,8 +44,11 @@ public class BlogPageController extends BaseController{
     }
 
     @Autowired
-    public BlogPageController(LuceneSearch luceneSearch) {
+    public BlogPageController(LuceneSearch luceneSearch, BlogArticleService blogArticleService, BlogChannelService blogChannelService, BlogCommentService blogCommentService) {
         this.luceneSearch = luceneSearch;
+        this.blogArticleService = blogArticleService;
+        this.blogChannelService = blogChannelService;
+        this.blogCommentService = blogCommentService;
     }
 
     @PostMapping("click")
@@ -78,7 +84,7 @@ public class BlogPageController extends BaseController{
     @GetMapping(value = {"/wzzl","/wzzl/**"})
     public String articleParttener(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                    @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                   HttpServletRequest httpServletRequest,Model model) {
+                                   HttpServletRequest httpServletRequest,Model model) throws RuntimeException {
         String href = httpServletRequest.getRequestURI();
         href = href.replaceFirst("/showBlog","");
         if(href.endsWith("/")){
@@ -121,7 +127,7 @@ public class BlogPageController extends BaseController{
      */
     @GetMapping("articleContent/{articleId}")
     public String articleContent(@PathVariable(value = "articleId",required = false)Long articleId,
-                                 Model model){
+                                 Model model) throws RuntimeException {
         if(articleId == null || articleId <= 0){
             throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("文章ID不能为空").build();
         }

@@ -111,7 +111,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
         if (null != file && !file.isEmpty()) {
             extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
-                    file.getOriginalFilename().lastIndexOf("."));
+                Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf("."));
             fileName = RandomUtil.randomUUID() + extName;
             byte[] data = file.getBytes();
             QETag tag = new QETag();
@@ -309,12 +309,12 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
         try {
             Auth auth = Auth.create(uploadInfo.getQiniuAccessKey(), uploadInfo.getQiniuSecretKey());
-            String authstr =  auth.uploadToken(uploadInfo.getQiniuBucketName());
-            InputStream inputStream = classPathResource .getInputStream();
+            String authstr = auth.uploadToken(uploadInfo.getQiniuBucketName());
+            InputStream inputStream = classPathResource.getInputStream();
             Response response = getUploadManager().put(inputStream,"test.jpg",authstr,null,null);
             return response.isOK();
-        } catch (Exception e) {
-            logger.error("测试七牛上传文件失败",e);
+        } catch (IOException e) {
+            logger.error("七牛上传文件IO异常", e);
             return false;
         }
     }

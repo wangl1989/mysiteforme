@@ -1,9 +1,11 @@
 package com.mysiteforme.admin.config;
 
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.base.CaptchaFormAuthenticationFilter;
-import com.mysiteforme.admin.realm.AuthRealm;
-import org.apache.shiro.codec.Base64;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -12,11 +14,11 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +27,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.filter.DelegatingFilterProxy;
-import redis.clients.jedis.JedisPool;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.base.CaptchaFormAuthenticationFilter;
+import com.mysiteforme.admin.realm.AuthRealm;
+
+import redis.clients.jedis.JedisPool;
 
 /**
  * Shiro安全框架配置类
