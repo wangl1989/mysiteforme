@@ -4,8 +4,6 @@ import com.mysiteforme.admin.freemark.*;
 import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
-import freemarker.template.TemplateModelException;
 
 import javax.annotation.PostConstruct;
 

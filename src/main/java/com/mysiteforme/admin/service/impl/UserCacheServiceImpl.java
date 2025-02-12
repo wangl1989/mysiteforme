@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.User;
@@ -37,6 +36,7 @@ public class UserCacheServiceImpl implements UserCacheService {
      * @return 用户信息对象，未找到时返回null
      */
     @Cacheable(value = "user",key="'user_id_'+T(String).valueOf(#id)",unless = "#result == null")
+    @Override
     public User findUserById(Long id) {
         Map<String,Object> map = Maps.newHashMap();
         map.put("id", id);

@@ -20,7 +20,9 @@ public class CommentNumberTempletModel implements TemplateMethodModelEx {
     public CommentNumberTempletModel(BlogCommentService blogCommentService){
         this.blogCommentService = blogCommentService;
     }
+    
     @Override
+    @SuppressWarnings("rawtypes")
     public Object exec(List list) {
         if(list == null || list.isEmpty()){
             throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("模板参数为空").build();

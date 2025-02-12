@@ -14,9 +14,9 @@ import java.lang.reflect.Method;
  * @date 2017-08-25 16:18:02
  */
 public class ScheduleRunnable implements Runnable {
-	private Object target;
-	private Method method;
-	private String params;
+	private final Object target;
+	private final Method method;
+	private final String params;
 	
 	public ScheduleRunnable(String beanName, String methodName, String params) throws NoSuchMethodException, SecurityException {
 
@@ -39,7 +39,7 @@ public class ScheduleRunnable implements Runnable {
 			}else{
 				method.invoke(target);
 			}
-		}catch (Exception e) {
+		}catch (ReflectiveOperationException e) {
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("执行定时任务失败").build();
 		}
 	}

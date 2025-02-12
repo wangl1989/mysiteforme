@@ -3,12 +3,9 @@ package com.mysiteforme.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * <p>
@@ -18,12 +15,10 @@ import java.io.Serializable;
  * @author wangl
  * @since 2018-01-13
  */
-@Setter
-@Getter
-@EqualsAndHashCode(callSuper = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_log")
-public class Log extends DataEntity implements Serializable {
+public class Log extends DataEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -101,7 +96,7 @@ public class Log extends DataEntity implements Serializable {
      * 异常信息
      */
 	private String exception;
-
+    
 
     @Override
 	public String toString() {

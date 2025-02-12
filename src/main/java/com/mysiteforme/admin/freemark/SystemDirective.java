@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.freemark;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.entity.Dict;
 import com.mysiteforme.admin.service.DictService;
@@ -34,7 +33,7 @@ public class SystemDirective extends BaseDirective implements TemplateDirectiveM
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         List<Dict> dictList = Lists.newArrayList();

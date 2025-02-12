@@ -10,6 +10,9 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.service.RoleService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +34,12 @@ import java.util.Set;
 @Controller
 @RequestMapping("admin/system/role")
 public class RoleController extends BaseController{
+
+    public RoleController(RoleService roleService, UserCacheService userCacheService, MenuService menuService) {
+        this.roleService = roleService;
+        this.userCacheService = userCacheService;
+        this.menuService = menuService;
+    }
 
     @GetMapping("list")
     @SysLog("跳转角色列表页面")

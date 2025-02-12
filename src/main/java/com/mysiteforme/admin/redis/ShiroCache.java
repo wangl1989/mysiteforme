@@ -17,10 +17,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class ShiroCache<K, V> implements Cache<K, V> {
 
     private static final String REDIS_SHIRO_CACHE = "mysiteforme-shiro-cache:";
-    private String cacheKey;
-    private RedisTemplate<K, V> redisTemplate;
+    private final String cacheKey;
+    private final RedisTemplate<K, V> redisTemplate;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public ShiroCache(String name, RedisTemplate client) {
         this.cacheKey = REDIS_SHIRO_CACHE + name + ":";
         this.redisTemplate = client;

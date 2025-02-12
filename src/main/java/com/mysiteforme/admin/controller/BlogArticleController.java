@@ -9,6 +9,9 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
+import com.mysiteforme.admin.service.BlogArticleService;
+import com.mysiteforme.admin.service.BlogChannelService;
+import com.mysiteforme.admin.service.BlogTagsService;
 import com.xiaoleilu.hutool.date.DateUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
@@ -42,6 +45,12 @@ import java.util.Map;
 @Controller
 @RequestMapping("/admin/blogArticle")
 public class BlogArticleController extends BaseController{
+
+    public BlogArticleController(BlogArticleService blogArticleService, BlogChannelService blogChannelService, BlogTagsService blogTagsService) {
+        this.blogArticleService = blogArticleService;
+        this.blogChannelService = blogChannelService;
+        this.blogTagsService = blogTagsService;
+    }
 
     /**
      * 显示文章列表页面

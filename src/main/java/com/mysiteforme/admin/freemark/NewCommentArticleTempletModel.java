@@ -27,7 +27,7 @@ public class NewCommentArticleTempletModel extends BaseDirective implements Temp
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         Iterator<Map.Entry<String, TemplateModel>> iterator = map.entrySet().iterator();
         int limit = 5;

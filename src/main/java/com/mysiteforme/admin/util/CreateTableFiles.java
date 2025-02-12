@@ -4,17 +4,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
-import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
-import com.google.common.collect.Maps;
 import com.mysiteforme.admin.base.DataEntity;
 import com.mysiteforme.admin.base.TreeEntity;
 import com.mysiteforme.admin.entity.Site;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 数据库表生成文件工具类
@@ -37,7 +34,7 @@ public class CreateTableFiles {
     @Value("${source-code-zipfile}")
     public  String zipFile;
 
-    private static final String author = "wangl";
+    private static final String AUTHOR_NAME_STRING = "wangl";
 
 
     private static final String[] superEntityColumnsTypeOne = new String[] { "id","create_date","create_by","update_date","update_by","remarks","del_flag" };
@@ -52,7 +49,7 @@ public class CreateTableFiles {
             site.setAuthor("wang");
 
         }
-        createFile(tableNames,type,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author,site);
+        createFile(tableNames,type,driverName,userName,password,dataBaseUrl,baseDic,zipFile,AUTHOR_NAME_STRING,site);
     }
 
     public void createFile(String[] tableNames,int type,String driverName,String userName,String password,String dataBaseUrl,String baseDic,String zipFile,String author, Site site) {

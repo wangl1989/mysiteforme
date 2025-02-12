@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Created by tnt on 2017/12/6.
- * ${TODO}
+ * MENU菜单树形结构数据
  */
 @Data
 @Getter

@@ -1,5 +1,28 @@
 package com.mysiteforme.admin.service.impl;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
@@ -10,22 +33,6 @@ import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
 import com.mysiteforme.admin.util.ToolUtil;
 import com.xiaoleilu.hutool.util.RandomUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
-import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Decoder;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
@@ -33,6 +40,9 @@ import org.slf4j.LoggerFactory;
 public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalUploadServiceImpl.class);
+
+    // 上传基础
+    private final static String UPLOAD_PATH = "/static/upload/";
 
     /**
      * 上传文件到本地服务器
@@ -54,11 +64,14 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         if( rescource!= null){
             return rescource.getWebUrl();
         }
-        String extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
-                file.getOriginalFilename().lastIndexOf("."));
+        String originalFilename = file.getOriginalFilename();
+        if(StringUtils.isBlank(originalFilename)){
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件名错误").build();
+        }
+        String extName = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf("."));
         String fileName = UUID.randomUUID() + extName;
         String contentType = file.getContentType();
-        String filePath = ResourceUtils.getURL("classpath:").getPath() + "static/upload/" ;
+        String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
         File targetFile = new File(filePath);
         if(!targetFile.exists()){
             if (!targetFile.mkdirs()){
@@ -66,11 +79,11 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
                 throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
             }
         }
-        FileOutputStream out = new FileOutputStream(filePath+fileName);
-        out.write(data);
-        out.flush();
-        out.close();
-        String webUrl = "/static/upload/"+fileName;
+        try (FileOutputStream out = new FileOutputStream(filePath + fileName)) {
+            out.write(data);
+            out.flush();
+        }
+        String webUrl = UPLOAD_PATH + fileName;
         rescource = new Rescource();
         rescource.setFileName(fileName);
         rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
@@ -78,7 +91,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         rescource.setFileType(contentType);
         rescource.setWebUrl(webUrl);
         rescource.setSource("local");
-        save(rescource);
+        baseMapper.insert(rescource);
         return webUrl;
     }
 
@@ -99,7 +112,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             }else{
                 return false;
             }
-        }catch (Exception exception){
+        }catch (IOException exception){
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹删除出现异常").build();
         }
 
@@ -123,41 +136,39 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         }
         String extName = url.substring(url.lastIndexOf("."));
         String fileName = UUID.randomUUID() + extName;
-        String filePath = ResourceUtils.getURL("classpath:").getPath() + "static/upload/" ;
+        String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
         File uploadDir = new File(filePath);
         if(!uploadDir.exists()){
             if(!uploadDir.mkdirs()){
                 throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
             }
         }
-        URL neturl=new URL(url);
-        HttpURLConnection conn=(HttpURLConnection)neturl.openConnection();
+        URL neturl = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection)neturl.openConnection();
         conn.connect();
-        BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
-        byte[] buf = new byte[1024];
-        int len;
-        FileOutputStream out = new FileOutputStream(filePath+fileName);
-        while ((len = br.read(buf)) > 0) out.write(buf, 0, len);
-        File targetFile = new File(filePath+fileName);
-        String webUrl = "";
-        if(targetFile.exists()){
-            webUrl = "/static/upload/"+fileName;
+        try (BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
+             FileOutputStream out = new FileOutputStream(filePath + fileName)) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = br.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+            
+            String webUrl = UPLOAD_PATH + fileName;
             rescource = new Rescource();
-            QETag tag = new QETag();
             rescource.setFileName(fileName);
             rescource.setFileSize(new java.text.DecimalFormat("#.##").format(br.read(buf)/1024)+"kb");
-            rescource.setHash(tag.calcETag(targetFile));
+            rescource.setHash(new QETag().calcETag(new File(filePath+fileName)));
             rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
             rescource.setWebUrl(webUrl);
             rescource.setOriginalNetUrl(url);
             rescource.setSource("local");
-            save(rescource);
+            baseMapper.insert(rescource);
+            return webUrl;
+        } finally {
+            conn.disconnect();
         }
-        br.close();
-        out.flush();
-        out.close();
-        conn.disconnect();
-        return webUrl;
     }
 
     /**
@@ -176,8 +187,9 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         String hash = null;
         try {
             hash = tag.calcETag(file);
-        } catch (Exception e) {
-            logger.error("上传七牛云发生异常", e);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            logger.error("计算文件哈希值失败", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件哈希计算失败").build();
         }
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
         wrapper.eq("hash",hash);
@@ -186,23 +198,18 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             return rescource.getWebUrl();
         }
         StringBuilder sb = null;
+        String filePath = null;
         try {
             sb = new StringBuilder(ResourceUtils.getURL("classpath:").getPath());
-        } catch (FileNotFoundException e) {
-            logger.error("获取文件出现异常", e);
+            filePath = sb.append(UPLOAD_PATH).toString();
+        } catch (IOException e) {
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
         }
-        String filePath = null;
-        if (sb != null) {
-            filePath = sb.append("static/upload/").toString();
-        }
+        
         StringBuilder name = new StringBuilder(RandomUtil.randomUUID());
-        StringBuilder returnUrl = new StringBuilder("/static/upload/");
-        String  extName;
-        extName = file.getName().substring(
-                file.getName().lastIndexOf("."));
-        if (sb != null) {
-            sb.append(name).append(extName);
-        }
+        StringBuilder returnUrl = new StringBuilder(UPLOAD_PATH);
+        String  extName = file.getName().substring(file.getName().lastIndexOf("."));
+        sb.append(name).append(extName);
         File uploadDir = null;
         if (filePath != null) {
             uploadDir = new File(filePath);
@@ -213,28 +220,16 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
                 throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹创建失败").build();
             }
         }
-        try {
-            InputStream input = new FileInputStream(file);
+        try (InputStream input = new FileInputStream(file);
+             FileOutputStream out = new FileOutputStream(sb.toString())) {
             byte[] buf = new byte[input.available()];
             int len;
-            FileOutputStream out = null;
-            if (sb != null) {
-                out = new FileOutputStream(sb.toString());
-            }
-            while ((len = input.read(buf)) > 0) if (out != null) {
+            while ((len = input.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-            input.close();
-            if (out != null) {
-                out.flush();
-            }
-            if (out != null) {
-                out.close();
-            }
-        } catch (FileNotFoundException e) {
-            logger.error("文件未找到", e);
+            out.flush();
         } catch (IOException e) {
-            logger.error("文件上传流出现问题", e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
         }
         returnUrl.append(name).append(extName);
         return returnUrl.toString();
@@ -247,26 +242,22 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String uploadBase64(String base64) {
-        StringBuilder webUrl=new StringBuilder("/static/upload/");
-        BASE64Decoder decoder = new BASE64Decoder();
+        StringBuilder webUrl = new StringBuilder(UPLOAD_PATH);
         String fileFormat = ToolUtil.getFileFormat(base64);
-        try
-        {
+        try {
             // 去除base64字符串的前缀（如果有）
             if (base64.contains(",")) {
                 base64 = base64.split(",")[1];
             }
             //Base64解码
-            byte[] b = decoder.decodeBuffer(base64);
-            for(int i=0;i<b.length;++i)
-            {
-                if(b[i]<0)
-                {//调整异常数据
+            byte[] b = Base64.getDecoder().decode(base64);
+            for(int i=0;i<b.length;++i) {
+                if(b[i]<0) {//调整异常数据
                     b[i]+= (byte) 256;
                 }
             }
             //生成jpeg图片
-            String filePath = ResourceUtils.getURL("classpath:").getPath() + "static/upload/" ;
+            String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
             File targetFileDir = new File(filePath);
             if(!targetFileDir.exists()){
                 if(targetFileDir.mkdirs()){
@@ -278,16 +269,15 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             String fileName = RandomUtil.randomUUID()+"."+ fileFormat;
             sb.append(fileName);
             String imgFilePath = sb.toString();//新生成的图片
-            OutputStream out = Files.newOutputStream(Paths.get(imgFilePath));
-            out.write(b);
-            out.flush();
-            out.close();
+            try (OutputStream out = Files.newOutputStream(Paths.get(imgFilePath))) {
+                out.write(b);
+                out.flush();
+            }
             return webUrl.append(fileName).toString();
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            logger.error("上传Base64图片失败", e);
-            return null;
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传Base64图片失败").build();
         }
     }
 

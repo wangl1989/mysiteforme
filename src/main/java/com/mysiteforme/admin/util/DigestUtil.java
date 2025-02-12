@@ -7,12 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
-import java.io.IOException;
 
 /**
  * 文件摘要计算工具类
@@ -29,7 +30,7 @@ public class DigestUtil {
      * @param file 要计算的文件
      * @return 文件的MD5值
      */
-    public static String fileMD5(MultipartFile file)  {
+    public static String fileMD5(MultipartFile file) {
         MessageDigest digest;
         InputStream in;
         byte[] buffer = new byte[1024];
@@ -41,11 +42,13 @@ public class DigestUtil {
                 digest.update(buffer, 0, len);
             }
             in.close();
-        } catch (Exception e) {
-            LOGGER.error("getFileMD5 error", e);
+        } catch (IOException e) {
+            LOGGER.error("文件读写失败", e);
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("不支持的MD5算法", e);
             return null;
         }
-
         BigInteger bigInt = new BigInteger(1, digest.digest());
         return bigInt.toString(16);
     }
@@ -67,11 +70,13 @@ public class DigestUtil {
                 digest.update(buffer, 0, len);
             }
             in.close();
-        } catch (Exception e) {
-            LOGGER.error("getFileSha1 error", e);
+        } catch (IOException e) {
+            LOGGER.error("文件读写失败", e);
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("不支持的SHA1算法", e);
             return null;
         }
-
         BigInteger bigInt = new BigInteger(1, digest.digest());
         return bigInt.toString(20);
     }
@@ -107,8 +112,11 @@ public class DigestUtil {
                 digest.update(buffer, 0, len);
             }
             in.close();
-        } catch (Exception e) {
-            LOGGER.error("getFileMD5 error", e);
+        } catch (IOException e) {
+            LOGGER.error("文件读写失败", e);
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("不支持的摘要算法: {}", algorithm, e);
             return null;
         }
 

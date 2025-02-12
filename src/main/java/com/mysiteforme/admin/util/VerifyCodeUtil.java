@@ -189,7 +189,7 @@ public class VerifyCodeUtil {
         //画干扰线
         Random random = new Random();
         if(interLine > 0){
-            int x = 0, y, y1 = 0;
+            int x = 0, y, y1;
             for(int i=0; i<interLine; i++){
                 graphics.setColor(null==lineColor ? generateRandomColor() : lineColor);
                 y = random.nextInt(height);

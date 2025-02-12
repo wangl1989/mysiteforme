@@ -26,6 +26,7 @@ public class SysUserTempletModel implements TemplateMethodModelEx {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Object exec(List list) {
         if(list == null || list.isEmpty()){
             throw new RuntimeException("参数为空");

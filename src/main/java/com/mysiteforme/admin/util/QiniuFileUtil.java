@@ -32,10 +32,10 @@ public class QiniuFileUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(QiniuFileUtil.class);
 
-	private static final String path = "你的域名";
-	private static final String qiniuAccess = "****************";
-	private static final String qiniuKey = "****************";
-	private static final String bucketName = "wanggg";
+	private static final String PATH = "你的域名";
+	private static final String QINIU_ACCESS = "****************";
+	private static final String QINIU_KEY = "****************";
+	private static final String BUCKT_NAME = "wanggg";
 
 	/***
 	 * 普通上传图片
@@ -44,12 +44,12 @@ public class QiniuFileUtil {
 		Configuration config = new Configuration();
 		String fileName, extName, filePath = "";
 		if (null != file && !file.isEmpty()) {
-			extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
-					file.getOriginalFilename().lastIndexOf("."));
+			String originalFilename = file.getOriginalFilename();
+			extName = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf("."));
 			fileName = UUID.randomUUID() + extName;
 			UploadManager uploadManager = new UploadManager(config);
-			Auth auth = Auth.create(qiniuAccess, qiniuKey);
-			String token = auth.uploadToken(bucketName);
+			Auth auth = Auth.create(QINIU_ACCESS, QINIU_KEY);
+			String token = auth.uploadToken(BUCKT_NAME);
 			byte[] data = file.getBytes();
 			QETag tag = new QETag();
 			String hash = tag.calcETag(file);
@@ -61,7 +61,7 @@ public class QiniuFileUtil {
 			}
 			Response r = uploadManager.put(data, fileName, token);
 			if (r.isOK()) {
-				filePath = path + fileName;
+				filePath = PATH + fileName;
 				rescource = getRescource(file, fileName, extName, hash);
                 rescource.setWebUrl(filePath);
 				rescource.setSource("qiniu");
@@ -86,11 +86,11 @@ public class QiniuFileUtil {
 	 */
 	public static void deleteQiniuP(String imgPath) {
 		Configuration config = new Configuration();
-		Auth auth = Auth.create(qiniuAccess, qiniuKey);
+		Auth auth = Auth.create(QINIU_ACCESS, QINIU_KEY);
 		BucketManager bucketManager = new BucketManager(auth,config);
-		imgPath = imgPath.replace(path, "");
+		imgPath = imgPath.replace(PATH, "");
 		try {
-			bucketManager.delete(bucketName, imgPath);
+			bucketManager.delete(BUCKT_NAME, imgPath);
 		} catch (QiniuException e) {
 			logger.error("删除七牛云图片失败:{}",e.getMessage());
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除七牛云图片失败").build();
@@ -102,12 +102,12 @@ public class QiniuFileUtil {
 	 */
 	public static String uploadImageSrc(String src,RescourceService rescourceService){
 		Configuration config = new Configuration();
-		Auth auth = Auth.create(qiniuAccess, qiniuKey);
+		Auth auth = Auth.create(QINIU_ACCESS, QINIU_KEY);
 		BucketManager bucketManager = new BucketManager(auth, config);
 		String filePath;
 		try {
-			FetchRet fetchRet = bucketManager.fetch(src, bucketName);
-			filePath = path + fetchRet.key;
+			FetchRet fetchRet = bucketManager.fetch(src, BUCKT_NAME);
+			filePath = PATH + fetchRet.key;
 			Rescource rescource = new Rescource();
 			rescource.setFileName(fetchRet.key);
 			rescource.setFileSize(new java.text.DecimalFormat("#.##").format(fetchRet.fsize/1024)+"kb");
@@ -144,8 +144,8 @@ public class QiniuFileUtil {
 	public static String uploadLocalImg(String src,RescourceService rescourceService) throws IOException, NoSuchAlgorithmException{
 		Configuration config = new Configuration();
 		UploadManager uploadManager = new UploadManager(config);
-		Auth auth = Auth.create(qiniuAccess, qiniuKey);
-		String token = auth.uploadToken(bucketName);
+		Auth auth = Auth.create(QINIU_ACCESS, QINIU_KEY);
+		String token = auth.uploadToken(BUCKT_NAME);
 		File file = new File(src);
 		if(!file.exists()){
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
@@ -161,7 +161,7 @@ public class QiniuFileUtil {
 				file.getName().lastIndexOf("."));
 		Response response = uploadManager.put(file,name,token);
 		if(response.isOK()){
-			filePath = path + name;
+			filePath = PATH + name;
 			rescource = new Rescource();
 			rescource.setFileName(name);
             saveSource(file, rescource.getHash(), rescource, filePath, extName);
@@ -184,8 +184,8 @@ public class QiniuFileUtil {
 	public static String uploadBase64(String base64,String name) {
 		Configuration config = new Configuration();
 		UploadManager uploadManager = new UploadManager(config);
-		Auth auth = Auth.create(qiniuAccess, qiniuKey);
-		String token = auth.uploadToken(bucketName),filePath;
+		Auth auth = Auth.create(QINIU_ACCESS, QINIU_KEY);
+		String token = auth.uploadToken(BUCKT_NAME),filePath;
 
 		byte[] data = Base64.decodeBase64(base64);
 		try {
@@ -194,7 +194,7 @@ public class QiniuFileUtil {
 			logger.error("上传base64图片失败:{}",e.getMessage());
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传base64图片失败").build();
 		}
-		filePath = path+name;
+		filePath = PATH+name;
 		return filePath;
 	}
 }

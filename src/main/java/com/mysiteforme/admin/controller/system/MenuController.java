@@ -7,6 +7,7 @@ import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.VO.ZtreeVO;
+import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -27,6 +28,10 @@ import java.util.Map;
 @RequestMapping("/admin/system/menu")
 public class MenuController extends BaseController{
     private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
+
+    public MenuController(MenuService menuService) {
+        this.menuService = menuService;
+    }
 
     @GetMapping ("list")
     @SysLog("跳转菜单列表")

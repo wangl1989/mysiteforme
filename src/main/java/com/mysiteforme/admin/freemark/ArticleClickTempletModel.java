@@ -1,12 +1,14 @@
 package com.mysiteforme.admin.freemark;
 
-import com.mysiteforme.admin.service.BlogArticleService;
-import freemarker.template.SimpleNumber;
-import freemarker.template.TemplateMethodModelEx;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.mysiteforme.admin.service.BlogArticleService;
+
+import freemarker.template.SimpleNumber;
+import freemarker.template.TemplateMethodModelEx;
 
 /**
  * Created by wangl on 2018/1/22.
@@ -25,6 +27,7 @@ public class ArticleClickTempletModel implements TemplateMethodModelEx {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Object exec(List list) {
         if(list == null || list.isEmpty()){
             throw new RuntimeException("参数为空");

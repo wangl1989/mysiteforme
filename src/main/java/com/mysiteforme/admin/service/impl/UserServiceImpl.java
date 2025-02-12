@@ -6,10 +6,8 @@ import com.google.common.collect.Maps;
 import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.ToolUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,21 +30,12 @@ import java.util.Set;
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserService {
 
-	private final UserCacheService userCacheService;
-
-	@Autowired
-	public UserServiceImpl(UserCacheService userCacheService) {
-		// TODO Auto-generated constructor stub
-		this.userCacheService = userCacheService;
-	}
-
 	/* 这里caching不能添加put 因为添加了总会执行该方法
 	 * @see com.mysiteforme.service.UserService#findUserByLoginName(java.lang.String)
 	 */
-	@Cacheable(value = "user", key = "'user_name_'+#name",unless = "#result == null")
+	@Cacheable(value = "user", key = "'user_name_'+#name", unless = "#result == null")
 	@Override
 	public User findUserByLoginName(String name) {
-		// TODO Auto-generated method stub
 		Map<String,Object> map = Maps.newHashMap();
 		map.put("loginName", name);
 		return baseMapper.selectUserByMap(map);

@@ -7,6 +7,9 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.base.MySysUser;
 import com.mysiteforme.admin.entity.*;
 import com.mysiteforme.admin.entity.Menu;
+import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.VerifyCodeUtil;
@@ -17,7 +20,6 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,8 +43,11 @@ import java.util.*;
 public class LoginController extends BaseController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
-	@Value("${server.port}")
-	private String port;
+    public LoginController(UserService userService, UserCacheService userCacheService, MenuService menuService) {
+        this.userService = userService;
+        this.userCacheService = userCacheService;
+        this.menuService = menuService;
+    }
 
 	/**
 	 * 跳转到登录页面
