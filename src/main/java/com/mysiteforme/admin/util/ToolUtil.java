@@ -8,21 +8,6 @@
 package com.mysiteforme.admin.util;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.exception.MyException;
-import com.xiaoleilu.hutool.http.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.util.HtmlUtils;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
 import java.awt.image.BufferedImage;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -42,6 +27,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.util.HtmlUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.exception.MyException;
+import com.xiaoleilu.hutool.http.HttpUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 public class ToolUtil {
 
@@ -165,9 +166,8 @@ public class ToolUtil {
 	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> getSessionMapAttribute(HttpSession session, String attributeName, Class<K> keyType, Class<V> valueType) {
 		Object attr = session.getAttribute(attributeName);
-		if (attr instanceof Map) {
-			Map<?, ?> rawMap = (Map<?, ?>) attr;
-			for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+		if (attr instanceof Map<?, ?> rawMap) {
+            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
 				if (!keyType.isInstance(entry.getKey()) || !valueType.isInstance(entry.getValue())) {
 					return null;
 				}
@@ -273,6 +273,14 @@ public class ToolUtil {
 	public static boolean isAjax(HttpServletRequest request){
 		String accept = request.getHeader("accept");
         return accept != null && accept.contains("application/json") || (request.getHeader("X-Requested-With") != null && request.getHeader("X-Requested-With").contains("XMLHttpRequest"));
+    }
+
+	/**
+	 * 判断请求是否是json请求
+     */
+	public static boolean isJson(HttpServletRequest request){
+		String accept = request.getHeader("accept");
+        return accept != null && accept.contains("application/json");
     }
 
 	/**

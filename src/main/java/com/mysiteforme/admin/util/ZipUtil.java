@@ -19,13 +19,11 @@ public class ZipUtil {
      * 文件压缩方法
      */
     public static void zipFloder(String sourceFileName, String zipFileName) throws IOException {
-        ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFileName)));
-        BufferedOutputStream bos = new BufferedOutputStream(out);
-        File sourceFile = new File(sourceFileName);
-        //调用函数
-        compress(out,bos,sourceFile,"");
-        bos.close();
-        out.close();
+        try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFileName))); BufferedOutputStream bos = new BufferedOutputStream(out)) {
+            File sourceFile = new File(sourceFileName);
+            //调用函数
+            compress(out,bos,sourceFile,"");
+        }
     }
 
     public static void compress(ZipOutputStream out,BufferedOutputStream bos,File sourceFile,String base) throws IOException {
@@ -39,16 +37,14 @@ public class ZipUtil {
             }
         }else{//如果不是目录（文件夹），即为文件，则先写入目录进入点，之后将文件写入zip文件中
             out.putNextEntry( new ZipEntry(base) );
-            FileInputStream fos = new FileInputStream(sourceFile);
-            BufferedInputStream bis = new BufferedInputStream(fos);
-            int tag;
-            //将源文件写入到zip文件中
-            byte[] buffer = new byte[1024];
-            while ((tag = bis.read(buffer)) != -1) {
-                bos.write(buffer, 0, tag);
+            try (FileInputStream fos = new FileInputStream(sourceFile); BufferedInputStream bis = new BufferedInputStream(fos)) {
+                int tag;
+                //将源文件写入到zip文件中
+                byte[] buffer = new byte[1024];
+                while ((tag = bis.read(buffer)) != -1) {
+                    bos.write(buffer, 0, tag);
+                }
             }
-            bis.close();
-            fos.close();
         }
     }
 

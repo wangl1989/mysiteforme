@@ -2,14 +2,14 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 15:08:01
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:26:03
+ * @ Modified time: 2025-02-16 00:19:44
  * @ Description: 用户登录缓存操作
  */
 
-package com.mysiteforme.admin.redis;
+package com.mysiteforme.admin.service.impl;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -17,14 +17,20 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysiteforme.admin.config.JwtProperties;
+import com.mysiteforme.admin.entity.VO.PermissionApiVO;
+import com.mysiteforme.admin.entity.VO.PermissionVO;
 import com.mysiteforme.admin.entity.VO.UserLoginFail;
 import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.redis.JwtService;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.security.MyUserDetails;
+import com.mysiteforme.admin.service.SecurityService;
 import com.mysiteforme.admin.util.ApiToolUtil;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.MessageConstants;
@@ -32,21 +38,24 @@ import com.mysiteforme.admin.util.MessageUtil;
 import com.mysiteforme.admin.util.Result;
 import com.mysiteforme.admin.util.ResultCode;
 
+import ch.qos.logback.core.util.Duration;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
-public class LoginCache {
+@Service
+@RequiredArgsConstructor
+public class SecurityServiceImpl implements SecurityService {
 
-    private final  RedisUtils redisUtils;
+    private final RedisUtils redisUtils;
+
+    private final JwtService jwtService;
+
+    private final JwtProperties jwtProperties;
  
-    public LoginCache(RedisUtils redisUtils) {
-        this.redisUtils = redisUtils;
-    }
-
     /**
      * 登录失败提示信息
      */
@@ -62,6 +71,7 @@ public class LoginCache {
      * @return Result准备输出前端对象
      * @throws MyException 自定义异常
      */
+    @Override
     public Result loginFailData(String username) throws MyException{
         // 判定是否有用户登录相关的key
         if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + username)) {
@@ -88,16 +98,17 @@ public class LoginCache {
      * 登录成功，删除验证登录失败缓存
      * @param user 用户对象
      */
+    @Override
     public void loginSuccess(MyUserDetails user, HttpServletResponse response) throws ServletException,IOException{
         
         //  获取随机token 并存到Redis中
-        String token = UUID.randomUUID().toString().replaceAll("-", "");
+        String jwtToken = jwtService.generateToken(user);
         //  这里已经登录成功，删除登录尝试错误对象的缓存
         redisUtils.del(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + user.getLoginName());
         // 缓存用户信息 userVO
-        redisUtils.set(RedisConstants.LOGIN_CACHE_KEY + token, user, Constants.USER_LOGIN_TOKEN_EXPIRE_TIME, TimeUnit.MINUTES);
+        redisUtils.set(RedisConstants.LOGIN_CACHE_KEY + jwtToken, user, Duration.buildByMilliseconds(jwtProperties.getAccessTokenExpiration()).getMilliseconds(), TimeUnit.MINUTES);
         // 将token返回给前端
-        ApiToolUtil.returnSystemDate(Result.success(MessageUtil.getMessage(MessageConstants.SUCCESS),token), response);
+        ApiToolUtil.returnSystemDate(Result.success(MessageUtil.getMessage(MessageConstants.SUCCESS),jwtToken), response);
     }
 
     /**
@@ -105,13 +116,25 @@ public class LoginCache {
      * @param authHeader 请求头中的token
      * @return 是否有效
      */
-    public Boolean checkToken(String authHeader, HttpServletRequest request){
+    @Override
+    public Boolean checkToken(String authHeader, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         // 提取token值
         String token = authHeader.substring(Constants.GRANT_TYPE.length());
         if (StringUtils.isBlank(token)) {
             return false;
         }
-        //  通过token值从缓存中取用户信息
+        // 1. 验证token有效性
+        if (!jwtService.validateToken(token)) {
+            log.error("jw验证：token无效————>{}",token);
+            ApiToolUtil.returnSystemDate(Result.error(ERROR_CODE, MessageUtil.getMessage(MessageConstants.JwtToken.JWT_TOKEN_INVALID)), response);
+        }
+
+        // 2. 检查token状态（可选，如果需要支持token注销功能）
+        if (redisUtils.isTokenBlacklisted(token)) {
+            log.error("jw验证：token被加入到黑名单中————>{}",token);
+            ApiToolUtil.returnSystemDate(Result.error(ERROR_CODE, MessageUtil.getMessage(MessageConstants.JwtToken.JWT_TOKEN_HAS_BEEN_INVALIDATED)), response);
+        }
+        // 3. 通过token值从缓存中取用户信息
         MyUserDetails userDetails = redisUtils.get(RedisConstants.LOGIN_CACHE_KEY + token, MyUserDetails.class);
         //  转换JSON对象
 
@@ -122,16 +145,16 @@ public class LoginCache {
         }
         //  MyUserDetails对象放到上下文中
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         return true;
     }
 
     /**
      * 登出成功，删除token缓存
-     * @param request
-     * @param response
+     * @param request 请求对象
+     * @param response 响应对象
      */
+    @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         String authHeader = request.getHeader(Constants.AUTHORIZATION);
         String authToken = authHeader.substring(Constants.GRANT_TYPE.length());
@@ -151,6 +174,7 @@ public class LoginCache {
      * code: 用户输入的验证码
      * key: 生成验证码时生成的key(也就是token)
      */
+    @Override
     public void validateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String code = getCaptchaFromRequest(request);
         String key = request.getHeader(Constants.CAPTCHA_TOKEN);
@@ -182,5 +206,45 @@ public class LoginCache {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(body);
         return node.get("captcha").asText();
+    }
+
+    @Override
+    public boolean checkPermission(HttpServletRequest request) {
+        String authHeader = request.getHeader(Constants.AUTHORIZATION);
+            // 如果请求头为空，则返回false
+            if (StringUtils.isBlank(authHeader)) {
+                return false;
+            }
+            // 如果token为空，则返回false
+            String authToken = authHeader.substring(Constants.GRANT_TYPE.length());
+            if (StringUtils.isBlank(authToken)) {
+                return false;
+            }   
+            
+            // 获取当前请求信息
+            String method = request.getMethod();
+            String path = request.getRequestURI();
+            // 如果请求方法或请求路径为空，则返回false
+            if (StringUtils.isBlank(method) || StringUtils.isBlank(path)) {
+                return false;
+            }
+            // 获取当前用户信息
+            MyUserDetails userDetails = redisUtils.get(RedisConstants.LOGIN_CACHE_KEY + authToken, MyUserDetails.class);
+            if(userDetails == null){
+                return false;
+            }
+            
+            Set<PermissionVO> permissions = userDetails.getPermissions();
+            for (PermissionVO permission : permissions) {
+                PermissionApiVO permissionApi = permission.getApi();
+                if(!ObjectUtils.isEmpty(permissionApi)) {
+                    if (path.equals(permissionApi.getApiUrl()) && method.equals(permissionApi.getHttpMethod())) {
+                        return true;
+                    }
+                }
+                
+            }
+        // 如果以上条件都不满足，则返回false
+        return false;   
     }
 }

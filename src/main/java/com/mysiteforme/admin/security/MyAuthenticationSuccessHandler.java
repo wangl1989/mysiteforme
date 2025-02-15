@@ -10,11 +10,10 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
+import com.mysiteforme.admin.service.SecurityService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import com.mysiteforme.admin.redis.LoginCache;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,10 +27,10 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
     /**
      * 处理登录请求的Redis工具
      */
-    private final LoginCache loginCache;
+    private final SecurityService securityService;
  
-    public MyAuthenticationSuccessHandler(LoginCache loginCache) {
-        this.loginCache = loginCache;
+    public MyAuthenticationSuccessHandler(SecurityService securityService) {
+        this.securityService = securityService;
     }
  
     @Override
@@ -47,6 +46,6 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
             HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException, ServletException {
         MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
-        loginCache.loginSuccess(user, response);
+        securityService.loginSuccess(user, response);
     }
 }

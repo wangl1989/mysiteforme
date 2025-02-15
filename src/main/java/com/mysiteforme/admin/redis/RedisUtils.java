@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 11:54:07
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:26:58
+ * @ Modified time: 2025-02-15 23:45:58
  * @ Description: Redis基础操作类
  */
 
@@ -297,6 +297,29 @@ public class RedisUtils {
             log.error("Redis数据异常:限流异常", e);
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("消息请求太快了，请稍后再试").build();
         }
+    }
+
+    /**
+     * 检查token是否在黑名单中
+     * @param token token值
+     * @return true：在黑名单中，false：不在黑名单中
+     */
+    public boolean isTokenBlacklisted(String token) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey("token:blacklist:" + token));
+    }
+    
+    /**
+     * 将token加入黑名单（比如在用户登出时调用）
+     * @param token token值
+     * @param timeToLive token的有效期，单位：毫秒
+     */
+    public void addToBlacklist(String token, long timeToLive) {
+        redisTemplate.opsForValue().set(
+            "token:blacklist:" + token,
+            "1",
+            timeToLive,
+            TimeUnit.MILLISECONDS
+        );
     }
 
 }

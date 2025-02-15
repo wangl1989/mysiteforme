@@ -10,11 +10,10 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
+import com.mysiteforme.admin.service.SecurityService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.mysiteforme.admin.redis.LoginCache;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,10 +23,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class CaptchaFilter extends OncePerRequestFilter {
     
-    private final LoginCache loginCache;
+    private final SecurityService securityService;
 
-    public CaptchaFilter (LoginCache loginCache) {
-        this.loginCache = loginCache;
+    public CaptchaFilter (SecurityService securityService) {
+        this.securityService = securityService;
     }
     
     @Override
@@ -39,7 +38,7 @@ public class CaptchaFilter extends OncePerRequestFilter {
         RequestWrapper requestWrapper = new RequestWrapper(request);
         // 只拦截登录请求
         if ("/login".equals(url) && request.getMethod().equals("POST")) {
-            loginCache.validateCaptcha(requestWrapper,response);
+            securityService.validateCaptcha(requestWrapper,response);
         }
         filterChain.doFilter(requestWrapper, response);
     }

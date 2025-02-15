@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 00:02:36
  * @ Modified by: wangl
- * @ Modified time: 2025-02-13 21:10:23
+ * @ Modified time: 2025-02-16 00:10:25
  * @ Description:JWT过滤器
  */
 
@@ -10,11 +10,11 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
+import com.mysiteforme.admin.service.SecurityService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.mysiteforme.admin.redis.LoginCache;
 import com.mysiteforme.admin.util.Constants;
 
 import jakarta.servlet.FilterChain;
@@ -24,10 +24,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
-    private final LoginCache loginCache;
+    private final SecurityService securityService;
 
-    public JwtAuthenticationFilter(LoginCache loginCache) {
-        this.loginCache = loginCache;
+    public JwtAuthenticationFilter(SecurityService securityService) {
+        this.securityService = securityService;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //  如果认证码  以规定值开头
         if (authHeader.startsWith(Constants.GRANT_TYPE)) {
 
-            if(!loginCache.checkToken(authHeader,request)){
+            if(!securityService.checkToken(authHeader,request, response)){
                 chain.doFilter(request, response);
                 return;
             }

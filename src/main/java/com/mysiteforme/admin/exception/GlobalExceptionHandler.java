@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 04:02:46
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:54:46
+ * @ Modified time: 2025-02-15 20:40:18
  * @ Description: 全局异常处理器类，用于捕获并处理应用程序中抛出的各种异常。
 *                 通过使用@ControllerAdvice注解，该类可以处理所有控制器中的异常。
  */
@@ -10,7 +10,6 @@
 package com.mysiteforme.admin.exception;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -24,11 +23,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
-import com.mysiteforme.admin.util.RestResponse;
+import com.mysiteforme.admin.util.ApiToolUtil;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.MessageUtil;
+import com.mysiteforme.admin.util.Result;
+import com.mysiteforme.admin.util.ResultCode;
 import com.mysiteforme.admin.util.ToolUtil;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 @ControllerAdvice
@@ -70,7 +73,6 @@ public class GlobalExceptionHandler {
         // 自定义错误MyException的处理策略
         exceptionStrategyMap.put(MyException.class, (e, req) -> {
             MyException ex = (MyException) e;
-            ex.setViewName(MyException.ERROR_PAGE); // 设置错误页面为500页面
             log.error("自定义错误: {}, URL: {}", ex.getMsg(), req.getRequestURL(), ex); // 记录错误信息
             return ex;
         });
@@ -82,7 +84,6 @@ public class GlobalExceptionHandler {
             return MyException.builder()
                     .msg("请求体格式错误") // 设置错误消息
                     .errorType(e.getClass().getSimpleName()) // 设置错误类型
-                    .viewName(MyException.ERROR_PAGE) // 设置错误页面为500页面
                     .build();
         });
 
@@ -93,7 +94,6 @@ public class GlobalExceptionHandler {
             return MyException.builder()
                     .msg("不支持的请求方法: " + ex.getMethod()) // 设置错误消息，包含不支持的请求方法
                     .errorType(e.getClass().getSimpleName()) // 设置错误类型
-                    .viewName(MyException.ERROR_PAGE) // 设置错误页面为500页面
                     .build();
         });
 
@@ -104,7 +104,6 @@ public class GlobalExceptionHandler {
             return MyException.builder()
                     .msg("数据库操作失败") // 设置错误消息
                     .errorType("DatabaseError") // 设置错误类型为DatabaseError
-                    .viewName(MyException.ERROR_PAGE) // 设置错误页面为500页面
                     .build();
         });
 
@@ -114,7 +113,6 @@ public class GlobalExceptionHandler {
             log.error("认证异常: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
             return MyException.builder()
                     .msg("认证异常") // 设置错误消息
-                    .viewName("login") // 设置错误页面为登录页面
                     .build();
         });
 
@@ -123,7 +121,6 @@ public class GlobalExceptionHandler {
             NoHandlerFoundException ex = (NoHandlerFoundException) e;
             log.error("路径错误: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
             return MyException.builder()
-                    .viewName(MyException.NOT_FOUND_PAGE) // 设置错误页面为404页面
                     .build();
         });
     }
@@ -139,7 +136,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleAllException(HttpServletRequest request,
                                            HttpServletResponse response,
-                                           Exception e) throws IOException {
+                                           Exception e) throws IOException,
+                                           ServletException {
 
         // 获取对应的异常处理器
         ExceptionStrategy handler = exceptionStrategyMap.entrySet().stream()
@@ -151,7 +149,6 @@ public class GlobalExceptionHandler {
                     return MyException.builder()
                             .msg("系统发生未知错误") // 设置错误消息为系统发生未知错误
                             .errorType(ex.getClass().getSimpleName()) // 设置错误类型
-                            .viewName(MyException.ERROR_PAGE) // 设置错误页面为500页面
                             .build();
                 });
 
@@ -159,21 +156,12 @@ public class GlobalExceptionHandler {
         MyException errorInfo = handler.handle(e, request);
 
         // 处理Ajax请求
-        if (ToolUtil.isAjax(request)) {
-            response.setContentType("application/json;charset=UTF-8");
-            try (PrintWriter writer = response.getWriter()) {
-                RestResponse failResponse = RestResponse.failure(errorInfo.getMsg());
-                writer.write(JSONObject.toJSONString(failResponse));
-                writer.flush();
-            }
-            return null;
+        if (ToolUtil.isJson(request)) {
+            ApiToolUtil.returnSystemDate(Result.error(errorInfo.getCode(), errorInfo.getMessage()), response);
+        }else{
+            ApiToolUtil.returnSystemDate(Result.error(ResultCode.BAD_PARAM, MessageUtil.getMessage(MessageConstants.System.SYSTEM_ERROR_VIEW)), response);
         }
 
-        // 返回错误视图
-        ModelAndView mv = new ModelAndView(errorInfo.getViewName()); // 创建ModelAndView对象，设置视图名称
-        mv.addObject("errorType", errorInfo.getErrorType()); // 向视图添加错误类型
-        mv.addObject("errorMessage", errorInfo.getMsg()); // 向视图添加错误消息
-        mv.addObject("requestUrl", request.getRequestURL()); // 向视图添加请求URL
-        return mv; // 返回视图
+        return null;
     }
 }

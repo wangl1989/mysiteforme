@@ -10,13 +10,13 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
+import com.mysiteforme.admin.service.SecurityService;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.util.StringUtils;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.redis.LoginCache;
 import com.mysiteforme.admin.util.ApiToolUtil;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.MessageUtil;
@@ -30,10 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MyAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-    private final LoginCache loginCache;
+    private final SecurityService securityService;
 
-    public MyAuthenticationFailureHandler(LoginCache loginCache) {
-        this.loginCache = loginCache;
+    public MyAuthenticationFailureHandler(SecurityService securityService) {
+        this.securityService = securityService;
     }
 
     @Override
@@ -48,6 +48,6 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
                     .build();
         }
 
-        ApiToolUtil.returnSystemDate(loginCache.loginFailData(username), response);
+        ApiToolUtil.returnSystemDate(securityService.loginFailData(username), response);
     }
 }

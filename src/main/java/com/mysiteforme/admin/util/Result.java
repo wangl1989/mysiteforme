@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 13:43:17
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 12:27:02
+ * @ Modified time: 2025-02-15 22:16:51
  * @ Description: 返回结果对象
  */
 
@@ -46,6 +46,7 @@ public class Result extends HashMap<String,Object> {
      */
     public static Result success(String message,Object data){
         Result result = new Result();
+        result.setSuccess(true);
         result.setMessage(message);
         result.setCode(ResultCode.SUCCESS);
         result.setData(data);
@@ -72,6 +73,7 @@ public class Result extends HashMap<String,Object> {
      */
     public static Result error(Integer code,String message,Object data){
         Result result = new Result();
+        result.setSuccess(false);
         result.setCode(code);
         result.setMessage(message); 
         result.setData(data);
@@ -79,11 +81,21 @@ public class Result extends HashMap<String,Object> {
         return result;
     }
 
+    public Result setSuccess(Boolean status){
+        if (status != null){
+            status = false;
+        } 
+        put("success", status);
+        return this;
+    }
     /**
      * 状态码
      */
     public Result setCode(Integer code) {
-        if (code != null) put("code", code);
+        if (code == null){
+            code = ResultCode.SERVICE_UNAVAILABLE;
+        } 
+        put("code", code);
         return this;
     }
 
@@ -91,7 +103,7 @@ public class Result extends HashMap<String,Object> {
      * 提示信息
      */
     public Result setMessage(String message) {
-        if (message != null) put("message", message);
+        put("message", message);
         return this;
     }
 
@@ -99,7 +111,7 @@ public class Result extends HashMap<String,Object> {
      * 数据
      */
     public Result setData(Object data) {
-        if (data != null) put("data", data);
+        put("data", data);
         return this;
     }
 

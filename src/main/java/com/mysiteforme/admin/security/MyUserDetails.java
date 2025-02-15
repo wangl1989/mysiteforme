@@ -2,25 +2,23 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 20:46:26
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 02:24:33
+ * @ Modified time: 2025-02-15 15:32:07
  * @ Description: 实现Security用户的接口
  */
 
 package com.mysiteforme.admin.security;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.Lists;
-import com.mysiteforme.admin.entity.VO.PermissionVO;
+import com.mysiteforme.admin.entity.VO.RoleVO;
 import com.mysiteforme.admin.entity.VO.UserVO;
 
 @JsonIgnoreProperties({"enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired",
@@ -37,6 +35,7 @@ public class MyUserDetails extends UserVO implements UserDetails{
     public MyUserDetails(UserVO user) {
         this.setId(user.getId());
         this.setLoginName(user.getLoginName());
+        this.setIcon(user.getIcon());
         this.myPassword = user.getPassword();
         this.setRoles(user.getRoles());
         this.setPermissions(user.getPermissions());
@@ -45,15 +44,10 @@ public class MyUserDetails extends UserVO implements UserDetails{
     }
  
     @Override
-    @JsonDeserialize
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = Lists.newArrayList();
-        Set<PermissionVO> permissions = this.getPermissions();
-        for(PermissionVO permission : permissions){
-            if(StringUtils.isNotBlank(permission.getPermissionCode())){
-                authorities.add(new SimpleGrantedAuthority(permission.getPermissionCode()));
-            }
-        }
+        Set<RoleVO> roles = this.getRoles();
+        Set<SimpleGrantedAuthority> authorities = roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
         return authorities;
     }
  

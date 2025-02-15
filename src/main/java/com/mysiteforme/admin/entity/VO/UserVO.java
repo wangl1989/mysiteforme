@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 01:35:33
  * @ Modified by: wangl
- * @ Modified time: 2025-02-13 22:55:43
+ * @ Modified time: 2025-02-15 21:15:54
  * @ Description: 用户VO
  */
 
@@ -17,9 +17,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class UserVO {
     /**

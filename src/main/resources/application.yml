@@ -89,7 +89,10 @@ mybatis-plus:
     cache-enabled: false
     # 添加以下配置
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-
+jwt:
+  secret: B374A26A71490437AA024E4FADD5B497FDFF1A8EA6FF12F6FB65AF2720B59CCF
+  access-token-expiration: 900000      # 15分钟 = 15 * 60 * 1000
+  refresh-token-expiration: 604800000  # 7天 = 7 * 24 * 60 * 1000
 ---
 #开发环境配置
 server:
@@ -129,7 +132,8 @@ logging:
   level:
     root: INFO
     com.mysiteforme: DEBUG
-    org.springframework: INFO
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security: DEBUG
 #源码生成文件夹
 source-code-dic:  D://mysite
 source-code-zipfile:  D://源码.rar

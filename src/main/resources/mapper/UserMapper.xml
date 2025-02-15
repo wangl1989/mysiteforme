@@ -187,25 +187,25 @@
             <result property="groupName" column="group_name"/>
         </association>
         
-        <!-- 按钮权限集合 -->
-        <collection property="buttons" ofType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
+        <!-- 按钮权限 -->
+        <association property="button" javaType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
             <id property="id" column="button_id"/>
             <result property="buttonKey" column="button_key"/>
             <result property="buttonName" column="button_name"/>
-        </collection>
+        </association>
         
-        <!-- 页面权限集合 -->
-        <collection property="pages" ofType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
+        <!-- 页面权限 -->
+        <association property="page" javaType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
             <id property="id" column="page_id"/>
             <result property="pageUrl" column="page_url"/>
-        </collection>
+        </association>
         
-        <!-- API权限集合 -->
-        <collection property="apis" ofType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
+        <!-- API权限 -->
+        <association property="api" javaType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
             <id property="id" column="api_id"/>
             <result property="apiUrl" column="api_url"/>
             <result property="httpMethod" column="http_method"/>
-        </collection>
+        </association>
     </collection>
 </resultMap>
 

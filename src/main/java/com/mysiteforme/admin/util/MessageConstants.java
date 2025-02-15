@@ -35,6 +35,12 @@ public class MessageConstants {
         public static final String USER_CAPTCHA_ERROR = "message.user.captcha.error";
     }
 
+    public static class JwtToken{
+        // token无效
+        public static final String JWT_TOKEN_INVALID = "message.jwt.token.invalid";
+        public static final String JWT_TOKEN_HAS_BEEN_INVALIDATED = "message.jwt.token.has.been.invalidated";
+    }
+
     public static class Exception {
         public static final String EXCEPTION_LOGIN = "message.exception.login";
         public static final String EXCEPTION_LOGIN_LIMIT = "message.exception.login.limit";
@@ -56,6 +62,8 @@ public class MessageConstants {
 
     public static class System {
         public static final String SYSTEM_ERROR = "message.system.error";
+        // 系统错误视图
+        public static final String SYSTEM_ERROR_VIEW = "message.system.error.view";
     }
 
     public static class Validate {

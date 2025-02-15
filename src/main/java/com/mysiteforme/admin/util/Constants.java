@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-11 14:55:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:33:33
+ * @ Modified time: 2025-02-15 21:43:47
  * @ Description: 常量类
  */
 
@@ -89,7 +89,7 @@ public class Constants {
 	/**
 	 * 用户登录token过期时间 单位：分钟
 	 */
-	public static final int USER_LOGIN_TOKEN_EXPIRE_TIME = 30;
+	public static final int USER_LOGIN_TOKEN_EXPIRE_TIME = 60;
 
 	/**
 	 * 验证码有效期

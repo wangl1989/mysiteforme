@@ -2,13 +2,12 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 22:56:48
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:47:57
+ * @ Modified time: 2025-02-15 21:16:37
  * @ Description: 权限VO
  */
 
 package com.mysiteforme.admin.entity.VO;
 
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -58,17 +57,17 @@ public class PermissionVO {
     /**
      * 权限按钮集合
      */
-    private List<PermissionButtonVO> buttons;
+    private PermissionButtonVO button;
 
     /**
      * 权限api集合
      */
-    private List<PermissionApiVO> apis;
+    private PermissionApiVO api;
 
     /**
      * 权限路由地址集合
      */
-    private List<PermissionPageVO> pages;
+    private PermissionPageVO page;
 
     
 }

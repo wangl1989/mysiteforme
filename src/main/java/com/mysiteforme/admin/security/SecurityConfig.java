@@ -2,19 +2,21 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 19:20:36
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:04:24
+ * @ Modified time: 2025-02-16 00:18:38
  * @ Description: Securit配置信息
  */
 
 package com.mysiteforme.admin.security;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,16 +29,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.mysiteforme.admin.redis.LoginCache;
+import com.mysiteforme.admin.service.SecurityService;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final DataSource dataSource;
@@ -49,30 +53,12 @@ public class SecurityConfig {
  
     private final UserDetailsService userDetailsService;
 
-    private final LoginCache loginCache;
+    private final SecurityService securityService;
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
     private final MyPasswordEncoder myPasswordEncoder;
 
-    @Autowired
-    public SecurityConfig(DataSource dataSource, 
-            UserDetailsService userDetailsService,
-            MyAuthenticationSuccessHandler myAuthenticationSuccessHandler,
-            MyAuthenticationFailureHandler myAuthenticationFailureHandler,
-            MyLogoutSuccessHandler myLogoutSuccessHandler,
-            LoginCache loginCache,
-            AuthenticationConfiguration authenticationConfiguration,
-            MyPasswordEncoder myPasswordEncoder) {
-        this.dataSource = dataSource;
-        this.userDetailsService = userDetailsService;
-        this.myAuthenticationSuccessHandler = myAuthenticationSuccessHandler;
-        this.myAuthenticationFailureHandler = myAuthenticationFailureHandler;
-        this.myLogoutSuccessHandler = myLogoutSuccessHandler;
-        this.loginCache = loginCache;
-        this.authenticationConfiguration = authenticationConfiguration;
-        this.myPasswordEncoder = myPasswordEncoder;
-    }
 
     /**
      * anyRequest          |   匹配所有请求路径
@@ -147,28 +133,32 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 配置请求授权
             .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
-                    // 验证码接口放行
-                    .requestMatchers("/genCaptcha").permitAll()
-                    //  允许直接访问 授权登录接口
-                    .requestMatchers("/login").permitAll()
+                    // 验证码接口,登录放行
+                    .requestMatchers("/genCaptcha","/login").permitAll()
                     //  允许任意请求被已登录用户访问，不检查Authority
-                    .anyRequest().authenticated()
+                    .anyRequest().access((authentication, context) -> {
+                        // 在这里实现动态权限判断逻辑
+                        boolean isAuthenticated = authentication != null;
+                        return new AuthorizationDecision(isAuthenticated && securityService.checkPermission(context.getRequest()));
+                    })
             )
             // 配置记住我功能
             //.rememberMe(Customizer.withDefaults())
             //  禁用默认的表单登录配置：前端传递的都是json数据
             .formLogin(AbstractHttpConfigurer::disable)
-            // 添加验证码拦截器
-            .addFilterBefore(captchaFilter(), UsernamePasswordAuthenticationFilter.class)
-            // 添加JWT过滤器
+            // 1. 添加验证码拦截器,最先执行
+            .addFilterBefore(captchaFilter(), SecurityContextHolderFilter.class)
+            // 2. JWT过滤器在验证码之后
             .addFilterBefore(myJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            // 3. JSON登录过滤器替换默认的表单登录过滤器
+            .addFilterAt(jsonAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             // 异常处理器
             .exceptionHandling(ex -> ex
                     // 未登录异常
                    .authenticationEntryPoint(new MyAuthenticationEntryPoint())
                     // 权限认证失败异常
                    .accessDeniedHandler(new MyAccessDeniedHandler()))
-            .addFilterAt(jsonAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            
             // 添加Logout filter
             .logout(logout -> logout.logoutSuccessHandler(myLogoutSuccessHandler));
 
@@ -221,7 +211,7 @@ public class SecurityConfig {
      */
     @Bean
     public JwtAuthenticationFilter myJwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(loginCache);
+        return new JwtAuthenticationFilter(securityService);
     }
 
     /**
@@ -230,7 +220,7 @@ public class SecurityConfig {
      */
     @Bean
     public CaptchaFilter captchaFilter() {
-        return new CaptchaFilter(loginCache);
+        return new CaptchaFilter(securityService);
     }
  
     /*
@@ -257,16 +247,13 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         // 添加日志
-        authProvider.setPreAuthenticationChecks(user -> {
-            System.out.println("===========正在进行预认证检查：{}========="+user.getUsername());
-        });
+        authProvider.setPreAuthenticationChecks(user -> System.out.println("===========正在进行预认证检查：{}========="+user.getUsername()));
         return authProvider;
     }
 
     /**
      * 配置跨源访问(CORS)
      *
-     * @return
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
