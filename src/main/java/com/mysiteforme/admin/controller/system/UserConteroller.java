@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
-import com.mysiteforme.admin.base.MySysUser;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.ShowMenu;
@@ -18,18 +17,21 @@ import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import com.mysiteforme.admin.base.MySecurityUser;
 
 /**
  * Created by wangl on 2017/11/21.
@@ -52,7 +54,6 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/list";
     }
 
-    @RequiresPermissions("sys:user:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<User> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -80,7 +81,6 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/add";
     }
 
-    @RequiresPermissions("sys:user:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增系统用户数据")
@@ -88,7 +88,7 @@ public class UserConteroller extends BaseController{
         if(StringUtils.isBlank(user.getLoginName())){
             return RestResponse.failure("登录名不能为空");
         }
-        if(user.getRoleLists() == null || user.getRoleLists().isEmpty()){
+        if(user.getRoles() == null || user.getRoles().isEmpty()){
             return  RestResponse.failure("用户角色至少选择一个");
         }
         if(userService.userCount(user.getLoginName())>0){
@@ -117,7 +117,7 @@ public class UserConteroller extends BaseController{
         User user = userCacheService.findUserById(id);
         List<Long> roleIdList = Lists.newArrayList();
         if(user != null) {
-            Set<Role> roleSet = user.getRoleLists();
+            Set<Role> roleSet = user.getRoles();
             if (roleSet != null && !roleSet.isEmpty()) {
                 for (Role r : roleSet) {
                     roleIdList.add(r.getId());
@@ -131,7 +131,6 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/edit";
     }
 
-    @RequiresPermissions("sys:user:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存系统用户编辑数据")
@@ -142,7 +141,7 @@ public class UserConteroller extends BaseController{
         if(StringUtils.isBlank(user.getLoginName())){
             return RestResponse.failure("登录名不能为空");
         }
-        if(user.getRoleLists() == null || user.getRoleLists().isEmpty()){
+        if(user.getRoles() == null || user.getRoles().isEmpty()){
             return  RestResponse.failure("用户角色至少选择一个");
         }
         User oldUser = userCacheService.findUserById(user.getId());
@@ -172,7 +171,6 @@ public class UserConteroller extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:user:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除系统用户数据(单个)")
@@ -188,7 +186,6 @@ public class UserConteroller extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:user:delete")
     @PostMapping("deleteSome")
     @ResponseBody
     @SysLog("删除系统用户数据(多个)")
@@ -212,16 +209,16 @@ public class UserConteroller extends BaseController{
     @GetMapping("getUserMenu")
     @ResponseBody
     public List<ShowMenu> getUserMenu(){
-        Long userId = MySysUser.id();
+        Long userId = MySecurityUser.id();
         return menuService.getShowMenuByUser(userId);
     }
 
     @GetMapping("userinfo")
     public String toEditMyInfo(Model model){
-        Long userId = MySysUser.id();
+        Long userId = MySecurityUser.id();
         User user = userCacheService.findUserById(userId);
         model.addAttribute("userinfo",user);
-        model.addAttribute("userRole",user.getRoleLists());
+        model.addAttribute("userRole",user.getRoles());
         return "admin/system/user/userInfo";
     }
 
@@ -250,7 +247,7 @@ public class UserConteroller extends BaseController{
                 }
             }
         }
-        user.setRoleLists(oldUser.getRoleLists());
+        user.setRoles(oldUser.getRoles());
         userService.updateUser(user);
         return RestResponse.success();
     }
@@ -260,7 +257,6 @@ public class UserConteroller extends BaseController{
         return "admin/system/user/changePassword";
     }
 
-    @RequiresPermissions("sys:user:changePassword")
     @PostMapping("changePassword")
     @SysLog("用户修改密码")
     @ResponseBody
@@ -279,7 +275,7 @@ public class UserConteroller extends BaseController{
         if(!confirmPwd.equals(newPwd)){
             return RestResponse.failure("确认密码与新密码不一致");
         }
-        User user = userCacheService.findUserById(MySysUser.id());
+        User user = userCacheService.findUserById(MySecurityUser.id());
 
         //旧密码不能为空
         String pw = Objects.requireNonNull(ToolUtil.entryptPassword(oldPwd, user.getSalt())).split(",")[0];

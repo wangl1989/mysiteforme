@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-14 00:31:49
+ * @ Description: 系统文件controller
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,12 +18,11 @@ import com.mysiteforme.admin.service.RescourceService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +44,6 @@ public class RescourceController extends BaseController{
         return "admin/system/rescource/list";
     }
 
-    @RequiresPermissions("sys:rescource:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<Rescource> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -66,7 +72,6 @@ public class RescourceController extends BaseController{
         return layerData;
     }
 
-    @RequiresPermissions("sys:rescource:delete")
     @PostMapping("delete")
     @SysLog("删除系统资源")
     @ResponseBody
@@ -83,15 +88,9 @@ public class RescourceController extends BaseController{
             String path = rescource.getWebUrl();
             if(StringUtils.isNotEmpty(source) && StringUtils.isNotBlank(path)){
                 switch (source) {
-                    case "qiniu":
-                        qiniuService.delete(path);
-                        break;
-                    case "oss":
-                        ossService.delete(path);
-                        break;
-                    default:
-                        localService.delete(path);
-                        break;
+                    case "qiniu" -> qiniuService.delete(path);
+                    case "oss" -> ossService.delete(path);
+                    default -> localService.delete(path);
                 }
             } else {
                 return RestResponse.failure(rescource.getFileName()+"文件类型不存在");

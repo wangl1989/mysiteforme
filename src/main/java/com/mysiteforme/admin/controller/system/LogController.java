@@ -3,10 +3,9 @@ package com.mysiteforme.admin.controller.system;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,7 +73,6 @@ public class LogController extends BaseController{
         return  layerData;
     }
 
-    @RequiresPermissions("system:logs:delete")
     @PostMapping("delete")
     @ResponseBody
     public RestResponse delete(@RequestParam("ids[]") List<Long> ids){

@@ -2,10 +2,11 @@ package com.mysiteforme.admin.config;
 
 import com.mysiteforme.admin.freemark.*;
 import freemarker.template.Configuration;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 
 /**
  * Freemarker模板引擎配置类

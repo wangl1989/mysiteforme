@@ -3,13 +3,16 @@ package com.mysiteforme.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogComment;
 import com.mysiteforme.admin.service.BlogCommentService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
+
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -63,7 +64,6 @@ public class BlogCommentController {
      * @param request 请求对象
      * @return 分页数据
      */
-    @RequiresPermissions("blog:comment:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<BlogComment> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -148,7 +148,6 @@ public class BlogCommentController {
      * @param id 评论ID
      * @return 操作结果
      */
-    @RequiresPermissions("blog:comment:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客评论数据")
@@ -162,7 +161,6 @@ public class BlogCommentController {
         return RestResponse.success();
     }
 
-    @RequiresPermissions("blog:comment:reply")
     @PostMapping("adminReplay")
     @ResponseBody
     @SysLog("管理员回复")

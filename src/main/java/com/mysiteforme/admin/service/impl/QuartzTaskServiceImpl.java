@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -50,7 +50,7 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
         wrapper.eq("del_flag",false);
         List<QuartzTask> scheduleJobList = list(wrapper);
         for(QuartzTask scheduleJob : scheduleJobList){
-            CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob.getId());
+            CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob);
             //如果不存在，则创建
             if(cronTrigger == null) {
                 ScheduleUtils.createScheduleJob(scheduler, scheduleJob);

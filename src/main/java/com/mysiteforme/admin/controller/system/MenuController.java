@@ -10,7 +10,6 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -39,7 +38,6 @@ public class MenuController extends BaseController{
         return "admin/system/menu/test";
     }
 
-    @RequiresPermissions("sys:menu:list")
     @PostMapping("tree")
     @ResponseBody
     public RestResponse tree(){
@@ -48,7 +46,6 @@ public class MenuController extends BaseController{
         return RestResponse.success().setData(ztreeVOs);
     }
 
-    @RequiresPermissions("sys:menu:list")
     @PostMapping("treelist")
     @ResponseBody
     public RestResponse treelist(){
@@ -67,7 +64,6 @@ public class MenuController extends BaseController{
         return "admin/system/menu/add";
     }
 
-    @RequiresPermissions("sys:menu:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增菜单数据")
@@ -122,7 +118,6 @@ public class MenuController extends BaseController{
        return "admin/system/menu/edit";
     }
 
-    @RequiresPermissions("sys:menu:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑菜单数据")
@@ -153,7 +148,6 @@ public class MenuController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:menu:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除菜单")

@@ -1,26 +1,27 @@
 package com.mysiteforme.admin.exception;
 
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.util.RestResponse;
-import com.mysiteforme.admin.util.ToolUtil;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authz.AuthorizationException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.Map;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.util.RestResponse;
+import com.mysiteforme.admin.util.ToolUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 全局异常处理器类，用于捕获并处理应用程序中抛出的各种异常。
@@ -109,16 +110,6 @@ public class GlobalExceptionHandler {
             log.error("认证异常: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
             return MyException.builder()
                     .msg("认证异常") // 设置错误消息
-                    .viewName("login") // 设置错误页面为登录页面
-                    .build();
-        });
-
-        // 处理权限异常AuthorizationException
-        exceptionStrategyMap.put(AuthorizationException.class, (e, req) -> {
-            AuthorizationException ex = (AuthorizationException) e;
-            log.error("权限异常: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .msg("权限异常") // 设置错误消息
                     .viewName("login") // 设置错误页面为登录页面
                     .build();
         });

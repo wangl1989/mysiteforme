@@ -10,7 +10,6 @@ import com.mysiteforme.admin.service.UploadInfoService;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -46,7 +45,6 @@ public class SiteController extends BaseController{
         this.uploadInfoService = uploadInfoService;
     }
 
-    @RequiresPermissions("sys:site:list")
     @GetMapping("show")
     @SysLog("跳转网站展示页面")
     public String show(Model model){
@@ -55,7 +53,6 @@ public class SiteController extends BaseController{
         return "admin/system/site/show";
     }
 
-    @RequiresPermissions("sys:site:list")
     @GetMapping("oss")
     public String oss(Model model){
         UploadInfo uploadInfo = uploadInfoService.getOneInfo();
@@ -63,7 +60,6 @@ public class SiteController extends BaseController{
         return "admin/system/site/oss";
     }
 
-    @RequiresPermissions("sys:site:editOss")
     @PostMapping("editOss")
     @ResponseBody
     @Transactional
@@ -86,7 +82,6 @@ public class SiteController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:site:list")
     @GetMapping("qiniu")
     public String qiniu(Model model){
         UploadInfo uploadInfo = uploadInfoService.getOneInfo();
@@ -94,7 +89,6 @@ public class SiteController extends BaseController{
         return "admin/system/site/qiniu";
     }
 
-    @RequiresPermissions("sys:site:editQiniu")
     @PostMapping("editQiniu")
     @ResponseBody
     @Transactional
@@ -117,7 +111,6 @@ public class SiteController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:site:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存网站基本数据")

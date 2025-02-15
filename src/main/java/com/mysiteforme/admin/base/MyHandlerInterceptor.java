@@ -1,11 +1,5 @@
 package com.mysiteforme.admin.base;
 
-import com.mysiteforme.admin.entity.Site;
-import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.realm.AuthRealm;
-import com.mysiteforme.admin.service.SiteService;
-import com.mysiteforme.admin.service.UserCacheService;
-import com.mysiteforme.admin.service.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +8,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.security.MyUserDetails;
+import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 /**
  * 系统通用拦截器
@@ -48,7 +50,8 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
 //        LOGGER.info("当前请求路径.."+httpServletRequest.getRequestURI());
-        if (siteService == null || userService == null|| userCacheService == null) {//解决service为null无法注入问题
+        if (siteService == null || userService == null|| userCacheService == null) {
+            //解决service为null无法注入问题
             System.out.println("siteService is null!!!");
             BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(httpServletRequest.getServletContext());
             siteService = (SiteService) factory.getBean("siteService");
@@ -58,11 +61,11 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
         }
         Site sysSite = siteService.getCurrentSite();
         httpServletRequest.setAttribute("site",sysSite);
-        AuthRealm.ShiroUser shiroUser = MySysUser.ShiroUser();
-        if(shiroUser == null){
+        MyUserDetails myUserDetails = MySecurityUser.securityUser();
+        if(myUserDetails == null){
             return false;
         }
-        User user = userCacheService.findUserById(MySysUser.id());
+        User user = userCacheService.findUserById(myUserDetails.getId());
         if(user != null){
             httpServletRequest.setAttribute("currentUser",user);
             return true;

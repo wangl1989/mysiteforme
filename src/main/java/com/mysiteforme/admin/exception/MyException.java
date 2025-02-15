@@ -1,5 +1,7 @@
 package com.mysiteforme.admin.exception;
 
+import com.mysiteforme.admin.util.ResultCode;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,9 @@ public class MyException extends RuntimeException {
 
     // 业务错误
     public static final int BUSINESS_ERROR = 400;
+
+    // 登录错误
+    public static final int LOGIN_ERROR = 405;
 
     // 系统错误
     public static final int SERVER_ERROR = 500;
@@ -97,7 +102,19 @@ public class MyException extends RuntimeException {
         public Builder throwable(Throwable throwable) {
             this.throwable = throwable;
             return this;
-        }   
+        }
+        
+        public Builder systemError(String msg){
+            this.msg = msg;
+            this.code = ResultCode.INTERNAL_ERROR;
+            return this;
+        }
+
+        public Builder validationError(String msg){
+            this.msg = msg;
+            this.code = ResultCode.INVALID_RESULT;
+            return this;
+        }
 
         public MyException build() {
             return new MyException(this);

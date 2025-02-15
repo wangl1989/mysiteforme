@@ -14,7 +14,7 @@
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="del_flag"/>
         <result property="icon" column="icon" />
-        <collection property="roleLists"  ofType="com.mysiteforme.admin.entity.Role">
+        <collection property="roles"  ofType="com.mysiteforme.admin.entity.Role">
             <result property="id" column="role.id"/>
             <result property="name" column="role.name"/>
         </collection>
@@ -105,4 +105,108 @@
     <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
         delete from sys_user_role where user_id = #{userId}
     </delete>
+
+    <select id="findUserByLoginNameDetails"  resultMap="UserDetailMap">
+        SELECT 
+            u.id,
+            u.login_name,
+            u.nick_name,
+            u.icon,
+            u.password,
+            u.del_flag,
+            -- 角色信息
+            r.id AS role_id,
+            r.name AS role_name,
+            -- 权限信息
+            p.id AS permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.permission_type,
+            p.icon AS permission_icon,
+            -- 权限分组信息
+            g.id AS group_id,
+            g.group_code,
+            g.group_name,
+            -- 按钮权限
+            pb.id AS button_id,
+            pb.button_key,
+            pb.button_name,
+            -- 页面权限
+            pp.id AS page_id,
+            pp.page_url,
+            -- API权限
+            pa.id AS api_id,
+            pa.api_url,
+            pa.http_method
+        FROM 
+            sys_user u
+            -- 角色关联
+            LEFT JOIN sys_user_permission up ON u.id = up.user_id
+            LEFT JOIN sys_role_permission rp ON u.id = rp.role_id
+            LEFT JOIN sys_role r ON r.id = rp.role_id AND r.del_flag = 0
+            -- 权限关联
+            LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
+            LEFT JOIN sys_permission_group g ON g.id = p.group_id
+            -- 具体权限项关联
+            LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
+            LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
+            LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
+        WHERE 
+            u.login_name = #{loginName}
+            AND u.del_flag = 0
+ 
+    </select>
+
+    <resultMap id="UserDetailMap" type="com.mysiteforme.admin.entity.VO.UserVO">
+    <!-- 用户基本信息 -->
+    <id property="id" column="id"/>
+    <result property="loginName" column="login_name"/>
+    <result property="nickName" column="nick_name"/>
+    <result property="icon" column="icon"/>
+    <result property="password" column="password"/>
+    <result property="delFlag" column="del_flag"/>
+    
+    <!-- 角色集合 -->
+    <collection property="roles" ofType="com.mysiteforme.admin.entity.VO.RoleVO">
+        <id property="id" column="role_id"/>
+        <result property="name" column="role_name"/>
+    </collection>
+    
+    <!-- 权限集合 -->
+    <collection property="permissions" ofType="com.mysiteforme.admin.entity.VO.PermissionVO">
+        <id property="id" column="permission_id"/>
+        <result property="permissionName" column="permission_name"/>
+        <result property="permissionCode" column="permission_code"/>
+        <result property="permissionType" column="permission_type"/>
+        <result property="icon" column="permission_icon"/>
+        
+        <!-- 权限分组信息 -->
+        <association property="group" javaType="com.mysiteforme.admin.entity.VO.PermissionGroupVO">
+            <id property="id" column="group_id"/>
+            <result property="groupCode" column="group_code"/>
+            <result property="groupName" column="group_name"/>
+        </association>
+        
+        <!-- 按钮权限集合 -->
+        <collection property="buttons" ofType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
+            <id property="id" column="button_id"/>
+            <result property="buttonKey" column="button_key"/>
+            <result property="buttonName" column="button_name"/>
+        </collection>
+        
+        <!-- 页面权限集合 -->
+        <collection property="pages" ofType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
+            <id property="id" column="page_id"/>
+            <result property="pageUrl" column="page_url"/>
+        </collection>
+        
+        <!-- API权限集合 -->
+        <collection property="apis" ofType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
+            <id property="id" column="api_id"/>
+            <result property="apiUrl" column="api_url"/>
+            <result property="httpMethod" column="http_method"/>
+        </collection>
+    </collection>
+</resultMap>
+
 </mapper>

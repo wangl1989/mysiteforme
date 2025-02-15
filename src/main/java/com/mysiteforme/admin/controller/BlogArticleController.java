@@ -13,7 +13,9 @@ import com.mysiteforme.admin.service.BlogArticleService;
 import com.mysiteforme.admin.service.BlogChannelService;
 import com.mysiteforme.admin.service.BlogTagsService;
 import com.xiaoleilu.hutool.date.DateUtil;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+
+import jakarta.servlet.ServletRequest;
+
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.util.LayerData;
@@ -30,7 +32,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,6 @@ public class BlogArticleController extends BaseController{
      * 显示文章列表页面
      * @return 列表页面路径
      */
-    @RequiresPermissions("blog:article:list")
     @GetMapping("list")
     public String list(){
         return "/admin/blogArticle/list";
@@ -68,7 +68,6 @@ public class BlogArticleController extends BaseController{
      * @param page 分页参数
      * @return 分页数据
      */
-    @RequiresPermissions("blog:article:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<BlogArticle> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -122,7 +121,6 @@ public class BlogArticleController extends BaseController{
      * @param model 模型对象
      * @return 添加页面路径
      */
-    @RequiresPermissions("blog:article:add")
     @GetMapping("add")
     public String add(@RequestParam(value = "channelId",required = false)Long channelId, Model model){
         BlogChannel blogChannel = blogChannelService.getById(channelId);
@@ -141,7 +139,6 @@ public class BlogArticleController extends BaseController{
      * @param blogArticle 文章对象
      * @return 操作结果
      */
-    @RequiresPermissions("blog:article:add")
     @PostMapping("add")
     @SysLog("保存新增博客文章数据")
     @ResponseBody
@@ -186,7 +183,6 @@ public class BlogArticleController extends BaseController{
         return "/admin/blogArticle/edit";
     }
 
-    @RequiresPermissions("blog:article:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客内容数据")
@@ -214,7 +210,6 @@ public class BlogArticleController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("blog:article:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客内容数据")

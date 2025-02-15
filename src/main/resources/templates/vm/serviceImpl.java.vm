@@ -9,12 +9,16 @@
 #end
 package ${package.ServiceImpl};
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ${package.Entity}.${entity};
 import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 import ${superServiceImplClassPackage};
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ${package.Entity}.DTO.${entity}DTO;
+
 
 /**
  * <p>
@@ -33,5 +37,11 @@ open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperNam
 @Transactional(rollbackFor = Exception.class)
 public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
 
+    @Override
+    public void save${entity}DTO(${entity}DTO ${table.entityPath}DTO) {
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(${table.entityPath}DTO,${table.entityPath});
+        baseMapper.insert(${table.entityPath});
+    }
 }
 #end

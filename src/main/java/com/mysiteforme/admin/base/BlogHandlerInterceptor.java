@@ -1,7 +1,5 @@
 package com.mysiteforme.admin.base;
 
-import com.mysiteforme.admin.entity.Site;
-import com.mysiteforme.admin.service.SiteService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +8,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.service.SiteService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 /**
  * 博客系统拦截器

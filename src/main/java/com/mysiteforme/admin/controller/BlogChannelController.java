@@ -8,10 +8,12 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.BlogChannelService;
 import com.mysiteforme.admin.service.BlogArticleService;
 import com.mysiteforme.admin.service.SiteService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.util.RestResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -47,14 +48,12 @@ public class BlogChannelController extends BaseController{
      * 显示栏目列表页面
      * @return 列表页面路径
      */
-    @RequiresPermissions("blog:channel:list")
     @GetMapping("list")
     public String list(){
         // 这里不是跳转方法，而是跳转到页面
         return "/admin/blogChannel/list";
     }
 
-    @RequiresPermissions("blog:channel:list")
     @PostMapping("list")
     @ResponseBody
     public RestResponse list(HttpServletRequest request){
@@ -68,7 +67,6 @@ public class BlogChannelController extends BaseController{
      * @param model 模型对象
      * @return 添加页面路径
      */
-    @RequiresPermissions("blog:channel:add")
     @GetMapping("add")
     public String add(@RequestParam(value = "parentId",required = false)Long parentId,Model model){
         if(parentId != null && parentId != 0){
@@ -87,7 +85,6 @@ public class BlogChannelController extends BaseController{
      * @param blogChannel 栏目对象
      * @return 操作结果
      */
-    @RequiresPermissions("blog:channel:add")
     @PostMapping("add")
     @SysLog("保存新增博客栏目数据")
     @ResponseBody
@@ -140,7 +137,6 @@ public class BlogChannelController extends BaseController{
      * @param model 模型对象
      * @return 编辑页面路径
      */
-    @RequiresPermissions("blog:channel:edit")
     @GetMapping("edit")
     public String edit(Long id,Model model){
         BlogChannel blogChannel = blogChannelService.getById(id);
@@ -158,7 +154,6 @@ public class BlogChannelController extends BaseController{
      * @param blogChannel 栏目对象
      * @return 操作结果
      */
-    @RequiresPermissions("blog:channel:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客栏目数据")
@@ -187,7 +182,6 @@ public class BlogChannelController extends BaseController{
      * @param id 栏目ID
      * @return 操作结果
      */
-    @RequiresPermissions("blog:channel:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客栏目数据")

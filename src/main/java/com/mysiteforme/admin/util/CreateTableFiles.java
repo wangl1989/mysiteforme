@@ -1,5 +1,11 @@
 package com.mysiteforme.admin.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
@@ -9,9 +15,6 @@ import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.mysiteforme.admin.base.DataEntity;
 import com.mysiteforme.admin.base.TreeEntity;
 import com.mysiteforme.admin.entity.Site;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import java.util.*;
 
 /**
  * 数据库表生成文件工具类
@@ -105,6 +108,9 @@ public class CreateTableFiles {
             builder.customMap(Collections.singletonMap("abc", author + "-mp")) // 自定义参数
                     .beforeOutputFile((t, objectMap) -> {
                         System.out.println("准备生成文件: " + t.getEntityName());
+                        if(t.getName().contains("sys_")){
+                            objectMap.put("sysFile", true);
+                        }
                         // 可以在这里添加自定义逻辑，如修改 objectMap 中的配置
                         objectMap.put("site", site);
                         objectMap.put("entityName", t.getEntityName());
@@ -117,6 +123,12 @@ public class CreateTableFiles {
                                 .fileName("list.ftl")
                                 .templatePath("/templates/vm/list.jsp.vm")
                                 .packageName("front")
+                                .build());
+                        add(new CustomFile.Builder()
+                                .enableFileOverride()
+                                .fileName("DTO.java")
+                                .templatePath("/templates/vm/entityDTO.java.vm")
+                                .packageName("entity/DTO")
                                 .build());
                         add(new CustomFile.Builder()
                                 .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
@@ -136,7 +148,7 @@ public class CreateTableFiles {
                                 .build());
                     }});
         });
-        fastAutoGenerator.templateEngine(new VelocityTemplateEngine()); // 使用 Freemarker 模板引擎
+        fastAutoGenerator.templateEngine(new VelocityTemplateEngine()); // 使用 Velocity 模板引擎
         fastAutoGenerator.execute(); // 执行生成
     }
 }

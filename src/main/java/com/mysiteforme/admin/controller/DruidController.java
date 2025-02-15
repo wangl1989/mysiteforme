@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.controller;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +16,6 @@ public class DruidController {
      * 显示监控首页
      * @return 监控页面路径
      */
-    @RequiresPermissions("sys:druid:list")
     @GetMapping("list")
     public String index() {
         return "admin/system/druid/index";

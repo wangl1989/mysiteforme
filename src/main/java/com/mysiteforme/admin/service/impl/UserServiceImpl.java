@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.ToolUtil;
 import org.springframework.cache.annotation.CacheEvict;
@@ -60,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		user.setLocked(false);
 		baseMapper.insert(user);
 		//保存用户角色关系
-		this.saveUserRoles(user.getId(),user.getRoleLists());
+		this.saveUserRoles(user.getId(),user.getRoles());
 		return user;
 	}
 
@@ -82,7 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		baseMapper.updateById(user);
 		//先解除用户跟角色的关系
 		this.dropUserRolesByUserId(user.getId());
-		this.saveUserRoles(user.getId(),user.getRoleLists());
+		this.saveUserRoles(user.getId(),user.getRoles());
 	}
 
 	/**
@@ -143,6 +144,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	@Override
 	public Map<String,Object> selectUserMenuCount() {
 		return baseMapper.selectUserMenuCount();
+	}
+
+	@Override
+	public UserVO findUserByLoginNameDetails(String name) {
+		return baseMapper.findUserByLoginNameDetails(name);
 	}
 
 }

@@ -98,7 +98,7 @@ public class VerifyCodeUtil {
         int i = 0;
         Random random = new Random();
         switch(type){
-            case TYPE_NUM_ONLY:
+            case TYPE_NUM_ONLY -> {
                 while(i < length){
                     int t = random.nextInt(10);
                     //排除特殊字符
@@ -107,8 +107,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_LETTER_ONLY:
+            }
+            case TYPE_LETTER_ONLY -> {
                 while(i < length){
                     int t = random.nextInt(123);
                     if((t>=97 || (t>=65&&t<=90)) && (null==excludeString||excludeString.indexOf((char)t)<0)){
@@ -116,8 +116,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_ALL_MIXED:
+            }
+            case TYPE_ALL_MIXED -> {
                 while(i < length){
                     int t = random.nextInt(123);
                     if((t>=97 || (t>=65&&t<=90) || (t>=48&&t<=57)) && (null==excludeString||excludeString.indexOf((char)t)<0)){
@@ -125,8 +125,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_NUM_UPPER:
+            }
+            case TYPE_NUM_UPPER -> {
                 while(i < length){
                     int t = random.nextInt(91);
                     if((t>=65 || (t>=48&&t<=57)) && (null==excludeString || excludeString.indexOf((char)t)<0)){
@@ -134,8 +134,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_NUM_LOWER:
+            }
+            case TYPE_NUM_LOWER -> {
                 while(i < length){
                     int t = random.nextInt(123);
                     if((t>=97 || (t>=48&&t<=57)) && (null==excludeString || excludeString.indexOf((char)t)<0)){
@@ -143,8 +143,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_UPPER_ONLY:
+            }
+            case TYPE_UPPER_ONLY -> {
                 while(i < length){
                     int t = random.nextInt(91);
                     if((t >= 65) && (null==excludeString||excludeString.indexOf((char)t)<0)){
@@ -152,8 +152,8 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
-            case TYPE_LOWER_ONLY:
+            }
+            case TYPE_LOWER_ONLY -> {
                 while(i < length){
                     int t = random.nextInt(123);
                     if((t>=97) && (null==excludeString||excludeString.indexOf((char)t)<0)){
@@ -161,7 +161,7 @@ public class VerifyCodeUtil {
                         i++;
                     }
                 }
-                break;
+            }
         }
         return verifyCode.toString();
     }

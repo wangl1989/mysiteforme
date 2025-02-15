@@ -3,13 +3,15 @@ package com.mysiteforme.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
 import com.mysiteforme.admin.service.QuartzTaskLogService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
+
+import jakarta.servlet.ServletRequest;
+
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
 import java.util.Map;
 
 /**
@@ -51,7 +52,6 @@ public class QuartzTaskLogController {
         return "/admin/quartzTaskLog/list";
     }
 
-    @RequiresPermissions("quartz:log:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<QuartzTaskLog> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -105,7 +105,6 @@ public class QuartzTaskLogController {
         return RestResponse.success();
     }
 
-    @RequiresPermissions("quartz:log:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除任务执行日志数据")

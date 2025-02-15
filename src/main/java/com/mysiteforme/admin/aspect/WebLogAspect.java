@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-13 19:52:05
+ * @ Description: Web层日志切面:系统操作日志切面,实现系统操作日志的记录
+ */
+
 package com.mysiteforme.admin.aspect;
 
 import com.alibaba.fastjson.JSONObject;
@@ -5,10 +13,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.text.StringEscapeUtils;
-import com.mysiteforme.admin.base.MySysUser;
+
+import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.Log;
 import com.mysiteforme.admin.service.LogService;
 import com.mysiteforme.admin.util.ToolUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -23,20 +37,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-
-/**
- * Web层日志切面
- * 实现系统操作日志的记录
- * @author wangl
- * @since 2018/1/13
- */
 @Aspect
 @Component
 @Order(5)
@@ -136,8 +139,9 @@ public class WebLogAspect {
                 sysLog.setIsp(StringEscapeUtils.escapeHtml4(map.get("isp")));
             }
             sysLog.setType(ToolUtil.isAjax(request) ? "Ajax请求" : "普通请求");
-            if (MySysUser.ShiroUser() != null) {
-                sysLog.setUsername(StringUtils.isNotBlank(MySysUser.nickName()) ? MySysUser.nickName() : MySysUser.loginName());
+            
+            if (MySecurityUser.securityUser() != null) {
+                sysLog.setUsername(StringUtils.isNotBlank(MySecurityUser.nickName()) ? MySecurityUser.nickName() : MySecurityUser.loginName());
             }
         }
     }
@@ -165,8 +169,8 @@ public class WebLogAspect {
      */
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfterReturning(Object ret) {
-        if(MySysUser.ShiroUser() != null) {
-            sysLog.setUsername(StringUtils.isNotBlank(MySysUser.nickName()) ? MySysUser.nickName() : MySysUser.loginName());
+        if(MySecurityUser.securityUser() != null) {
+            sysLog.setUsername(StringUtils.isNotBlank(MySecurityUser.nickName()) ? MySecurityUser.nickName() : MySecurityUser.loginName());
         }
         String retString = JSONObject.toJSONString(ret);
         sysLog.setResponse(retString.length()>5000?JSONObject.toJSONString("请求参数数据过长不与显示"):retString);

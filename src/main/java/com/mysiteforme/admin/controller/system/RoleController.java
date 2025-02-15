@@ -16,13 +16,12 @@ import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +46,6 @@ public class RoleController extends BaseController{
         return "admin/system/role/list";
     }
 
-    @RequiresPermissions("sys:role:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<Role> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -100,7 +98,6 @@ public class RoleController extends BaseController{
         return "admin/system/role/add";
     }
 
-    @RequiresPermissions("sys:role:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增角色数据")
@@ -137,7 +134,6 @@ public class RoleController extends BaseController{
         return "admin/system/role/edit";
     }
 
-    @RequiresPermissions("sys:role:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑角色数据")
@@ -158,7 +154,6 @@ public class RoleController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:role:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除角色数据")
@@ -171,7 +166,6 @@ public class RoleController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:role:delete")
     @PostMapping("deleteSome")
     @ResponseBody
     @SysLog("多选删除角色数据")

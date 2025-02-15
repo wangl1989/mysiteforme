@@ -1,13 +1,15 @@
 package com.mysiteforme.admin.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.mysiteforme.admin.base.MySysUser;
+
 import org.apache.ibatis.reflection.MetaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+
+import com.mysiteforme.admin.base.MySecurityUser;
 
 /**
  * mybatisplus自定义填充公共字段 ,即没有传的字段自动填充
@@ -32,16 +34,16 @@ public class SysMetaObjectHandler implements MetaObjectHandler {
             setFieldValByName("createDate", new Date(),metaObject);
         }
         if (null == createId) {
-            if(MySysUser.ShiroUser() != null) {
-                setFieldValByName("createId", MySysUser.id(), metaObject);
+            if(MySecurityUser.securityUser() != null) {
+                setFieldValByName("createId", MySecurityUser.id(), metaObject);
             }
         }
         if (null == updateDate) {
             setFieldValByName("updateDate", new Date(),metaObject);
         }
         if (null == updateId) {
-            if(MySysUser.ShiroUser() != null) {
-                setFieldValByName("updateId", MySysUser.id(), metaObject);
+            if(MySecurityUser.securityUser() != null) {
+                setFieldValByName("updateId", MySecurityUser.id(), metaObject);
             }
         }
     }
@@ -53,7 +55,7 @@ public class SysMetaObjectHandler implements MetaObjectHandler {
         setFieldValByName("updateDate",new Date(), metaObject);
         Object updateId = getFieldValByName("updateId",metaObject);
         if (null == updateId) {
-            setFieldValByName("updateId", MySysUser.id(), metaObject);
+            setFieldValByName("updateId", MySecurityUser.id(), metaObject);
         }
     }
 }

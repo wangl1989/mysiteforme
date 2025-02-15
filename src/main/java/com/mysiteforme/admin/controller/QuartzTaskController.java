@@ -3,13 +3,15 @@ package com.mysiteforme.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.service.QuartzTaskService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
+
+import jakarta.servlet.ServletRequest;
+
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,6 @@ public class QuartzTaskController {
      * @param page 分页参数
      * @return 分页数据
      */
-    @RequiresPermissions("quartz:task:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<QuartzTask> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -108,7 +108,6 @@ public class QuartzTaskController {
      * @param quartzTask 任务对象
      * @return 操作结果
      */
-    @RequiresPermissions("quartz:task:add")
     @PostMapping("add")
     @SysLog("保存新增定时任务数据")
     @ResponseBody
@@ -135,7 +134,6 @@ public class QuartzTaskController {
      * @param quartzTask 任务对象
      * @return 操作结果
      */
-    @RequiresPermissions("quartz:task:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑定时任务数据")
@@ -152,7 +150,6 @@ public class QuartzTaskController {
      * @param ids 任务ID集合
      * @return 操作结果
      */
-    @RequiresPermissions("quartz:task:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除定时任务数据")
@@ -168,7 +165,6 @@ public class QuartzTaskController {
      * 暂停选中的定时任务
      * @param ids 任务ID List
      */
-    @RequiresPermissions("quartz:task:paush")
     @PostMapping("paush")
     @ResponseBody
     public RestResponse paush(@RequestParam(value = "ids[]",required = false)List<Long> ids){
@@ -183,7 +179,6 @@ public class QuartzTaskController {
      * 恢复选中的定时任务运行
      * @param ids 任务ID List
      */
-    @RequiresPermissions("quartz:task:resume")
     @PostMapping("resume")
     @ResponseBody
     public RestResponse resume(@RequestParam(value = "ids[]",required = false)List<Long> ids){
@@ -198,7 +193,6 @@ public class QuartzTaskController {
      * 立即执行选中的定时任务
      * @param ids 任务ID List
      */
-    @RequiresPermissions("quartz:task:run")
     @PostMapping("run")
     @ResponseBody
     public RestResponse run(@RequestParam(value = "ids[]",required = false)List<Long> ids){

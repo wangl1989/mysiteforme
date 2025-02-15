@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:06:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-14 00:31:23
+ * @ Description: 文件上传controller
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import java.io.BufferedInputStream;
@@ -9,9 +17,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -217,22 +225,19 @@ public class FileController extends BaseController {
     private boolean uploadResult(UploadService service,String urlType ,Element e, String imgSrc) throws IOException, NoSuchAlgorithmException {
         //区分文件的来源类型
         switch (urlType) {
-            case "local":
+            case "local" -> {
                 imgSrc = imgSrc.substring(6);
                 File file = new File(imgSrc);
                 if(!file.exists()){
                     return false;
                 }
                 e.attr("src",service.uploadLocalImg(imgSrc));
-                break;
-            case "web":
-                e.attr("src",service.uploadNetFile(imgSrc));
-                break;
-            case "base64":
-                e.attr("src",service.uploadBase64(imgSrc));
-                break;
-            default:
+            }
+            case "web" -> e.attr("src",service.uploadNetFile(imgSrc));
+            case "base64" -> e.attr("src",service.uploadBase64(imgSrc));
+            default -> {
                 return false;
+            }
         }
         return true;
     }

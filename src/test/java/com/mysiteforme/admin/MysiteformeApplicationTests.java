@@ -1,31 +1,35 @@
 package com.mysiteforme.admin;
 
-import com.alibaba.fastjson.JSONObject;
-import com.mysiteforme.admin.dao.MenuDao;
-import com.mysiteforme.admin.entity.Menu;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MysiteformeApplicationTests {
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MysiteformeApplicationTests.class);
+    @Test
+    public void contextLoads() {
+        // Verify that the context loads successfully
+    }
 
-	@Autowired
-	private MenuDao menuDao;
+    @Test
+    public void testPasswordEncoder() {
+        String rawPassword = "123456";
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        System.out.println("Raw password: " + rawPassword);
+        System.out.println("Encoded password: " + encodedPassword);
 
-	@Test
-	public void contextLoads() {
-		List<Menu> list = menuDao.getMenus(null);
-		LOGGER.info(JSONObject.toJSONString(list));
-	}
-
+        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
+        System.out.println("Password verification result: " + matches);
+        
+        // Add assertion to make it a proper test
+        assert matches : "Password verification should return true";
+    }
 }

@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.base.BaseController;
 import com.xiaoleilu.hutool.http.HTMLFilter;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+
+import jakarta.servlet.ServletRequest;
+
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.BlogTags;
 import com.mysiteforme.admin.service.BlogTagsService;
@@ -21,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
 import java.util.Map;
 
 /**
@@ -44,7 +45,6 @@ public class BlogTagsController extends BaseController{
      * 显示标签列表页面
      * @return 列表页面路径
      */
-    @RequiresPermissions("blog:tags:list")
     @GetMapping("list")
     public String list(){
         return "/admin/blogTags/list";
@@ -56,7 +56,6 @@ public class BlogTagsController extends BaseController{
      * @param page 分页参数
      * @return 分页数据
      */
-    @RequiresPermissions("blog:tags:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<BlogTags> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -80,7 +79,6 @@ public class BlogTagsController extends BaseController{
      * 显示标签添加页面
      * @return 添加页面路径
      */
-    @RequiresPermissions("blog:tags:add")
     @GetMapping("add")
     public String add(){
         return "/admin/blogTags/add";
@@ -91,7 +89,6 @@ public class BlogTagsController extends BaseController{
      * @param blogTags 标签对象
      * @return 操作结果
      */
-    @RequiresPermissions("blog:tags:add")
     @PostMapping("add")
     @SysLog("保存新增博客标签数据")
     @ResponseBody
@@ -106,7 +103,6 @@ public class BlogTagsController extends BaseController{
      * @param model 模型对象
      * @return 编辑页面路径
      */
-    @RequiresPermissions("blog:tags:edit")
     @GetMapping("edit")
     public String edit(Long id,Model model){
         BlogTags blogTags = blogTagsService.getById(id);
@@ -119,7 +115,6 @@ public class BlogTagsController extends BaseController{
      * @param blogTags 标签对象
      * @return 操作结果
      */
-    @RequiresPermissions("blog:tags:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑博客标签数据")
@@ -136,7 +131,6 @@ public class BlogTagsController extends BaseController{
      * @param id 标签ID
      * @return 操作结果
      */
-    @RequiresPermissions("blog:tags:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除博客标签数据")

@@ -3,6 +3,7 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.VO.UserVO;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,13 @@ import java.util.Set;
 public interface UserService extends IService<User> {
 
 	User findUserByLoginName(String name);
+
+	/**
+	 * 根据姓名查询用户详细信息
+	 * @param name 用户登录名
+	 * @return 用户详细信息
+	 */
+	UserVO findUserByLoginNameDetails(String name);
 
 	/**
 	 * 保存用户信息

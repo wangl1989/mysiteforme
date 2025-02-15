@@ -34,12 +34,10 @@ public class ScheduleUtils {
     /**
      * 获取表达式触发器
      */
-    public static CronTrigger getCronTrigger(Scheduler scheduler, Long jobId) {
-        try {
-            return (CronTrigger) scheduler.getTrigger(getTriggerKey(jobId));
-        } catch (SchedulerException e) {
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("获取定时任务CronTrigger出现异常").build();
-        }
+    public static CronTrigger getCronTrigger(Scheduler scheduler, QuartzTask scheduleJob) {
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCron())
+                .withMisfireHandlingInstructionDoNothing();
+        return TriggerBuilder.newTrigger().withIdentity(getTriggerKey(scheduleJob.getId())).withSchedule(scheduleBuilder).build();
     }
 
     /**
@@ -82,7 +80,7 @@ public class ScheduleUtils {
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCron())
             		.withMisfireHandlingInstructionDoNothing();
 
-            CronTrigger trigger = getCronTrigger(scheduler, scheduleJob.getId());
+            CronTrigger trigger = getCronTrigger(scheduler, scheduleJob);
             
             //按新的cronExpression表达式重新构建trigger
             trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();

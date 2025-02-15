@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
+
 
 /**
  * <p>
@@ -54,7 +54,6 @@ public class Menu extends TreeEntity<Menu> {
 	private Integer dataCount;
 
 
-	@Length(max = 1000, message = "icon长度必须介于 1 和 1000 之间")
 	public String getIcon() {
 		return icon;
 	}

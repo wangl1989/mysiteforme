@@ -1,8 +1,8 @@
 package com.mysiteforme.admin.util;
 
 /**
- * 系统常量定义类
- * 用于定义系统中使用的各种常量值
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-13 23:03:56
  * 
  * @author wangl
  */
@@ -47,5 +47,45 @@ public class Constants {
 	 * 评论类型：2.系统留言
 	 */
 	public static final Integer COMMENT_TYPE_LEVING_A_MESSAGE = 2;
+
+	/**
+	 * 验证码的token
+	 */
+	public static final String CAPTCHA_TOKEN = "Captcha-Key";
+
+	/**
+	 * header中认证字段
+	 */
+	public static final String AUTHORIZATION = "Authorization";
+
+	/**
+	 * 认证类型
+	 */
+	public static final String GRANT_TYPE = "Bearer ";
+
+	/**
+	 * 设置用户需要等待多长时间(分钟)后重新登录
+	 */
+	public static final int USER_WAIT_TO_LOGIN = 10;
+
+	/**
+	 * 允许用户尝试登录次数
+	 */
+	public static final int ALLOW_USER_LOGIN_FAIL_COUNT = 5;
+
+	/**
+	 * 接口限流设置：允许API接口访问的间隔时间  单位：秒
+	 */
+	public static final int ALLOW_USER_ACTION_SECOND = 1;
+
+	/**
+	 * 用户登录token过期时间 单位：分钟
+	 */
+	public static final int USER_LOGIN_TOKEN_EXPIRE_TIME = 30;
+
+	/**
+	 * 验证码有效期
+	 */
+	public static final int USER_CAPTCHA_CACHE_EXPIRE_TIME = 5;
 
 }

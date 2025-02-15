@@ -1,14 +1,14 @@
 package ${package.Entity};
 
 #foreach($pkg in ${table.importPackages})
+#if( $pkg != "java.io.Serializable;" )
 import ${pkg};
+#end
 #end
 #if(${entityLombokModel})
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 #end
 
 #set($tablecomment = "")
@@ -31,7 +31,6 @@ import lombok.Setter;
 #if(${entityLombokModel})
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 #end
 #if(${table.convert})
 @TableName("${table.name}")

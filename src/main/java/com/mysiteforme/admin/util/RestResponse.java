@@ -6,6 +6,27 @@ import java.util.HashMap;
  * ResponseBody构造器。一般用于ajax、rest等类型的Web服务
  */
 public class RestResponse extends HashMap<String, Object> {
+
+    /**
+     * 成功状态码
+     */
+    public static final Integer SUCCESS_CODE = 200;
+
+    /*
+     * 登录失败
+     */
+    public static final Integer LOGIN_FAUIL = 501;
+
+    /*
+     * 无权限
+     */
+    public static final Integer NO_PERMISSION = 502;
+    
+    /**
+     * 操作失败
+     */
+    public static final Integer OPRATE_FAIL = 503;
+
     public static RestResponse success(){
         return success("成功");
     }
@@ -13,6 +34,7 @@ public class RestResponse extends HashMap<String, Object> {
         RestResponse restResponse = new RestResponse();
         restResponse.setSuccess(true);
         restResponse.setMessage(message);
+        restResponse.setCode(SUCCESS_CODE);
         return restResponse;
     }
 
@@ -20,6 +42,14 @@ public class RestResponse extends HashMap<String, Object> {
         RestResponse restResponse = new RestResponse();
         restResponse.setSuccess(false);
         restResponse.setMessage(message);
+        return restResponse;
+    }
+
+    public static RestResponse failure(String message, Integer code){
+        RestResponse restResponse = new RestResponse();
+        restResponse.setSuccess(false);
+        restResponse.setMessage(message);
+        restResponse.setCode(code);
         return restResponse;
     }
 
@@ -31,6 +61,16 @@ public class RestResponse extends HashMap<String, Object> {
 
     public RestResponse setMessage(String message) {
         if (message != null) put("message", message);
+        return this;
+    }
+
+    public RestResponse setCode(Integer code) {
+        if (code != null) put("code", code);
+        return this;
+    }
+
+    public RestResponse setToken(String token) {
+        if (token != null) put("token", token);
         return this;
     }
 

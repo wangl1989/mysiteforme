@@ -3,7 +3,7 @@ package com.mysiteforme.admin.config;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.servlet.MultipartConfigElement;
+import jakarta.servlet.MultipartConfigElement;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -24,6 +24,8 @@ import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.base.BlogHandlerInterceptor;
 import com.mysiteforme.admin.base.MyHandlerInterceptor;
+import com.mysiteforme.admin.security.SecurityHeadersFilter;
+import com.mysiteforme.admin.security.XssFilter;
 
 /**
  * Spring MVC配置类
@@ -52,28 +54,28 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //        return new ServletListenerRegistrationBean<>(new RequestContextListener());
 //    }
 //
-    @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
-        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new XssFilter());
-        registration.addUrlPatterns("/*");
-        registration.setName("xssFilter");
-
-        // 添加不需要过滤的路径
-//        Map<String, String> initParameters = Maps.newHashMap();
-//        initParameters.put("excludes", "/static/*,/assets/*");
-//        registration.setInitParameters(initParameters);
-        registration.setOrder(1);
-        return registration;
-    }
-    @Bean
-    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter() {
-        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new SecurityHeadersFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setOrder(2);
-        return registrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
+//        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(new XssFilter());
+//        registration.addUrlPatterns("/*");
+//        registration.setName("xssFilter");
+//
+//        // 添加不需要过滤的路径
+////        Map<String, String> initParameters = Maps.newHashMap();
+////        initParameters.put("excludes", "/static/*,/assets/*");
+////        registration.setInitParameters(initParameters);
+//        registration.setOrder(1);
+//        return registration;
+//    }
+//    @Bean
+//    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter() {
+//        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+//        registrationBean.setFilter(new SecurityHeadersFilter());
+//        registrationBean.addUrlPatterns("/*");
+//        registrationBean.setOrder(2);
+//        return registrationBean;
+//    }
 
     /**
      * 配置静态资源映射

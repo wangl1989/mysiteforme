@@ -7,70 +7,46 @@
                 #set($tabletype = $e)
         #end
 #end
-package ${package.Controller};
+package ${package.Controller}#if($sysFile).system#end;
 
-import com.xiaoleilu.hutool.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mysiteforme.admin.base.BaseController;
-import ${package.Entity}.${entity};
-import ${package.Service}.${table.serviceName};
-import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.annotation.SysLog;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.entity.DTO.${entity}DTO;
+import com.mysiteforme.admin.entity.${entity};
+import com.mysiteforme.admin.service.${entity}Service;
+import com.mysiteforme.admin.util.Result;
 
-import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
-
-import javax.servlet.ServletRequest;
-import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
- * ${tablecomment}  前端控制器
+ * ${entity}  前端控制器
  * </p>
  *
  * @author ${author}
  * @since ${date}
  */
-@Controller
+@Slf4j
+@RestController
 @RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
 public class ${table.controllerName} extends BaseController{
-    private static final Logger LOGGER = LoggerFactory.getLogger(${table.controllerName}.class);
 
     @Autowired
     private ${entity}Service ${table.entityPath}Service;
 
-    @GetMapping("list")
-    @SysLog("跳转${tablecomment}列表")
-    public String list(){
-        return "#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/list";
-    }
 
-    @PostMapping("list")
-    @ResponseBody
-    @SysLog("请求${tablecomment}列表数据")
-    public LayerData<${entity}> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
-                                      @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                      ServletRequest request){
-        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
-        LayerData<${entity}> layerData = new LayerData<>();
+    @GetMapping("list")
+    @SysLog("请求${entity}列表数据")
+    public Result list(@RequestBody ${entity}DTO ${table.entityPath}DTO){
         QueryWrapper<${entity}> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        if(!map.isEmpty()){
+        //if(!map.isEmpty()){
 #foreach($field in ${table.fields})
 #set($comment = "")
 #set($type = "")
@@ -148,23 +124,15 @@ public class ${table.controllerName} extends BaseController{
 
 #end
 #end
-        }
-        IPage<${entity}> pageData = ${table.entityPath}Service.page(new Page<>(page,limit),wrapper);
-        layerData.setData(pageData.getRecords());
-        layerData.setCount((int)pageData.getTotal());
-        return layerData;
-    }
-
-    @GetMapping("add")
-    @SysLog("跳转新增${tablecomment}页面")
-    public String add(){
-        return "#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/add";
+       // }
+        IPage<${entity}> pageData = ${table.entityPath}Service.page(new Page<>(${table.entityPath}DTO.getPage(),${table.entityPath}DTO.getLimit()),wrapper);
+        Result result = Result.success(pageData);
+        return result;
     }
 
     @PostMapping("add")
-    @SysLog("保存新增${tablecomment}数据")
-    @ResponseBody
-    public RestResponse add(${entity} ${table.entityPath}){
+    @SysLog("保存新增${entity}数据")
+    public Result add(@RequestBody ${entity}DTO ${table.entityPath}DTO){
 #foreach($field in ${table.fields})
 #set($comment = "")
 #set($type = "")
@@ -206,33 +174,24 @@ public class ${table.controllerName} extends BaseController{
 #if($isNullAble == false)
 #if(${field.propertyType.equals("String")})
         if(StringUtils.isBlank(${table.entityPath}.get${field.capitalName}())){
-            return RestResponse.failure("${comment}不能为空");
+            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
         }
 #else
         if(${table.entityPath}.get${field.capitalName}() == null){
-            return RestResponse.failure("${comment}不能为空");
+            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
         }
 #end
 #end
 #end
-        ${table.entityPath}Service.insert(${table.entityPath});
-        return RestResponse.success();
-    }
-
-    @GetMapping("edit")
-    @SysLog("跳转编辑${tablecomment}页面")
-    public String edit(Long id,Model model){
-        ${entity} ${table.entityPath} = ${table.entityPath}Service.selectById(id);
-        model.addAttribute("${table.entityPath}",${table.entityPath});
-        return "#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/edit";
+        ${table.entityPath}Service.save${entity}DTO(${table.entityPath}DTO);
+        return Result.success();
     }
 
     @PostMapping("edit")
-    @ResponseBody
     @SysLog("保存编辑${tablecomment}数据")
-    public RestResponse edit(${entity} ${table.entityPath}){
+    public Result edit(${entity} ${table.entityPath}){
         if(null == ${table.entityPath}.getId() || 0 == ${table.entityPath}.getId()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
 #foreach($field in ${table.fields})
 #set($comment = "")
@@ -275,30 +234,29 @@ public class ${table.controllerName} extends BaseController{
 #if($isNullAble == false)
 #if(${field.propertyType.equals("String")})
         if(StringUtils.isBlank(${table.entityPath}.get${field.capitalName}())){
-            return RestResponse.failure("${comment}不能为空");
+            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
         }
 #else
         if(${table.entityPath}.get${field.capitalName}() == null){
-            return RestResponse.failure("${comment}不能为空");
+            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
         }
 #end
 #end
 #end
-        ${table.entityPath}Service.updateById(${table.entityPath});
-        return RestResponse.success();
+        ${table.entityPath}Service.getById(${table.entityPath});
+        return Result.success();
     }
 
     @PostMapping("delete")
-    @ResponseBody
     @SysLog("删除${tablecomment}数据")
-    public RestResponse delete(@RequestParam(value = "id",required = false)Long id){
+    public Result delete(@RequestParam(value = "id",required = false)Long id){
         if(null == id || 0 == id){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
-        ${entity} ${table.entityPath} = ${table.entityPath}Service.selectById(id);
+        ${entity} ${table.entityPath} = ${table.entityPath}Service.getById(id);
         ${table.entityPath}.setDelFlag(true);
         ${table.entityPath}Service.updateById(${table.entityPath});
-        return RestResponse.success();
+        return Result.success();
     }
 
 }

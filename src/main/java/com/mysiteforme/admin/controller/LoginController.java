@@ -1,225 +1,116 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-14 12:37:36
+ * @ Description: 用户登录相关的controller
+ */
+
 package com.mysiteforme.admin.controller;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
-import com.mysiteforme.admin.base.MySysUser;
-import com.mysiteforme.admin.entity.*;
-import com.mysiteforme.admin.entity.Menu;
-import com.mysiteforme.admin.service.UserService;
-import com.mysiteforme.admin.service.UserCacheService;
-import com.mysiteforme.admin.service.MenuService;
-import com.mysiteforme.admin.util.Constants;
-import com.mysiteforme.admin.util.RestResponse;
-import com.mysiteforme.admin.util.VerifyCodeUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.authz.UnauthorizedException;
-import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import com.mysiteforme.admin.entity.DTO.UserDTO;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.*;
+
+import com.google.common.collect.Maps;
+import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
+import com.mysiteforme.admin.service.MenuService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.util.Constants;
+import com.mysiteforme.admin.util.Result;
+import com.mysiteforme.admin.util.ToolUtil;
+import com.mysiteforme.admin.util.VerifyCodeUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * 登录控制器
  * 处理用户登录、登出等认证相关操作
  */
-@Controller
+@Slf4j
+@RestController
 public class LoginController extends BaseController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
-    public LoginController(UserService userService, UserCacheService userCacheService, MenuService menuService) {
+	 
+    public LoginController(UserService userService,
+						   UserCacheService userCacheService,
+						   MenuService menuService,
+						   RedisUtils redisUtils) {
         this.userService = userService;
         this.userCacheService = userCacheService;
         this.menuService = menuService;
+		this.redisUtils = redisUtils;
     }
 
-	/**
-	 * 跳转到登录页面
-	 * @return 登录页面路径
-	 */
-	@GetMapping("login")
-	public String login(HttpServletRequest request) {
-		LOGGER.info("跳到这边的路径为:{}",request.getRequestURI());
-		Subject s = SecurityUtils.getSubject();
-		LOGGER.info("是否记住登录--->{}<-----是否有权限登录----->{}",s.isRemembered(),s.isAuthenticated());
-		if(s.isAuthenticated()){
-			return "redirect:index";
-		}else {
-			return "login";
+	
+//	/**
+//	 * 用户登录
+//	 * @param userDTO 用户登录信息
+//	 */
+	@PostMapping("/login")
+	public Result loginMain(@RequestBody UserDTO userDTO) {
+		log.info("=================用户登录===================");
+		try {
+			// 添加日志
+			log.info("用户尝试登录：{}", userDTO.getUsername());
+
+			UsernamePasswordAuthenticationToken token =
+					new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword());
+
+			Authentication authentication = authenticationManager.authenticate(token);
+			// 如果认证成功，这里不会抛出异常
+
+			log.info("用户登录成功：{}", authentication.getName());
+			// ... 后续处理
+
+		} catch (AuthenticationException e) {
+			log.error("用户登录失败：{}", e.getMessage(), e);
+			// ... 异常处理
 		}
+		return Result.success();
 	}
 	
-	/**
-	 * 用户登录
-	 * @param request HTTP请求对象
-	 * @return 登录结果
-	 */
-	@PostMapping("login/main")
-	@ResponseBody
-	@SysLog("用户登录")
-	public RestResponse loginMain(HttpServletRequest request) {
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
-		String rememberMe = request.getParameter("rememberMe");
-		String code = request.getParameter("code");
-		if(StringUtils.isBlank(username) || StringUtils.isBlank(password)){
-			return RestResponse.failure("用户名或者密码不能为空");
-		}
-		if(StringUtils.isBlank(rememberMe)){
-			return RestResponse.failure("记住我不能为空");
-		}
-		if(StringUtils.isBlank(code)){
-			return  RestResponse.failure("验证码不能为空");
-		}
-		Map<String,Object> map = Maps.newHashMap();
-		String error = null;
-		HttpSession session = request.getSession();
-		if(session == null){
-			return RestResponse.failure("session超时");
-		}
-		String trueCode =  (String)session.getAttribute(Constants.VALIDATE_CODE);
-		if(StringUtils.isBlank(trueCode)){
-			return RestResponse.failure("验证码超时");
-		}
-		if(StringUtils.isBlank(code) || !trueCode.equalsIgnoreCase(code)){
-			error = "验证码错误";
-		}else {
-			/*就是代表当前的用户。*/
-			Subject user = SecurityUtils.getSubject();
-			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.parseBoolean(rememberMe));
-			try {
-				user.login(token);
-				if (user.isAuthenticated()) {
-					map.put("url","index");
-				}
-			}catch (IncorrectCredentialsException e) {
-				error = "登录密码错误.";
-			} catch (ExcessiveAttemptsException e) {
-				error = "登录失败次数过多";
-			} catch (LockedAccountException e) {
-				error = "帐号已被锁定.";
-			} catch (DisabledAccountException e) {
-				error = "帐号已被禁用.";
-			} catch (ExpiredCredentialsException e) {
-				error = "帐号已过期.";
-			} catch (UnknownAccountException e) {
-				error = "帐号不存在";
-			} catch (UnauthorizedException e) {
-				error = "您没有得到相应的授权！";
-			}
-		}
-		if(StringUtils.isBlank(error)){
-			return RestResponse.success("登录成功").setData(map);
-		}else{
-			return RestResponse.failure(error);
-		}
-	}
-	
-	/**
-	 * 登录成功后跳转到首页
-	 * @param model 模型对象
-	 * @return 首页路径
-	 */
-	@GetMapping("index")
-	public String showView(Model model){
-		return "index";
-	}
 
 	/**
 	 * 生成验证码
 	 * @param response HTTP响应对象
 	 */
 	@GetMapping("/genCaptcha")
-	public void genCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		//设置页面不缓存
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0);
+	public Result genCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String token = request.getHeader(Constants.CAPTCHA_TOKEN);
+		if (StringUtils.isBlank(token)) {
+			// 如果从头部信息中没获取到验证码koen，则新建一个token，如果拿到了就用原来的
+			token = UUID.randomUUID().toString().replaceAll("-", "");
+		}
 		String verifyCode = VerifyCodeUtil.generateTextCode(VerifyCodeUtil.TYPE_ALL_MIXED, 4, null);
-		//将验证码放到HttpSession里面
-		request.getSession().setAttribute(Constants.VALIDATE_CODE, verifyCode);
-		LOGGER.info("本次生成的验证码为[{}],已存放到HttpSession中",verifyCode);
-		//设置输出的内容的类型为JPEG图像
-		response.setContentType("image/jpeg");
+		//将验证码放到缓存里面REDIS,验证码有效期为5分钟
+		redisUtils.set(RedisConstants.USER_CAPTCHA_CACHE_KEY+token, verifyCode, Constants.USER_CAPTCHA_CACHE_EXPIRE_TIME,TimeUnit.MINUTES);
+		LOGGER.info("本次生成的验证码为[{}],已存放到Redis中,redis的key值为{}",verifyCode,RedisConstants.USER_CAPTCHA_CACHE_KEY+token);
 		BufferedImage bufferedImage = VerifyCodeUtil.generateImageCode(verifyCode, 116, 36, 5, true, new Color(249,205,173), null, null);
-		//写给浏览器
-		ImageIO.write(bufferedImage, "JPEG", response.getOutputStream());
+		Map<String,String> map = Maps.newHashMap();
+		map.put("key", token);
+		map.put("image", ToolUtil.getBase64FromImage(bufferedImage));
+		return Result.success(map);
 	}
 
-	/**
-	 * 登录成功后跳转到首页
-	 * @param model 模型对象
-	 * @return 首页路径
-	 */
-	@GetMapping("main")
-	public String main(Model model){
-		Map<String,Object> map = userService.selectUserMenuCount();
-		User user = userCacheService.findUserById(MySysUser.id());
-		Set<Menu> menus = user.getMenus();
-		java.util.List<Menu> showMenus = Lists.newArrayList();
-		if(menus != null && !menus.isEmpty()){
-			for (Menu menu : menus){
-				if(StringUtils.isNotBlank(menu.getHref())){
-					Long result = (Long)map.get(menu.getPermission());
-					if(result != null){
-						menu.setDataCount(result.intValue());
-						showMenus.add(menu);
-					}
-				}
-			}
-		}
-		showMenus.sort(new MenuComparator());
-		model.addAttribute("userMenu",showMenus);
-		return "main";
-	}
-
-	/**
-	 *  空地址请求
-	 */
-	@GetMapping(value = "")
-	public String index() {
-		LOGGER.info("这事空地址在请求路径");
-		Subject s = SecurityUtils.getSubject();
-		return s.isAuthenticated() ? "redirect:index" : "login";
-	}
-
-	/**
-	 * 用户登出
-	 * @return 登出结果
-	 */
-	@GetMapping("systemLogout")
-	@SysLog("退出系统")
-	public String logOut(){
-		SecurityUtils.getSubject().logout();
-		return "redirect:/login";
-	}
-}
-
-class MenuComparator implements Comparator<Menu>{
-
-	@Override
-	public int compare(Menu o1, Menu o2) {
-		if(o1.getSort()>o2.getSort()){
-			return -1;
-		}else {
-			return 0;
-		}
-
-	}
+	
 }

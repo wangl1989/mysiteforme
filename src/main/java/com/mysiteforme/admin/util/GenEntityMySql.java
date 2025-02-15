@@ -18,8 +18,8 @@ public class GenEntityMySql {
         Site site = new Site();
         site.setName("默认站点");
         site.setDescription("这是一个默认站点");
-        site.setAuthor("wang");
-        createTableFiles.createFile(new String[]{"blog_article"},1,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author, site);
+        site.setAuthor("wangl");
+        createTableFiles.createFile(new String[]{"sys_permission_group"},2,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author, site);
 
 
 	}

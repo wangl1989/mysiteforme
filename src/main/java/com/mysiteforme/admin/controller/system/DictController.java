@@ -10,13 +10,12 @@ import com.mysiteforme.admin.service.DictService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 import java.util.Map;
 
 /**
@@ -47,7 +46,6 @@ public class DictController extends BaseController{
         return "admin/system/dict/list";
     }
 
-    @RequiresPermissions("sys:dict:list")
     @PostMapping("list")
     @ResponseBody
     public LayerData<Dict> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -81,7 +79,6 @@ public class DictController extends BaseController{
         return "admin/system/dict/add";
     }
 
-    @RequiresPermissions("sys:dict:add")
     @PostMapping("add")
     @SysLog("新增系统字典")
     @ResponseBody
@@ -117,7 +114,6 @@ public class DictController extends BaseController{
         return "admin/system/dict/edit";
     }
 
-    @RequiresPermissions("sys:dict:edit")
     @PostMapping("edit")
     @SysLog("编辑系统字典")
     @ResponseBody
@@ -155,7 +151,6 @@ public class DictController extends BaseController{
         return RestResponse.success();
     }
 
-    @RequiresPermissions("sys:dict:editType")
     @PostMapping("editType")
     @SysLog("编辑系统字典类型")
     @ResponseBody

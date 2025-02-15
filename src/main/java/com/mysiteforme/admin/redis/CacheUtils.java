@@ -1,12 +1,14 @@
 package com.mysiteforme.admin.redis;
 
-import com.mysiteforme.admin.base.MySysUser;
 import com.mysiteforme.admin.dao.UserDao;
 import com.mysiteforme.admin.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
+
+import com.mysiteforme.admin.base.MySecurityUser;
 
 /**
  * Created by wangl on 2018/1/20.
@@ -36,6 +38,6 @@ public class CacheUtils {
             @CacheEvict(value = "user", key = "'user_tel_'+#result.tel", condition = "#result.tel != null and #result.tel != ''" ),
     })
     public User clearUserCache(){
-        return userDao.selectById(MySysUser.id());
+        return userDao.selectById(MySecurityUser.id());
     }
 }

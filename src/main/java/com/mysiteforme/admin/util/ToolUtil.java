@@ -1,4 +1,13 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:06:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-13 22:38:24
+ * @ Description: 基础工具类
+ */
+
 package com.mysiteforme.admin.util;
+
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -12,21 +21,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
+import java.awt.image.BufferedImage;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 public class ToolUtil {
 
@@ -56,6 +72,20 @@ public class ToolUtil {
 		}
 
 	}
+
+	/**
+	 * 将BufferedImage转换为Base64字符串
+	 * @param image BufferedImage对象
+	 * @return Base64编码的图片字符串
+	 * @throws IOException 如果转换失败
+	 */
+	public static String getBase64FromImage(BufferedImage image) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+		byte[] imageBytes = baos.toByteArray();
+		return Base64.getEncoder().encodeToString(imageBytes);
+    }
+
 
 	/**
 	 * 验证上传图片类型

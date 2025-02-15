@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-14 00:31:03
+ * @ Description: 用户基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -5,6 +13,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.collect.Sets;
 import com.mysiteforme.admin.base.DataEntity;
+import com.mysiteforme.admin.entity.VO.PermissionVO;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,14 +22,6 @@ import lombok.Setter;
 
 import java.util.Set;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
 @Data
@@ -62,10 +64,13 @@ public class User extends DataEntity {
 	private String icon;
 
 	@TableField(exist=false)
-	private Set<Role> roleLists = Sets.newHashSet();
+	private Set<Role> roles = Sets.newHashSet();
 	
 	@TableField(exist=false)
 	private Set<Menu> menus = Sets.newHashSet();
+
+	@TableField(exist=false)
+	private Set<PermissionVO> permissions = Sets.newHashSet();
 
 
 	@JSONField(serialize=false)

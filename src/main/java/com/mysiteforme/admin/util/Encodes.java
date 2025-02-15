@@ -1,12 +1,20 @@
 /**
- * Copyright (c) 2005-2012 springside.org.cn
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-14 00:33:57
+ * @ Description: 编码解码工具类
+ * 支持Base64、URL、Hex等多种编码格式
+ * 提供UTF8编码转换功能
  */
+
+
 package com.mysiteforme.admin.util;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-/**
- * 编码解码工具类
- * 支持Base64、URL、Hex等多种编码格式
- * 提供UTF8编码转换功能
- * @author calvin
- * @version 2013-01-15
- */
+
 public class Encodes {
 	private static final Logger logger = LoggerFactory.getLogger(Encodes.class);
 	private static final String DEFAULT_URL_ENCODING = "UTF-8";

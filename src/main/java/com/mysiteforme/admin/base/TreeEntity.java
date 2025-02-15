@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
-
 import java.util.List;
 
 /**
@@ -52,7 +50,6 @@ public class TreeEntity<T> extends DataEntity {
      * 获取父节点ID路径
      * @return 父节点ID路径字符串
      */
-    @Length(max = 1000, message = "路径长度必须介于 1 和 1000 之间")
     public String getParentIds() {
         return parentIds;
     }
