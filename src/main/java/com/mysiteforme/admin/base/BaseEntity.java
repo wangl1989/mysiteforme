@@ -1,5 +1,9 @@
 /**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:27:51
+ * @ Description: 实体类基类
  */
 package com.mysiteforme.admin.base;
 
@@ -14,11 +18,6 @@ import lombok.Setter;
 import java.io.Serializable;
 
 
-/**
- * 实体类基类
- * 提供ID等基础字段
- * @author JeeSite
- */
 @Getter
 @Setter
 @Data

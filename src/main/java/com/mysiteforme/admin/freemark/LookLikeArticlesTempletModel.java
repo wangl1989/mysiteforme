@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:01:38
+ * @ Description: 获取相似文章列表 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.google.common.collect.Maps;
@@ -7,18 +15,13 @@ import com.mysiteforme.admin.service.BlogArticleService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2018/2/7.
- * todo:
- */
-@Component
+@Deprecated
 public class LookLikeArticlesTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
     private BlogArticleService blogArticleService;

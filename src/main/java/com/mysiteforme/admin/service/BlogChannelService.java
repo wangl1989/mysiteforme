@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:27:42
+ * @ Description: 博客栏目Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -8,14 +16,6 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 
 import java.util.List;
 
-/**
- * <p>
- * 博客栏目 服务类
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
 public interface BlogChannelService extends IService<BlogChannel> {
 
     /**

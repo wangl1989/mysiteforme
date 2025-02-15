@@ -1,6 +1,11 @@
 /**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:28:48
+ * @ Description: 数据实体基类 提供创建者、创建时间、更新者、更新时间等审计字段
  */
+
 package com.mysiteforme.admin.base;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
@@ -14,11 +19,6 @@ import lombok.Setter;
 
 import java.util.Date;
 
-/**
- * 数据实体基类
- * 提供创建者、创建时间、更新者、更新时间等审计字段
- * @author JeeSite
- */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Getter

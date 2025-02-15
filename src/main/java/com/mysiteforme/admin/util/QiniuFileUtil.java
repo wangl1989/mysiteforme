@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:39:01
+ * @ Description: 七牛云文件操作工具类 提供七牛云文件上传、删除等操作
+ */
+
 package com.mysiteforme.admin.util;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,10 +32,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * 七牛云文件操作工具类
- * 提供七牛云文件上传、删除等操作
- */
 public class QiniuFileUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(QiniuFileUtil.class);

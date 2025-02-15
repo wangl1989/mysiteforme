@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 20:08:11
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:30:43
+ * @ Description: Druid数据源配置类 配置Druid监控统计功能
+ */
+
 package com.mysiteforme.admin.config;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +18,7 @@ import javax.sql.DataSource;
 import com.alibaba.druid.pool.DruidDataSource;
 import java.sql.SQLException;
 
-/**
- * Druid数据源配置类
- * 配置Druid监控统计功能
- */
+
 @Configuration
 public class DruidDBConfig {
 

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:48:38
+ * @ Description: 表字段展示对象
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 import com.mysiteforme.admin.entity.Dict;
@@ -8,11 +16,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * &#064;Author:tnt
- * &#064;Description:$
- * &#064;Date:  Create in 18:00 2017/12/25.
- */
 @Data
 @Getter
 @Setter

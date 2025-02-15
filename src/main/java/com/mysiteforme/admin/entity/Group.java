@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:51:17
+ * @ Description: 分组基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -7,14 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_group")
 @Data

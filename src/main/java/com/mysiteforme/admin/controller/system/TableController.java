@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:36:47
+ * @ Description: 数据表控制器 提供数据表的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import com.alibaba.fastjson.JSONObject;
@@ -29,11 +37,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
-/**
- * &#064;Author:tnt
- * &#064;Description:$
- * &#064;Date:  Create in 17:51 2017/12/25.
- */
+
 @Controller
 @RequestMapping("admin/system/table")
 public class TableController extends BaseController{

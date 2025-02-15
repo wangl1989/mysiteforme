@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:33:33
+ * @ Description: 常量类
+ */
+
 package com.mysiteforme.admin.util;
 
 /**

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 22:47:38
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:51:52
+ * @ Description: 权限基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;

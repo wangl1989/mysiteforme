@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 12:46:48
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:37:27
+ * @ Description: 消息工具类
+ */
+
 package com.mysiteforme.admin.util;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,12 +19,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import org.springframework.stereotype.Component;
 
-/**
- * 消息工具类
- * 
- * @author wangl
- * @date 2025/02/12
- */
+
 @Component
 public class MessageUtil implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 

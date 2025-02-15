@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:25:56
+ * @ Description: 上传信息服务实现类 提供上传信息的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,14 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * <p>
- * 文件上传配置 服务实现类
- * </p>
- *
- * @author wangl
- * @since 2018-07-06
- */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UploadInfoServiceImpl extends ServiceImpl<UploadInfoDao, UploadInfo> implements UploadInfoService {

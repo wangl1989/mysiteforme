@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:36:57
+ * @ Description: 用户控制器 提供用户的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,10 +41,7 @@ import java.util.Set;
 
 import com.mysiteforme.admin.base.MySecurityUser;
 
-/**
- * Created by wangl on 2017/11/21.
- *
- */
+
 @Controller
 @RequestMapping("admin/system/user")
 public class UserConteroller extends BaseController{

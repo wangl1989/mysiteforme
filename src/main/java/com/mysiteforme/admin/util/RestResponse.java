@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:39:38
+ * @ Description: RestResponse 类用于构建 RESTful 风格的响应体（后期换成自定义的Result对象）
+ */
+
 package com.mysiteforme.admin.util;
 
 import java.util.HashMap;

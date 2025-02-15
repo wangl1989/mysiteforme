@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:33:04
+ * @ Description: 定时任务工具类
+ */
+
 package com.mysiteforme.admin.util.quartz;
 
 import com.mysiteforme.admin.entity.QuartzTask;
@@ -7,13 +15,6 @@ import org.quartz.*;
 
 import java.util.Objects;
 
-
-/**
- * 类ScheduleUtils的功能描述:
- * 定时任务工具类
- * &#064;author  hxy
- * &#064;date  2017-08-25 16:18:10
- */
 public class ScheduleUtils {
     private final static String JOB_NAME = "TASK_";
     

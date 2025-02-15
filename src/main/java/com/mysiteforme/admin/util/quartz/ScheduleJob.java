@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:32:44
+ * @ Description: 定时任务调度
+ */
+
 package com.mysiteforme.admin.util.quartz;
 
 import com.mysiteforme.admin.entity.QuartzTask;
@@ -18,12 +26,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ExecutionException;
 
 
-/**
- * 类ScheduleJob的功能描述:
- * 定时任务
- * &#064;auther  hxy
- * &#064;date  2017-08-25 11:48:34
- */
 @Component
 public class ScheduleJob extends QuartzJobBean {
 	private static final Logger logger = LoggerFactory.getLogger(ScheduleJob.class);

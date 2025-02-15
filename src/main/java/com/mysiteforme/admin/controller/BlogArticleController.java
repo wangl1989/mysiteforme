@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:37:28
+ * @ Description: 博客文章控制器 提供博客文章的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.alibaba.fastjson.JSONObject;
@@ -35,14 +43,7 @@ import org.springframework.web.util.WebUtils;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 博客内容  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-19
- */
+
 @Controller
 @RequestMapping("/admin/blogArticle")
 public class BlogArticleController extends BaseController{

@@ -2,8 +2,8 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-11 14:55:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 00:31:49
- * @ Description: 系统文件controller
+ * @ Modified time: 2025-02-15 12:35:39
+ * @ Description: 资源控制器 提供资源的增删改查功能 
  */
 
 package com.mysiteforme.admin.controller.system;
@@ -26,10 +26,6 @@ import jakarta.servlet.ServletRequest;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2018/1/14.
- * todo:
- */
 @Controller
 @RequestMapping("/admin/system/rescource")
 public class RescourceController extends BaseController{

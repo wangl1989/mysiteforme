@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:35:00
+ * @ Description: 文件摘要计算工具类 提供文件MD5、SHA1等摘要算法的计算
+ */
+
 package com.mysiteforme.admin.util;
 
 import com.google.common.collect.Maps;
@@ -15,12 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * 文件摘要计算工具类
- * 提供文件MD5、SHA1等摘要算法的计算
- * 
- * @author wangl
- */
 public class DigestUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ToolUtil.class);

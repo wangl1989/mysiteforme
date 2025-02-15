@@ -1,3 +1,15 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:26:32
+ * @ Description:
+ *      在 Spring 中，@Cacheable 注解在同一个类中自调用时不会生效，
+ *      因为 Spring AOP 代理无法拦截同一个类中的方法调用。
+ *      为了解决这个问题，可以将需要缓存的方法提取到一个单独的服务类中，
+ *      然后在原来的服务类中注入这个新服务类并调用其方法。
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.google.common.collect.Maps;
@@ -10,12 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-/**
- * 在 Spring 中，@Cacheable 注解在同一个类中自调用时不会生效，
- * 因为 Spring AOP 代理无法拦截同一个类中的方法调用。
- * 为了解决这个问题，可以将需要缓存的方法提取到一个单独的服务类中，
- * 然后在原来的服务类中注入这个新服务类并调用其方法。
- */
 @Service("userCacheService")
 public class UserCacheServiceImpl implements UserCacheService {
 

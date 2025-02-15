@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:22:38
+ * @ Description: 组服务实现类 提供组的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 
@@ -8,14 +16,7 @@ import com.mysiteforme.admin.service.GroupService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * <p>
- *  服务实现类
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 @Service
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class GroupServiceImpl extends ServiceImpl<GroupDao, Group> implements GroupService {

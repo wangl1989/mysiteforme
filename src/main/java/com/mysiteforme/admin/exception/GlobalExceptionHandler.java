@@ -1,3 +1,12 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:02:46
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:54:46
+ * @ Description: 全局异常处理器类，用于捕获并处理应用程序中抛出的各种异常。
+*                 通过使用@ControllerAdvice注解，该类可以处理所有控制器中的异常。
+ */
+
 package com.mysiteforme.admin.exception;
 
 import java.io.IOException;
@@ -22,11 +31,6 @@ import com.mysiteforme.admin.util.ToolUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-/**
- * 全局异常处理器类，用于捕获并处理应用程序中抛出的各种异常。
- * 通过使用@ControllerAdvice注解，该类可以处理所有控制器中的异常。
- */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

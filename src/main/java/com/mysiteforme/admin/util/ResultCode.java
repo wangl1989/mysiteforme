@@ -1,10 +1,13 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 13:42:09
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:39:57
+ * @ Description: 结果码类 用于定义结果码
+ */
+
 package com.mysiteforme.admin.util;
 
-/**
- * 结果码
- * @author wangl
- * 
- */
 public class ResultCode {
   
     /**

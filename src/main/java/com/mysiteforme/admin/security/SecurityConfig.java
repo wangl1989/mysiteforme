@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 19:20:36
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 15:52:58
+ * @ Modified time: 2025-02-15 13:04:24
  * @ Description: Securit配置信息
  */
 
@@ -13,9 +13,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,7 +33,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.mysiteforme.admin.redis.LoginCache;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration

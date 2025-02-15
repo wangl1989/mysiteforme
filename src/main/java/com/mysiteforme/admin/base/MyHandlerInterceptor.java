@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:29:56
+ * @ Description: 系统通用拦截器，用于处理系统通用的请求拦截
+ */
+
 package com.mysiteforme.admin.base;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +27,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 
-/**
- * 系统通用拦截器
- * 用于处理系统通用的请求拦截
- * @author wangl
- * @since 2017/11/30
- */
 @Component
 public class MyHandlerInterceptor implements HandlerInterceptor {
 

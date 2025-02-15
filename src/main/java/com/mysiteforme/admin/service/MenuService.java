@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:28:39
+ * @ Description: 菜单Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -8,14 +16,7 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 public interface MenuService extends IService<Menu> {
 
     /**

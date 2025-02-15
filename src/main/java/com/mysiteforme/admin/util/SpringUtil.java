@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:40:27
+ * @ Description: SpringUtil 类用于获取 Spring 上下文中的 Bean
+ */
+
 package com.mysiteforme.admin.util;
 
 import lombok.Getter;
@@ -7,10 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by wangl on 2018/1/25.
- * todo: Spring 工具包 获取bean类
- */
+
 @Component
 public class SpringUtil implements ApplicationContextAware {
 

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:27:30
+ * @ Description: 博客文章Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -6,14 +14,7 @@ import com.mysiteforme.admin.entity.BlogArticle;
 
 import java.util.List;
 import java.util.Map;
-/**
- * <p>
- * 博客内容 服务类
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 public interface BlogArticleService extends IService<BlogArticle> {
 
     /**

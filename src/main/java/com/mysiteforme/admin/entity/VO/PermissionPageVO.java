@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 22:24:17
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:47:43
+ * @ Description: 权限页面展示对象
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 import lombok.Data;

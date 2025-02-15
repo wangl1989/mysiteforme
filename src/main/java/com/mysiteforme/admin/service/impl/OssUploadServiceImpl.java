@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:23:22
+ * @ Description: 阿里云上传服务实现类 提供阿里云上传的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.aliyun.oss.OSS;
@@ -27,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
+import java.io.IOException; 
 import java.io.InputStream;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;

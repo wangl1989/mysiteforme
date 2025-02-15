@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:30:59
+ * @ Description: FastJson实现的Redis序列化器 用于Redis数据的序列化和反序列化
+ */
+
 package com.mysiteforme.admin.config;
 
 import com.alibaba.fastjson.JSON;
@@ -8,12 +16,7 @@ import org.springframework.data.redis.serializer.SerializationException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-/**
- * FastJson实现的Redis序列化器
- * 用于Redis数据的序列化和反序列化
- * @author wangl
- * @since 2018/1/21
- */
+
 public class FastJson2JsonRedisSerializer<T> implements RedisSerializer<T> {
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 

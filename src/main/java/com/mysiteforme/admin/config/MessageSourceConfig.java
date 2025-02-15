@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 13:17:09
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:31:41
+ * @ Description: 配置消息源 用于国际化消息的加载
+ */
+
 package com.mysiteforme.admin.config;
 
 import org.springframework.context.MessageSource;
@@ -5,12 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
-/**
- * 配置消息源
- * 
- * @author wangl
- * @date 2025/02/12
- */
+
 @Configuration
 public class MessageSourceConfig {
     

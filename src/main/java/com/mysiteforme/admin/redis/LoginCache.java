@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 15:08:01
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 12:35:40
+ * @ Modified time: 2025-02-15 12:26:03
  * @ Description: 用户登录缓存操作
  */
 
@@ -13,9 +13,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysiteforme.admin.security.RequestWrapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
-import com.mysiteforme.admin.entity.VO.PermissionVO;
-import com.mysiteforme.admin.entity.VO.RoleVO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysiteforme.admin.entity.VO.UserLoginFail;
-import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.security.MyUserDetails;
 import com.mysiteforme.admin.util.ApiToolUtil;

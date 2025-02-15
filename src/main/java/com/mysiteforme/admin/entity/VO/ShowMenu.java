@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:48:24
+ * @ Description: 菜单展示对象
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 import com.google.common.collect.Lists;
@@ -8,10 +16,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by wangl on 2017/11/28.
- * todo:
- */
 @Data
 @Getter
 @Setter

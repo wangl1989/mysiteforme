@@ -1,11 +1,15 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:40:52
+ * @ Description: 下划线转驼峰法工具类
+ */
+
 package com.mysiteforme.admin.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by wangl on 2017/12/31.
- * todo:
- */
 public class Underline2Camel {
 
     /**

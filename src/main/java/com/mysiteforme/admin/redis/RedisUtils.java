@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 11:54:07
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:26:58
+ * @ Description: Redis基础操作类
+ */
+
 package com.mysiteforme.admin.redis;
 
 import java.util.Arrays;

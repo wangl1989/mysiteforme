@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:25:18
+ * @ Description: 角色服务实现类 提供角色的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,15 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-
-/**
- * <p>
- *  服务实现类
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
 @Service
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleService {

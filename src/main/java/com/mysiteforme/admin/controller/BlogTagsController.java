@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:38:15
+ * @ Description: 博客标签控制器 提供博客标签的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -25,14 +33,6 @@ import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 
-/**
- * <p>
- * 博客标签  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
 @Controller
 @RequestMapping("/admin/blogTags")
 public class BlogTagsController extends BaseController{

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:36:35
+ * @ Description: 网站控制器 提供网站的增删改查功能(这里可以设置系统通用功能)
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 
@@ -21,14 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * <p>
- *  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2017-12-30
- */
 @Controller
 @RequestMapping("/admin/system/site")
 public class SiteController extends BaseController{

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:30:26
+ * @ Description: 树形结构实体基类 提供树形结构所需的父子关系字段
+ */
+
 package com.mysiteforme.admin.base;
 
 
@@ -8,12 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
 
-/**
- * 树形结构实体基类
- * 提供树形结构所需的父子关系字段
- * @author chenjianann
- * @since 2014-05-16
- */
+
 @EqualsAndHashCode(callSuper = true)
 @Setter
 @Getter

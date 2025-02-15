@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 22:56:48
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 23:29:49
+ * @ Modified time: 2025-02-15 12:47:57
  * @ Description: 权限VO
  */
 
@@ -10,7 +10,9 @@ package com.mysiteforme.admin.entity.VO;
 
 import java.util.List;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

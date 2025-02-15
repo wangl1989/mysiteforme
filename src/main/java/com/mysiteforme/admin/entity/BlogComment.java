@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:50:41
+ * @ Description: 博客评论基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,14 +18,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-/**
- * <p>
- * 博客评论
- * </p>
- *
- * @author wangl
- * @since 2018-01-18
- */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Getter

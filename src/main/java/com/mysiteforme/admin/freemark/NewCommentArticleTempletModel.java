@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:01:30
+ * @ Description: 最新评论文章标签 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.entity.BlogArticle;
@@ -5,14 +13,13 @@ import com.mysiteforme.admin.service.BlogArticleService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Deprecated
 public class NewCommentArticleTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
     private BlogArticleService blogArticleService;

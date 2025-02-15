@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:53:15
+ * @ Description: 资源基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,14 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 系统资源
- * </p>
- *
- * @author wangl
- * @since 2018-01-14
- */
+
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_rescource")
 @Data

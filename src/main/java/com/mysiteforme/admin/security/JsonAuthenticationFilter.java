@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-15 01:07:30
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:02:57
+ * @ Description: 自定义登录过滤器，在这里读取流中的用户名密码，然后交给下一个验证器链路
+ */
+
 package com.mysiteforme.admin.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

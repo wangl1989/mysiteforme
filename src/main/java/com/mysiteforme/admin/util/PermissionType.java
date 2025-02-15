@@ -1,8 +1,16 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 22:34:07
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:38:31
+ * @ Description: 权限类型枚举类 用于定义权限类型
+ */
+
 package com.mysiteforme.admin.util;
 
 public enum PermissionType {
 
-    MENU(1, "菜单"),
+    PAGE(1, "页面"),
     BUTTON(2, "按钮"),
     API(3, "API");
 

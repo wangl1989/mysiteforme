@@ -1,16 +1,16 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:30:31
+ * @ Description: 站点Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Site;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author wangl
- * @since 2017-12-30
- */
 public interface SiteService extends IService<Site> {
 
     /**

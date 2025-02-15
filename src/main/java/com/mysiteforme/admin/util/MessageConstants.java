@@ -1,9 +1,13 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 13:00:52
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:37:14
+ * @ Description: 消息常量类 用于存储消息的常量
+ */
+
 package com.mysiteforme.admin.util;
 
-/**
- * @ Modified by: wangl
- * @ Modified time: 2025-02-13 20:28:15
- */
 public class MessageConstants {
     public static final String SUCCESS = "message.success";
     public static final String FAILED = "message.failed";

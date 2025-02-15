@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:49:42
+ * @ Description: ztree树形结构数据
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 import lombok.Data;
@@ -7,11 +15,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Ztree 树
- * @author Administrator
- *
- */
 @Data
 @Getter
 @Setter

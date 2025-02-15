@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:32:11
+ * @ Description: MybatisPlus配置类 配置分页插件
+ */
+
 package com.mysiteforme.admin.config;
 
 import org.mybatis.spring.annotation.MapperScan;
@@ -8,9 +16,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 
-/**
- * @author chen
- */
+
 @Configuration
 @MapperScan("com.mysiteforme.admin.dao*")
 public class MybatisPlusConfig {

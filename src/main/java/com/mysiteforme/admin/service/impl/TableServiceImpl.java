@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:25:45
+ * @ Description: 表服务实现类 提供表的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.alibaba.fastjson.JSON;
@@ -20,10 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wang on 2017/12/25.
- * todo:
- */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class TableServiceImpl implements TableService {

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:43:49
+ * @ Description: Freemarker模板引擎配置类 配置自定义标签和模型 （已废弃）
+ */
+
 package com.mysiteforme.admin.config;
 
 import com.mysiteforme.admin.freemark.*;
@@ -5,16 +13,10 @@ import freemarker.template.Configuration;
 import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 
-/**
- * Freemarker模板引擎配置类
- * 配置自定义标签和模型
- * @author wangl
- * @since 2017/11/26
- */
-@Component
+
+@Deprecated
 public class FreemarkerConfig {
 
     private Configuration configuration;

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:23:00
+ * @ Description: 日志服务实现类 提供日志的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,14 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 系统日志 服务实现类
- * </p>
- *
- * @author wangl
- * @since 2018-01-14
- */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogService {

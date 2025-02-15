@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:02:46
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:26:45
+ * @ Description: 用户服务实现类 提供用户的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,14 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * <p>
- *  服务实现类
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
 @Service("userService")
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserService {

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:33:52
+ * @ Description: 数据库表生成文件工具类 用于根据数据库表结构自动生成相关的实体类、Mapper、Service等文件
+ */
+
 package com.mysiteforme.admin.util;
 
 import java.util.ArrayList;
@@ -16,12 +24,6 @@ import com.mysiteforme.admin.base.DataEntity;
 import com.mysiteforme.admin.base.TreeEntity;
 import com.mysiteforme.admin.entity.Site;
 
-/**
- * 数据库表生成文件工具类
- * 用于根据数据库表结构自动生成相关的实体类、Mapper、Service等文件
- * 
- * @author wangl
- */
 @Component
 public class CreateTableFiles {
     @Value("${spring.datasource.druid.driver-class-name}")

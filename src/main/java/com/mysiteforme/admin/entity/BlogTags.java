@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:50:50
+ * @ Description: 博客标签基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,14 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 博客标签
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 @EqualsAndHashCode(callSuper = true)
 @TableName("blog_tags")
 @Data

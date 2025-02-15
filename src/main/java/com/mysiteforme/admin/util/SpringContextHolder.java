@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:40:16
+ * @ Description: SpringContextHolder 类用于保存 Spring ApplicationContext，并提供获取 Bean 的方法
+ */
+
 package com.mysiteforme.admin.util;
 
 
@@ -11,12 +19,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-/**
- * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出ApplicaitonContext.
- * 
- * @author XXXXXX
- * &#064;date  2013-5-29 下午1:25:40
- */
 @Service
 @Lazy(false)
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {

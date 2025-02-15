@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:38:00
+ * @ Description: 博客评论控制器 提供博客评论的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,14 +34,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 
-/**
- * <p>
- * 博客评论  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-18
- */
+
 @Controller
 @RequestMapping("/admin/blogComment")
 public class BlogCommentController {

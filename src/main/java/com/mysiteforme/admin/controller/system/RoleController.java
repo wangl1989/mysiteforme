@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:35:48
+ * @ Description: 角色控制器 提供角色的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,10 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by wangl on 2017/12/2.
- * todo:
- */
 @Controller
 @RequestMapping("admin/system/role")
 public class RoleController extends BaseController{

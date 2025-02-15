@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:53:25
+ * @ Description: 角色基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,14 +18,6 @@ import lombok.Setter;
 
 import java.util.Set;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_role")
 @Getter

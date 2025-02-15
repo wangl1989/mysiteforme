@@ -2,10 +2,9 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 13:53:29
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 12:28:54
- * @ Description:
+ * @ Modified time: 2025-02-15 13:33:24
+ * @ Description: API工具类
  */
-
 package com.mysiteforme.admin.util;
 
 import java.io.IOException;

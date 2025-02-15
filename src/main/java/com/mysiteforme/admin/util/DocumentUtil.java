@@ -1,14 +1,16 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:35:13
+ * @ Description: Lucene文档工具类 用于创建和管理Lucene索引文档
+ */
+
 package com.mysiteforme.admin.util;
 
 import com.mysiteforme.admin.entity.BlogArticle;
 import org.apache.lucene.document.*;
 
-/**
- * Lucene文档工具类
- * 用于创建和管理Lucene索引文档
- * 
- * @author wangl
- */
 public class DocumentUtil {
 
     /**

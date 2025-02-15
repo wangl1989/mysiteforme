@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:50:14
+ * @ Description: 博客基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import java.util.Date;
@@ -11,14 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 博客内容
- * </p>
- *
- * @author wangl
- * @since 2018-01-18
- */
+
 @EqualsAndHashCode(callSuper = true)
 @Setter
 @Getter

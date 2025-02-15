@@ -2,8 +2,8 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-14 02:38:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 22:45:18
- * @ Description:
+ * @ Modified time: 2025-02-15 12:34:50
+ * @ Description: 权限控制器 提供权限的增删改查功能
  */
 
 package com.mysiteforme.admin.controller.system;
@@ -29,14 +29,7 @@ import com.mysiteforme.admin.util.Result;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * <p>
- *   前端控制器
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/admin/system/permission")

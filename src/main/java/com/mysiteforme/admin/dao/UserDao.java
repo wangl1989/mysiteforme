@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:45:16
+ * @ Description: 用户数据层接口 提供用户的增删改查功能
+ */
+
 package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -11,14 +19,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * <p>
-  *  Mapper 接口
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 @Mapper
 public interface UserDao extends BaseMapper<User> {
 	User selectUserByMap(Map<String, Object> map);

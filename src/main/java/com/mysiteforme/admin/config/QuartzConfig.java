@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 20:33:34
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:32:31
+ * @ Description: Quartz定时任务配置类 配置定时任务的执行器和持久化
+ */
+
 package com.mysiteforme.admin.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +18,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 
-/**
- * Quartz定时任务配置类
- * 配置定时任务的执行器和持久化
- * @author wangl
- * @since 2018/1/25
- */
 @Configuration
 public class QuartzConfig {
 

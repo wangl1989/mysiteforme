@@ -1,4 +1,17 @@
 /**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:34:41
+ * @ Description:
+ * 消息摘要工具类
+ * 支持SHA-1、MD5等消息摘要算法
+ * 可以对字符串、字节数组等进行摘要计算
+ * <p>
+ * 返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
+ */
+
+/**
  * Copyright (c) 2005-2012 springside.org.cn
  */
 package com.mysiteforme.admin.util;
@@ -13,15 +26,6 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
-/**
- * 消息摘要工具类
- * 支持SHA-1、MD5等消息摘要算法
- * 可以对字符串、字节数组等进行摘要计算
- * <p>
- * 返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
- * 
- * @author calvin
- */
 public class Digests {
 	private static final Logger logger = LoggerFactory.getLogger(Digests.class);
 

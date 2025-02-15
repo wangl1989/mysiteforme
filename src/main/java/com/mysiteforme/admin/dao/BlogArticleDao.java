@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:40:00
+ * @ Description: 博客文章数据层接口 提供博客文章的增删改查功能
+ */
+
 package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -9,14 +17,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 博客内容 Mapper 接口
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 @Mapper
 public interface BlogArticleDao extends BaseMapper<BlogArticle> {
 

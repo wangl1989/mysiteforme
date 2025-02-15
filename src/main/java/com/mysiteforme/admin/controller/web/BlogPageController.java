@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:37:14
+ * @ Description: 博客页面控制器 提供博客页面的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.web;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -31,10 +39,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2018/1/21.
- * todo:
- */
+
 @RequestMapping("showBlog")
 @Controller
 public class BlogPageController extends BaseController{

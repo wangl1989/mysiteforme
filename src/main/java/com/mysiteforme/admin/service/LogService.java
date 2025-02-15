@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:28:29
+ * @ Description: 日志Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -5,14 +13,7 @@ import com.mysiteforme.admin.entity.Log;
 
 import java.util.List;
 
-/**
- * <p>
- * 系统日志 服务类
- * </p>
- *
- * @author wangl
- * @since 2018-01-13
- */
+
 public interface LogService extends IService<Log> {
 
     /**

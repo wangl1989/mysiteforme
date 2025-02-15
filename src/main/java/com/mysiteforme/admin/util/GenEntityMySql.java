@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:35:50
+ * @ Description: 数据库表生成实体类测试
+ */
+
 package com.mysiteforme.admin.util;
 
 

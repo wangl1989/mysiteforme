@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:32:54
+ * @ Description: 执行定时任务
+ */
+
 package com.mysiteforme.admin.util.quartz;
 
 import com.mysiteforme.admin.exception.MyException;
@@ -7,12 +15,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 
-/**
- * 类ScheduleRunnable的功能描述:
- * 执行定时任务
- * @auther hxy
- * @date 2017-08-25 16:18:02
- */
 public class ScheduleRunnable implements Runnable {
 	private final Object target;
 	private final Method method;

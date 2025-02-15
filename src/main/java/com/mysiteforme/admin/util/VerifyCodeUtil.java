@@ -1,3 +1,15 @@
+/**
+ * @ Author: 玄玉
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:41:35
+ * @ Description: 验证码生成器
+ * 可生成数字、大写、小写字母及三者混合类型的验证码
+ * 支持自定义验证码字符数量,支持自定义验证码图片的大小,支持自定义需排除的特殊字符,支持自定义干扰线的数量,支持自定义验证码图文颜色
+ * 另外,给Shiro加入验证码有多种方式,也可以通过继承修改FormAuthenticationFilter类,通过Shiro去验证验证码
+ * 而这里既然使用了SpringMVC,也为了简化操作,就使用此工具生成验证码,并在Controller中处理验证码的校验
+ */
+
 package com.mysiteforme.admin.util;
 
 import java.awt.Color;
@@ -7,15 +19,6 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 
-/**
- * 验证码生成器
- * 可生成数字、大写、小写字母及三者混合类型的验证码
- * 支持自定义验证码字符数量,支持自定义验证码图片的大小,支持自定义需排除的特殊字符,支持自定义干扰线的数量,支持自定义验证码图文颜色
- * 另外,给Shiro加入验证码有多种方式,也可以通过继承修改FormAuthenticationFilter类,通过Shiro去验证验证码
- * 而这里既然使用了SpringMVC,也为了简化操作,就使用此工具生成验证码,并在Controller中处理验证码的校验
- * &#064;create  Sep 29, 2013 4:23:13 PM
- * @author 玄玉
- */
 public class VerifyCodeUtil {
     /**
      * 验证码类型为仅数字,即0~9

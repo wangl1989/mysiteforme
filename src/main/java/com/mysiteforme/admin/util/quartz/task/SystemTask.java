@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:32:31
+ * @ Description: 系统定时任务（可在前端配置）
+ */
+
 package com.mysiteforme.admin.util.quartz.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,10 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Created by wangl on 2018/1/26.
- * todo: 系统定时任务
- */
 @Component("systemTask")
 public class SystemTask {
 

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:01:15
+ * @ Description: 获取字典标签 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.google.common.collect.Lists;
@@ -7,18 +15,13 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2017/11/26.
- * todo: 获取字典标签
- */
-@Component
+@Deprecated
 public class SystemDirective extends BaseDirective implements TemplateDirectiveModel {
 
     private DictService dictService;

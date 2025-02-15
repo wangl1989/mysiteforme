@@ -1,16 +1,17 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:27:53
+ * @ Description: 博客评论Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.BlogComment;
-/**
- * <p>
- * 博客评论 服务类
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 public interface BlogCommentService extends IService<BlogComment> {
 
     /**

@@ -1,18 +1,22 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:01:09
+ * @ Description: 根据用户ID获取用户详情 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.service.UserCacheService;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Created by wangl on 2018/1/23.
- * todo: 根据用户ID获取用户详情
- */
-@Component
+
+@Deprecated
 public class SysUserTempletModel implements TemplateMethodModelEx {
     private UserCacheService userCacheService;
 

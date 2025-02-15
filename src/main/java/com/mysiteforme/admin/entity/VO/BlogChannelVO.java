@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:47:14
+ * @ Description: 博客栏目前端展示对象
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 

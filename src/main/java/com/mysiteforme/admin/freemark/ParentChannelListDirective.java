@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:01:22
+ * @ Description: 获取当前栏目（文章）父栏目集合 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.entity.BlogChannel;
@@ -5,18 +13,13 @@ import com.mysiteforme.admin.service.BlogChannelService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2018/1/22.
- * todo: 当前栏目(文章)父栏目集合
- */
-@Component
+@Deprecated
 public class ParentChannelListDirective extends BaseDirective implements TemplateDirectiveModel {
 
     private BlogChannelService blogChannelService;

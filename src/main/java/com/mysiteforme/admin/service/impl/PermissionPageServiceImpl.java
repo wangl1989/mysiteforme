@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 13:55:47
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:24:05
+ * @ Description: 权限页面服务实现类 提供权限页面的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import org.springframework.beans.BeanUtils;
@@ -11,14 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.DTO.PermissionPageDTO;
 
 
-/**
- * <p>
- *  服务实现类
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class PermissionPageServiceImpl extends ServiceImpl<PermissionPageDao, PermissionPage> implements PermissionPageService {

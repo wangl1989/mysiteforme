@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:53:57
+ * @ Description: 文件上传配置基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,14 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 文件上传配置
- * </p>
- *
- * @author wangl
- * @since 2018-07-06
- */
+
 @EqualsAndHashCode(callSuper = true)
 @TableName("upload_info")
 @Data

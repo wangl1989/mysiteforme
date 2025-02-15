@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:39:32
+ * @ Description: 定时任务日志控制器 提供定时任务日志的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -25,14 +33,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 
-/**
- * <p>
- * 任务执行日志  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-25
- */
+
 @Controller
 @RequestMapping("/admin/quartzTaskLog")
 public class QuartzTaskLogController {

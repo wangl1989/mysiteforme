@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:33:55
+ * @ Description: 菜单控制器 提供菜单的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import com.alibaba.fastjson.JSONObject;
@@ -19,10 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2017/12/3.
- * todo:
- */
+
 @Controller
 @RequestMapping("/admin/system/menu")
 public class MenuController extends BaseController{

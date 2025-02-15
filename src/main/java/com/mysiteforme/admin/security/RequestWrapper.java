@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-15 04:23:23
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:04:09
+ * @ Description: Request请求包装类，处理Stream流读取只能读取一次的问题
+ */
+
 package com.mysiteforme.admin.security;
 
 

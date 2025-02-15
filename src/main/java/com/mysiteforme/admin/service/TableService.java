@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:30:44
+ * @ Description: 数据表Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,10 +15,6 @@ import com.mysiteforme.admin.entity.VO.TableVO;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2017/12/25.
- * todo: 数据表service
- */
 public interface TableService {
 
     /**

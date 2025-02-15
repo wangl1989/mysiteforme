@@ -1,9 +1,12 @@
-package com.mysiteforme.admin.util;
-
 /**
- * Created by wangl on 2018/1/14.
- * todo:计算文件在七牛云存储上的 hash 值
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:02:46
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:38:46
+ * @ Description: 计算文件在七牛云存储上的 hash 值
  */
+
+package com.mysiteforme.admin.util;
 
 import org.springframework.web.multipart.MultipartFile;
 

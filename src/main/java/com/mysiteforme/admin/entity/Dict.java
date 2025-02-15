@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:51:04
+ * @ Description: 字典表基类
+ */
+
 package com.mysiteforme.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,14 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 字典表
- * </p>
- *
- * @author wangl
- * @since 2017-11-26
- */
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Getter

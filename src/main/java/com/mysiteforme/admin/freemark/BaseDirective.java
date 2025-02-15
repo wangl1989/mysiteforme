@@ -1,11 +1,16 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:56:23
+ * @ Description: 基础指令类 已废弃 
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import freemarker.template.*;
 
-/**
- * Created by wangl on 2017/11/26.
- * todo:
- */
+@Deprecated
 public class BaseDirective {
 
     public String getString(TemplateModel paramValue) throws TemplateModelException {

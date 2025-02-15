@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:56:58
+ * @ Description: 评论数量标签
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.exception.MyException;
@@ -5,11 +13,10 @@ import com.mysiteforme.admin.service.BlogCommentService;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+@Deprecated
 public class CommentNumberTempletModel implements TemplateMethodModelEx {
 
     private BlogCommentService blogCommentService;

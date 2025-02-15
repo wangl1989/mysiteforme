@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:28:12
+ * @ Description: 字典Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -5,14 +13,7 @@ import com.mysiteforme.admin.entity.Dict;
 
 import java.util.List;
 
-/**
- * <p>
- * 字典表 服务类
- * </p>
- *
- * @author wangl
- * @since 2017-11-26
- */
+
 public interface DictService extends IService<Dict> {
 
     /**

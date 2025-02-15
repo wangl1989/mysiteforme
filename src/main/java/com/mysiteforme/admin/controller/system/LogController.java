@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:33:37
+ * @ Description: 日志控制器 提供日志的查询功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import java.util.List;
@@ -23,10 +31,7 @@ import com.mysiteforme.admin.service.LogService;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 
-/**
- * Created by wangl on 2018/1/13.
- * todo:
- */
+
 @Controller
 @RequestMapping("admin/system/log")
 public class LogController extends BaseController{

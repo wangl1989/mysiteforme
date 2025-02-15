@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 15:04:25
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:34:32
+ * @ Description: 权限按钮控制器 提供权限按钮的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller.system;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +23,6 @@ import com.mysiteforme.admin.util.Result;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * <p>
- * PermissionButton  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
 @Slf4j
 @RestController
 @RequestMapping("/admin/system/permission/button")

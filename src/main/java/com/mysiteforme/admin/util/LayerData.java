@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:36:56
+ * @ Description: Layer数据封装类 用于返回前端数据，后期转为返回自定义的Result类
+ */
+
 package com.mysiteforme.admin.util;
 
 import lombok.Data;

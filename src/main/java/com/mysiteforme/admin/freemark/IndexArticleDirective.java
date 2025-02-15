@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:57:30
+ * @ Description: 获取文章列表数据（可选参数：排序，集合长度） 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.google.common.collect.Maps;
@@ -6,18 +14,13 @@ import com.mysiteforme.admin.service.BlogArticleService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wangl on 2018/1/20.
- * todo:获取文章列表数据（可选参数：排序，集合长度）
- */
-@Component
+@Deprecated
 public class IndexArticleDirective extends BaseDirective implements TemplateDirectiveModel {
 
     private BlogArticleService blogArticleService;

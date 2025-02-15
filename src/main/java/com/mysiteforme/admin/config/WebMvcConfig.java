@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:06:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:14:52
+ * @ Description: WebMvc配置类 配置视图解析、资源映射、消息转换等
+ */
+
 package com.mysiteforme.admin.config;
 
 import java.nio.charset.StandardCharsets;
@@ -27,55 +35,44 @@ import com.mysiteforme.admin.base.MyHandlerInterceptor;
 import com.mysiteforme.admin.security.SecurityHeadersFilter;
 import com.mysiteforme.admin.security.XssFilter;
 
-/**
- * Spring MVC配置类
- * 配置视图解析、资源映射、消息转换等
- * @author wang
- * @since 2025/02/07
- */
+
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-//    /**
-//     * 添加视图控制器
-//     * @param registry 视图控制器注册器
-//     */
-//    @Override
-//    public void addViewControllers(@NotNull ViewControllerRegistry registry) {
-//        registry.addViewController("/login").setViewName("login");  // 将 `/login` 映射到 `login.html`
-//        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);              // 优先级（可选）
-//    }
+    @Bean
+    public XssFilter xssFilter() {
+        return new XssFilter();
+    }
 
-//    /**
-//     * RequestContextListener注册
-//     */
-//    @Bean
-//    public ServletListenerRegistrationBean<RequestContextListener> requestContextListenerRegistration() {
-//        return new ServletListenerRegistrationBean<>(new RequestContextListener());
-//    }
-//
-//    @Bean
-//    public FilterRegistrationBean<XssFilter> xssFilterRegistration() {
-//        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
-//        registration.setFilter(new XssFilter());
-//        registration.addUrlPatterns("/*");
-//        registration.setName("xssFilter");
-//
-//        // 添加不需要过滤的路径
-////        Map<String, String> initParameters = Maps.newHashMap();
-////        initParameters.put("excludes", "/static/*,/assets/*");
-////        registration.setInitParameters(initParameters);
-//        registration.setOrder(1);
-//        return registration;
-//    }
-//    @Bean
-//    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter() {
-//        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
-//        registrationBean.setFilter(new SecurityHeadersFilter());
-//        registrationBean.addUrlPatterns("/*");
-//        registrationBean.setOrder(2);
-//        return registrationBean;
-//    }
+    @Bean
+    public SecurityHeadersFilter securityHeadersFilter() {
+        return new SecurityHeadersFilter();
+    }
+
+    @Bean
+    public FilterRegistrationBean<XssFilter> xssFilterRegistration(XssFilter xssFilter) {
+        FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(xssFilter);
+        registration.addUrlPatterns("/*");
+        registration.setName("xssFilter");
+        /*
+         * 添加不需要过滤的路径
+         * Map<String, String> initParameters = Maps.newHashMap();
+         * initParameters.put("excludes", "/static/*,/assets/*");
+         * registration.setInitParameters(initParameters);
+         */
+        registration.setOrder(1);
+        return registration;
+    }
+    
+    @Bean
+    public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter(SecurityHeadersFilter securityHeadersFilter) {
+        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(securityHeadersFilter);
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setOrder(2);
+        return registrationBean;
+    }
 
     /**
      * 配置静态资源映射
@@ -85,15 +82,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
-
-//    //跨域配置（CORS）
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**")                   // 允许跨域的路径
-////                .allowedOrigins("https://example.com")    // 允许的来源
-//                .allowedMethods("GET", "POST")           // 允许的HTTP方法
-//                .allowCredentials(true);                 // 允许携带凭证（如Cookie）
-//    }
 
     /**
      * 配置消息转换器
@@ -117,6 +105,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         converters.add(responseBodyConverter());
     }
 
+    /**
+     * 配置文件上传大小限制
+     * @return 文件上传配置
+     */
     @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
@@ -130,6 +122,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return factory.createMultipartConfig();
     }
 
+    /**
+     * 配置字符串消息转换器
+     * @return 字符串消息转换器
+     */
     @Bean
     public HttpMessageConverter<String> responseBodyConverter() {
         return new StringHttpMessageConverter(

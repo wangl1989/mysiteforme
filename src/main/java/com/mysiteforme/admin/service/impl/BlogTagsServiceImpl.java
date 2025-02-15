@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:22:15
+ * @ Description: 博客标签服务实现类 
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -14,14 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 博客标签 服务实现类
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTags> implements BlogTagsService {

@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:37:41
+ * @ Description: 博客栏目控制器 提供博客栏目的增删改查功能 
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,14 +34,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * <p>
- * 博客栏目  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-17
- */
+
 @Controller
 @RequestMapping("/admin/blogChannel")
 public class BlogChannelController extends BaseController{

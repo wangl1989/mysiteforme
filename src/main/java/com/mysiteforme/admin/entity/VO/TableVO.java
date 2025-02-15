@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:48:55
+ * @ Description: 数据库的表展示对象
+ */
+
 package com.mysiteforme.admin.entity.VO;
 
 import lombok.Data;
@@ -8,11 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/**
- * &#064;Author:tnt
- * &#064;Description:$
- * &#064;Date:  Create in 17:55 2017/12/25.
- */
+
 @Data
 @Getter
 @Setter

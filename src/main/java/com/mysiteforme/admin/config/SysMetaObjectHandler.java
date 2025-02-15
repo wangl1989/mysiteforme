@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:32:44
+ * @ Description: mybatisplus自定义填充公共字段 ,即没有传的字段自动填充
+ */
+
 package com.mysiteforme.admin.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
@@ -11,10 +19,7 @@ import java.util.Date;
 
 import com.mysiteforme.admin.base.MySecurityUser;
 
-/**
- * mybatisplus自定义填充公共字段 ,即没有传的字段自动填充
- * @author chen
- */
+
 @Component
 public class SysMetaObjectHandler implements MetaObjectHandler {
 

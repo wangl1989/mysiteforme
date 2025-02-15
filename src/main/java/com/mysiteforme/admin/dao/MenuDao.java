@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:42:12
+ * @ Description: 菜单数据层接口 提供菜单的增删改查功能
+ */
+
 package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -8,14 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
-  *  Mapper 接口
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 @Mapper
 public interface MenuDao extends BaseMapper<Menu> {
 

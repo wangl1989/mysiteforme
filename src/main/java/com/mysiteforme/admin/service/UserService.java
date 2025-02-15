@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:02:46
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:31:37
+ * @ Description: 用户Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -8,14 +16,7 @@ import com.mysiteforme.admin.entity.VO.UserVO;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author wangl
- * @since 2017-10-31
- */
+
 public interface UserService extends IService<User> {
 
 	User findUserByLoginName(String name);

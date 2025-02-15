@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:00:50
+ * @ Description: 获取文章的标签集合 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.entity.BlogTags;
@@ -6,18 +14,13 @@ import com.mysiteforme.admin.service.BlogTagsService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by wang on 2018/2/4.
- * todo: 获取文章的标签集合
- */
-@Component
+@Deprecated
 public class TagsTempletModel extends BaseDirective implements TemplateDirectiveModel {
 
     private BlogTagsService blogTagsService;

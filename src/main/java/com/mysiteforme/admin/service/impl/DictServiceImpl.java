@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:22:29
+ * @ Description: 字典服务实现类 提供字典的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,14 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * <p>
- * 字典表 服务实现类
- * </p>
- *
- * @author wangl
- * @since 2017-11-26
- */
+
 @Service
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictService {

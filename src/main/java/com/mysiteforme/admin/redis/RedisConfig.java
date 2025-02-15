@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-13 11:27:04
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:26:32
+ * @ Description: Redis配置类
+ */
+
 package com.mysiteforme.admin.redis;
 
 import java.time.Duration;

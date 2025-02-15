@@ -2,8 +2,8 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 20:39:17
  * @ Modified by: wangl
- * @ Modified time: 2025-02-13 20:32:15
- * @ Description: 用户认证服务类
+ * @ Modified time: 2025-02-15 13:19:55
+ * @ Description: 用户认证服务类 Security用户实现类
  */
 
 package com.mysiteforme.admin.security;

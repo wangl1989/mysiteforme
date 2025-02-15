@@ -1,7 +1,16 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:06:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:19:24
+ * @ Description: XSS过滤器
+ */
+
 package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 import java.util.List;
+
 
 import com.google.common.collect.Lists;
 
@@ -13,11 +22,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * XSS过滤器
- * @author wangl
- * 
- */
 public class XssFilter implements Filter {
 
     private static final List<String> EXCLUDE_URLS = Lists.newArrayList();
@@ -45,7 +49,7 @@ public class XssFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // 初始化Xss拦截器
-//        throw new UnsupportedOperationException("Unimplemented method 'init'");
+        // throw new UnsupportedOperationException("Unimplemented method 'init'");
     }
 
     @Override

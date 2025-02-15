@@ -1,20 +1,21 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:00:41
+ * @ Description: 文章点击量标签 已废弃
+ */
+
 package com.mysiteforme.admin.freemark;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.mysiteforme.admin.service.BlogArticleService;
-
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 
-/**
- * Created by wangl on 2018/1/22.
- * todo:文章点击量标签
- */
-@Component
+@Deprecated
 public class ArticleClickTempletModel implements TemplateMethodModelEx {
 
 

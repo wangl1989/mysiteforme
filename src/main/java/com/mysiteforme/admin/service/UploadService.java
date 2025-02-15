@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:31:06
+ * @ Description: 上传Service
+ */
+
 package com.mysiteforme.admin.service;
 
 import com.mysiteforme.admin.entity.UploadInfo;

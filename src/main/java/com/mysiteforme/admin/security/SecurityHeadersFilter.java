@@ -1,8 +1,15 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-12 04:06:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:16:25
+ * @ Description: 安全响应头过滤器（CSP、X-Frame-Options、X-XSS-Protection、X-Content-Type-Options）
+ */
+
 package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
-import org.springframework.stereotype.Component;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -11,12 +18,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * 安全响应头过滤器
- * @author wangl
- * 
- */
-@Component
 public class SecurityHeadersFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,

@@ -2,8 +2,8 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 17:57:59
  * @ Modified by: wangl
- * @ Modified time: 2025-02-13 21:53:49
- * @ Description:
+ * @ Modified time: 2025-02-15 12:26:38
+ * @ Description: Redis常量类
  */
 
 package com.mysiteforme.admin.redis;

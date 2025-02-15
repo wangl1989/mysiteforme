@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:21:41
+ * @ Description: 博客栏目服务实现类 提供栏目的业务逻辑处理
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,18 +29,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-/*
-  <p>
-  博客栏目 服务实现类
-  </p>
-
-  @author wangl
- * @since 2018-01-17
- */
-/**
- * 博客栏目服务实现类
- * 提供栏目的业务逻辑处理
- */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class BlogChannelServiceImpl extends ServiceImpl<BlogChannelDao, BlogChannel> implements BlogChannelService {

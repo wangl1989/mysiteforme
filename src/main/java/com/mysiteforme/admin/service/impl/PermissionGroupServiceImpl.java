@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-14 22:39:40
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:23:57
+ * @ Description: 权限组服务实现类 提供权限组的服务
+ */
+
 package com.mysiteforme.admin.service.impl;
 
 import org.springframework.beans.BeanUtils;
@@ -11,14 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.DTO.PermissionGroupDTO;
 
 
-/**
- * <p>
- *  服务实现类
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class PermissionGroupServiceImpl extends ServiceImpl<PermissionGroupDao, PermissionGroup> implements PermissionGroupService {

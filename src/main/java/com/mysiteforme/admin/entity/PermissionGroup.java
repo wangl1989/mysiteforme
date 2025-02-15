@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-14 22:39:40
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 22:46:14
+ * @ Modified time: 2025-02-15 12:52:17
  * @ Description: 权限组别
  */
 
@@ -16,14 +16,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
+
 @SuppressWarnings("rawtypes")
 @Data
 @EqualsAndHashCode(callSuper = true)

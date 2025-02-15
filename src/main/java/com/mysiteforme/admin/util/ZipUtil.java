@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:41:52
+ * @ Description: 文件压缩工具类
+ */
+
 package com.mysiteforme.admin.util;
 
 import java.io.*;
@@ -5,12 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-/**
- * &#064;Author:tnt
- * &#064;Description:$
- * &#064;Date:  Create in 9:50 2025/1/10.
- */
 public class ZipUtil {
 
     /**

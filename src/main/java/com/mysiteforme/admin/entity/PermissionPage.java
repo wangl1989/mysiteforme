@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-14 13:55:47
  * @ Modified by: wangl
- * @ Modified time: 2025-02-14 22:46:36
+ * @ Modified time: 2025-02-15 12:52:48
  * @ Description: 前端页面路由权限
  */
 
@@ -13,15 +13,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-/**
- * <p>
- * 
- * </p>
- *
- * @author wangl
- * @since 2025-02-14
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_permission_page")

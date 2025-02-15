@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:55:05
+ * @ Description: 自定义异常类
+ */
+
 package com.mysiteforme.admin.exception;
 
 import com.mysiteforme.admin.util.ResultCode;
@@ -5,11 +13,6 @@ import com.mysiteforme.admin.util.ResultCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Created by wangl on 2018/1/24.
- * todo: 使用lombok注解代替builder模式
- * update by wangl on 2025/02/11
- */
 @Getter
 @Setter
 public class MyException extends RuntimeException {

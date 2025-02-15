@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:28:09
+ * @ Description: 博客系统拦截器，用于处理博客相关的请求拦截
+ */
+
 package com.mysiteforme.admin.base;
 
 import org.jetbrains.annotations.NotNull;
@@ -15,12 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 
-/**
- * 博客系统拦截器
- * 用于处理博客相关的请求拦截
- * @author wangl
- * @since 2017/11/30
- */
+
 @Component
 public class BlogHandlerInterceptor implements HandlerInterceptor {
 

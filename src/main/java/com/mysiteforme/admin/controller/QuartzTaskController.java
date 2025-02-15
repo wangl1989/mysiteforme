@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:39:20
+ * @ Description: 定时任务控制器 提供定时任务的增删改查功能
+ */
+
 package com.mysiteforme.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,14 +34,6 @@ import org.springframework.web.util.WebUtils;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 定时任务  前端控制器
- * </p>
- *
- * @author wangl
- * @since 2018-01-24
- */
 @Controller
 @RequestMapping("/admin/quartzTask")
 public class QuartzTaskController {

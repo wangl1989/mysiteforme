@@ -1,4 +1,12 @@
 /**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:35:31
+ * @ Description: 异常处理工具类 提供异常包装和处理的常用方法
+ */
+
+/**
  * Copyright (c) 2005-2012 springside.org.cn
  */
 package com.mysiteforme.admin.util;
@@ -7,12 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-/**
- * 异常处理工具类
- * 提供异常包装和处理的常用方法
- * @author calvin
- * @version 2013-01-15
- */
+
 public class Exceptions {
 
 	/**

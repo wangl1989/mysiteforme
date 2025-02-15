@@ -1,3 +1,11 @@
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:41:59
+ * @ Description: 系统日志数据层接口 提供系统日志的增删改查功能
+ */
+
 package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -7,14 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 系统日志 Mapper 接口
- * </p>
- *
- * @author wangl
- * @since 2018-01-14
- */
+
 @Mapper
 public interface LogDao extends BaseMapper<Log> {
 
