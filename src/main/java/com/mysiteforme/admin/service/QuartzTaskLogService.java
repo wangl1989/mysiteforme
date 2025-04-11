@@ -8,9 +8,13 @@
 
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
+import com.mysiteforme.admin.entity.request.PageListQuartzTaskLogRequest;
 
 public interface QuartzTaskLogService extends IService<QuartzTaskLog> {
+
+    IPage<QuartzTaskLog> selectPageQuartzTaskLog(PageListQuartzTaskLogRequest request);
 
 }

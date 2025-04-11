@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 03:09:46
  * @ Modified by: wangl
- * @ Modified time: 2025-02-13 17:47:17
+ * @ Modified time: 2025-02-17 13:01:04
  * @ Description: 登录失败处理器
  */
 
@@ -10,16 +10,14 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
-import com.mysiteforme.admin.service.SecurityService;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.druid.util.StringUtils;
-import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.service.SecurityService;
 import com.mysiteforme.admin.util.ApiToolUtil;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.MessageUtil;
+import com.mysiteforme.admin.util.Result;
+import com.mysiteforme.admin.util.ResultCode;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,22 +30,22 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 
     private final SecurityService securityService;
 
-    public MyAuthenticationFailureHandler(SecurityService securityService) {
+    private final ApiToolUtil apiToolUtil;
+
+    public MyAuthenticationFailureHandler(SecurityService securityService, ApiToolUtil apiToolUtil) {
         this.securityService = securityService;
+        this.apiToolUtil = apiToolUtil;
     }
 
     @Override
     public void onAuthenticationFailure(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
             throws IOException, ServletException {
-        // 获取用户名
-        String username = request.getParameter("username");
-        if (StringUtils.isEmpty(username)) {
-            log.error("用户登录异常：用户参数名称错误，未获取到名为name的参数");
-            throw MyException.builder().systemError(MessageUtil.getMessage(MessageConstants.User.USER_LOGIN_FAILED))
-                    .build();
-        }
-
-        ApiToolUtil.returnSystemDate(securityService.loginFailData(username), response);
+                if(exception != null){
+                    log.debug("登录失败：{}",exception.getMessage());
+                    apiToolUtil.returnSystemDate(Result.orgenalError(ResultCode.LOGIN_ERROR,exception.getMessage()),request,response);
+                }else{
+                    apiToolUtil.returnSystemDate(securityService.loginFailData(request,response),request,response);
+                }
     }
 }

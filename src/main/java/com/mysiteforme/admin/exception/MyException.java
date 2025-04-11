@@ -2,12 +2,14 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-11 14:55:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:55:05
+ * @ Modified time: 2025-02-17 18:58:10
  * @ Description: 自定义异常类
  */
 
 package com.mysiteforme.admin.exception;
 
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.MessageUtil;
 import com.mysiteforme.admin.util.ResultCode;
 
 import lombok.Getter;
@@ -108,7 +110,7 @@ public class MyException extends RuntimeException {
         }
         
         public Builder systemError(String msg){
-            this.msg = msg;
+            this.msg = MessageUtil.getMessage(msg);
             this.code = ResultCode.INTERNAL_ERROR;
             return this;
         }
@@ -116,6 +118,48 @@ public class MyException extends RuntimeException {
         public Builder validationError(String msg){
             this.msg = msg;
             this.code = ResultCode.INVALID_RESULT;
+            return this;
+        }
+
+        public Builder tokenError(String msg){
+            this.msg = MessageUtil.getMessage(msg);
+            this.code = ResultCode.INVALID_TOKEN;
+            return this;
+        }
+
+        public Builder tokenExpired(){
+            this.msg = MessageUtil.getMessage(MessageConstants.JwtToken.JWT_TOKEN_EXPIRED);
+            this.code = ResultCode.TOKEN_EXPIRED;
+            return this;
+        }
+
+        public Builder paramMsgError(String msg){
+            this.msg = MessageUtil.getMessage(msg);
+            this.code = ResultCode.INVALID_PARAM;
+            return this;
+        }
+
+        public Builder businessError(String msg){
+            this.msg = MessageUtil.getMessage(msg);
+            this.code = ResultCode.BUSINESS_ERROR;
+            return this;
+        }
+
+        /**
+         * 未授权
+         */
+        public Builder unauthorized() {
+            this.msg = MessageUtil.getMessage(MessageConstants.User.USER_LOGIN_FAILED_UNAUTHORIZED);
+            this.code = ResultCode.UNAUTHORIZED;
+            return this;
+        }
+
+        /**
+         * 禁止访问
+         */
+        public Builder forbidden() {
+            this.msg = MessageUtil.getMessage(MessageConstants.User.USER_LOGIN_FAILED_FORBIDDEN);
+            this.code = ResultCode.FORBIDDEN;
             return this;
         }
 

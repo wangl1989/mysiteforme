@@ -30,7 +30,7 @@ CREATE TABLE sys_permission_group (
     create_by bigint DEFAULT NULL COMMENT '创建者',
     create_date DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_by bigint DEFAULT NULL COMMENT '更新者',
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    update_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     remarks varchar(255) DEFAULT NULL COMMENT '分组描述',
     del_flag tinyint DEFAULT NULL COMMENT '删除标志'
 );
@@ -40,7 +40,7 @@ CREATE TABLE `sys_permission` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `permission_name` varchar(40) DEFAULT NULL COMMENT '权限名称',
   `permission_code` varchar(2000) DEFAULT NULL COMMENT '权限编码',
-  `permission_type` varchar(2000) DEFAULT NULL COMMENT '权限类型',
+  `permission_type` INT(20) DEFAULT NULL COMMENT '权限类型',
   `group_id` BIGINT COMMENT '权限分组ID',
   `icon` varchar(100) DEFAULT NULL COMMENT '权限图标',
   `sort` smallint DEFAULT NULL COMMENT '排序',
@@ -88,6 +88,7 @@ CREATE TABLE sys_permission_api (
     permission_id BIGINT NOT NULL COMMENT '关联权限表ID',
     api_url VARCHAR(200) NOT NULL COMMENT 'API接口URL',
     http_method VARCHAR(10) COMMENT 'HTTP请求方法',
+    common tinyint DEFAULT 0 COMMENT '是否为公共接口，默认false',
     `sort` smallint DEFAULT NULL COMMENT '排序',
     `create_by` bigint DEFAULT NULL COMMENT '创建者',
     `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -117,35 +118,46 @@ CREATE TABLE sys_user_permission (
     KEY idx_permission_id (permission_id)
 );
 
-DROP TABLE IF EXISTS `sys_user`;
-CREATE TABLE `sys_user` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `login_name` varchar(36) DEFAULT NULL COMMENT '登录名',
-    `nick_name` varchar(40) DEFAULT NULL COMMENT '昵称',
-    `icon` varchar(2000) DEFAULT NULL,
-    `password` varchar(40) DEFAULT NULL COMMENT '密码',
-    `salt` varchar(40) DEFAULT NULL COMMENT 'shiro加密盐',
-    `tel` varchar(11) DEFAULT NULL COMMENT '手机号码',
-    `email` varchar(200) DEFAULT NULL COMMENT '邮箱地址',
-    `locked` tinyint DEFAULT NULL COMMENT '是否锁定',
-    `create_date` datetime DEFAULT NULL,
-    `create_by` bigint DEFAULT NULL,
-    `update_date` datetime DEFAULT NULL,
-    `update_by` bigint DEFAULT NULL,
-    `remarks` varchar(255) DEFAULT NULL,
-    `del_flag` tinyint DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB
+-- ----------------------------
+-- Table structure for user_device
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_device`;
+CREATE TABLE `sys_user_device` (
+    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `user_name` VARCHAR(50) NOT NULL COMMENT '用户ID',
+    `user_agent` TEXT NOT NULL COMMENT '用户ID',
+    `device_id` VARCHAR(100) NOT NULL COMMENT '设备ID',
+    `device_type` VARCHAR(50) DEFAULT NULL COMMENT '设备类型',
+    `device_name` VARCHAR(100) DEFAULT NULL COMMENT '设备名称',
+    `device_model` VARCHAR(100) DEFAULT NULL COMMENT '设备型号',
+    `os_version` TEXT DEFAULT NULL COMMENT '操作系统版本',
+    `browser_info` TEXT DEFAULT NULL COMMENT '浏览器信息',
+    `last_login_ip` VARCHAR(50) DEFAULT NULL COMMENT '最后登录IP',
+    `last_login_location` VARCHAR(100) DEFAULT NULL COMMENT '最后登录位置',
+    `device_fingerprint` TEXT DEFAULT NULL COMMENT '设备指纹',
+    `login_out_date` datetime DEFAULT NULL COMMENT '登出时间',
+    `create_by` bigint DEFAULT NULL COMMENT '创建者',
+    `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by` bigint DEFAULT NULL COMMENT '更新者',
+    `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `remarks` varchar(255) DEFAULT NULL COMMENT '备注',
+    `del_flag` tinyint DEFAULT NULL COMMENT '删除标志'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户设备表';
 
-DROP TABLE IF EXISTS `sys_role`;
-CREATE TABLE `sys_role` (
-    `id` bigint NOT NULL AUTO_INCREMENT,
-    `name` varchar(40) DEFAULT NULL COMMENT '角色名称',
-    `create_date` datetime DEFAULT NULL,
-    `create_by` bigint DEFAULT NULL,
-    `update_date` datetime DEFAULT NULL,
-    `update_by` bigint DEFAULT NULL,
-    `remarks` varchar(255) DEFAULT NULL,
-    `del_flag` tinyint DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB
+
+ALTER TABLE sys_user ADD COLUMN color VARCHAR(200) AFTER icon COMMENT '图标颜色';
+ALTER TABLE sys_user ADD COLUMN path VARCHAR(200) AFTER permission COMMENT '前端路由地址';
+ALTER TABLE sys_user ADD COLUMN component VARCHAR(200) AFTER path COMMENT '前端组件地址';
+ALTER TABLE sys_user ADD COLUMN title VARCHAR(200) AFTER component COMMENT '菜单标题';
+ALTER TABLE sys_user ADD COLUMN show_badge tinyint DEFAULT 0 AFTER title COMMENT '是否显示徽标（菜单右侧的红色小圆点）';
+ALTER TABLE sys_user ADD COLUMN show_text_badge VARCHAR(200) AFTER show_badge COMMENT '是否显示文字徽标（菜单右侧的红色文字标签）';
+ALTER TABLE sys_user ADD COLUMN is_hide tinyint AFTER show_text_badge COMMENT '是否在菜单中隐藏（在左侧菜单栏中不显示）';
+ALTER TABLE sys_user ADD COLUMN is_hide_tab tinyint AFTER is_hide COMMENT '是否在标签页中隐藏 （在顶部标签栏中不显示）';
+ALTER TABLE sys_user ADD COLUMN link varchar(2000) AFTER is_hide_tab COMMENT '外链链接地址';
+ALTER TABLE sys_user ADD COLUMN is_iframe tinyint AFTER link COMMENT '是否为iframe';
+ALTER TABLE sys_user ADD COLUMN keep_alive tinyint AFTER is_iframe COMMENT '是否缓存';
+ALTER TABLE sys_user ADD COLUMN is_in_main_container tinyint AFTER keep_alive COMMENT '是否在主容器中';
+
+
+
+

@@ -20,8 +20,6 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_site")
 @Data
-@Getter
-@Setter
 public class Site extends DataEntity {
 
 	private String name;

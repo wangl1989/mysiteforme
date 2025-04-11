@@ -1,6 +1,6 @@
 package com.mysiteforme.admin;
 
-import com.xiaoleilu.hutool.util.ZipUtil;
+import cn.hutool.core.util.ZipUtil;
 import org.junit.Test;
 
 /**

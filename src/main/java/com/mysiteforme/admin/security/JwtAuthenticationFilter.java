@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 00:02:36
  * @ Modified by: wangl
- * @ Modified time: 2025-02-16 00:10:25
+ * @ Modified time: 2025-02-17 21:02:41
  * @ Description:JWT过滤器
  */
 
@@ -40,19 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        this.doParse(request, response, filterChain, authHeader);
+        this.doParse(request, response, filterChain);
     }
  
-    private void doParse(
-            HttpServletRequest request, HttpServletResponse response, FilterChain chain, String authHeader
-    ) throws ServletException, IOException {
-        //  如果认证码  以规定值开头
-        if (authHeader.startsWith(Constants.GRANT_TYPE)) {
-
-            if(!securityService.checkToken(authHeader,request, response)){
-                chain.doFilter(request, response);
-                return;
-            }
+    private void doParse(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+        if(!securityService.checkToken(request, response)){
+            return;
         }
         chain.doFilter(request, response);
     }

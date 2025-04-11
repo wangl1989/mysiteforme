@@ -1,18 +1,30 @@
 /**
  * @ Author: wangl
- * @ Create Time: 2025-02-14 13:55:47
+ * @ Create Time: 2025-02-14 02:38:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:29:25
- * @ Description: 权限页面Service
+ * @ Modified time: 2025-02-18 11:56:05
+ * @ Description: 页面权限Service
  */
 
 package com.mysiteforme.admin.service;
 
-import com.mysiteforme.admin.entity.PermissionPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mysiteforme.admin.entity.DTO.PermissionPageDTO;
+import com.mysiteforme.admin.entity.PermissionPage;
 
 public interface PermissionPageService extends IService<PermissionPage> {
-
-    public void savePermissionPageDTO(PermissionPageDTO permissionPageDTO);
+    
+    /**
+     * 根据页面URL检查唯一性
+     */
+    boolean checkPageUrlUnique(String pageUrl, Long id);
+    
+    /**
+     * 根据ID查询页面权限
+     */
+    PermissionPage getById(Long id);
+    
+    /**
+     * 根据URL查询页面权限
+     */
+    PermissionPage getByUrl(String url);
 }

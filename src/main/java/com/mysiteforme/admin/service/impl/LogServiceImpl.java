@@ -8,19 +8,25 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.dao.LogDao;
 import com.mysiteforme.admin.entity.Log;
 import com.mysiteforme.admin.service.LogService;
-import com.xiaoleilu.hutool.date.DateTime;
-import com.xiaoleilu.hutool.date.DateUtil;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 
 
 @Service
@@ -60,5 +66,28 @@ public class LogServiceImpl extends ServiceImpl<LogDao, Log> implements LogServi
             pv.add(total);
         }
         return pv;
+    }
+
+    @Override
+    public IPage<Log> selectPageLogs(PageListSystemLogRequest request) {
+        LambdaQueryWrapper<Log> wrapper = new LambdaQueryWrapper<>();
+        if(request != null) {
+            if (StringUtils.isNotBlank(request.getType())) {
+                wrapper.eq(Log::getType, request.getType());
+            }
+            if (StringUtils.isNotBlank(request.getTitle())) {
+                wrapper.like(Log::getTitle, request.getTitle());
+            }
+            if (StringUtils.isNotBlank(request.getUsername())) {
+                wrapper.eq(Log::getUsername, request.getUsername());
+            }
+            if (StringUtils.isNotBlank(request.getHttpMethod())) {
+                wrapper.eq(Log::getHttpMethod, request.getHttpMethod());
+            }
+            wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(),Log::getCreateDate);
+        }else{
+            request = new PageListSystemLogRequest();
+        }
+        return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
     }
 }

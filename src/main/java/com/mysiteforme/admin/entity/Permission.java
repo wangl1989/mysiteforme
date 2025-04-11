@@ -31,12 +31,12 @@ public class Permission extends DataEntity {
     /**
      * 权限类型
      */
-    private String permissionType;
+    private Integer permissionType;
 
 	/**
 	 * 分组ID
 	 */
-	private Long groupId;
+	private Long menuId;
     /**
      * 权限图标
      */

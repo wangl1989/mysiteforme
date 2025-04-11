@@ -8,23 +8,58 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.Dict;
 import com.mysiteforme.admin.dao.DictDao;
+import com.mysiteforme.admin.entity.Role;
+import com.mysiteforme.admin.entity.request.AddDictRequest;
+import com.mysiteforme.admin.entity.request.PageListDictRequest;
+import com.mysiteforme.admin.entity.request.UpdateDictRequest;
 import com.mysiteforme.admin.service.DictService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 
 @Service
 @Transactional(readOnly = true, rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictService {
+
+    @Override
+    public IPage<Dict> selectPageDict(PageListDictRequest request) {
+        LambdaQueryWrapper<Dict> wrapper = new LambdaQueryWrapper<>();
+        if(request != null){
+            if(StringUtils.isNotBlank(request.getType())) {
+                wrapper.eq(Dict::getType, request.getType());
+            }
+            if(StringUtils.isNotBlank(request.getLabel())){
+                wrapper.like(Dict::getLabel,request.getLabel());
+            }
+            if(StringUtils.isNotBlank(request.getValue())){
+                wrapper.eq(Dict::getValue,request.getValue());
+            }
+            if(StringUtils.isNotBlank(request.getDescription())){
+                wrapper.like(Dict::getDescription,request.getDescription());
+            }
+            if(request.getSortBySortAsc() != null){
+                wrapper.orderByAsc(request.getSortBySortAsc(),Dict::getSort);
+            }
+            if(request.getSortByCreateDateAsc() != null){
+                wrapper.orderByAsc(request.getSortByCreateDateAsc(),Dict::getCreateDate);
+            }
+            wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), Dict::getCreateDate);
+            wrapper.orderBy(request.getSortBySortAsc() != null, request.getSortBySortAsc() != null && request.getSortBySortAsc(), Dict::getSort);
+        }
+        return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
+    }
 
     /**
      * 根据字典类型获取字典列表
@@ -66,10 +101,10 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
         queryWrapper.eqSql("sort","select max(sort) from sys_dict ")
                 .eq("type",type)
                 .eq("del_flag",false);
-        Dict dict = getOne(queryWrapper);
+        List<Dict> dicts = list(queryWrapper);
         int sort = 0;
-        if(dict != null){
-            sort =  dict.getSort() + 1;
+        if(dicts != null && !dicts.isEmpty()){
+            sort =  dicts.get(0).getSort() + 1;
         }
         return sort;
     }
@@ -82,7 +117,7 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
      * @return 字典数量
      */
     @Override
-    public Integer getCountByAll(String type, String label, String value) {
+    public Integer getCountByAll(String type, String label, String value,Long id) {
         QueryWrapper<Dict> wrapper = new QueryWrapper<>();
         wrapper.eq("type",type);
         if(StringUtils.isNotBlank(label)){
@@ -91,19 +126,31 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
         if(StringUtils.isNotBlank(value)){
             wrapper.eq("value",value);
         }
+        if(null != id && 0L != id){
+            wrapper.eq("id",id);
+        }
         wrapper.eq("del_flag",false);
         return Math.toIntExact(count(wrapper));
     }
 
-    /**
-     * 保存或更新字典
-     * 同时清除对应类型的缓存
-     * @param dict 字典对象
-     */
-    @CacheEvict(value = "dictCache",key = "#dict.type",condition = "#dict.type ne null ")
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveOrUpdateDict(Dict dict) {
+        saveOrUpdate(dict);
+    }
+
+    @CacheEvict(value = "dictCache",key = "#dict.type",condition = "#dict.type ne null ")
+    @Override
+    public void saveDict(AddDictRequest request) {
+        Dict dict = new Dict();
+        BeanUtils.copyProperties(request,dict);
+        saveOrUpdate(dict);
+    }
+
+    @CacheEvict(value = "dictCache",key = "#dict.type",condition = "#dict.type ne null ")
+    @Override
+    public void updateDict(UpdateDictRequest request) {
+        Dict dict = new Dict();
+        BeanUtils.copyProperties(request,dict);
         saveOrUpdate(dict);
     }
 

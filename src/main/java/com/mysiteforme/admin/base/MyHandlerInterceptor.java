@@ -1,11 +1,3 @@
-/**
- * @ Author: wangl
- * @ Create Time: 2025-02-11 14:55:13
- * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:29:56
- * @ Description: 系统通用拦截器，用于处理系统通用的请求拦截
- */
-
 package com.mysiteforme.admin.base;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,21 +18,22 @@ import com.mysiteforme.admin.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
+/**
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 12:29:56
+ * @ Description: 系统通用拦截器，用于处理系统通用的请求拦截
+ */
 @Component
 public class MyHandlerInterceptor implements HandlerInterceptor {
 
-    private  SiteService siteService;
-    private  UserService userService;
-    private  UserCacheService userCacheService;
+    private SiteService siteService;
+    private UserService userService;
 
-    public MyHandlerInterceptor() {
-        super();
-    }
+    public MyHandlerInterceptor() {}
 
-    @Autowired
-    public MyHandlerInterceptor(SiteService siteService, UserService userService, UserCacheService userCacheService) {
-        this.userCacheService = userCacheService;
+    public MyHandlerInterceptor(SiteService siteService, UserService userService) {
         this.siteService = siteService;
         this.userService = userService;
     }
@@ -52,24 +45,21 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse, @NotNull Object o) {
 //        LOGGER.info("当前请求路径.."+httpServletRequest.getRequestURI());
-        if (siteService == null || userService == null|| userCacheService == null) {
+        if (siteService == null || userService == null) {
             //解决service为null无法注入问题
-            System.out.println("siteService is null!!!");
+            System.out.println("siteService or userService is null!!!");
             BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(httpServletRequest.getServletContext());
             siteService = (SiteService) factory.getBean("siteService");
             userService = (UserService) factory.getBean("userService");
-            userCacheService = (UserCacheService) factory.getBean("userCacheService");
 
         }
-        Site sysSite = siteService.getCurrentSite();
-        httpServletRequest.setAttribute("site",sysSite);
-        MyUserDetails myUserDetails = MySecurityUser.securityUser();
-        if(myUserDetails == null){
+        siteService.getCurrentSite();
+        Long currentId = MySecurityUser.id();
+        if(currentId == null){
             return false;
         }
-        User user = userCacheService.findUserById(myUserDetails.getId());
+        User user = userService.getById(currentId);
         if(user != null){
-            httpServletRequest.setAttribute("currentUser",user);
             return true;
         }
         return false;

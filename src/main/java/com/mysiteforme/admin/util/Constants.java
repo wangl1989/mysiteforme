@@ -62,6 +62,18 @@ public class Constants {
 	public static final String CAPTCHA_TOKEN = "Captcha-Key";
 
 	/**
+	 * 设备ID常量
+	 */
+	public static final String DEVICE_ID = "Device-Id";
+
+	/**
+	 * 验证码前端传递进来body里的参数名称
+	 */
+	public static final String CAPTCHA = "captcha";
+
+
+
+	/**
 	 * header中认证字段
 	 */
 	public static final String AUTHORIZATION = "Authorization";
@@ -95,5 +107,11 @@ public class Constants {
 	 * 验证码有效期
 	 */
 	public static final int USER_CAPTCHA_CACHE_EXPIRE_TIME = 5;
+
+	public static final int TYPE_PAGE = 1;
+
+	public static final int TYPE_BUTTON = 2;
+
+	public static final int TYPE_API = 3;
 
 }

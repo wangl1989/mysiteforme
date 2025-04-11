@@ -3,6 +3,9 @@ server:
     port: 80
     tomcat:
       uri-encoding: UTF-8
+    error:
+      whitelabel:
+        enabled: false
 spring:
   application:
     name: mysiteforme
@@ -16,7 +19,7 @@ spring:
   mvc:
     static-path-pattern: /static/**
     pathmatch:
-      matching-strategy: path_pattern_parser
+      matching-strategy: PATH_PATTERN_PARSER
     problemdetails:
       enabled: true
   web:
@@ -39,7 +42,7 @@ spring:
         profileEnable: true
         principalCookieName: USER_COOKIE
         principalSessionName:
-        aopPatterns: com.mysiteforme.admin.service
+      aopPatterns: com.mysiteforme.admin.service
       stat-view-servlet:
         enabled: true
         url-pattern: /druid/*
@@ -68,6 +71,17 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
 #mybatisPlus
 mybatis-plus:
   mapper-locations: classpath:mapper/**.xml
@@ -91,8 +105,9 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 jwt:
   secret: B374A26A71490437AA024E4FADD5B497FDFF1A8EA6FF12F6FB65AF2720B59CCF
-  access-token-expiration: 900000      # 15分钟 = 15 * 60 * 1000
+  access-token-expiration: 1800000      # 30分钟 = 30 * 60 * 1000
   refresh-token-expiration: 604800000  # 7天 = 7 * 24 * 60 * 1000
+
 ---
 #开发环境配置
 server:
@@ -126,14 +141,17 @@ spring:
 
 #日志
 logging:
+  charset:
+    console: UTF-8
   config: classpath:log/logback.xml
   file:
     path: D:\log\mysiteforme
   level:
     root: INFO
-    com.mysiteforme: DEBUG
+    com.mysiteforme.admin.security: DEBUG
     org.springframework.security.web.FilterChainProxy: DEBUG
     org.springframework.security: DEBUG
+    org.springframework.cache: DEBUG
 #源码生成文件夹
 source-code-dic:  D://mysite
 source-code-zipfile:  D://源码.rar

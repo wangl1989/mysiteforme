@@ -1,5 +1,6 @@
 /web/
 /target/
 /.idea/
-
 /.vscode/
+/.cursor/
+/.lingma/

@@ -14,16 +14,19 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.mysiteforme.admin.util.ApiToolUtil;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.MessageUtil;
 import com.mysiteforme.admin.util.Result;
-import com.mysiteforme.admin.util.ResultCode;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final ApiToolUtil apiToolUtil;
+
+    public MyAuthenticationEntryPoint(ApiToolUtil apiToolUtil) {
+        this.apiToolUtil = apiToolUtil;
+    }
 
     /**
      * 拦截未登录请求：
@@ -38,6 +41,6 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        ApiToolUtil.returnSystemDate(Result.error(ResultCode.LOGIN_ERROR, MessageUtil.getMessage(MessageConstants.User.USER_NO_LOGIN)), response);
+        apiToolUtil.returnSystemDate(Result.forbidden(), request, response);
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.mysiteforme.admin.security.MyUserDetails;
 
+import javax.annotation.Nullable;
+
 public class MySecurityUser {
 
     /**

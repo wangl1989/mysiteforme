@@ -72,6 +72,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-pool2</artifactId>
 		</dependency>
@@ -80,6 +85,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
@@ -89,6 +95,10 @@
 			<artifactId>spring-context-support</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -312,9 +322,9 @@
 
 		<!--工具类-->
 		<dependency>
-			<groupId>com.xiaoleilu</groupId>
+			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
-			<version>3.3.0</version>
+			<version>5.8.16</version>
 		</dependency>
 
 		<!--对分词索引查询解析-->
@@ -375,8 +385,6 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-
 
 		<!-- Jakarta EE 9+ 的 Servlet API-->
 		<dependency>

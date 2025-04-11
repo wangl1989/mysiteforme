@@ -17,4 +17,10 @@ public @interface SysLog {
      * @return 描述信息字符串,用于记录操作的具体内容
      */
     String value() default "";
+
+    /**
+     * 自动生成的方法上面添加的日志描述注解
+     * @return 用户生成
+     */
+    String generateValue() default "";
 }

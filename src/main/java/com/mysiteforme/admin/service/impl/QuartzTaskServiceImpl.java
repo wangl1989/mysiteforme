@@ -8,14 +8,20 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.dao.QuartzTaskDao;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
+import com.mysiteforme.admin.entity.request.PageListUserRequest;
 import com.mysiteforme.admin.service.QuartzTaskService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.quartz.ScheduleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +65,28 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
                 ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
             }
         }
+    }
+
+    @Override
+    public IPage<QuartzTask> selectPageQuartzTask(PageListQuartzTaskRequest request) {
+        LambdaQueryWrapper<QuartzTask> wrapper = new LambdaQueryWrapper<>();
+        if(request != null){
+            if(StringUtils.isNotBlank(request.getName())) {
+                wrapper.like(QuartzTask::getName, request.getName());
+            }
+            if(request.getStatus() != null){
+                wrapper.eq(QuartzTask::getStatus,request.getStatus());
+            }
+            if(request.getSortByCreateDateDesc() != null){
+                wrapper.orderByDesc(request.getSortByCreateDateDesc(),QuartzTask::getCreateDate);
+            }
+            if(request.getSortByCreateDateAsc() != null){
+                wrapper.orderByAsc(request.getSortByCreateDateAsc(),QuartzTask::getCreateDate);
+            }
+        }else{
+            request = new PageListQuartzTaskRequest();
+        }
+        return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
     }
 
     /**

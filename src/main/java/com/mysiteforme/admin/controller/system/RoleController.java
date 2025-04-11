@@ -8,180 +8,108 @@
 
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
-import com.mysiteforme.admin.entity.Menu;
-import com.mysiteforme.admin.entity.Role;
-import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.service.RoleService;
-import com.mysiteforme.admin.service.UserCacheService;
-import com.mysiteforme.admin.service.MenuService;
-import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.RestResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.entity.request.AddRoleRequest;
+import com.mysiteforme.admin.entity.request.PageListRoleRequest;
+import com.mysiteforme.admin.entity.request.SaveRoleMenuPerRequest;
+import com.mysiteforme.admin.entity.request.UpdateRoleRequest;
+import com.mysiteforme.admin.util.MessageConstants;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
+import com.mysiteforme.admin.annotation.SysLog;
+import com.mysiteforme.admin.entity.Role;
+import com.mysiteforme.admin.service.RoleService;
+import com.mysiteforme.admin.util.Result;
+import lombok.RequiredArgsConstructor;
 
-import jakarta.servlet.ServletRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+@RestController
+@RequestMapping("/api/admin/role")
+@RequiredArgsConstructor
+public class RoleController {
 
-@Controller
-@RequestMapping("admin/system/role")
-public class RoleController extends BaseController{
-
-    public RoleController(RoleService roleService, UserCacheService userCacheService, MenuService menuService) {
-        this.roleService = roleService;
-        this.userCacheService = userCacheService;
-        this.menuService = menuService;
-    }
+    private final RoleService roleService;
 
     @GetMapping("list")
-    @SysLog("跳转角色列表页面")
-    public String list(){
-        return "admin/system/role/list";
-    }
-
-    @PostMapping("list")
-    @ResponseBody
-    public LayerData<Role> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
-                                @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                ServletRequest request){
-        Map<String, Object> map = WebUtils.getParametersStartingWith(request, "s_");
-        LayerData<Role> roleLayerData = new LayerData<>();
-        QueryWrapper<Role> roleEntityWrapper = new QueryWrapper<>();
-        roleEntityWrapper.eq("del_flag",false);
-        if(!map.isEmpty()){
-            String keys = (String) map.get("key");
-            if(StringUtils.isNotBlank(keys)) {
-                roleEntityWrapper.like("name", keys);
-            }
-        }
-        IPage<Role> rolePage = roleService.page(new Page<>(page,limit),roleEntityWrapper);
-        long total = rolePage.getTotal();
-        roleLayerData.setCount((int) total);
-        roleLayerData.setData(setUserToRole(rolePage.getRecords()));
-        return roleLayerData;
-    }
-
-    private List<Role> setUserToRole(List<Role> roles){
-        for(Role r : roles){
-            if(r.getCreateId() != null && r.getCreateId() != 0){
-                User u = userCacheService.findUserById(r.getCreateId());
-                if(StringUtils.isBlank(u.getNickName())){
-                    u.setNickName(u.getLoginName());
-                }
-                r.setCreateUser(u);
-            }
-            if(r.getUpdateId() != null && r.getUpdateId() != 0){
-                User u  = userCacheService.findUserById(r.getUpdateId());
-                if(StringUtils.isBlank(u.getNickName())){
-                    u.setNickName(u.getLoginName());
-                }
-                r.setUpdateUser(u);
-            }
-        }
-        return roles;
-    }
-
-    @GetMapping("add")
-    public String add(Model model){
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("parentId",null);
-        map.put("isShow",false);
-        List<Menu> menuList = menuService.selectAllMenus(map);
-        model.addAttribute("menuList",menuList);
-        return "admin/system/role/add";
+    public Result list(PageListRoleRequest request){
+        return Result.success(roleService.selectPageUser(request));
     }
 
     @PostMapping("add")
-    @ResponseBody
-    @SysLog("保存新增角色数据")
-    public RestResponse add(@RequestBody Role role){
-        if(StringUtils.isBlank(role.getName())){
-            return RestResponse.failure("角色名称不能为空");
+    @SysLog(MessageConstants.SysLog.ROLE_ADD)
+    public Result add(@RequestBody AddRoleRequest request){
+        if(request == null){
+            return Result.objectNotNull();
         }
-        if(roleService.getRoleNameCount(role.getName())>0){
-            return RestResponse.failure("角色名称已存在");
+        if(roleService.getRoleNameCount(request.getName())>0){
+            return Result.paramMsgError(MessageConstants.Role.ROLE_NAME_HAS_EXIST);
         }
-        roleService.saveRole(role);
-        return RestResponse.success();
+        roleService.saveRole(request);
+        return Result.success();
     }
 
-    @GetMapping("edit")
-    public String edit(Long id,Model model){
-        Role role = roleService.getRoleById(id);
-        List<Long> menuIds = Lists.newArrayList();
-        if(role != null) {
-            Set<Menu> menuSet = role.getMenuSet();
-            if (menuSet != null && !menuSet.isEmpty()) {
-                for (Menu m : menuSet) {
-                    menuIds.add(m.getId());
-                }
+    @PutMapping("edit")
+    @SysLog(MessageConstants.SysLog.ROLE_EDIT)
+    public Result edit(@RequestBody UpdateRoleRequest request){
+        Role oldRole = roleService.getRoleById(request.getId());
+        if(!oldRole.getName().equals(request.getName())){
+            if(roleService.getRoleNameCount(request.getName())>0){
+                return Result.paramMsgError(MessageConstants.Role.ROLE_NAME_HAS_EXIST);
             }
         }
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("parentId",null);
-        map.put("isShow",false);
-        List<Menu> menuList = menuService.selectAllMenus(map);
-        model.addAttribute("role",role);
-        model.addAttribute("menuList",menuList);
-        model.addAttribute("menuIds",menuIds);
-        return "admin/system/role/edit";
+        roleService.updateRole(request);
+        return Result.success();
     }
 
-    @PostMapping("edit")
-    @ResponseBody
-    @SysLog("保存编辑角色数据")
-    public RestResponse edit(@RequestBody Role role){
-        if(role.getId() == null || role.getId() == 0){
-            return RestResponse.failure("角色ID不能为空");
-        }
-        if(StringUtils.isBlank(role.getName())){
-            return RestResponse.failure("角色名称不能为空");
-        }
-        Role oldRole = roleService.getRoleById(role.getId());
-        if(!oldRole.getName().equals(role.getName())){
-            if(roleService.getRoleNameCount(role.getName())>0){
-                return RestResponse.failure("角色名称已存在");
-            }
-        }
-        roleService.updateRole(role);
-        return RestResponse.success();
-    }
-
-    @PostMapping("delete")
-    @ResponseBody
-    @SysLog("删除角色数据")
-    public RestResponse delete(@RequestParam(value = "id",required = false)Long id){
+    @DeleteMapping("delete")
+    @SysLog(MessageConstants.SysLog.ROLE_DELETE)
+    public Result delete(@RequestParam(value = "id",required = false)Long id){
         if(id == null || id == 0){
-            return RestResponse.failure("角色ID不能为空");
+            return Result.idIsNullError();
         }
-        Role role = roleService.getRoleById(id);
-        roleService.deleteRole(role);
-        return RestResponse.success();
+        roleService.deleteRole(id);
+        return Result.success();
     }
 
-    @PostMapping("deleteSome")
-    @ResponseBody
-    @SysLog("多选删除角色数据")
-    public RestResponse deleteSome(@RequestBody List<Role> roles){
-        if(roles == null || roles.isEmpty()){
-            return RestResponse.failure("请选择需要删除的角色");
-        }
-        for (Role r : roles){
-            roleService.deleteRole(r);
-        }
-        return RestResponse.success();
+    /**
+     * 获取当前用户可分配的角色集合
+     * @return Result
+     */
+    @GetMapping("userAllRole")
+    public Result userAllRole(){
+        return Result.success(roleService.userAllRole(MySecurityUser.id()));
     }
 
+    /**
+     * 根据角色ID获取这个角色对应的菜单和权限集合。
+     * @param roleId 角色ID
+     * @return Result数据对象
+     */
+    @GetMapping("getRoleMenusPers")
+    public Result getUserRoleMenusPermissions(@RequestParam(value = "roleId",required = false)Long roleId){
+        if(roleId == null || roleId == 0){
+            return Result.idIsNullError();
+        }
+        return Result.success(roleService.getUserRoleMenusPermissions(roleId));
+    }
+
+    /**
+     * 保存角色权限菜单关系
+     * @param request 分配参数对象
+     * @return Result
+     */
+    @PostMapping("saveRoleMenusPers")
+    public Result saveUserRoleMenusPermissions(@RequestBody @Valid SaveRoleMenuPerRequest request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        if(request.getMenuIds() == null || request.getMenuIds().isEmpty()){
+            return Result.paramMsgError(MessageConstants.Role.ROLE_MUST_ASSIGN_ONE_MENU);
+        }
+        if(request.getPermissionIds() == null || request.getPermissionIds().isEmpty()){
+            return Result.paramMsgError(MessageConstants.Role.ROLE_MUST_ASSIGN_ONE_PERMISSION);
+        }
+        roleService.assignRoleMenusPermissions(request);
+        return Result.success();
+    }
 
 }

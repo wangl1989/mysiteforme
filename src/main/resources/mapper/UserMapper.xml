@@ -107,12 +107,191 @@
     </delete>
 
     <select id="findUserByLoginNameDetails"  resultMap="UserDetailMap">
+        <include refid="userDetailSql"/>
+        AND u.login_name = #{loginName}
+    </select>
+
+    <resultMap id="permissionsMap" type="com.mysiteforme.admin.entity.VO.PermissionVO">
+        <id property="id" column="permission_id"/>
+        <result property="permissionName" column="permission_name"/>
+        <result property="permissionCode" column="permission_code"/>
+        <result property="permissionType" column="permission_type"/>
+        <result property="icon" column="permission_icon"/>
+        <!-- 菜单信息 -->
+        <association property="menu"  javaType="com.mysiteforme.admin.entity.VO.MenuVO">
+            <id property="id" column="menu_id"/>
+            <result property="name" column="menu_name"/>
+            <result property="parentId" column="menu_parent_id"/>
+            <result property="parentIds" column="menu_parent_ids"/>
+            <result property="level" column="menu_level"/>
+            <result property="sort" column="menu_sort"/>
+            <result property="remarks" column="menu_remarks"/>
+        </association>
+
+        <!-- 按钮权限 -->
+        <association property="button" javaType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
+            <id property="id" column="button_id"/>
+            <result property="buttonKey" column="button_key"/>
+            <result property="buttonName" column="button_name"/>
+        </association>
+
+        <!-- 页面权限 -->
+        <association property="page" javaType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
+            <id property="id" column="page_id"/>
+            <result property="pageUrl" column="page_url"/>
+        </association>
+
+        <!-- API权限 -->
+        <association property="api" javaType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
+            <id property="id" column="api_id"/>
+            <result property="apiUrl" column="api_url"/>
+            <result property="httpMethod" column="http_method"/>
+            <result property="common" column="common"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="UserDetailMap" type="com.mysiteforme.admin.entity.VO.UserVO">
+        <!-- 用户基本信息 -->
+        <id property="id" column="id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="icon" column="icon"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="password" column="password"/>
+        <result property="remarks" column="remarks"/>
+        <result property="locked" column="locked"/>
+
+
+        <!-- 角色集合 -->
+        <collection property="roles" ofType="com.mysiteforme.admin.entity.VO.RoleVO">
+            <id property="id" column="role_id"/>
+            <result property="name" column="role_name"/>
+        </collection>
+
+        <!-- 权限集合 -->
+        <collection property="permissions" resultMap="permissionsMap" />
+    </resultMap>
+
+
+    <resultMap id="pageListUserResponseMap" type="com.mysiteforme.admin.entity.response.PageListUserResponse">
+        <id property="id" column="id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="icon" column="icon"/>
+        <result property="email" column="email"/>
+        <result property="tel" column="tel"/>
+        <result property="locked" column="locked"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createUserNickName" column="create_user_nick_name"/>
+        <result property="createUserLoginName" column="create_user_login_name"/>
+        <result property="createId" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateUserNickName" column="update_user_nick_name"/>
+        <result property="updateUserLoginName" column="update_user_login_name"/>
+        <result property="updateId" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+        <collection property="roles" ofType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
+            <id property="id" column="user_role_id"/>
+            <result property="name" column="user_role_name" />
+        </collection>
+    </resultMap>
+
+    <select id="selectPageUser" resultMap="pageListUserResponseMap">
+        SELECT
+            u.id,
+            u.login_name,
+            u.nick_name,
+            u.icon,
+            u.tel,
+            u.email,
+            u.del_flag,
+            u.remarks,
+            u.locked,
+            u.create_date,
+            u.update_date,
+            u.create_by,
+            u.update_by,
+            cu.nick_name AS create_user_nick_name,
+            cu.login_name AS create_user_login_name,
+            uu.nick_name AS update_user_nick_name,
+            uu.login_name AS update_user_login_name,
+            -- 角色信息
+            r.id AS user_role_id,
+            r.name AS user_role_name
+        FROM sys_user u
+        LEFT JOIN sys_user_role ur ON u.id = ur.user_id
+        LEFT JOIN sys_role r ON r.id = ur.role_id AND r.del_flag = false
+        LEFT JOIN sys_user cu ON cu.id = u.create_by
+        LEFT JOIN sys_user uu ON uu.id = u.update_by
+        WHERE u.del_flag = false
+        <if test="request.loginName != null and request.loginName != ''">
+            AND u.login_name LIKE CONCAT('%', #{request.loginName}, '%')
+        </if>
+        <if test="request.tel != null and request.tel != ''">
+            AND u.tel = #{request.tel}
+        </if>
+        <if test="request.email != null and request.email != ''">
+            AND u.email LIKE CONCAT('%', #{request.email}, '%')
+        </if>
+        <if test="request.sortByLoginNameAsc != null or request.sortByCreateDateAsc != null or request.sortByUpdateDateAsc != null">
+            ORDER BY 1
+            <if test="request.sortByLoginNameAsc != null">
+                ,
+                <choose>
+                    <when test="request.sortByLoginNameAsc">
+                        u.login_name ASC
+                    </when>
+                    <otherwise>
+                        u.login_name DESC
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="request.sortByCreateDateAsc != null">
+                ,
+                <choose>
+                    <when test="request.sortByCreateDateAsc">
+                        u.create_date ASC
+                    </when>
+                    <otherwise>
+                        u.create_date DESC
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="request.sortByUpdateDateAsc != null">
+                ,
+                <choose>
+                    <when test="request.sortByUpdateDateAsc">
+                        u.update_date ASC
+                    </when>
+                    <otherwise>
+                        u.update_date DESC
+                    </otherwise>
+                </choose>
+            </if>
+
+        </if>
+    </select>
+
+    <!-- findUserByIdDetails -->
+    <select id="findUserByIdDetails" resultMap="UserDetailMap">
+        <include refid="userDetailSql"/>
+        AND u.id = #{id}
+    </select>
+
+    <sql id="userDetailSql">
         SELECT 
             u.id,
             u.login_name,
             u.nick_name,
             u.icon,
+            u.tel,
+            u.email,
             u.password,
+            u.locked,
+            u.remarks,
             u.del_flag,
             -- 角色信息
             r.id AS role_id,
@@ -123,10 +302,14 @@
             p.permission_code,
             p.permission_type,
             p.icon AS permission_icon,
-            -- 权限分组信息
-            g.id AS group_id,
-            g.group_code,
-            g.group_name,
+            -- 菜单信息
+            m.id AS menu_id,
+            m.name AS menu_name,
+            m.parent_id AS menu_parent_id,
+            m.parent_ids AS menu_parent_ids,
+            m.level AS menu_level,
+            m.sort AS menu_sort,
+            m.remarks AS menu_remarks,
             -- 按钮权限
             pb.id AS button_id,
             pb.button_key,
@@ -137,76 +320,24 @@
             -- API权限
             pa.id AS api_id,
             pa.api_url,
-            pa.http_method
+            pa.http_method,
+            pa.common
         FROM 
             sys_user u
-            -- 角色关联
-            LEFT JOIN sys_user_permission up ON u.id = up.user_id
-            LEFT JOIN sys_role_permission rp ON u.id = rp.role_id
-            LEFT JOIN sys_role r ON r.id = rp.role_id AND r.del_flag = 0
-            -- 权限关联
-            LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
-            LEFT JOIN sys_permission_group g ON g.id = p.group_id
-            -- 具体权限项关联
-            LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
-            LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
-            LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
+        -- 单独权限关联
+        LEFT JOIN sys_user_permission up ON u.id = up.user_id
+        -- 角色权限关联
+        LEFT JOIN sys_user_role sur ON sur.user_id = u.id
+        LEFT JOIN sys_role r ON r.id = sur.role_id AND r.del_flag = 0
+        LEFT JOIN sys_role_permission rp ON rp.role_id = r.id
+        -- 具体权限关联
+        LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
+        LEFT JOIN sys_menu m ON m.id = p.menu_id
+        -- 具体权限项关联
+        LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
+        LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
+        LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
         WHERE 
-            u.login_name = #{loginName}
-            AND u.del_flag = 0
- 
-    </select>
-
-    <resultMap id="UserDetailMap" type="com.mysiteforme.admin.entity.VO.UserVO">
-    <!-- 用户基本信息 -->
-    <id property="id" column="id"/>
-    <result property="loginName" column="login_name"/>
-    <result property="nickName" column="nick_name"/>
-    <result property="icon" column="icon"/>
-    <result property="password" column="password"/>
-    <result property="delFlag" column="del_flag"/>
-    
-    <!-- 角色集合 -->
-    <collection property="roles" ofType="com.mysiteforme.admin.entity.VO.RoleVO">
-        <id property="id" column="role_id"/>
-        <result property="name" column="role_name"/>
-    </collection>
-    
-    <!-- 权限集合 -->
-    <collection property="permissions" ofType="com.mysiteforme.admin.entity.VO.PermissionVO">
-        <id property="id" column="permission_id"/>
-        <result property="permissionName" column="permission_name"/>
-        <result property="permissionCode" column="permission_code"/>
-        <result property="permissionType" column="permission_type"/>
-        <result property="icon" column="permission_icon"/>
-        
-        <!-- 权限分组信息 -->
-        <association property="group" javaType="com.mysiteforme.admin.entity.VO.PermissionGroupVO">
-            <id property="id" column="group_id"/>
-            <result property="groupCode" column="group_code"/>
-            <result property="groupName" column="group_name"/>
-        </association>
-        
-        <!-- 按钮权限 -->
-        <association property="button" javaType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
-            <id property="id" column="button_id"/>
-            <result property="buttonKey" column="button_key"/>
-            <result property="buttonName" column="button_name"/>
-        </association>
-        
-        <!-- 页面权限 -->
-        <association property="page" javaType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
-            <id property="id" column="page_id"/>
-            <result property="pageUrl" column="page_url"/>
-        </association>
-        
-        <!-- API权限 -->
-        <association property="api" javaType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
-            <id property="id" column="api_id"/>
-            <result property="apiUrl" column="api_url"/>
-            <result property="httpMethod" column="http_method"/>
-        </association>
-    </collection>
-</resultMap>
-
+            u.del_flag = 0
+    </sql>
 </mapper>

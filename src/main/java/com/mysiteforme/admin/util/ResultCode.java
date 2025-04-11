@@ -45,6 +45,15 @@ public class ResultCode {
      * 资源冲突
      */
     public static final int CONFLICT = 409;
+
+    /**
+     * 登录失败
+     */
+    public static final int LOGIN_ERROR = 410;
+    /**
+     * 登录失败次数过多
+     */
+    public static final int LOGIN_FAILED_LIMIT = 411;
     
     /**
      * 服务端错误 (5xx)
@@ -79,13 +88,13 @@ public class ResultCode {
      * 结果校验不存在
      */
     public static final int INVALID_RESULT = 604; 
+    /**
+     * token错误
+     */
+    public static final int INVALID_TOKEN = 610;
 
     /**
-     * 登录失败
+     * 刷新token错误
      */
-    public static final int LOGIN_ERROR = 410;
-    /**
-     * 登录失败次数过多
-     */
-    public static final int LOGIN_FAILED_LIMIT = 411;
+    public static final int INVALID_REFRESH_TOKEN = 611;
 }

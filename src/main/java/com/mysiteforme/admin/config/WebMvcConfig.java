@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 04:06:40
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:14:52
+ * @ Modified time: 2025-02-17 21:09:57
  * @ Description: WebMvc配置类 配置视图解析、资源映射、消息转换等
  */
 
@@ -10,21 +10,26 @@ package com.mysiteforme.admin.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import jakarta.servlet.MultipartConfigElement;
+import java.util.Locale;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
@@ -32,12 +37,41 @@ import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.google.common.collect.Lists;
 import com.mysiteforme.admin.base.BlogHandlerInterceptor;
 import com.mysiteforme.admin.base.MyHandlerInterceptor;
+import com.mysiteforme.admin.security.CustomExceptionHandlerFilter;
 import com.mysiteforme.admin.security.SecurityHeadersFilter;
 import com.mysiteforme.admin.security.XssFilter;
+import com.mysiteforme.admin.util.ApiToolUtil;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.Result;
+import com.mysiteforme.admin.util.ResultCode;
 
+import jakarta.servlet.MultipartConfigElement;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final CustomExceptionHandlerFilter filter;
+
+    private final ApiToolUtil apiToolUtil;
+
+    public WebMvcConfig(CustomExceptionHandlerFilter filter,ApiToolUtil apiToolUtil) {
+        this.filter = filter;
+        this.apiToolUtil = apiToolUtil;
+    }
+
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        resolvers.add((request, response, handler, ex) -> {
+            if (ex instanceof NoResourceFoundException) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                // 可以写入自定义的响应内容
+                apiToolUtil.returnSystemDate(Result.error(ResultCode.NOT_FOUND, MessageConstants.System.SYSTEM_NOT_FOUND),request,response);
+            }
+            return null;
+        });
+    }
 
     @Bean
     public XssFilter xssFilter() {
@@ -49,6 +83,24 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return new SecurityHeadersFilter();
     }
 
+    /**
+     * 配置异常处理过滤器
+     * @return 异常处理过滤器注册器
+     */
+    @Bean
+    public FilterRegistrationBean<CustomExceptionHandlerFilter> exceptionFilterRegistration() {
+        FilterRegistrationBean<CustomExceptionHandlerFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(filter);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE); // 最高优先级
+        registration.addUrlPatterns("/*"); // 应用到所有URL
+        return registration;
+    }
+
+    /**
+     * 配置XSS过滤器
+     * @param xssFilter XSS过滤器
+     * @return XSS过滤器注册器
+     */
     @Bean
     public FilterRegistrationBean<XssFilter> xssFilterRegistration(XssFilter xssFilter) {
         FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
@@ -80,7 +132,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/static/**","/favicon.ico").addResourceLocations("classpath:/static/");
     }
 
     /**
@@ -140,7 +192,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MyHandlerInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login","/login/main","/logout","/genCaptcha","/static/**","/showBlog/**");
+                .excludePathPatterns("/login","/api/auth/refresh","/favicon.ico","/actuator/**","/error","/logout","/genCaptcha","/static/**","/showBlog/**");
         registry.addInterceptor(new BlogHandlerInterceptor())
                 .addPathPatterns("/showBlog/**");
     }

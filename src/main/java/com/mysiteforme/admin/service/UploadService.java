@@ -9,6 +9,7 @@
 package com.mysiteforme.admin.service;
 
 import com.mysiteforme.admin.entity.UploadInfo;
+import com.mysiteforme.admin.entity.UploadBaseInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -59,4 +60,14 @@ public interface UploadService {
      * @return 配置是否可用
      */
     Boolean testAccess(UploadInfo uploadInfo);
+
+
+    /**
+     * 测试基础信息是否可用
+     * @param uploadBaseInfo 上传配置信息
+     * @return 配置是否可用
+     */
+    Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo);
+
+
 }

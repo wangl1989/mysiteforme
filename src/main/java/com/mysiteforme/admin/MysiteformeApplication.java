@@ -2,12 +2,13 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-11 14:55:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 21:22:02
+ * @ Modified time: 2025-02-17 13:39:59
  * @ Description: 主启动类
  */
 
 package com.mysiteforme.admin;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -15,8 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication
 public class MysiteformeApplication extends SpringBootServletInitializer {
 
-
-	public static void main(String[] args) {
-		SpringApplication.run(MysiteformeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MysiteformeApplication.class, args);
+    }
 }

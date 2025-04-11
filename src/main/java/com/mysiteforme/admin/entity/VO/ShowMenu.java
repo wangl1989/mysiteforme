@@ -25,6 +25,7 @@ public class ShowMenu implements Serializable{
     private  Long pid;
     private String title;
     private String icon;
+    private String color;
     private String href;
     private Boolean spread = false;
     private List<ShowMenu> children = Lists.newArrayList();

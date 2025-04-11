@@ -27,6 +27,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,14 +36,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
 import com.mysiteforme.admin.entity.Rescource;
+import com.mysiteforme.admin.entity.UploadBaseInfo;
 import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
 import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.util.RandomUtil;
-
-
 
 @Service("localService")
 public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
@@ -66,8 +65,6 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         String hash = tag.calcETag(file);
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
         wrapper.eq("hash",hash);
-        wrapper.eq("source","local");
-        wrapper.eq("del_flag",false);
         Rescource rescource = getOne(wrapper);
         if( rescource!= null){
             return rescource.getWebUrl();
@@ -192,7 +189,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件不存在").build();
         }
         QETag tag = new QETag();
-        String hash = null;
+        String hash;
         try {
             hash = tag.calcETag(file);
         } catch (IOException | NoSuchAlgorithmException e) {
@@ -205,8 +202,8 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         if( rescource!= null){
             return rescource.getWebUrl();
         }
-        StringBuilder sb = null;
-        String filePath = null;
+        StringBuilder sb;
+        String filePath;
         try {
             sb = new StringBuilder(ResourceUtils.getURL("classpath:").getPath());
             filePath = sb.append(UPLOAD_PATH).toString();
@@ -214,17 +211,15 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
         }
         
-        StringBuilder name = new StringBuilder(RandomUtil.randomUUID());
+        StringBuilder name = new StringBuilder(UUID.randomUUID().toString());
         StringBuilder returnUrl = new StringBuilder(UPLOAD_PATH);
         String  extName = file.getName().substring(file.getName().lastIndexOf("."));
         sb.append(name).append(extName);
-        File uploadDir = null;
-        if (filePath != null) {
-            uploadDir = new File(filePath);
-        }
-        if (uploadDir != null && !uploadDir.exists()) {
+        File uploadDir;
+        uploadDir = new File(filePath);
+        if (!uploadDir.exists()) {
             if(!uploadDir.mkdir()){
-                logger.error("文件夹创建失败");
+                logger.error("上传本地图片到服务器——文件夹创建失败");
                 throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹创建失败").build();
             }
         }
@@ -274,7 +269,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             }
             StringBuilder sb = new StringBuilder(targetFileDir.getPath());
             sb.append(File.separator);
-            String fileName = RandomUtil.randomUUID()+"."+ fileFormat;
+            String fileName = UUID.randomUUID()+"."+ fileFormat;
             sb.append(fileName);
             String imgFilePath = sb.toString();//新生成的图片
             try (OutputStream out = Files.newOutputStream(Paths.get(imgFilePath))) {
@@ -298,4 +293,44 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
     public Boolean testAccess(UploadInfo uploadInfo) {
         return null;
     }
+
+    @Override
+    public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
+        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
+        try {
+            String uploadPath;
+            switch (ToolUtil.getOs()) {
+                case "windows" -> uploadPath = uploadBaseInfo.getLocalWindowUrl();
+                case "linux" -> uploadPath = uploadBaseInfo.getLocalLinuxUrl();
+                default -> {
+                    return false;
+                }
+            }
+            File file = new File(uploadPath);
+            if(!file.exists()){
+                if(!file.mkdir()){
+                    logger.error("文件夹创建失败");
+                    return false;
+                }
+            }
+            String name = "userface1.jpg";
+            try (InputStream input = classPathResource.getInputStream();
+             FileOutputStream out = new FileOutputStream(uploadPath + name)) {
+                byte[] buf = new byte[input.available()];
+                int len;
+                while ((len = input.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                out.flush();
+                return true;
+            } catch (IOException e) {
+                throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
+            }
+        } catch (MyException e) {
+            logger.error("测试文件上传失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    
 }

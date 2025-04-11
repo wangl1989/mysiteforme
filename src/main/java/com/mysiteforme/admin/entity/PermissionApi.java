@@ -15,13 +15,16 @@ import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_permission_api")
 public class PermissionApi extends DataEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+	private static final long serialVersionUID = 1L;
 
     /**
      * 关联权限表ID
@@ -42,7 +45,13 @@ public class PermissionApi extends DataEntity {
      * 排序
      */
 	@TableField("sort")
-	private Short sort;
+	private Integer sort;
+
+	/**
+	 * 是否为公共接口
+	 */
+	@TableField("common")
+	private Boolean common;
 
 
 

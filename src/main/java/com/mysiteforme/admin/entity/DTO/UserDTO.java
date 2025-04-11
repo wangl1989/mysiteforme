@@ -33,4 +33,19 @@ public class UserDTO {
      */ 
     private String captcha;
 
+    /**
+     * 设备类型
+     */
+    private String deviceType;
+
+    /**
+     * 设备名称
+     */
+    private String deviceName;
+
+    /**
+     * 设备型号
+     */
+    private String deviceModel;
+
 }

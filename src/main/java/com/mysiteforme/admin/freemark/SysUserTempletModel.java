@@ -9,6 +9,7 @@
 package com.mysiteforme.admin.freemark;
 
 import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.UserService;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +19,17 @@ import java.util.List;
 
 @Deprecated
 public class SysUserTempletModel implements TemplateMethodModelEx {
-    private UserCacheService userCacheService;
+    private UserService userService;
 
     public SysUserTempletModel(){
 
     }
 
-    @Autowired
     public SysUserTempletModel(UserCacheService userCacheService){
-        this.userCacheService = userCacheService;
+        this.userService = userService;
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public Object exec(List list) {
         if(list == null || list.isEmpty()){
             throw new RuntimeException("参数为空");
@@ -40,6 +39,6 @@ public class SysUserTempletModel implements TemplateMethodModelEx {
             return null;
         }
         Long userId = simpleNumber.getAsNumber().longValue();
-        return userCacheService.findUserById(userId);
+        return userService.getById(userId);
     }
 }

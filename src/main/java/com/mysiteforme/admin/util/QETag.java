@@ -8,15 +8,16 @@
 
 package com.mysiteforme.admin.util;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public class QETag {
 
@@ -107,11 +108,9 @@ public class QETag {
      */
     public String calcETag(MultipartFile file) throws IOException,
             NoSuchAlgorithmException {
-        String etag = "";
         long fileLength = file.getSize();
         InputStream inputStream = file.getInputStream();
-        etag = calcETag(inputStream,fileLength);
-        return etag;
+        return calcETag(inputStream,fileLength);
     }
 
     /**

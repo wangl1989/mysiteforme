@@ -26,8 +26,6 @@ public class BaseController {
 
 	protected RoleService roleService;
 
-	protected DictService dictService;
-
 	protected RescourceService rescourceService;
 
 	protected TableService tableService;

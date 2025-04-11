@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-14 20:33:34
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 12:32:31
+ * @ Modified time: 2025-02-17 20:49:04
  * @ Description: Quartz定时任务配置类 配置定时任务的执行器和持久化
  */
 
@@ -48,9 +48,9 @@ public class QuartzConfig {
         schedulerFactoryBean.setStartupDelay(20);
         schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
         //可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了
-        schedulerFactoryBean.setOverwriteExistingJobs(true);
+        schedulerFactoryBean.setOverwriteExistingJobs(false);
         //设置自动启动，默认为true
-        schedulerFactoryBean.setAutoStartup(true);
+        schedulerFactoryBean.setAutoStartup(false);
 
         return schedulerFactoryBean;
     }

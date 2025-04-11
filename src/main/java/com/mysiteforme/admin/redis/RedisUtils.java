@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.MessageUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +31,7 @@ public class RedisUtils {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private final String userTips = MessageUtil.getMessage(MessageConstants.Exception.EXCEPTION_REDIS_DATA);
+    private final String userTips = MessageConstants.Exception.EXCEPTION_REDIS_DATA;
 
     @Autowired
     public RedisUtils(RedisTemplate<String, Object> redisTemplate) {

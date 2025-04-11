@@ -55,13 +55,23 @@ public class Result extends HashMap<String,Object> {
     }
 
     /**
+     * 返回原始错误对象
+     * @param code 状态码
+     * @param message 消息
+     * @return 返回结果对象
+     */
+    public static Result orgenalError(Integer code,String message){
+        return error(code,message,null);
+    }
+
+    /**
      * 通用返回错误对象
      * @param code 状态码
      * @param message 消息
      * @return 返回结果对象
      */
     public static Result error(Integer code,String message){
-        return error(code,message,null);
+        return error(code,MessageUtil.getMessage(message),null);
     }
 
     /**
@@ -82,12 +92,23 @@ public class Result extends HashMap<String,Object> {
     }
 
     public Result setSuccess(Boolean status){
-        if (status != null){
+        if (status == null){
             status = false;
         } 
         put("success", status);
         return this;
     }
+
+    public boolean isSuccess() {
+        Object value = get("success");
+        return value != null && (boolean) value;
+    }
+
+    public Integer getCode() {
+        Object value = get("code");
+        return value != null?(Integer) value:ResultCode.INTERNAL_ERROR;
+    }
+
     /**
      * 状态码
      */
@@ -128,42 +149,68 @@ public class Result extends HashMap<String,Object> {
      * 系统错误
      */
     public static Result systemError() {
-        return error(ResultCode.INTERNAL_ERROR, MessageUtil.getMessage(MessageConstants.System.SYSTEM_ERROR));
+        return error(ResultCode.INTERNAL_ERROR, MessageConstants.System.SYSTEM_ERROR);
     }
 
     /**
-     * 参数错误
+     * 返回参数错误对象
+     * @param message MessageConstants中的常量
+     * @return 错误对象
      */
-    public static Result paramError(String message) {
-        return error(ResultCode.INVALID_PARAM, message);
+    public static Result paramMsgError(String message) {
+        return error(ResultCode.INVALID_PARAM,message);
+    }
+
+    /**
+     * 返回token验证失效
+     * @param message MessageConstants中的常量
+     * @return 错误对象
+     */
+    public static Result tokenInvalidError(String message) {
+        return error(ResultCode.INVALID_TOKEN,message);
+    }
+
+    /**
+     * 返回刷新token验证失效
+     * @param message MessageConstants中的常量
+     * @return 错误对象
+     */
+    public static Result refreshTokenInvalidError(String message) {
+        return error(ResultCode.INVALID_REFRESH_TOKEN,message);
     }
 
     /**
      * ID不能为空错误
      */
     public static Result idIsNullError(){
-        return error(ResultCode.INVALID_PARAM, MessageUtil.getMessage(MessageConstants.Validate.VALIDATE_ID_ERROR));
+        return error(ResultCode.INVALID_PARAM, MessageConstants.Validate.VALIDATE_ID_ERROR);
     }
 
     /**
      * 业务错误
+     * @param message MessageConstants中的常量
+     * @return 错误对象
      */
-    public static Result businessError(String message) {
-        return error(ResultCode.BUSINESS_ERROR, message);
+    public static Result businessMsgError(String message) {
+        return error(ResultCode.BUSINESS_ERROR,message);
+    }
+
+    public static Result objectNotNull(){
+        return error(ResultCode.BUSINESS_ERROR, MessageConstants.OBJECT_NOT_NULL);
     }
 
     /**
      * 未授权
      */
     public static Result unauthorized() {
-        return error(ResultCode.UNAUTHORIZED, MessageUtil.getMessage(MessageConstants.User.USER_LOGIN_FAILED_UNAUTHORIZED));
+        return error(ResultCode.UNAUTHORIZED, MessageConstants.User.USER_LOGIN_FAILED_UNAUTHORIZED);
     }
 
     /**
      * 禁止访问
      */
     public static Result forbidden() {
-        return error(ResultCode.FORBIDDEN, MessageUtil.getMessage(MessageConstants.User.USER_LOGIN_FAILED_FORBIDDEN));
+        return error(ResultCode.FORBIDDEN, MessageConstants.User.USER_LOGIN_FAILED_FORBIDDEN);
     }
 
 }

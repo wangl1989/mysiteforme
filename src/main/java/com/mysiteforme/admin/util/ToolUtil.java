@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.exception.MyException;
-import com.xiaoleilu.hutool.http.HttpUtil;
+import cn.hutool.http.HttpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -289,6 +290,7 @@ public class ToolUtil {
 	public static Map<String,String> getOsAndBrowserInfo(HttpServletRequest request){
 		Map<String,String> map = Maps.newHashMap();
         String  userAgent       = request.getHeader("User-Agent");
+		map.put("agent",userAgent);
 		String  user            =   userAgent.toLowerCase();
 
 		String os;
@@ -373,7 +375,7 @@ public class ToolUtil {
 			if("0:0:0:0:0:0:0:1".equals(ip)){
 				ip = "0.0.0.0";
 			}
-            String result= HttpUtil.get("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip, "GBK");
+            String result= HttpUtil.get("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip, Charset.forName("GBK"));
 			Map<String,String> resultMap = JSON.parseObject(result,Map.class);
 			String status = resultMap.get("err");
 
@@ -399,6 +401,23 @@ public class ToolUtil {
 		finalMap.put("city",city);
 		finalMap.put("isp",isp);
 		return finalMap;
+	}
+
+	/**
+	 * 获取操作系统类型
+	 * @return 操作系统类型
+	 */
+	public static String getOs(){
+		String osName = System.getProperty("os.name").toLowerCase();
+		if (osName.contains("win")) {
+			return "windows";
+		} else if (osName.contains("mac")) {
+			return "mac";
+		} else if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
+			return "linux";
+		} else {
+			return "other";
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -8,6 +8,9 @@
 
 package com.mysiteforme.admin.entity.VO;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,12 +18,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class PermissionApiVO {
+public class PermissionApiVO implements Serializable{
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long id;    
 
     private String apiUrl;
 
-    private String httpMethod;  
+    private String httpMethod;
+
+    /**
+     * 是否是公共接口
+     */
+    private Boolean common;
 
 }

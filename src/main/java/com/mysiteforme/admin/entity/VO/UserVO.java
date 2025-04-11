@@ -8,7 +8,11 @@
 
 package com.mysiteforme.admin.entity.VO;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +25,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class UserVO {
+public class UserVO implements Serializable{
+
+    @Serial
+    private static final long serialVersionUID = 1L;
     /**
      * 用户ID
      */
@@ -36,6 +43,16 @@ public class UserVO {
      * 用户昵称
      */
     private String nickName;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 手机号
+     */
+    private String tel;
 
     /**
      * 用户头像
@@ -61,6 +78,16 @@ public class UserVO {
      * 用户是否有效
      */
     private Boolean delFlag;
+
+    /**
+     * 备注
+     */
+    private String remarks;
+
+    /**
+     * 是否被锁定
+     */
+    private Boolean locked;
 
 
 }

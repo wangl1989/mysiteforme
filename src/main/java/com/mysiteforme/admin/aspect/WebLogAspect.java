@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mysiteforme.admin.util.MessageUtil;
 import org.apache.commons.text.StringEscapeUtils;
 
 import com.mysiteforme.admin.base.MySecurityUser;
@@ -59,9 +60,7 @@ public class WebLogAspect {
         this.logService = logService;
     }
 
-
-
-    private Log sysLog = new Log();
+    private Log sysLog;
 
     /**
      * 切入点表达式,拦截使用@SysLog注解的方法
@@ -76,12 +75,12 @@ public class WebLogAspect {
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) throws JsonProcessingException {
         startTime.set(System.currentTimeMillis());
+        sysLog = new Log();
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if(attributes != null) {
             HttpServletRequest request = attributes.getRequest();
             HttpSession session = (HttpSession) attributes.resolveReference(RequestAttributes.REFERENCE_SESSION);
-            sysLog = new Log();
             sysLog.setClassMethod(joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
             sysLog.setHttpMethod(request.getMethod());
             //获取传入目标方法的参数
@@ -90,9 +89,9 @@ public class WebLogAspect {
             for (Object o : args) {
                 //排序不需要序列化的对象
                 if (!(o instanceof ServletRequest) &&
-                        !(o instanceof ServletResponse) &&
-                        !(o instanceof MultipartFile) &&
-                        !(o instanceof MultipartFile[])) {
+                    !(o instanceof ServletResponse) &&
+                    !(o instanceof MultipartFile) &&
+                    !(o instanceof MultipartFile[])) {
                     objs.add(o);
                 }
             }
@@ -111,8 +110,15 @@ public class WebLogAspect {
             Method method = signature.getMethod();
             com.mysiteforme.admin.annotation.SysLog mylog = method.getAnnotation(com.mysiteforme.admin.annotation.SysLog.class);
             if (mylog != null) {
-                //注解上的描述
-                sysLog.setTitle(mylog.value());
+                if(StringUtils.isNotBlank(mylog.generateValue())){
+                    //自动生成的方法注解上的描述
+                    sysLog.setTitle(mylog.generateValue());
+                } else if (StringUtils.isNotBlank(mylog.value())) {
+                    //系统方法注解上的描述
+                    System.out.println("mylog.value():" + mylog.value());
+                    sysLog.setTitle(MessageUtil.getMessage(mylog.value()));
+                }
+
             }
 
             Map<String, String> browserMap = ToolUtil.getOsAndBrowserInfo(request);
@@ -138,8 +144,6 @@ public class WebLogAspect {
                 sysLog.setCity(StringEscapeUtils.escapeHtml4(map.get("city")));
                 sysLog.setIsp(StringEscapeUtils.escapeHtml4(map.get("isp")));
             }
-            sysLog.setType(ToolUtil.isAjax(request) ? "Ajax请求" : "普通请求");
-            
             if (MySecurityUser.securityUser() != null) {
                 sysLog.setUsername(StringUtils.isNotBlank(MySecurityUser.nickName()) ? MySecurityUser.nickName() : MySecurityUser.loginName());
             }

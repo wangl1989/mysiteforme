@@ -8,13 +8,24 @@
 
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Dict;
+import com.mysiteforme.admin.entity.request.AddDictRequest;
+import com.mysiteforme.admin.entity.request.PageListDictRequest;
+import com.mysiteforme.admin.entity.request.UpdateDictRequest;
 
 import java.util.List;
 
 
 public interface DictService extends IService<Dict> {
+
+    /**
+     * 分页搜索字典列表页数据
+     * @param request 查询参数对象
+     * @return 分页数据对象
+     */
+    IPage<Dict> selectPageDict(PageListDictRequest request);
 
     /**
      * 根据字典类型获取字典列表
@@ -42,15 +53,16 @@ public interface DictService extends IService<Dict> {
      * @param type 字典类型
      * @param label 字典标签
      * @param value 字典值
+     * @param id 唯一id值
      * @return 字典数量
      */
-    Integer getCountByAll(String type, String label, String value);
+    Integer getCountByAll(String type, String label, String value,Long id);
 
-    /**
-     * 保存或更新字典
-     * @param dict 字典对象
-     */
     void saveOrUpdateDict(Dict dict);
+
+    void saveDict(AddDictRequest request);
+
+    void updateDict(UpdateDictRequest request);
 
     /**
      * 删除字典

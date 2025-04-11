@@ -10,6 +10,7 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Log;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,5 +20,6 @@ import java.util.Map;
 @Mapper
 public interface LogDao extends BaseMapper<Log> {
 
+    @MapKey("")
     List<Map<String,Object>> selectSelfMonthData();
 }

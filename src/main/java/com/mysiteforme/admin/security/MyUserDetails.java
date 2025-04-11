@@ -28,6 +28,8 @@ public class MyUserDetails extends UserVO implements UserDetails{
 
     private String myPassword;
 
+    private String deviceId;
+
 
     public MyUserDetails() {
     }
@@ -79,6 +81,14 @@ public class MyUserDetails extends UserVO implements UserDetails{
     @Override
     public boolean isEnabled() {
         return this.getDelFlag();
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
     
     

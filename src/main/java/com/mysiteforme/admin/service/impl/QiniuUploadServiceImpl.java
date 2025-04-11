@@ -8,11 +8,28 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
+
+import cn.hutool.core.lang.UUID;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
 import com.mysiteforme.admin.entity.Rescource;
+import com.mysiteforme.admin.entity.UploadBaseInfo;
 import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.RescourceService;
@@ -27,21 +44,6 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FetchRet;
 import com.qiniu.util.Auth;
-import com.xiaoleilu.hutool.util.RandomUtil;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 
 @Service("qiniuService")
 public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
@@ -120,13 +122,12 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         if (null != file && !file.isEmpty()) {
             extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
                 Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf("."));
-            fileName = RandomUtil.randomUUID() + extName;
+            fileName = UUID.randomUUID() + extName;
             byte[] data = file.getBytes();
             QETag tag = new QETag();
             String hash = tag.calcETag(file);
             QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
             wrapper.eq("hash",hash);
-            wrapper.eq("source","qiniu");
             Rescource rescource = getOne(wrapper);
             if( rescource!= null){
                 return rescource.getWebUrl();
@@ -183,7 +184,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String uploadNetFile(String url) {
-        String fileName = RandomUtil.randomUUID();
+        String fileName = UUID.randomUUID().toString();
         QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
         wrapper.eq("source","qiniu");
         wrapper.eq("original_net_url",url);
@@ -249,7 +250,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         }
         String filePath="",
                 extName,
-                name = RandomUtil.randomUUID();
+                name = UUID.randomUUID().toString();
         extName = file.getName().substring(
                 file.getName().lastIndexOf("."));
         StringBuilder key = new StringBuilder();
@@ -289,7 +290,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         StringBuilder key = new StringBuilder();
         StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
         String qiniuDir = getUploadInfo().getQiniuDir();
-        String fileName = RandomUtil.randomUUID();
+        String fileName = UUID.randomUUID().toString();
         if(StringUtils.isNotBlank(qiniuDir)){
             key.append(qiniuDir).append("/");
             returnUrl.append(qiniuDir).append("/");
@@ -318,6 +319,21 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
         try {
             Auth auth = Auth.create(uploadInfo.getQiniuAccessKey(), uploadInfo.getQiniuSecretKey());
             String authstr = auth.uploadToken(uploadInfo.getQiniuBucketName());
+            InputStream inputStream = classPathResource.getInputStream();
+            Response response = getUploadManager().put(inputStream,"test.jpg",authstr,null,null);
+            return response.isOK();
+        } catch (IOException e) {
+            logger.error("七牛上传文件IO异常", e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
+        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
+        try {
+            Auth auth = Auth.create(uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
+            String authstr = auth.uploadToken(uploadBaseInfo.getBucketName());
             InputStream inputStream = classPathResource.getInputStream();
             Response response = getUploadManager().put(inputStream,"test.jpg",authstr,null,null);
             return response.isOK();

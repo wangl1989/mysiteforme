@@ -8,18 +8,38 @@
 
 package com.mysiteforme.admin.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mysiteforme.admin.entity.DTO.AssignUserPermission;
+import com.mysiteforme.admin.entity.DTO.PermissionForUserDTO;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
-
-import java.util.Map;
-import java.util.Set;
+import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.entity.response.PageListUserResponse;
+import com.mysiteforme.admin.entity.response.UserDetailResponse;
 
 
 public interface UserService extends IService<User> {
 
-	User findUserByLoginName(String name);
+	/**
+	 * 分页获取用户列表
+	 * @param request 查询用户参数
+	 * @return 分页数据
+	 */
+	IPage<PageListUserResponse> selectPageUser(PageListUserRequest request);
+
+
+	/**
+	 * 根据ID获取用户详情
+	 * @param id 用户ID
+	 * @return 用户对象
+	 */
+	UserDetailResponse getUserDetailById(Long id);
 
 	/**
 	 * 根据姓名查询用户详细信息
@@ -31,16 +51,23 @@ public interface UserService extends IService<User> {
 	/**
 	 * 保存用户信息
 	 * 包含密码加密、角色关系保存
-	 * @param user 用户对象，包含角色列表
+	 * @param request 用户对象，包含角色列表
 	 */
-	User saveUser(User user);
+	User saveUser(AddUserRequest request);
+
+
+	/**
+	 * 更新用户密码
+	 * @param request 更新用户密码参数对象
+	 */
+	User changePassword(ChangePasswordRequest request);
 
 	/**
 	 * 更新用户信息
 	 * 包含更新角色关系
-	 * @param user 用户对象，包含更新后的角色列表
+	 * @param request 请求对象，包含更新后的角色列表
 	 */
-	void updateUser(User user);
+	User updateUser(UpdateUserRequest request);
 
 	/**
 	 * 保存用户角色关系
@@ -69,5 +96,13 @@ public interface UserService extends IService<User> {
 	 */
 	void deleteUser(User user);
 
-	Map<String,Object> selectUserMenuCount();
+	// 给用户分配权限
+    void assignUserPermission(AssignUserPermissionRequest request);
+
+	/**
+	 * 根据用户ID获取他对应的单独分配的权限集合
+	 * @param userId
+	 * @return
+	 */
+	List<Long> getAssinUserPermission(Long userId);
 }

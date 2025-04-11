@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 19:20:36
  * @ Modified by: wangl
- * @ Modified time: 2025-02-16 00:18:38
+ * @ Modified time: 2025-02-17 19:59:09
  * @ Description: Securit配置信息
  */
 
@@ -12,6 +12,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.mysiteforme.admin.util.ApiToolUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -29,18 +32,21 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.mysiteforme.admin.service.SecurityService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final DataSource dataSource;
@@ -55,10 +61,15 @@ public class SecurityConfig {
 
     private final SecurityService securityService;
 
+    private final ApiToolUtil apiToolUtil;
+
+    private final CorsConfigurationSource corsConfigurationSource;
+
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final MyPasswordEncoder myPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
+    private final CustomExceptionHandlerFilter customExceptionHandlerFilter;
 
     /**
      * anyRequest          |   匹配所有请求路径
@@ -79,6 +90,66 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
         // 创建自定义的 JsonAuthenticationFilter
+        JsonAuthenticationFilter jsonAuthenticationFilter = getJsonAuthenticationFilter();
+
+        httpSecurity
+            // 0. 验证所有权限
+            .addFilterBefore(customExceptionHandlerFilter , WebAsyncManagerIntegrationFilter.class)
+            //  禁用默认的表单登录配置：前端传递的都是json数据
+            .formLogin(AbstractHttpConfigurer::disable)
+            //  禁用basic明文验证
+            .httpBasic(Customizer.withDefaults())
+            //  基于 token ，不需要 csrf
+            .csrf(AbstractHttpConfigurer::disable)
+            //  允许跨域请求
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            //  基于token，不需要session
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 配置请求授权
+            .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
+                    // // 1. 允许直接访问的接口：验证码接口,登录放行
+                    .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh","/error","/favicon.ico","/actuator/**").permitAll()
+                    // 2. 添加API路径模式
+                    .requestMatchers("/api/**").access((authentication, context) -> {
+                        // 判断是否已认证
+                        if (authentication == null) {
+                            return new AuthorizationDecision(false);
+                        }
+                        // 判断是否有权限
+                        HttpServletRequest myrequest = context.getRequest();
+                        String path = myrequest.getRequestURI();
+                        log.debug("=================我们在正在验证的URL是：{}",path);
+                        boolean hasPermission = securityService.checkPermission(myrequest);
+                        return new AuthorizationDecision(hasPermission);
+                    })
+                    //  允许任意请求被已登录用户访问，不检查Authority
+                    .anyRequest().permitAll()
+            )
+            // 配置记住我功能
+            //.rememberMe(Customizer.withDefaults())
+            
+            // 1. 添加验证码拦截器,最先执行
+            .addFilterBefore(captchaFilter(), CustomExceptionHandlerFilter.class)
+            // 2. JWT过滤器在验证码之后
+            .addFilterBefore(myJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            // 3. JSON登录过滤器替换默认的表单登录过滤器
+            .addFilterAt(jsonAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // 异常处理器
+            .exceptionHandling(ex -> ex
+                    // 未登录异常:未登录用户访问需要认证的资源
+                   .authenticationEntryPoint(new MyAuthenticationEntryPoint(apiToolUtil))
+                    // 权限认证失败异常:已登录用户访问未授权的资源
+                   .accessDeniedHandler(new MyAccessDeniedHandler()))
+            
+            // 添加Logout filter
+            .logout(logout -> logout.logoutSuccessHandler(myLogoutSuccessHandler));
+
+
+        return httpSecurity.build();
+    }
+
+    @NotNull
+    private JsonAuthenticationFilter getJsonAuthenticationFilter() throws Exception {
         JsonAuthenticationFilter jsonAuthenticationFilter = new JsonAuthenticationFilter();
         jsonAuthenticationFilter.setFilterProcessesUrl("/login"); // 设置登录接口地址
         // 设置登录成功和失败处理器
@@ -121,54 +192,7 @@ public class SecurityConfig {
          * 整个认证流程是一个责任链模式的实现
          */
         jsonAuthenticationFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-
-        httpSecurity
-            //  禁用basic明文验证
-            .httpBasic(Customizer.withDefaults())
-            //  基于 token ，不需要 csrf
-            .csrf(AbstractHttpConfigurer::disable)
-            //  允许跨域请求
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            //  基于token，不需要session
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 配置请求授权
-            .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
-                    // 验证码接口,登录放行
-                    .requestMatchers("/genCaptcha","/login").permitAll()
-                    //  允许任意请求被已登录用户访问，不检查Authority
-                    .anyRequest().access((authentication, context) -> {
-                        // 在这里实现动态权限判断逻辑
-                        boolean isAuthenticated = authentication != null;
-                        return new AuthorizationDecision(isAuthenticated && securityService.checkPermission(context.getRequest()));
-                    })
-            )
-            // 配置记住我功能
-            //.rememberMe(Customizer.withDefaults())
-            //  禁用默认的表单登录配置：前端传递的都是json数据
-            .formLogin(AbstractHttpConfigurer::disable)
-            // 1. 添加验证码拦截器,最先执行
-            .addFilterBefore(captchaFilter(), SecurityContextHolderFilter.class)
-            // 2. JWT过滤器在验证码之后
-            .addFilterBefore(myJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            // 3. JSON登录过滤器替换默认的表单登录过滤器
-            .addFilterAt(jsonAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            // 异常处理器
-            .exceptionHandling(ex -> ex
-                    // 未登录异常
-                   .authenticationEntryPoint(new MyAuthenticationEntryPoint())
-                    // 权限认证失败异常
-                   .accessDeniedHandler(new MyAccessDeniedHandler()))
-            
-            // 添加Logout filter
-            .logout(logout -> logout.logoutSuccessHandler(myLogoutSuccessHandler));
-
-
-        return httpSecurity.build();
-    }
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return myPasswordEncoder;
+        return jsonAuthenticationFilter;
     }
 
     /*
@@ -220,7 +244,7 @@ public class SecurityConfig {
      */
     @Bean
     public CaptchaFilter captchaFilter() {
-        return new CaptchaFilter(securityService);
+        return new CaptchaFilter(securityService,apiToolUtil);
     }
  
     /*
@@ -244,29 +268,14 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(this.userDetailsService);
+        authProvider.setPasswordEncoder(this.passwordEncoder);
         // 添加日志
-        authProvider.setPreAuthenticationChecks(user -> System.out.println("===========正在进行预认证检查：{}========="+user.getUsername()));
+        authProvider.setPreAuthenticationChecks(user -> System.out.println("===========正在进行预认证检查：{}========="+user.getUsername()+"==密码=="+user.getPassword()));
         return authProvider;
     }
 
-    /**
-     * 配置跨源访问(CORS)
-     *
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 
     
 

@@ -12,40 +12,82 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
+import com.mysiteforme.admin.dao.PermissionDao;
+import com.mysiteforme.admin.dao.RoleDao;
 import com.mysiteforme.admin.dao.UserDao;
+import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.VO.RoleVO;
+import com.mysiteforme.admin.entity.VO.UserVO;
+import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.UserCacheService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mysiteforme.admin.util.MessageConstants;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service("userCacheService")
+@RequiredArgsConstructor
 public class UserCacheServiceImpl implements UserCacheService {
 
-    private UserDao baseMapper;
+    private final UserDao baseMapper;
 
-    public UserCacheServiceImpl() {}
+    private final RoleDao roleDao;
 
-    @Autowired
-    public UserCacheServiceImpl(UserDao baseMapper) {
-        this.baseMapper = baseMapper;
-    }
+    private final PermissionDao permissionDao;
 
     /**
-     * 根据用户ID查找用户信息
-     * 结果会被缓存，缓存key为'user_id_'+用户ID
-     * 当结果为null时不缓存
+     * 根据ID查询用户详细信息
      * @param id 用户ID
-     * @return 用户信息对象，未找到时返回null
+     * @return 用户详细信息
      */
-    @Cacheable(value = "user",key="'user_id_'+T(String).valueOf(#id)",unless = "#result == null")
+    @Cacheable(value = "system::user::details", key = "'id:'+#id", unless = "#result == null")
     @Override
-    public User findUserById(Long id) {
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("id", id);
-        return baseMapper.selectUserByMap(map);
+    public UserVO findUserByIdDetails(Long id) {
+        User user = baseMapper.selectById(id);
+        if(user == null || user.getDelFlag()){
+            throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
+        }
+        // 检查用户ID是否是超级管理员
+        if(id == 1L){
+            return this.getSuperAdminUserDetail(user);
+        }else{
+            return baseMapper.findUserByIdDetails(id);
+        }
     }
+
+    @Override
+    public UserVO getSuperAdminUserDetail(User user) {
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        QueryWrapper<Role> roleWrapper = new QueryWrapper<>();
+        roleWrapper.eq("del_flag", false);
+        List<Role> roles = roleDao.selectList(roleWrapper);
+        Set<RoleVO> roleVOs = roles.stream().map(role -> new RoleVO(role.getId(), role.getName())).collect(Collectors.toSet());
+        userVO.setRoles(roleVOs);
+        userVO.setPermissions(permissionDao.allPermission());
+        return userVO;
+    }
+
+    @Cacheable(value = "system::user", key = "'all'", unless = "#result.size()>0")
+    @Override
+    public Map<Long, User> getAllUser() {
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        List<User> userList = baseMapper.selectList(lambdaQueryWrapper);
+        if(!userList.isEmpty()){
+            return userList.stream().collect(Collectors.toMap(User::getId, user -> user));
+        }
+        return Map.of();
+    }
+
+
 }

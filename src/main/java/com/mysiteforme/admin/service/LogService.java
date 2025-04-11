@@ -8,10 +8,12 @@
 
 package com.mysiteforme.admin.service;
 
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Log;
-
-import java.util.List;
+import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
 
 
 public interface LogService extends IService<Log> {
@@ -21,5 +23,12 @@ public interface LogService extends IService<Log> {
      * @return 每日日志数量列表
      */
     List<Integer> selectSelfMonthData();
+
+    /**
+     * 分页查询日志
+     * @param request 查询参数
+     * @return 分页查询结果
+     */
+    IPage<Log> selectPageLogs(PageListSystemLogRequest request);
 
 }

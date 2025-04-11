@@ -8,48 +8,80 @@
 
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mysiteforme.admin.dao.RoleDao;
-import com.mysiteforme.admin.entity.Menu;
-import com.mysiteforme.admin.entity.Role;
-import com.mysiteforme.admin.service.RoleService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysiteforme.admin.entity.request.AddRoleRequest;
+import com.mysiteforme.admin.entity.request.PageListRoleRequest;
+import com.mysiteforme.admin.entity.request.SaveRoleMenuPerRequest;
+import com.mysiteforme.admin.entity.request.UpdateRoleRequest;
+import com.mysiteforme.admin.entity.response.BaseRoleResponse;
+import com.mysiteforme.admin.entity.response.PageListRoleResponse;
+import com.mysiteforme.admin.entity.response.RoleMenuPerResponse;
+import com.mysiteforme.admin.service.UserCacheService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.dao.RoleDao;
+import com.mysiteforme.admin.entity.Role;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.VO.PermissionVO;
+import com.mysiteforme.admin.entity.VO.UserVO;
+import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.redis.CacheUtils;
+import com.mysiteforme.admin.service.RoleService;
+import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.util.MessageConstants;
+
 @Service
-@Transactional(readOnly = true, rollbackFor = Exception.class)
+@Transactional(readOnly = true, rollbackFor = MyException.class)
 public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleService {
+
+    private final UserService userService;
+
+    private final CacheUtils cacheUtils;
+
+    private final UserCacheService userCacheService;
+
+    public RoleServiceImpl(UserService userService, CacheUtils cacheUtils, UserCacheService userCacheService) {
+        this.userService = userService;
+        this.cacheUtils = cacheUtils;
+        this.userCacheService = userCacheService;
+    }
+
+    @Override
+    public IPage<PageListRoleResponse> selectPageUser(PageListRoleRequest request) {
+        return baseMapper.selectPageRole(new Page<>(request.getPage(),request.getLimit()),request);
+    }
 
     /**
      * 保存角色信息及其菜单关系
      * 同时更新角色缓存并清除角色列表缓存
-     * @param role 角色对象，包含菜单集合
+     * @param request 角色对象，包含菜单集合
      */
-    @Caching(
-            put = {@CachePut(value = "role",key = "'role_id_'+T(String).valueOf(#result.id)",condition = "#result.id != null and #result.id != 0")},
-            evict = {@CacheEvict(value = "roleAll",key = "'roleAll'" )
-    })
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveRole(Role role) {
+    public void saveRole(AddRoleRequest request) {
+        Role role = new Role();
+        BeanUtils.copyProperties(request,role);
         baseMapper.insert(role);
-        baseMapper.saveRoleMenus(role.getId(),role.getMenuSet());
+        //清除超级管理员缓存
+        cacheUtils.evictCacheOnRoleChangeSuperAdmin();
     }
 
     /**
-     * 根据ID获取角色信息
+     * 根据ID获取角色信息(包含权限集合)
      * 结果会被缓存
      * @param id 角色ID
      * @return 角色对象
      */
-    @Cacheable(value = "role",key = "'role_id_'+T(String).valueOf(#id)",unless = "#result == null")
     @Override
     public Role getRoleById(Long id) {
         return baseMapper.selectRoleById(id);
@@ -58,60 +90,44 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     /**
      * 更新角色信息及其菜单关系
      * 同时清除相关的角色、用户、菜单缓存
-     * @param role 角色对象，包含更新后的菜单集合
+     * @param request 角色对象，包含更新后的菜单集合
      */
-    @Caching(evict = {
-            @CacheEvict(value = "role",key = "'role_id_'+T(String).valueOf(#role.id)" ),
-            @CacheEvict(value = "roleAll",key = "'roleAll'" ),
-            @CacheEvict(value = "user",allEntries=true ),
-            @CacheEvict(value = "allMenus",allEntries = true)
-    })
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateRole(Role role) {
+    public void updateRole(UpdateRoleRequest request) {
+        Role role = new Role();
+        BeanUtils.copyProperties(request,role);
         baseMapper.updateById(role);
-        baseMapper.dropRoleMenus(role.getId());
-        baseMapper.saveRoleMenus(role.getId(),role.getMenuSet());
+        // 清除角色相关缓存
+        cacheUtils.evictCacheOnRoleChange(role.getId());
     }
 
     /**
      * 删除角色（软删除）及其关联关系
      * 同时清除相关的角色、用户缓存
-     * @param role 要删除的角色对象
+     * @param id 要删除的角色ID
      */
-    @Caching(evict = {
-            @CacheEvict(value = "role",key = "'role_id_'+T(String).valueOf(#role.id)" ),
-            @CacheEvict(value = "roleAll",key = "'roleAll'" ),
-            @CacheEvict(value = "user",allEntries=true )
-    })
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteRole(Role role) {
+    public void deleteRole(Long id) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("role_id",id);
+        wrapper.eq("del_flag",false);
+        long count = userService.count(wrapper);
+        if(count > 0){
+            throw MyException.builder().businessError(MessageConstants.Role.ROLE_HAS_USER).build();
+        }
+        Role role = getById(id);
         role.setDelFlag(true);
         baseMapper.updateById(role);
+        // 删除原先的菜单关系
         baseMapper.dropRoleMenus(role.getId());
+        // 删除原先的角色用户关系
         baseMapper.dropRoleUsers(role.getId());
-    }
-
-    /**
-     * 保存角色的菜单关系
-     * @param id 角色ID
-     * @param menuSet 菜单集合
-     */
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void saveRoleMenus(Long id, Set<Menu> menuSet) {
-        baseMapper.saveRoleMenus(id,menuSet);
-    }
-
-    /**
-     * 删除角色的所有菜单关系
-     * @param id 角色ID
-     */
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void dropRoleMenus(Long id) {
-        baseMapper.dropRoleMenus(id);
+        // 删除角色权限
+        baseMapper.dropRolePermissions(role.getId());
+        // 清除角色相关缓存
+        cacheUtils.evictCacheOnRoleChange(role.getId());
     }
 
     /**
@@ -126,16 +142,61 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
         return baseMapper.selectCount(wrapper);
     }
 
-    /**
-     * 获取所有未删除的角色列表
-     * 结果会被缓存
-     * @return 角色列表
-     */
-    @Cacheable(value = "roleAll",key = "'roleAll'",unless = "#result == null or #result.size() == 0")
     @Override
-    public List<Role> selectAll() {
-        QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        return baseMapper.selectList(wrapper);
+    public List<Long> getRoleIdsByPermissionId(Long permissionId){
+        return baseMapper.getRoleIdsByPermissionId(permissionId);
+    }
+
+    @Override
+    public List<BaseRoleResponse> userAllRole(Long id) {
+        if(id.equals(1L)) {
+            return baseMapper.myRoleList(null);
+        }else{
+            return baseMapper.myRoleList(id);
+        }
+    }
+
+    @Override
+    public RoleMenuPerResponse getUserRoleMenusPermissions(Long id) {
+        RoleMenuPerResponse response = new RoleMenuPerResponse();
+        response.setPermissionIds(baseMapper.getPemissionIdsByRoleId(id));
+        response.setMenuIds(baseMapper.getMenuIdsByRoleId(id));
+        return response;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void assignRoleMenusPermissions(SaveRoleMenuPerRequest request) {
+        // 删除原先的菜单关系
+        baseMapper.dropRoleMenus(request.getRoleId());
+        //保存角色菜单关系
+        baseMapper.saveRoleMenus(request.getRoleId(),request.getMenuIds());
+        //保存角色权限关系
+        Role role = baseMapper.selectById(request.getRoleId());
+        if(role == null || role.getDelFlag()){
+            throw MyException.builder().businessError(MessageConstants.Permission.ASSIGN_PERMISSION_USER_NOT_FOUND).build();
+        }
+        Long currentUserId = MySecurityUser.id();
+        if(currentUserId == null){
+            throw MyException.builder().unauthorized().build();
+        }
+        if(currentUserId.equals(1L)) {
+            // 如果不是超级管理员,则需要进行权限检查：当前用户只能分配当前用户拥有的权限。
+            // 获取当前登录用户的权限集合
+            UserVO securityUser = userCacheService.findUserByIdDetails(MySecurityUser.id());
+            Set<PermissionVO> permissionVOList = securityUser.getPermissions();
+            // 当前登录用户拥有的权限ID集合
+            Set<Long> roleOwnPermissionIds = permissionVOList.stream().map(PermissionVO::getId).collect(Collectors.toSet());
+            // 只能给角色分配当前角色拥有的权限
+            if(!roleOwnPermissionIds.containsAll(request.getPermissionIds())){
+                throw MyException.builder().businessError(MessageConstants.Permission.ASSIGN_PERMISSION_ROLE_MORE).build();
+            }
+        }
+        // 先移除角色对应的权限集合
+        baseMapper.dropRolePermissions(request.getRoleId());
+        // 再插入数据
+        baseMapper.saveRolePermissions(request.getRoleId(),request.getPermissionIds());
+        // 清除角色相关缓存
+        cacheUtils.evictCacheOnRoleChange(role.getId());
     }
 }

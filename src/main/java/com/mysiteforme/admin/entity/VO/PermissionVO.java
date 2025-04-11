@@ -9,14 +9,19 @@
 package com.mysiteforme.admin.entity.VO;
 
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class PermissionVO {
+public class PermissionVO implements Serializable{
+
+    private static final long serialVersionUID = 1L; 
 
     private Long id;
     /**
@@ -50,13 +55,14 @@ public class PermissionVO {
     private String remarks;
 
     /**
-     * 权限所在的组别
+     * 菜单对象
      */
-    private PermissionGroupVO group;
+    private MenuVO menu;
 
     /**
      * 权限按钮集合
      */
+    @Setter
     private PermissionButtonVO button;
 
     /**

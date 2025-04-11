@@ -11,6 +11,9 @@ package com.mysiteforme.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import com.mysiteforme.admin.entity.QuartzTask;
@@ -35,72 +38,22 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin/quartzTask")
+@RequestMapping("/api/admin/quartzTask")
 public class QuartzTaskController {
 
-    private QuartzTaskService quartzTaskService;
+    private final QuartzTaskService quartzTaskService;
 
-    public QuartzTaskController() {}
-
-    @Autowired
     public QuartzTaskController(QuartzTaskService quartzTaskService) {
         this.quartzTaskService = quartzTaskService;
     }
 
     /**
-     * 显示任务列表页面
-     * @return 列表页面路径
-     */
-    @GetMapping("list")
-    @SysLog("跳转定时任务列表")
-    public String list(){
-        return "/admin/quartzTask/list";
-    }
-
-    /**
      * 获取任务列表数据
-     * @param limit 每页数量
-     * @param page 分页参数
      * @return 分页数据
      */
-    @PostMapping("list")
-    @ResponseBody
-    public LayerData<QuartzTask> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
-                                      @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                      ServletRequest request){
-        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
-        LayerData<QuartzTask> layerData = new LayerData<>();
-        QueryWrapper<QuartzTask> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        if(!map.isEmpty()){
-            String name = (String) map.get("name");
-            if(StringUtils.isNotBlank(name)) {
-                wrapper.like("name",name);
-            }else{
-                map.remove("name");
-            }
-
-            String status = (String) map.get("status");
-            if(StringUtils.isNotBlank(status)) {
-                wrapper.eq("status",status);
-            }else{
-                map.remove("status");
-            }
-
-        }
-        IPage<QuartzTask> pageData = quartzTaskService.queryList(wrapper,new Page<>(page,limit));
-        layerData.setData(pageData.getRecords());
-        layerData.setCount((int)pageData.getTotal());
-        return layerData;
-    }
-
-    /**
-     * 显示任务添加页面
-     * @return 添加页面路径
-     */
-    @GetMapping("add")
-    public String add(){
-        return "/admin/quartzTask/add";
+    @GetMapping("list")
+    public Result list(@RequestBody PageListQuartzTaskRequest request){
+        return Result.success(quartzTaskService.selectPageQuartzTask(request));
     }
 
     /**
@@ -109,24 +62,10 @@ public class QuartzTaskController {
      * @return 操作结果
      */
     @PostMapping("add")
-    @SysLog("保存新增定时任务数据")
-    @ResponseBody
-    public RestResponse add(QuartzTask quartzTask){
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_ADD)
+    public Result add(@RequestBody QuartzTask quartzTask){
         quartzTaskService.saveQuartzTask(quartzTask);
-        return RestResponse.success();
-    }
-
-    /**
-     * 编辑任务
-     * @param id 任务ID
-     * @param model 模型对象
-     * @return 编辑页面路径
-     */
-    @GetMapping("edit")
-    public String edit(Long id,Model model){
-        QuartzTask quartzTask = quartzTaskService.getById(id);
-        model.addAttribute("quartzTask",quartzTask);
-        return "/admin/quartzTask/edit";
+        return Result.success();
     }
 
     /**
@@ -134,15 +73,14 @@ public class QuartzTaskController {
      * @param quartzTask 任务对象
      * @return 操作结果
      */
-    @PostMapping("edit")
-    @ResponseBody
-    @SysLog("保存编辑定时任务数据")
-    public RestResponse edit(QuartzTask quartzTask){
+    @PutMapping("edit")
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_EDIT)
+    public Result edit(@RequestBody QuartzTask quartzTask){
         if(null == quartzTask.getId() || 0 == quartzTask.getId()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
         quartzTaskService.updateQuartzTask(quartzTask);
-        return RestResponse.success();
+        return Result.success();
     }
 
     /**
@@ -150,15 +88,15 @@ public class QuartzTaskController {
      * @param ids 任务ID集合
      * @return 操作结果
      */
-    @PostMapping("delete")
+    @DeleteMapping("delete")
     @ResponseBody
-    @SysLog("删除定时任务数据")
-    public RestResponse delete(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_DELETE)
+    public Result delete(@RequestParam(value = "ids[]",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
         quartzTaskService.deleteBatchTasks(ids);
-        return RestResponse.success();
+        return Result.success();
     }
 
     /**
@@ -167,12 +105,12 @@ public class QuartzTaskController {
      */
     @PostMapping("paush")
     @ResponseBody
-    public RestResponse paush(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    public Result paush(@RequestParam(value = "ids[]",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
         quartzTaskService.paush(ids);
-        return RestResponse.success();
+        return Result.success();
     }
 
     /**
@@ -181,12 +119,12 @@ public class QuartzTaskController {
      */
     @PostMapping("resume")
     @ResponseBody
-    public RestResponse resume(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    public Result resume(@RequestParam(value = "ids[]",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
         quartzTaskService.resume(ids);
-        return RestResponse.success();
+        return Result.success();
     }
 
     /**
@@ -195,12 +133,12 @@ public class QuartzTaskController {
      */
     @PostMapping("run")
     @ResponseBody
-    public RestResponse run(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    public Result run(@RequestParam(value = "ids[]",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
-            return RestResponse.failure("ID不能为空");
+            return Result.idIsNullError();
         }
         quartzTaskService.run(ids);
-        return RestResponse.success();
+        return Result.success();
     }
 
 }

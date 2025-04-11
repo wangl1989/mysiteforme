@@ -432,11 +432,11 @@ public class TableController extends BaseController{
             File f = new File(createTableFiles.zipFile);
             try {
                 if(f.exists() && !f.delete()){
-                    LOGGER.error("删除文件失败:{}", f.getName());
+                    LOGGER.error("下载JAVA源码---删除文件失败:{}", f.getName());
                 }
-                com.xiaoleilu.hutool.util.ZipUtil.zip(createTableFiles.baseDic, createTableFiles.zipFile);
+                cn.hutool.core.util.ZipUtil.zip(createTableFiles.baseDic, createTableFiles.zipFile);
             } catch (SecurityException e) {
-                LOGGER.error("压缩文件失败:{}", e.getMessage());
+                LOGGER.error("下载JAVA源码---压缩文件失败:{}", e.getMessage());
             }
             String filename = new String(f.getName().getBytes("GB2312"), "ISO8859-1");
             response.setCharacterEncoding("UTF-8");

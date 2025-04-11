@@ -102,10 +102,10 @@ public class BlogChannelController extends BaseController{
             wrapper.eqSql("sort","select max(sort) from blog_channel")
                     .isNull("parent_id")
                     .eq("del_flag",false);
-            BlogChannel channel = blogChannelService.getOne(wrapper);
+            List<BlogChannel> channels = blogChannelService.list(wrapper);
             int sort = 0;
-            if(channel != null){
-                sort =  channel.getSort() +10;
+            if(channels != null && !channels.isEmpty()){
+                sort =  channels.get(0).getSort() +10;
             }
             blogChannel.setSort(sort);
         }else{
@@ -119,10 +119,10 @@ public class BlogChannelController extends BaseController{
             wrapper.eqSql("sort","select max(sort) from blog_channel")
                     .isNull("parent_id")
                     .eq("del_flag",false);
-            BlogChannel channel = blogChannelService.getOne(wrapper);
+            List<BlogChannel> channels = blogChannelService.list(wrapper);
             int sort = 0;
-            if(channel != null){
-                sort =  channel.getSort() +10;
+            if(channels != null && !channels.isEmpty()){
+                sort =  channels.get(0).getSort() +10;
             }
             blogChannel.setSort(sort);
         }

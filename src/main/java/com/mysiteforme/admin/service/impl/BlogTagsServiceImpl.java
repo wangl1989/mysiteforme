@@ -50,10 +50,10 @@ public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTags> impl
         QueryWrapper<BlogTags> queryWrapper = new QueryWrapper<>();
         queryWrapper.eqSql("sort","select max(sort) from blog_tags ")
                 .eq("del_flag",false);
-        BlogTags blogTags = getOne(queryWrapper);
+        List<BlogTags> blogTags = list(queryWrapper);
         int sort = 0;
-        if(blogTags != null){
-            sort =  blogTags.getSort() + 1;
+        if(blogTags != null && !blogTags.isEmpty()){
+            sort =  blogTags.get(0).getSort() + 1;
         }
         tags.setSort(sort);
         save(tags);

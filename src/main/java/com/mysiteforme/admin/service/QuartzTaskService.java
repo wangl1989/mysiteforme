@@ -12,10 +12,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.QuartzTask;
+import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
 
 import java.util.List;
 
 public interface QuartzTaskService extends IService<QuartzTask> {
+
+    IPage<QuartzTask> selectPageQuartzTask(PageListQuartzTaskRequest request);
 
     /**
      * 根据ID，查询定时任务

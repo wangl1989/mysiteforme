@@ -8,6 +8,9 @@
 
 package com.mysiteforme.admin.entity.VO;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,7 +18,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class PermissionPageVO  {
+public class PermissionPageVO implements Serializable{
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 

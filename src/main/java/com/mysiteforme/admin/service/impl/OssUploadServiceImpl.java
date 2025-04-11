@@ -8,23 +8,15 @@
 
 package com.mysiteforme.admin.service.impl;
 
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.PutObjectResult;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mysiteforme.admin.dao.RescourceDao;
-import com.mysiteforme.admin.entity.Rescource;
-import com.mysiteforme.admin.entity.UploadInfo;
-import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.service.RescourceService;
-import com.mysiteforme.admin.service.UploadInfoService;
-import com.mysiteforme.admin.service.UploadService;
-import com.mysiteforme.admin.util.QETag;
-import com.mysiteforme.admin.util.ToolUtil;
-import com.xiaoleilu.hutool.util.RandomUtil;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +25,25 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException; 
-import java.io.InputStream;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.UUID;
-
-import com.aliyun.oss.OSSException;
 import com.aliyun.oss.ClientException;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.ObjectMetadata;
+import com.aliyun.oss.model.PutObjectResult;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mysiteforme.admin.dao.RescourceDao;
+import com.mysiteforme.admin.entity.Rescource;
+import com.mysiteforme.admin.entity.UploadBaseInfo;
+import com.mysiteforme.admin.entity.UploadInfo;
+import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.service.RescourceService;
+import com.mysiteforme.admin.service.UploadInfoService;
+import com.mysiteforme.admin.service.UploadService;
+import com.mysiteforme.admin.util.QETag;
+import com.mysiteforme.admin.util.ToolUtil;
 
 @Service("ossService")
 public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
@@ -102,7 +102,6 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
             String hash = tag.calcETag(file);
             QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
             wrapper.eq("hash",hash);
-            wrapper.eq("source","oss");
             Rescource rescource = getOne(wrapper);
             if(rescource != null){
                 return rescource.getWebUrl();
@@ -196,7 +195,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
             return rescource.getWebUrl();
         }
         String ossDir = getUploadInfo().getOssDir(),
-                fileName = RandomUtil.randomUUID();
+                fileName = UUID.randomUUID().toString();
         StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
         StringBuilder key = new StringBuilder();
         if(ossDir != null && !ossDir.isEmpty()){
@@ -286,7 +285,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
         InputStream sbs = new ByteArrayInputStream(asBytes);
         StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
         StringBuilder key = new StringBuilder();
-        StringBuilder fileName = new StringBuilder(RandomUtil.randomUUID());
+        StringBuilder fileName = new StringBuilder(UUID.randomUUID().toString());
         String ossDir = getUploadInfo().getOssDir();
         int fileSize = asBytes.length;
         OSS oss = getOSSClient();
@@ -335,6 +334,24 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
             return true;
         } catch (IOException e) {
             logger.error("测试文件读取失败: {}", e.getMessage(), e);
+            return false;
+        } catch (OSSException | ClientException e) {
+            logger.error("测试OSS连接失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
+        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
+        try {
+            OSS oss = new OSSClientBuilder().build(uploadBaseInfo.getEndpoint(),uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
+            InputStream inputStream = classPathResource .getInputStream();
+            oss.putObject(uploadBaseInfo.getBucketName(), "test.jpg", inputStream, null);
+            oss.shutdown();
+            return true;
+        } catch (IOException e) {
+            logger.error("测试文件上传失败: {}", e.getMessage(), e);
             return false;
         } catch (OSSException | ClientException e) {
             logger.error("测试OSS连接失败: {}", e.getMessage(), e);

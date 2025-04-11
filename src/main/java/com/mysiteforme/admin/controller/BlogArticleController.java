@@ -20,7 +20,7 @@ import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.service.BlogArticleService;
 import com.mysiteforme.admin.service.BlogChannelService;
 import com.mysiteforme.admin.service.BlogTagsService;
-import com.xiaoleilu.hutool.date.DateUtil;
+import cn.hutool.core.date.DateUtil;
 
 import jakarta.servlet.ServletRequest;
 
@@ -157,10 +157,10 @@ public class BlogArticleController extends BaseController{
         wrapper.eqSql("sort","select max(sort) from blog_article")
                 .eq("channel_id",blogArticle.getChannelId())
                 .eq("del_flag",false);
-        BlogArticle article = blogArticleService.getOne(wrapper);
+        List<BlogArticle> articles = blogArticleService.list(wrapper);
         int sort = 0;
-        if(article != null){
-            sort =  article.getSort() +1;
+        if(articles != null && !articles.isEmpty()){
+            sort =  articles.get(0).getSort() +1;
         }
         blogArticle.setSort(sort);
         blogArticleService.saveOrUpdateArticle(blogArticle);

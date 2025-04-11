@@ -55,12 +55,12 @@ public class MessageUtil implements ApplicationContextAware, ApplicationListener
     /**
      * 检查messageSource是否已初始化
      */
-    private static void checkMessageSource() {
-        if (messageSource == null) {
-            // 不抛出异常，而是记录日志
-            System.out.println("Warning: MessageSource not initialized yet");
-        }
-    }
+    // private static void checkMessageSource() {
+    //     if (messageSource == null) {
+    //         // 不抛出异常，而是记录日志
+    //         System.out.println("Warning: MessageSource not initialized yet");
+    //     }
+    // }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

@@ -7,13 +7,15 @@
         <result property="name" column="name"/>
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="del_flag"/>
-        <collection property="menuSet"  ofType="com.mysiteforme.admin.entity.Menu">
-            <result property="id" column="menuSet.id"/>
-            <result property="name" column="menuSet.name"/>
-            <result property="permission" column="menuSet.permission"/>
-            <result property="icon" column="menuSet.icon"/>
-            <result property="href" column="menu.href"/>
-            <result property="bgColor" column="menu.bgColor"/>
+        <collection property="permissionSet" ofType="com.mysiteforme.admin.entity.Permission">
+            <result property="id" column="permissionSet.id"/>
+            <result property="permissionName" column="permissionSet.permissionName"/>
+            <result property="permissionCode" column="permissionSet.permissionCode"/>
+            <result property="permissionType" column="permissionSet.permissionType"/>
+            <result property="menuId" column="permissionSet.menuId"/>
+            <result property="icon" column="permissionSet.icon"/>
+            <result property="sort" column="permissionSet.sort"/>
+            <result property="delFlag" column="permissionSet.delFlag"/>
         </collection>
     </resultMap>
 
@@ -23,17 +25,19 @@
         r.name,
         r.remarks,
         r.del_flag,
-        m.id  	        AS 	"menuSet.id",
-        m.name          AS  "menuSet.name",
-        m.permission    AS  "menuSet.permission",
-        m.icon          AS  "menuSet.icon",
-        m.href      	AS 	"menu.href",
-        m.bg_color      AS  "menu.bgColor"
-        from
+        p.id  	             AS 	"permissionSet.id",
+        p.permission_name    AS     "permissionSet.permissionName",
+        p.permission_code    AS     "permissionSet.permissionCode",
+        p.permission_type    AS     "permissionSet.permissionType",
+        p.menu_id            AS     "permissionSet.menuId",
+        p.icon               AS     "permissionSet.icon",
+        p.sort               AS     "permissionSet.sort",
+        p.del_flag      	 AS 	"permissionSet.delFlag"
+        FROM
         sys_role r
-        left join sys_role_menu  srm 	on 	    srm.role_id = r.id
-        left join sys_menu  m    		on 	    m.id = srm.menu_id
-        where
+        LEFT JOIN sys_role_permission  srp 	on 	    srp.role_id = r.id
+        LEFT JOIN sys_permission  p    		on 	    p.id = srp.permission_id AND p.del_flag = FALSE
+        WHERE
         r.del_flag = FALSE
         <if test="id != 0 or id != null">
          and r.id = #{id}
@@ -41,18 +45,170 @@
     </select>
 
     <insert id="saveRoleMenus">
-        insert into sys_role_menu(role_id,menu_id)
-        values
+        INSERT INTO sys_role_menu(role_id,menu_id)
+        VALUES
         <foreach collection="menus" item="m" index="index" separator="," >
-            (#{roleId},#{m.id})
+            (#{roleId},#{m})
+        </foreach>
+    </insert>
+
+    <insert id="saveRolePermissions">
+        INSERT INTO sys_role_permission(role_id,permission_id)
+        VALUES
+        <foreach collection="permissions" item="p" index="index" separator="," >
+            (#{roleId},#{p})
         </foreach>
     </insert>
 
     <delete id="dropRoleMenus" parameterType="java.lang.Long">
-        delete from sys_role_menu where role_id = #{roleId}
+        DELETE FROM sys_role_menu where role_id = #{roleId}
     </delete>
 
     <delete id="dropRoleUsers" parameterType="java.lang.Long">
-        delete from sys_user_role where role_id = #{roleId}
+        DELETE FROM sys_user_role where role_id = #{roleId}
     </delete>
+
+    <delete id="dropRolePermissions">
+        DELETE FROM sys_role_permission where role_id = #{roleId}
+    </delete>
+
+
+    <select id="getRoleIdsByPermissionId" resultType="java.lang.Long" >
+        SELECT
+            r.id
+        FROM
+            sys_role r
+        LEFT JOIN sys_role_permission srp ON srp.role_id = r.id
+        WHERE
+            r.del_flag = FALSE
+            AND srp.permission_id = #{permissionId}
+    </select>
+
+    <select id="getPemissionIdsByRoleId" resultType="java.lang.Long" >
+        SELECT
+            srp.permission_id
+        FROM
+            sys_role_permission srp
+        LEFT JOIN sys_role r ON r.id = srp.role_id
+        LEFT JOIN sys_permission p ON p.id = srp.permission_id
+        WHERE
+            r.del_flag = FALSE
+        AND p.del_flag = FALSE
+        AND srp.role_id = #{roleId}
+    </select>
+
+    <select id="getMenuIdsByRoleId" resultType="java.lang.Long">
+        SELECT
+            DISTINCT
+            srm.menu_id
+        FROM
+            sys_role_menu srm
+        LEFT JOIN sys_menu m ON m.id = srm.menu_id AND m.del_flag = FALSE
+        WHERE
+            srm.role_id = #{roleId}
+    </select>
+
+    <!-- getUserIdsByRoleId --> 
+
+    <select id="getUserIdsByRoleId" resultType="java.lang.Long" >
+        SELECT
+            ur.user_id
+        FROM
+            sys_user_role ur
+        WHERE
+            ur.role_id = #{roleId}
+    </select>
+
+    <!-- getRoleIdsByMenuId --> 
+
+    <select id="getRoleIdsByMenuId" resultType="java.lang.Long" >
+        SELECT
+            r.id
+        FROM
+            sys_role r
+        LEFT JOIN sys_role_menu srm ON srm.role_id = r.id
+        WHERE
+            srm.menu_id = #{menuId}
+    </select>
+
+    <select id="myRoleList" resultType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
+        SELECT DISTINCT
+            r.id,
+            r.name
+        FROM
+            sys_role r
+        LEFT JOIN sys_user_role ur ON ur.role_id = r.id
+        LEFT JOIN sys_user u ON u.id = ur.user_id AND u.del_flag = FALSE
+        WHERE
+            r.del_flag = FALSE
+            <if test="userId != null">
+            AND u.id = #{userId}
+            </if>
+    </select>
+    <select id="selectPageRole" resultMap="pageListRoleResponseMap">
+        SELECT
+            r.id,
+            r.name,
+            r.remarks,
+            r.del_flag,
+            r.create_by,
+            r.update_by,
+            r.create_date,
+            r.update_date,
+            u1.nick_name AS create_user_nick_name,
+            u1.login_name AS create_user_login_name,
+            u2.nick_name AS update_user_nick_name,
+            u2.login_name AS update_user_login_name
+        FROM
+            sys_role r
+        LEFT JOIN sys_user u1 ON u1.id = r.create_by
+        LEFT JOIN sys_user u2 ON u2.id = r.update_by
+        WHERE
+            1 = 1
+        <if test="request.name != null and request.name != ''">
+            AND r.name LIKE CONCAT('%',#{request.name},'%')
+        </if>
+        <choose>
+            <when test="request.sortByCreateDateAsc != null">
+                <choose>
+                    <when test="request.sortByCreateDateAsc">
+                        ORDER BY r.create_date ASC
+                    </when>
+                    <otherwise>
+                        ORDER BY r.create_date DESC
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                ORDER BY r.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getUserIdsByPermissionId" resultType="java.lang.Long">
+        SELECT
+            u.id AS userId,
+            u.login_name AS userName
+        FROM
+            sys_user u
+                LEFT JOIN sys_user_permission up ON u.id = up.user_id
+        WHERE
+            u.del_flag = false
+          AND up.permission_id = #{permissionId}
+    </select>
+
+    <resultMap id="pageListRoleResponseMap" type="com.mysiteforme.admin.entity.response.PageListRoleResponse">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createId" column="create_by"/>
+        <result property="updateId" column="update_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="createUserNickName" column="create_user_nick_name"/>
+        <result property="createUserLoginName" column="create_user_login_name"/>
+        <result property="updateUserNickName" column="update_user_nick_name"/>
+        <result property="updateUserLoginName" column="update_user_login_name"/>
+    </resultMap>
 </mapper>

@@ -1,18 +1,21 @@
 /**
  * @ Author: wangl
- * @ Create Time: 2025-02-14 13:55:47
+ * @ Create Time: 2025-02-14 02:38:13
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:28:50
- * @ Description: 权限API服务
+ * @ Modified time: 2025-02-18 13:00:19
+ * @ Description: API权限Service
  */
 
-package com.mysiteforme.admin.service;
+ package com.mysiteforme.admin.service;
 
-import com.mysiteforme.admin.entity.PermissionApi;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.mysiteforme.admin.entity.DTO.PermissionApiDTO;
-
-public interface PermissionApiService extends IService<PermissionApi> {
-
-    public void savePermissionApiDTO(PermissionApiDTO permissionApiDTO);
-}
+ import com.baomidou.mybatisplus.extension.service.IService;
+ import com.mysiteforme.admin.entity.PermissionApi;
+ 
+ public interface PermissionApiService extends IService<PermissionApi> {
+     
+     /**
+      * 根据API URL和HTTP方法检查唯一性
+      */
+     boolean checkApiUrlUnique(String apiUrl, String httpMethod, Long id);
+     
+ }

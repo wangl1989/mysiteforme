@@ -8,174 +8,92 @@
 
 package com.mysiteforme.admin.controller.system;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.Dict;
+import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.service.DictService;
-import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.RestResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.Result;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
 
-import jakarta.servlet.ServletRequest;
-import java.util.Map;
+@RestController
+@RequestMapping("/api/admin/dict")
+@RequiredArgsConstructor
+public class DictController {
 
+    private final DictService dictService;
 
-@Controller
-@RequestMapping("admin/system/dict")
-public class DictController extends BaseController{
-
-    public DictController(DictService dictService) {
-        this.dictService = dictService;
-    }
-
-    @PostMapping("deleteById")
-    @ResponseBody
-    public RestResponse deleteById(@RequestParam(value = "id",required = false)Long id){
+    @SysLog(MessageConstants.SysLog.DICT_DELETE)
+    @DeleteMapping("delete")
+    public Result deleteById(@RequestParam(value = "id",required = false)Long id){
         if(id == null || id == 0){
-            return RestResponse.failure("字典ID错误");
+            return Result.idIsNullError();
         }
         dictService.deleteDict(id);
-        return RestResponse.success();
+        return Result.success();
     }
 
     @GetMapping("list")
-    @SysLog("跳转系统字典页面")
-    public String list(){
-        return "admin/system/dict/list";
+    public Result list(@RequestBody PageListDictRequest request){
+        return Result.success(dictService.selectPageDict(request));
     }
 
-    @PostMapping("list")
-    @ResponseBody
-    public LayerData<Dict> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
-                                @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                ServletRequest request){
-        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
-        LayerData<Dict> layerData = new LayerData<>();
-        QueryWrapper<Dict> wrapper = new QueryWrapper<>();
-        if(!map.isEmpty()){
-            String type = (String) map.get("type");
-            if(StringUtils.isNotBlank(type)) {
-                wrapper.eq("type", type);
-            }
-            String label = (String)map.get("label");
-            if(StringUtils.isNotBlank(label)){
-                wrapper.like("label",label);
-            }
-        }
-        wrapper.orderBy(false,false,"type","sort");
-        IPage<Dict> dataPage = dictService.page(new Page<>(page,limit),wrapper);
-        layerData.setCount((int)dataPage.getTotal());
-        layerData.setData(dataPage.getRecords());
-        return layerData;
-    }
-
-    @GetMapping("add")
-    public String add(@RequestParam(value = "type",required = false)String type,Model model){
-        if(StringUtils.isNotBlank(type)){
-            model.addAttribute("type",type);
-        }
-        return "admin/system/dict/add";
-    }
-
+    @SysLog(MessageConstants.SysLog.DICT_ADD)
     @PostMapping("add")
-    @SysLog("新增系统字典")
-    @ResponseBody
-    public RestResponse add(Dict dict){
-        if(StringUtils.isBlank(dict.getType())){
-            return RestResponse.failure("字典类型不能为空");
-        }
-        if(StringUtils.isBlank(dict.getLabel())){
-            return RestResponse.failure("字典标签不能为空");
-        }
-        if(StringUtils.isBlank(dict.getValue())){
-            return RestResponse.failure("字典标签对应的值不能为空");
-        }
-        if(dictService.getCountByType(dict.getType())==0){
-            dict.setSort(0);
+    public Result add(@RequestBody AddDictRequest request) {
+        if(dictService.getCountByType(request.getType())==0){
+            request.setSort(1);
         }else{
-            if(dictService.getCountByAll(dict.getType(),dict.getLabel(),null)>0){
-                return RestResponse.failure("已经存在【"+dict.getType()+"】的label值【"+dict.getLabel()+"】");
+            if(dictService.getCountByAll(request.getType(),request.getLabel(),null,null)>0){
+                return Result.businessMsgError(MessageConstants.Dict.DICT_EXISTS_TYPE_AND_LABEL);
             }
-            if(dictService.getCountByAll(dict.getType(),dict.getLabel(),dict.getValue())>0){
-                return RestResponse.failure("已经存在【"+dict.getType()+"】的label标签【"+dict.getLabel()+"】的value值【"+dict.getValue()+"】");
+            if(dictService.getCountByAll(request.getType(),request.getLabel(),request.getValue(),null)>0){
+                return Result.businessMsgError(MessageConstants.Dict.DICT_EXISTS_TYPE_AND_LABEL_AND_VALUE);
             }
-            dict.setSort(dictService.getMaxSortByType(dict.getType()));
+            request.setSort(dictService.getMaxSortByType(request.getType())+1);
         }
-        dictService.saveOrUpdateDict(dict);
-        return RestResponse.success();
+        dictService.saveDict(request);
+        return Result.success();
     }
 
-    @GetMapping("edit")
-    public String edit(Long id,Model model){
-        Dict dict = dictService.getById(id);
-        model.addAttribute("dict",dict);
-        return "admin/system/dict/edit";
-    }
-
-    @PostMapping("edit")
-    @SysLog("编辑系统字典")
-    @ResponseBody
-    public RestResponse edit(Dict dict){
-        if(dict.getId()==null || dict.getId() == 0){
-            return RestResponse.failure("字典ID不能为空");
+    @PutMapping("edit")
+    @SysLog(MessageConstants.SysLog.DICT_UPDATE)
+    public Result edit(@RequestBody UpdateDictRequest request) {
+        if(request.getSort() == null || request.getSort() < 0){
+            return Result.paramMsgError(MessageConstants.Validate.VALIDATE_SORT_ERROR);
         }
-        if(StringUtils.isBlank(dict.getType())){
-            return RestResponse.failure("字典类型不能为空");
+        Dict oldDict = dictService.getById(request.getId());
+        if(oldDict==null){
+            return Result.businessMsgError(MessageConstants.Dict.DICT_ID_INVALID);
         }
-        if(StringUtils.isBlank(dict.getLabel())){
-            return RestResponse.failure("字典标签不能为空");
+        if(!oldDict.getType().equals(request.getType())){
+            return Result.businessMsgError(MessageConstants.Dict.DICT_TYPE_CAN_NOT_UPDATE);
         }
-        if(StringUtils.isBlank(dict.getValue())){
-            return RestResponse.failure("字典标签对应的值不能为空");
-        }
-        if(dict.getSort() == null || dict.getSort() < 0){
-            return RestResponse.failure("排序值不正确");
-        }
-        Dict oldDict = dictService.getById(dict.getId());
-        if(!oldDict.getType().equals(dict.getType())){
-            return RestResponse.failure("字典类型不能修改");
-        }
-        if(!oldDict.getLabel().equals(dict.getLabel())){
-            if(dictService.getCountByAll(dict.getType(),dict.getLabel(),null)>0){
-                return RestResponse.failure("已经存在【"+dict.getType()+"】的label值【"+dict.getLabel()+"】");
+        if(!oldDict.getLabel().equals(request.getLabel())){
+            if(dictService.getCountByAll(request.getType(),request.getLabel(),null,request.getId())>0){
+                return Result.businessMsgError(MessageConstants.Dict.DICT_EXISTS_TYPE_AND_LABEL);
             }
         }
-        if(!oldDict.getValue().equals(dict.getValue())) {
-            if (dictService.getCountByAll(dict.getType(), dict.getLabel(), dict.getValue()) > 0) {
-                return RestResponse.failure("已经存在【" + dict.getType() + "】的label标签【" + dict.getLabel() + "】的value值【" + dict.getValue() + "】");
+        if(!oldDict.getValue().equals(request.getValue())) {
+            if (dictService.getCountByAll(request.getType(), request.getLabel(), request.getValue(),request.getId()) > 0) {
+                return Result.businessMsgError(MessageConstants.Dict.DICT_EXISTS_TYPE_AND_LABEL_AND_VALUE);
             }
         }
-        dictService.saveOrUpdateDict(dict);
-        return RestResponse.success();
+        dictService.updateDict(request);
+        return Result.success();
     }
 
-    @PostMapping("editType")
-    @SysLog("编辑系统字典类型")
-    @ResponseBody
-    public RestResponse editType(@RequestParam(value="oldType",required = false)String oldType,
-                                 @RequestParam(value = "newType",required = false)String newType){
-        if(StringUtils.isBlank(oldType)){
-            return RestResponse.failure("原类型不能为空");
+    @PutMapping("editType")
+    @SysLog(MessageConstants.SysLog.DICT_UPDATE_TYPE)
+    public Result editType(@RequestBody UpdateDictTypeRequest request){
+        if(request.getNewType().equals(request.getOldType())){
+            return Result.paramMsgError(MessageConstants.Dict.DICT_TYPE_EQUAL);
         }
-        if (StringUtils.isBlank(newType)){
-            return RestResponse.failure("新类型不能为空");
+        if(dictService.getCountByType(request.getNewType())>0){
+            return Result.paramMsgError(MessageConstants.Dict.DICT_NEW_TYPE_EXISTS);
         }
-        if(oldType.equals(newType)){
-            return RestResponse.failure("TYPE值相等就没必要替换了吧");
-        }
-        if(dictService.getCountByType(newType)>0){
-            return RestResponse.failure("TYPE值已经被使用了");
-        }
-        dictService.updateByType(oldType,newType);
-        return RestResponse.success();
+        dictService.updateByType(request.getOldType(),request.getNewType());
+        return Result.success();
     }
-
-
 }

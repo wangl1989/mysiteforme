@@ -42,7 +42,7 @@ public class PermissionButton extends DataEntity {
      * 排序
      */
 	@TableField("sort")
-	private Short sort;
+	private Integer sort;
 
 
 

@@ -11,17 +11,12 @@ package com.mysiteforme.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_role")
-@Getter
-@Setter
 @Data
 public class Role extends DataEntity {
 
@@ -32,9 +27,19 @@ public class Role extends DataEntity {
 
 	@TableField(exist = false)
 	private Set<Menu> menuSet;
+	
+	@TableField(exist = false)
+	private Set<Permission> permissionSet;
 
 	@TableField(exist = false)
 	private Set<User> userSet;
 
+	public Role(){
+		super();
+	}
+
+	public Role(Long id){
+		this.id = id;
+	}
 
 }

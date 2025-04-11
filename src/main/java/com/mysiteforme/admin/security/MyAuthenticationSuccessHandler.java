@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-13 00:30:04
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 13:03:32
+ * @ Modified time: 2025-02-17 13:04:04
  * @ Description: 登录成功处理
  */
 
@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,17 +34,9 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
  
     @Override
     public void onAuthenticationSuccess(
-            HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-            Authentication authentication
-    ) throws IOException, ServletException {
-        AuthenticationSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);
-    }
- 
-    @Override
-    public void onAuthenticationSuccess(
             HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException, ServletException {
         MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
-        securityService.loginSuccess(user, response);
+        securityService.loginSuccess(user, request, response);
     }
 }

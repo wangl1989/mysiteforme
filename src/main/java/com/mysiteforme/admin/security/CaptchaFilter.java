@@ -10,10 +10,14 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 
-import com.mysiteforme.admin.service.SecurityService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.service.SecurityService;
+import com.mysiteforme.admin.util.ApiToolUtil;
+import com.mysiteforme.admin.util.Result;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,8 +29,11 @@ public class CaptchaFilter extends OncePerRequestFilter {
     
     private final SecurityService securityService;
 
-    public CaptchaFilter (SecurityService securityService) {
+    private final ApiToolUtil apiToolUtil;
+
+    public CaptchaFilter (SecurityService securityService,ApiToolUtil apiToolUtil) {
         this.securityService = securityService;
+        this.apiToolUtil= apiToolUtil;
     }
     
     @Override
@@ -38,9 +45,16 @@ public class CaptchaFilter extends OncePerRequestFilter {
         RequestWrapper requestWrapper = new RequestWrapper(request);
         // 只拦截登录请求
         if ("/login".equals(url) && request.getMethod().equals("POST")) {
-            securityService.validateCaptcha(requestWrapper,response);
+            try {
+                securityService.validateCaptcha(requestWrapper, response);
+            } catch (MyException e) {
+                // 直接返回JSON响应
+                apiToolUtil.returnSystemDate(Result.orgenalError(e.getCode(), e.getMsg()), request, response);
+                return; // 停止过滤器链继续执行
+            }
         }
         filterChain.doFilter(requestWrapper, response);
+
     }
     
 }

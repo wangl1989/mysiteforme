@@ -2,7 +2,7 @@
  * @ Author: wangl
  * @ Create Time: 2025-02-12 04:02:46
  * @ Modified by: wangl
- * @ Modified time: 2025-02-15 20:40:18
+ * @ Modified time: 2025-02-17 21:27:34
  * @ Description: 全局异常处理器类，用于捕获并处理应用程序中抛出的各种异常。
 *                 通过使用@ControllerAdvice注解，该类可以处理所有控制器中的异常。
  */
@@ -10,23 +10,16 @@
 package com.mysiteforme.admin.exception;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.google.common.collect.Maps;
-import com.mysiteforme.admin.util.ApiToolUtil;
+import com.mysiteforme.admin.util.ExcepttionHandlerUtils;
+import com.mysiteforme.admin.util.ExcepttionHandlerUtils.ExceptionStrategy;
 import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.MessageUtil;
 import com.mysiteforme.admin.util.Result;
 import com.mysiteforme.admin.util.ResultCode;
 import com.mysiteforme.admin.util.ToolUtil;
@@ -42,14 +35,7 @@ public class GlobalExceptionHandler {
      */
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * 定义了一个函数式接口ExceptionStrategy，用于处理具体的异常。
-     * 该接口只有一个方法handle，接收一个Exception对象和一个HttpServletRequest对象，并返回一个MyException对象。
-     */
-    @FunctionalInterface
-    private interface ExceptionStrategy {
-        MyException handle(Exception e, HttpServletRequest request);
-    }
+    
 
     /**
      * 异常处理策略映射，使用Map存储异常类型及其对应的处理策略。
@@ -60,69 +46,7 @@ public class GlobalExceptionHandler {
      * 构造器，初始化异常处理策略映射，并调用initExceptionHandlers方法来填充异常处理策略。
      */
     public GlobalExceptionHandler() {
-        exceptionStrategyMap = Maps.newHashMap();
-        // 初始化异常处理策略
-        initExceptionHandlers();
-    }
-
-    /**
-     * 初始化异常处理策略，将各种异常类型与具体的处理方式关联起来。
-     */
-    private void initExceptionHandlers() {
-
-        // 自定义错误MyException的处理策略
-        exceptionStrategyMap.put(MyException.class, (e, req) -> {
-            MyException ex = (MyException) e;
-            log.error("自定义错误: {}, URL: {}", ex.getMsg(), req.getRequestURL(), ex); // 记录错误信息
-            return ex;
-        });
-
-        // 处理HTTP请求体解析失败的异常HttpMessageNotReadableException
-        exceptionStrategyMap.put(HttpMessageNotReadableException.class, (e, req) -> {
-            HttpMessageNotReadableException ex = (HttpMessageNotReadableException) e;
-            log.error("请求体解析失败: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .msg("请求体格式错误") // 设置错误消息
-                    .errorType(e.getClass().getSimpleName()) // 设置错误类型
-                    .build();
-        });
-
-        // 处理不支持的HTTP请求方法的异常HttpRequestMethodNotSupportedException
-        exceptionStrategyMap.put(HttpRequestMethodNotSupportedException.class, (e, req) -> {
-            HttpRequestMethodNotSupportedException ex = (HttpRequestMethodNotSupportedException) e;
-            log.error("请求方法不支持: {}, URL: {}", e.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .msg("不支持的请求方法: " + ex.getMethod()) // 设置错误消息，包含不支持的请求方法
-                    .errorType(e.getClass().getSimpleName()) // 设置错误类型
-                    .build();
-        });
-
-        // 处理数据库操作异常SQLException
-        exceptionStrategyMap.put(SQLException.class, (e, req) -> {
-            SQLException ex = (SQLException) e;
-            log.error("数据库操作异常: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .msg("数据库操作失败") // 设置错误消息
-                    .errorType("DatabaseError") // 设置错误类型为DatabaseError
-                    .build();
-        });
-
-        // 处理认证异常AuthenticationException
-        exceptionStrategyMap.put(AuthenticationException.class, (e, req) -> {
-            AuthenticationException ex = (AuthenticationException) e;
-            log.error("认证异常: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .msg("认证异常") // 设置错误消息
-                    .build();
-        });
-
-        // 处理404异常，即请求路径未找到的异常NoHandlerFoundException
-        exceptionStrategyMap.put(NoHandlerFoundException.class, (e, req) -> {
-            NoHandlerFoundException ex = (NoHandlerFoundException) e;
-            log.error("路径错误: {}, URL: {}", ex.getMessage(), req.getRequestURL(), ex); // 记录错误信息
-            return MyException.builder()
-                    .build();
-        });
+        exceptionStrategyMap = ExcepttionHandlerUtils.initExceptionHandlers();
     }
 
     /**
@@ -134,7 +58,7 @@ public class GlobalExceptionHandler {
      * @throws IOException 可能抛出的IO异常
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleAllException(HttpServletRequest request,
+    public Result handleAllException(HttpServletRequest request,
                                            HttpServletResponse response,
                                            Exception e) throws IOException,
                                            ServletException {
@@ -157,11 +81,9 @@ public class GlobalExceptionHandler {
 
         // 处理Ajax请求
         if (ToolUtil.isJson(request)) {
-            ApiToolUtil.returnSystemDate(Result.error(errorInfo.getCode(), errorInfo.getMessage()), response);
+            return Result.error(errorInfo.getCode(), errorInfo.getMessage());
         }else{
-            ApiToolUtil.returnSystemDate(Result.error(ResultCode.BAD_PARAM, MessageUtil.getMessage(MessageConstants.System.SYSTEM_ERROR_VIEW)), response);
+            return Result.error(ResultCode.BAD_PARAM, MessageConstants.System.SYSTEM_ERROR_VIEW);
         }
-
-        return null;
     }
 }

@@ -8,9 +8,14 @@
 
 package com.mysiteforme.admin.service;
 
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Rescource;
+import com.mysiteforme.admin.entity.request.PageListResourceRequest;
 
 public interface RescourceService extends IService<Rescource> {
+
+    IPage<Rescource> selectPageRescource(PageListResourceRequest request);
 
 }

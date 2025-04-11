@@ -8,20 +8,29 @@
 
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.Role;
-
 import java.util.List;
-import java.util.Set;
+import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.entity.response.BaseRoleResponse;
+import com.mysiteforme.admin.entity.response.PageListRoleResponse;
+import com.mysiteforme.admin.entity.response.RoleMenuPerResponse;
 
 public interface RoleService extends IService<Role> {
 
     /**
-     * 保存角色
-     * @param role 角色对象
+     * 分页查询角色列表
+     * @param request 查询角色对象
+     * @return 返回分页对象集合
      */
-    void saveRole(Role role);
+    IPage<PageListRoleResponse> selectPageUser(PageListRoleRequest request);
+
+    /**
+     * 保存角色
+     * @param request 角色对象
+     */
+    void saveRole(AddRoleRequest request);
 
     /**
      * 根据ID获取角色
@@ -32,28 +41,15 @@ public interface RoleService extends IService<Role> {
 
     /**
      * 更新角色
-     * @param role 角色对象
+     * @param request 角色对象
      */
-    void updateRole(Role role);
+    void updateRole(UpdateRoleRequest request);
 
     /**
      * 删除角色
-     * @param role 角色对象
+     * @param id 角色Id
      */
-    void deleteRole(Role role);
-
-    /**
-     * 保存角色菜单关系
-     * @param id 角色ID
-     * @param menuSet 菜单集合
-     */
-    void saveRoleMenus(Long id, Set<Menu> menuSet);
-
-    /**
-     * 删除角色菜单关系
-     * @param id 角色ID
-     */
-    void dropRoleMenus(Long id);
+    void deleteRole(Long id);
 
     /**
      * 根据角色名称获取数量
@@ -63,8 +59,20 @@ public interface RoleService extends IService<Role> {
     Long getRoleNameCount(String name);
 
     /**
-     * 获取所有角色列表
-     * @return 角色列表
+	 * 获取已经被权限ID:permissionId 分配的权角色ID集合
+	 * @param permissionId 权限
+	 * @return 角色ID集合
+	 */
+	List<Long> getRoleIdsByPermissionId(Long permissionId);
+
+    List<BaseRoleResponse> userAllRole(Long id);
+
+    /**
+     * 获取用户角色菜单权限
+     * @param id 用户ID
+     * @return RoleMenuPerResponse
      */
-    List<Role> selectAll();
+    RoleMenuPerResponse getUserRoleMenusPermissions(Long id);
+
+    void assignRoleMenusPermissions(SaveRoleMenuPerRequest request);
 }
