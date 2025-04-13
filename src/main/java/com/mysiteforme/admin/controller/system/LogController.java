@@ -32,7 +32,7 @@ public class LogController{
     }
 
     @DeleteMapping("delete")
-    public Result delete(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    public Result delete(@RequestParam(value = "ids",required = false)List<Integer> ids){
         if(ids == null || ids.isEmpty()){
             return Result.idIsNullError();
         }

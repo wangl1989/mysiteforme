@@ -51,4 +51,12 @@ public interface PermissionDao extends BaseMapper<Permission> {
      * @return 权限集合
      */
     Set<PermissionVO> allPermission();
+
+    /**
+     * 获取权限最大排序值
+     * @param menuId 菜单ID
+     * @param menuType 菜单类型
+     * @return 返回最大排序值
+     */
+    Integer permissionMaxSort(@Param("menuId") Long menuId,@Param("menuType") Integer menuType);
 }

@@ -174,7 +174,7 @@ public class CacheUtils {
         // 1. 清除菜单缓存
         // 2. 清除用户菜单缓存
         Menu menu = menuDao.selectById(menuId);
-        if(menu == null || menu.getDelFlag()){
+        if(menu == null){
             throw MyException.builder().businessError(MessageConstants.Menu.MENU_NOT_FOUND).build();
         }
         Set<Long> userIds = menuDao.getUserIdsByMenuId(menuId);

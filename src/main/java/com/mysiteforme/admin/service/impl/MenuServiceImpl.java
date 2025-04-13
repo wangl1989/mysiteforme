@@ -99,7 +99,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
             request.setLevel(parentMenu.getLevel()+1);
             if(request.getSort() == null || request.getSort() == 0) {
                 QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-                wrapper.eqSql("sort", "select max(sort) from sys_menu").eq("parent_id", request.getParentId());
+                wrapper.eqSql("sort", "select max(sort) from sys_menu where parent_id =" + request.getParentId());
                 List<Menu> menus = this.list(wrapper);
                 int sort = 0;
                 if (menus != null && !menus.isEmpty()) {
@@ -166,6 +166,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         cacheUtils.evictCacheOnMenuChange(menu.getId());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteMenu(Long id) {
         LambdaQueryWrapper<Permission> queryWrapper = new LambdaQueryWrapper<>();
@@ -185,6 +186,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         Menu menu = this.getById(id);
         menu.setDelFlag(true);
         this.saveOrUpdate(menu);
+        cacheUtils.evictCacheOnMenuChange(id);
     }
 
     /**
@@ -198,22 +200,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         wrapper.eq("del_flag",false);
         wrapper.eq("name",name);
         return count(wrapper);
-    }
-
-    /**
-     * 获取树形结构的菜单列表
-     * 只包含显示的菜单，按sort排序
-     * @return 树形菜单列表
-     */
-    @Override
-    public List<ZtreeVO> showTreeMenus() {
-        QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        wrapper.eq("is_show",true);
-        wrapper.orderBy(false,false,"sort");
-        List<Menu> totalMenus = baseMapper.selectList(wrapper);
-        List<ZtreeVO> treeVOs = Lists.newArrayList();
-        return getZTree(null,totalMenus,treeVOs);
     }
 
     /**
@@ -233,44 +219,26 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         UserVO userVO = userCacheService.findUserByIdDetails(id);
         Set<PermissionVO> permissions = userVO.getPermissions();
         Map<Long,Set<PermissionVO>> permissionMap = Maps.newHashMap();
+
         permissions.forEach(permission -> {
             MenuVO menuVO = permission.getMenu();
             if(menuVO != null) {
-                permissionMap.computeIfAbsent(permission.getMenu().getId(), k -> new HashSet<>()).add(permission);
+                // 使用TreeSet替代HashSet，并传入比较器
+                permissionMap.computeIfAbsent(permission.getMenu().getId(),
+                        k -> new TreeSet<>()).add(permission);
             }
         });
-        List<MenuTreeVO> result = Lists.newArrayList();
-        return getMenuTree(total,permissionMap);
+
+        return getMenuTree(total, permissionMap);
     }
 
     /**
-     * 递归构建菜单树
-     * @param tree 当前节点，首次调用传null
-     * @param total 所有菜单列表
-     * @param result 构建结果列表
-     * @return 树形结构的菜单列表
+     * 递归获取树形菜单
+     * @param parentMenu 父菜单
+     * @param totalMenus 所有菜单
+     * @param treeVOs 树形菜单列表
+     * @return 树形菜单列表
      */
-    private List<ZtreeVO> getZTree(ZtreeVO tree, List<Menu> total, List<ZtreeVO> result) {
-        Long pid = tree == null?null:tree.getId();
-        List<ZtreeVO> childList = Lists.newArrayList();
-        for (Menu m : total){
-            if(Objects.equals(pid, m.getParentId())) {
-                ZtreeVO ztreeVO = new ZtreeVO();
-                ztreeVO.setId(m.getId());
-                ztreeVO.setName(m.getName());
-                ztreeVO.setPid(pid);
-                childList.add(ztreeVO);
-                getZTree(ztreeVO,total,result);
-            }
-        }
-        if(tree != null){
-            tree.setChildren(childList);
-        }else{
-            result = childList;
-        }
-        return result;
-    }
-
     private List<MenuTreeVO> getMenuTree(List<MenuTreeVO> total, Map<Long,Set<PermissionVO>> permissionMap) {
         // 用于存储根节点
         List<MenuTreeVO> rootNodes = new ArrayList<>();
@@ -286,6 +254,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
                 return newMeta;
             });
             // 设置权限列表（使用空集合兜底）
+            // TreeSet已经排好序，直接使用
             meta.setAuthList(permissionMap.getOrDefault(m.getId(), Collections.emptySet()));
             nodeMap.put(m.getId(), m);
         }
@@ -302,7 +271,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
                 if (parent != null) {
                     List<MenuTreeVO> children = parent.getChildren();
                     if (children == null || children.isEmpty()) {
-                        children = new ArrayList();
+                        children = new ArrayList<>();
                     }
                     children.add(m);
                     parent.setChildren(children);

@@ -27,7 +27,7 @@
     </resultMap>
 
     <select id="getMenus" resultMap="getSelf" parameterType="java.util.Map">
-        select
+    SELECT
         id,
         name,
         parent_id as "parentId",
@@ -47,7 +47,9 @@
         update_date as "updateDate",
         remarks,
         del_flag as "delFlag",
-        #{isShow} as "myIsShow" from sys_menu where
+        #{isShow} as "myIsShow"
+    FROM sys_menu
+    where
         del_flag = false
         <choose>
             <when test="parentId != null and parentId!='' ">
@@ -60,123 +62,28 @@
         <if test="isShow == true">
             and is_show = #{isShow}
         </if>
-        order by sort desc
+    ORDER BY sort desc
     </select>
 
 
-    <select id="showAllMenusList" resultType="com.mysiteforme.admin.entity.Menu"  parameterType="java.util.Map">
-        SELECT
-        m.id,
-        m.name,
-        m.parent_id    AS "parentId",
-        m.parent_ids   AS "parentIds",
-        m.sort,
-        m.href,
-        m.target,
-        m.level,
-        m.icon,
-        m.color,
-        m.is_show       AS "isShow",
-        bg_color        AS "bgColor",
-        m.permission,
-        m.create_date   AS  "createDate",
-        m.update_date   AS "updateDate",
-        p.id            AS "parentTree.id",
-        p.name          AS "parentTree.name",
-        p.icon          AS "parentTree.icon"
-        from
-        (select * from sys_menu where del_flag = false) m
-        left join sys_menu p  	on 	    p.id = m.parent_id
-        where 1=1
-        <if test="id != 0 and id != null">
-            and m.id = #{id}
-        </if>
-        <if test="name != null and name != ''">
-            and m.name like CONCAT('%', '${name}', '%')
-        </if>
-        <if test="parentId != null and parentId != 0">
-            and m.parent_id = #{parentId}
-        </if>
-        <if test="permission != null and permission != ''">
-            and m.permission = #{permission}
-        </if>
-    </select>
-
-    <resultMap id="showMenuMap" type="com.mysiteforme.admin.entity.VO.ShowMenu">
-        <result property="id"       column="id" />
-        <result property="pid"      column="pid"/>
-        <result property="title"    column="title"/>
-        <result property="icon"     column="icon"/>
-        <result property="color"   column="color"/>
-        <result property="href"     column="href"/>
-        <collection property="children" select="selectShowMenuByUser"  column="{parentId = id,userId = myuserId}">
-        </collection>
-    </resultMap>
-
-    <select id="selectShowMenuByUser" resultMap="showMenuMap" parameterType="java.util.Map">
-        SELECT
-        distinct  m.id        as "id",
-        m.parent_id as "pid",
-        m.name      as "title",
-        m.icon      as "icon",
-        m.color     as "color",
-        m.href      as "href",
-        m.sort,
-        #{userId}   as "myuserId"
-        FROM
-        sys_menu m
-        LEFT JOIN sys_role_menu srm on srm.menu_id = m.id
-        LEFT JOIN sys_role r on r.id = srm.role_id
-        LEFT JOIN sys_user_role sur on sur.role_id = r.id
-        LEFT JOIN sys_user u on u.id = sur.user_id
-        WHERE
-            m.del_flag = false
-            AND u.id = #{userId}
-        <choose>
-            <when test="parentId != null and parentId !='' ">
-                AND m.parent_id = #{parentId}
-            </when>
-            <otherwise>
-                AND m.parent_id is NULL
-            </otherwise>
-        </choose>
-        AND m.is_show = true
-        ORDER BY m.sort desc
-    </select>
-
-    <!--<insert id="saveRoleMenus">-->
-        <!--insert into sys_role_menu(role_id,menu_id)-->
-        <!--values-->
-        <!--<foreach collection="menus" item="m" index="index" separator="," >-->
-            <!--(#{roleId},#{m.id})-->
-        <!--</foreach>-->
-    <!--</insert>-->
-
-    <!--<delete id="dropRoleMenus" parameterType="java.lang.Long">-->
-        <!--delete from sys_role_menu where role_id = #{roleId}-->
-    <!--</delete>-->
-
-    <!--<delete id="dropRoleUsers" parameterType="java.lang.Long">-->
-        <!--delete from sys_user_role where role_id = #{roleId}-->
-    <!--</delete>-->
-
-    <!-- getUserIdsByMenuId --> 
+    <!-- getUserIdsByMenuId -->
 
     <select id="getUserIdsByMenuId" resultType="java.lang.Long">
-        SELECT DISTINCT
+    SELECT DISTINCT
         sup.user_id
-        FROM
+    FROM
         sys_user_permission sup
-        LEFT JOIN sys_permission p  on p.id = sup.permission_id
-        WHERE p.menu_id = #{menuId}
-        UNION
-        SELECT
+    LEFT JOIN sys_permission p  on p.id = sup.permission_id
+    WHERE p.menu_id = #{menuId}
+    UNION
+    SELECT
         sur.user_id
-        FROM
+    FROM
         sys_user_role sur
-        LEFT JOIN sys_role r on r.id = sur.role_id
-        LEFT JOIN sys_role_menu srm on srm.role_id = r.id
-        WHERE srm.menu_id = #{menuId}
+    LEFT JOIN sys_role r on r.id = sur.role_id
+    LEFT JOIN sys_role_menu srm on srm.role_id = r.id
+    WHERE
+        srm.menu_id = #{menuId}
     </select>
 
     <select id="getUserMenus" resultMap="getUserMenusMap">

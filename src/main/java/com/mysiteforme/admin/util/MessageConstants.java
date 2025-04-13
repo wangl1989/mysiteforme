@@ -193,6 +193,7 @@ public class MessageConstants {
         public static final String NAME_NOT_NULL = "message.permission.name.not.null";
         public static final String CODE_NOT_NULL = "message.permission.code.not.null";
         public static final String TYPE_NOT_NULL = "message.permission.type.not.null";
+        public static final String TYPE_CAN_NOT_CHANGE = "message.permission.type.can.not.change";
         public static final String DATA_INVALID = "message.permission.data.invalid";
         public static final String TYPE_INVALID = "message.permission.type.invalid";
         public static final String MENU_ID_NOT_NULL = "message.permission.menu.id.not.null";

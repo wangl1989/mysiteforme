@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.entity.*;
 import com.mysiteforme.admin.entity.request.BasePermissionRequest;
 import com.mysiteforme.admin.entity.request.PageListPermissionRequest;
+import com.mysiteforme.admin.entity.request.UpdatePermissionRequest;
 import com.mysiteforme.admin.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -74,13 +75,23 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveOrUpdatePermission(BasePermissionRequest request) {
         Permission permission = new Permission();
         BeanUtils.copyProperties(request,permission);
+        if(request instanceof UpdatePermissionRequest){
+            Permission oldPermission = baseMapper.selectById(((UpdatePermissionRequest) request).getId());
+            if(oldPermission == null){
+                throw MyException.builder().businessError(MessageConstants.Permission.NOT_EXISTS).build();
+            }
+            if(request.getPermissionType().intValue() != oldPermission.getPermissionType().intValue()){
+                throw MyException.builder().businessError(MessageConstants.Permission.TYPE_CAN_NOT_CHANGE).build();
+            }
+        }
         // 设置排序值
-        if (permission.getSort() == null || permission.getSort() == 0) {
-            Integer maxSort = permissionMaxSort(permission.getMenuId());
+        if (permission.getSort() == null || permission.getSort() == 0 || permission.getSort() == 1) {
+            Integer maxSort = baseMapper.permissionMaxSort(permission.getMenuId(),request.getPermissionType());
             permission.setSort(maxSort == null ? 1 : maxSort + 1);
         }
         // 保存基础权限信息
@@ -114,35 +125,22 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         if (data != null) {
             // 设置通用属性
             if (data instanceof PermissionApiDTO) {
-                ((PermissionApiDTO) data).setPermissionId(permission.getId());
                 ((PermissionApiDTO) data).setSort(permission.getSort());
                 ((PermissionApiDTO) data).setPermissionId(permission.getId());
+                ((PermissionApiDTO) data).setRemarks(permission.getRemarks());
             } else if (data instanceof PermissionPageDTO) {
-                ((PermissionPageDTO) data).setPermissionId(permission.getId());
                 ((PermissionPageDTO) data).setSort(permission.getSort());
                 ((PermissionPageDTO) data).setPermissionId(permission.getId());
+                ((PermissionPageDTO) data).setRemarks(permission.getRemarks());
             } else if (data instanceof PermissionButtonDTO) {
-                ((PermissionButtonDTO) data).setPermissionId(permission.getId());
                 ((PermissionButtonDTO) data).setSort(permission.getSort());
                 ((PermissionButtonDTO) data).setPermissionId(permission.getId());
+                ((PermissionButtonDTO) data).setRemarks(permission.getRemarks());
             }
             saveFunction.accept(data);
         } else {
             throw MyException.builder().businessError(errorMessage).build();
         }
-    }
-
-    private Integer permissionMaxSort(Long menuId){
-        QueryWrapper<Permission> query = new QueryWrapper<>();
-        query.eqSql("sort","select max(sort) from sys_permission")
-                .eq("menu_id",menuId)
-                .eq("del_flag",false);
-        List<Permission> permissions = baseMapper.selectList(query);
-        int sort = 0;
-        if(permissions != null && !permissions.isEmpty()){
-            sort =  permissions.get(0).getSort() +1;
-        }
-        return sort;
     }
 
     @Override
@@ -206,6 +204,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         permissionButtonService.saveOrUpdate(permissionButton);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deletePermission(Long id) throws MyException {
         Permission permission = baseMapper.selectById(id);
@@ -214,15 +213,52 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         }
         permission.setDelFlag(true);
         baseMapper.insertOrUpdate(permission);
+        switch (permission.getPermissionType()) {
+            case Constants.TYPE_API: // API类型
+                LambdaQueryWrapper<PermissionApi> apiWrapper = new LambdaQueryWrapper<>();
+                apiWrapper.eq(PermissionApi::getPermissionId, id);
+                apiWrapper.eq(PermissionApi::getDelFlag,false);
+                List<PermissionApi> apiList = permissionApiService.list(apiWrapper);
+                if(!apiList.isEmpty()){
+                    PermissionApi api = apiList.get(0);
+                    api.setDelFlag(true);
+                    permissionApiService.saveOrUpdate(api);
+                }
+                break;
+            case Constants.TYPE_BUTTON: // 页面类型
+                LambdaQueryWrapper<PermissionButton> buttonWrapper = new LambdaQueryWrapper<>();
+                buttonWrapper.eq(PermissionButton::getPermissionId, id);
+                buttonWrapper.eq(PermissionButton::getDelFlag,false);
+                List<PermissionButton> buttonList = permissionButtonService.list(buttonWrapper);
+                if(!buttonList.isEmpty()){
+                    PermissionButton button = buttonList.get(0);
+                    button.setDelFlag(true);
+                    permissionButtonService.saveOrUpdate(button);
+                }
+                break;
+            case Constants.TYPE_PAGE: // 按钮类型
+                LambdaQueryWrapper<PermissionPage> pageWrapper = new LambdaQueryWrapper<>();
+                pageWrapper.eq(PermissionPage::getPermissionId, id);
+                pageWrapper.eq(PermissionPage::getDelFlag,false);
+                List<PermissionPage> pageList = permissionPageService.list(pageWrapper);
+                if(!pageList.isEmpty()){
+                    PermissionPage page = pageList.get(0);
+                    page.setDelFlag(true);
+                    permissionPageService.saveOrUpdate(page);
+                }
+                break;
+            default:
+                throw MyException.builder().businessError(MessageConstants.Permission.DATA_INVALID).build();
+        }
         cacheUtils.evictCacheOnPermissionChange(id);
     }
 
     @Override
     public Boolean checkPermissionCode(Long id, String permissionCode) {
-        QueryWrapper<Permission> wrapper = new QueryWrapper<>();
-        wrapper.eq("permission_code", permissionCode);
+        LambdaQueryWrapper<Permission> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Permission::getPermissionCode, permissionCode);
         if(id != null) {
-            wrapper.ne("id", id);
+            wrapper.ne(Permission::getId, id);
         }
         return count(wrapper) == 0;
     }

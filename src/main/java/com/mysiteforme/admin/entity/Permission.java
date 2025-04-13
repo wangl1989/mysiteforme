@@ -43,6 +43,11 @@ public class Permission extends DataEntity {
     private String icon;
 
     /**
+     * 图标颜色
+     */
+    private String color;
+
+    /**
      * 排序值
      */
     private Integer sort;

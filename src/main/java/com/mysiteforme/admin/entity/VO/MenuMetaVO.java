@@ -32,7 +32,7 @@ public class MenuMetaVO implements Serializable{
     /** 
      * 是否显示新徽标（菜单右侧的红色小字提醒标签）
      */
-    private Boolean showTextBadge;
+    private String showTextBadge;
     /**
      * 是否在菜单中隐藏（在左侧菜单栏中不显示）
      */

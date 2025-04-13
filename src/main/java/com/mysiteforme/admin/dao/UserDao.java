@@ -32,8 +32,6 @@ public interface UserDao extends BaseMapper<User> {
 
 	IPage<PageListUserResponse> selectPageUser(IPage<PageListUserResponse> page, @Param("request")PageListUserRequest request);
 
-	User selectUserByMap(Map<String, Object> map);
-
 	void saveUserRoles(@Param("userId")Long id, @Param("roleIds")Set<Role> roles);
 
 	void dropUserRolesByUserId(@Param("userId")Long userId);

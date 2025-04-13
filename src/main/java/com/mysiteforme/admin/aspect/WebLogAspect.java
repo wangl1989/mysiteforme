@@ -96,7 +96,7 @@ public class WebLogAspect {
                 }
             }
             if(!objs.isEmpty()) {
-                String str = JSONObject.toJSONString(objs);
+                String str = JSONObject.toJSONString(objs.size()>1?objs:objs.get(0));
                 sysLog.setParams(str.length() > 5000 ? JSONObject.toJSONString("请求参数数据过长不与显示") : str);
             }
             String ip = ToolUtil.getClientIp(request);

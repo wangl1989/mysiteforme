@@ -45,8 +45,11 @@
             p.permission_code,
             p.permission_type,
             p.icon,
+            p.color,
             p.sort,
             p.remarks,
+            p.update_date,
+            p.create_date,
             m.id AS menu_id,
             m.name AS menu_name,
             m.parent_id AS menu_parent_id,
@@ -72,7 +75,7 @@
         WHERE
             p.del_flag = false
         ORDER BY
-            p.sort
+            p.sort DESC,p.update_date DESC
     </select>
 
     <select id="getAssinUserPermission" resultType="java.lang.Long">
@@ -84,14 +87,30 @@
             up.user_id = #{userId}
     </select>
 
+    <select id="permissionMaxSort" resultType="java.lang.Integer">
+        SELECT
+            max(sort)
+        FROM
+            sys_permission
+        WHERE
+            del_flag =false
+          AND
+            menu_id =#{menuId}
+          AND
+            permission_type = #{menuType}
+    </select>
+
     <resultMap type="com.mysiteforme.admin.entity.VO.PermissionVO" id="allPermissionMap">
         <id property="id" column="id"/>
         <result property="permissionName" column="permission_name"/>
         <result property="permissionCode" column="permission_code"/>
         <result property="permissionType" column="permission_type"/>
         <result property="icon" column="icon"/>
+        <result property="color" column="color"/>
         <result property="sort" column="sort"/>
         <result property="remarks" column="remarks"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
         <!-- 权限分组信息 -->
         <association property="menu" javaType="com.mysiteforme.admin.entity.VO.MenuVO">
             <id property="id" column="menu_id"/>

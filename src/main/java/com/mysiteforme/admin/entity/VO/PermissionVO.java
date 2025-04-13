@@ -9,19 +9,23 @@
 package com.mysiteforme.admin.entity.VO;
 
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class PermissionVO implements Serializable{
+public class PermissionVO implements Serializable,Comparable<PermissionVO>{
 
-    private static final long serialVersionUID = 1L; 
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     /**
@@ -45,6 +49,11 @@ public class PermissionVO implements Serializable{
     private String icon;
 
     /**
+     * 图标颜色
+     */
+    private String color;
+
+    /**
      * 排序值
      */
     private Integer sort;
@@ -62,7 +71,6 @@ public class PermissionVO implements Serializable{
     /**
      * 权限按钮集合
      */
-    @Setter
     private PermissionButtonVO button;
 
     /**
@@ -75,5 +83,25 @@ public class PermissionVO implements Serializable{
      */
     private PermissionPageVO page;
 
-    
+    /**
+     * 创建时间
+     */
+    private Date createDate;
+
+    /**
+     * 更新时间
+     */
+    private Date updateDate;
+
+
+    @Override
+    public int compareTo(@NotNull PermissionVO p) {
+        // 首先按照sort倒序
+        int sortCompare = Integer.compare(p.getSort(), this.getSort());
+        if (sortCompare != 0) {
+            return sortCompare;
+        }
+        // sort相同时按照createDate倒序
+        return p.getUpdateDate().compareTo(this.getUpdateDate());
+    }
 }

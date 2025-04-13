@@ -40,9 +40,19 @@ public class BasePermissionRequest {
     private String icon;
 
     /**
+     * 图标颜色
+     */
+    private String color;
+
+    /**
      * 排序值
      */
     private Integer sort;
+
+    /**
+     * 备注
+     */
+    private String remarks;
 
     /**
      * API权限数据

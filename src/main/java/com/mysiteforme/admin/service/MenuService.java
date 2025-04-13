@@ -51,12 +51,6 @@ public interface MenuService extends IService<Menu> {
     long getCountByName(String name);
 
     /**
-     * 获取树形结构的菜单列表
-     * @return 树形菜单列表
-     */
-    List<ZtreeVO> showTreeMenus();
-
-    /**
      * 获取指定用户的显示菜单
      * @param id 用户ID
      * @return 用户可见的菜单列表

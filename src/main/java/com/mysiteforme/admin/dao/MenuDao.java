@@ -23,11 +23,7 @@ import java.util.Set;
 @Mapper
 public interface MenuDao extends BaseMapper<Menu> {
 
-    List<Menu> showAllMenusList(Map<String,Object> map);
-
     List<Menu> getMenus(Map<String,Object> map);
-
-    List<ShowMenu> selectShowMenuByUser(Map<String,Object> map);
 
     List<MenuTreeVO> getUserMenus(Map<String,Object> map);
 

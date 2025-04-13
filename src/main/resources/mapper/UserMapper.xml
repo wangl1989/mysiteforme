@@ -29,52 +29,6 @@
         </collection>
     </resultMap>
 
-    <select id="selectUserByMap" resultMap="UserMap"  parameterType="java.util.Map">
-        SELECT
-        u.id,
-        u.login_name,
-        u.nick_name,
-        u.tel,
-        u.email,
-        u.password,
-        u.salt,
-        u.locked,
-        u.del_flag,
-        u.icon,
-        r.id     		AS 	"role.id",
-        r.name			AS	"role.name",
-        m.id 			AS 	"menu.id",
-        m.name			AS	"menu.name",
-        m.permission	AS 	"menu.permission",
-        m.href      	AS 	"menu.href",
-        m.bg_color      AS  "menu.bgColor",
-        m.icon          AS  "menu.icon",
-        m.sort          AS  "menu.sort",
-        u.remarks
-        from
-        sys_user u
-        left join sys_user_role  sur  	on  	sur.user_id = u.id
-        left join sys_role r				 	on  	r.id = sur.role_id
-        left join sys_role_menu  srm 	on 	srm.role_id = r.id
-        left join sys_menu  m    		on 	m.id = srm.menu_id
-        where
-        1=1
-        <if test="id == 0 or id == null">
-         and u.del_flag = false
-         and r.del_flag = false
-        </if>
-        <if test="loginName !=null and loginName !=''">
-            and (
-            u.login_name 	= #{loginName}
-            or u.tel 				= #{loginName}
-            or u.email 		= #{loginName}
-            )
-        </if>
-        <if test="id != 0 and id != null">
-            and u.id = #{id}
-        </if>
-    </select>
-
     <select id="saveUserRoles">
         insert into sys_user_role(user_id,role_id)
         values
@@ -109,6 +63,11 @@
     <select id="findUserByLoginNameDetails"  resultMap="UserDetailMap">
         <include refid="userDetailSql"/>
         AND u.login_name = #{loginName}
+        ORDER BY
+        m.sort DESC,
+        m.update_date DESC,
+        p.sort DESC,
+        p.update_date DESC
     </select>
 
     <resultMap id="permissionsMap" type="com.mysiteforme.admin.entity.VO.PermissionVO">
@@ -117,6 +76,11 @@
         <result property="permissionCode" column="permission_code"/>
         <result property="permissionType" column="permission_type"/>
         <result property="icon" column="permission_icon"/>
+        <result property="color" column="permission_color"/>
+        <result property="sort" column="permission_sort"/>
+        <result property="remarks" column="permission_remarks"/>
+        <result property="createDate" column="permission_create_date"/>
+        <result property="updateDate" column="permission_update_date"/>
         <!-- 菜单信息 -->
         <association property="menu"  javaType="com.mysiteforme.admin.entity.VO.MenuVO">
             <id property="id" column="menu_id"/>
@@ -170,7 +134,7 @@
             <result property="name" column="role_name"/>
         </collection>
 
-        <!-- 权限集合 -->
+        <!-- 菜单+权限集合 -->
         <collection property="permissions" resultMap="permissionsMap" />
     </resultMap>
 
@@ -279,6 +243,11 @@
     <select id="findUserByIdDetails" resultMap="UserDetailMap">
         <include refid="userDetailSql"/>
         AND u.id = #{id}
+        ORDER BY
+        m.sort DESC,
+        m.update_date DESC,
+        p.sort DESC,
+        p.update_date DESC
     </select>
 
     <sql id="userDetailSql">
@@ -302,6 +271,11 @@
             p.permission_code,
             p.permission_type,
             p.icon AS permission_icon,
+            p.sort AS permission_sort,
+            p.color AS permission_color,
+            p.remarks AS permission_remarks,
+            p.update_date AS permission_update_date,
+            p.create_date AS permission_create_date,
             -- 菜单信息
             m.id AS menu_id,
             m.name AS menu_name,
@@ -310,6 +284,7 @@
             m.level AS menu_level,
             m.sort AS menu_sort,
             m.remarks AS menu_remarks,
+            m.update_date,
             -- 按钮权限
             pb.id AS button_id,
             pb.button_key,
