@@ -8,15 +8,15 @@
 
 package com.mysiteforme.admin.security;
 
-import java.util.List;
-
 import javax.sql.DataSource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysiteforme.admin.util.ApiToolUtil;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -25,6 +25,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,13 +34,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import com.mysiteforme.admin.service.SecurityService;
-
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +67,8 @@ public class SecurityConfig {
 
     private final CustomExceptionHandlerFilter customExceptionHandlerFilter;
 
+    private final ObjectMapper objectMapper;
+
     /**
      * anyRequest          |   匹配所有请求路径
      * access              |   SpringEl表达式结果为true时可以访问
@@ -88,9 +86,8 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
         // 创建自定义的 JsonAuthenticationFilter
-        JsonAuthenticationFilter jsonAuthenticationFilter = getJsonAuthenticationFilter();
+        JsonAuthenticationFilter jsonAuthenticationFilter = getJsonAuthenticationFilter(objectMapper);
 
         httpSecurity
             // 0. 验证所有权限
@@ -101,6 +98,9 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults())
             //  基于 token ，不需要 csrf
             .csrf(AbstractHttpConfigurer::disable)
+            .headers(headers -> headers
+                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable) // 禁用 X-Frame-Options
+            )
             //  允许跨域请求
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             //  基于token，不需要session
@@ -108,7 +108,7 @@ public class SecurityConfig {
             // 配置请求授权
             .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
                     // // 1. 允许直接访问的接口：验证码接口,登录放行
-                    .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh","/error","/favicon.ico","/actuator/**").permitAll()
+                    .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh","/error","/favicon.ico","/static/**","/showBlog/**","/druid/**","/actuator/**").permitAll()
                     // 2. 添加API路径模式
                     .requestMatchers("/api/**").access((authentication, context) -> {
                         // 判断是否已认证
@@ -118,7 +118,7 @@ public class SecurityConfig {
                         // 判断是否有权限
                         HttpServletRequest myrequest = context.getRequest();
                         String path = myrequest.getRequestURI();
-                        log.debug("=================我们在正在验证的URL是：{}",path);
+                        log.debug("=================我们在正在验证的API-URL是：{}",path);
                         boolean hasPermission = securityService.checkPermission(myrequest);
                         return new AuthorizationDecision(hasPermission);
                     })
@@ -149,8 +149,8 @@ public class SecurityConfig {
     }
 
     @NotNull
-    private JsonAuthenticationFilter getJsonAuthenticationFilter() throws Exception {
-        JsonAuthenticationFilter jsonAuthenticationFilter = new JsonAuthenticationFilter();
+    private JsonAuthenticationFilter getJsonAuthenticationFilter(ObjectMapper objectMapper) throws Exception {
+        JsonAuthenticationFilter jsonAuthenticationFilter = new JsonAuthenticationFilter(objectMapper);
         jsonAuthenticationFilter.setFilterProcessesUrl("/login"); // 设置登录接口地址
         // 设置登录成功和失败处理器
         jsonAuthenticationFilter.setAuthenticationSuccessHandler(myAuthenticationSuccessHandler);

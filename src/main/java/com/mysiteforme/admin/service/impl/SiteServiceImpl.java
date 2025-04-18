@@ -8,6 +8,9 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import com.mysiteforme.admin.entity.UploadBaseInfo;
+import com.mysiteforme.admin.entity.response.SiteUploadTypeResponse;
+import com.mysiteforme.admin.service.UploadBaseInfoService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,9 +22,17 @@ import com.mysiteforme.admin.dao.SiteDao;
 import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.service.SiteService;
 
+import java.util.List;
+
 @Service("siteService")
 @Transactional(rollbackFor = Exception.class)
 public class SiteServiceImpl extends ServiceImpl<SiteDao, Site> implements SiteService {
+
+    private final UploadBaseInfoService uploadBaseInfoService;
+
+    public SiteServiceImpl(UploadBaseInfoService uploadBaseInfoService) {
+        this.uploadBaseInfoService = uploadBaseInfoService;
+    }
 
     /**
      * 获取当前站点信息
@@ -47,6 +58,20 @@ public class SiteServiceImpl extends ServiceImpl<SiteDao, Site> implements SiteS
     public void updateSite(Site site) {
         baseMapper.updateById(site);
     }
+
+    @Override
+    public List<SiteUploadTypeResponse> getSiteUploadTypeList() {
+        List<UploadBaseInfo> list = uploadBaseInfoService.lambdaQuery()
+                .eq(UploadBaseInfo::getDelFlag, false)
+                .list();
+        return list.stream().map(info -> {
+            SiteUploadTypeResponse response = new SiteUploadTypeResponse();
+            response.setRemarks(info.getRemarks());
+            response.setTypeCode(info.getType());
+            return response;
+        }).toList();
+    }
+
 
 
 }

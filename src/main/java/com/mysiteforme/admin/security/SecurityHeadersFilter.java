@@ -16,6 +16,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class SecurityHeadersFilter implements Filter {
@@ -36,10 +37,14 @@ public class SecurityHeadersFilter implements Filter {
                         "frame-src 'self' *; " +  // 允许所有iframe源
                         "media-src 'self' *");     // 允许所有媒体源
 
-         //移除 X-Frame-Options 限制
-         httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");  // 注释掉或删除这行
+        // 如果是 /druid/* 路径，则不设置 X-Frame-Options
+        String requestPath = ((HttpServletRequest) request).getRequestURI();
+        if (!requestPath.startsWith("/druid/")) {
+            httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+        }
 
-         //保留基本的 XSS 保护
+
+        //保留基本的 XSS 保护
         httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
         httpResponse.setHeader("X-Content-Type-Options", "nosniff");
 

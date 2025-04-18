@@ -8,48 +8,145 @@
 
 package com.mysiteforme.admin.service.impl;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.mysiteforme.admin.service.UploadBaseInfoService;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.UploadType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
-import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
 import com.mysiteforme.admin.util.ToolUtil;
 
+import static com.mysiteforme.admin.util.Constants.BASE_DIR;
+
 @Service("localService")
+@Slf4j
 public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalUploadServiceImpl.class);
+    private final UploadBaseInfoService uploadBaseInfoService;
 
-    // 上传基础
-    private final static String UPLOAD_PATH = "/static/upload/";
+    public LocalUploadServiceImpl(UploadBaseInfoService uploadBaseInfoService) {
+        this.uploadBaseInfoService = uploadBaseInfoService;
+    }
+
+    // 提取常量
+    private static final String KB_FORMAT = "#.##kb";
+    private static final String DEFAULT_CONTENT_TYPE = "unknown";
+
+    private String getStaticPath() throws IOException {
+        ClassPathResource resource = new ClassPathResource("static/");
+        return resource.getFile().getAbsolutePath();
+    }
+
+    private File createUploadDirectory(String dirPath) {
+        File dir = new File(dirPath);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.FOLDER_CREATE_FAILED)
+                    .build();
+        }
+        return dir;
+    }
+
+    private Rescource createResource(String fileName, long fileSize, String hash,
+                                     String fileType, String webUrl, String originalUrl) {
+        Rescource resource = new Rescource();
+        resource.setFileName(fileName);
+        resource.setFileSize(new DecimalFormat(KB_FORMAT).format(fileSize / 1024));
+        resource.setHash(hash);
+        resource.setFileType(StringUtils.defaultIfBlank(fileType, DEFAULT_CONTENT_TYPE));
+        resource.setWebUrl(webUrl);
+        if (originalUrl != null) {
+            resource.setOriginalNetUrl(originalUrl);
+        }
+        resource.setSource(UploadType.LOCAL.getCode());
+        return resource;
+    }
+
+    private String generateFileName(String originalName) {
+        String extension = StringUtils.isNotBlank(originalName)
+                ? originalName.substring(originalName.lastIndexOf("."))
+                : "";
+        return UUID.randomUUID() + extension;
+    }
+
+    @Override
+    public String upload(MultipartFile file, String fileName) throws IOException, NoSuchAlgorithmException{
+        Objects.requireNonNull(file, MessageConstants.file.UPLOAD_EMPTY);
+
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String hash = new QETag().calcETag(file);
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.LOCAL.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
+        }
+
+        // 处理文件名
+        String finalFileName = StringUtils.isNotBlank(fileName)
+                ? fileName
+                : generateFileName(file.getOriginalFilename());
+
+        // 获取上传路径
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
+        }
+
+        // 创建完整的文件路径
+        Path filePath = Paths.get(getStaticPath(), uploadDir, finalFileName).normalize();
+        createUploadDirectory(filePath.getParent().toString());
+
+        // 写入文件
+        try {
+            Files.write(filePath, file.getBytes());
+        } catch (IOException e) {
+            log.error("【MultipartFile文件上传】文件写入失败", e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.File_CREATE_FAILED)
+                    .build();
+        }
+
+        // 创建资源记录
+        String webUrl = BASE_DIR + uploadDir + finalFileName;
+        Rescource resource = createResource(
+                finalFileName,
+                file.getSize(),
+                hash,
+                file.getContentType(),
+                webUrl,
+                null
+        );
+
+        save(resource);
+        return webUrl;
+    }
 
     /**
      * 上传文件到本地服务器
@@ -60,44 +157,7 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-        byte[] data = file.getBytes();
-        QETag tag = new QETag();
-        String hash = tag.calcETag(file);
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("hash",hash);
-        Rescource rescource = getOne(wrapper);
-        if( rescource!= null){
-            return rescource.getWebUrl();
-        }
-        String originalFilename = file.getOriginalFilename();
-        if(StringUtils.isBlank(originalFilename)){
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件名错误").build();
-        }
-        String extName = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf("."));
-        String fileName = UUID.randomUUID() + extName;
-        String contentType = file.getContentType();
-        String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
-        File targetFile = new File(filePath);
-        if(!targetFile.exists()){
-            if (!targetFile.mkdirs()){
-                logger.error("创建文件夹失败");
-                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
-            }
-        }
-        try (FileOutputStream out = new FileOutputStream(filePath + fileName)) {
-            out.write(data);
-            out.flush();
-        }
-        String webUrl = UPLOAD_PATH + fileName;
-        rescource = new Rescource();
-        rescource.setFileName(fileName);
-        rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
-        rescource.setHash(hash);
-        rescource.setFileType(contentType);
-        rescource.setWebUrl(webUrl);
-        rescource.setSource("local");
-        baseMapper.insert(rescource);
-        return webUrl;
+        return upload(file,null);
     }
 
     /**
@@ -107,20 +167,16 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public Boolean delete(String path) {
-        // 获取项目的真实路径
         try {
-            String projectPath = ResourceUtils.getURL("classpath:").getPath();
-            path = projectPath+path;
-            File file = new File(path);
-            if(file.exists()){
-                return file.delete();
-            }else{
-                return false;
-            }
-        }catch (IOException exception){
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹删除出现异常").build();
+            Path filePath = Paths.get(getStaticPath(), path);
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            log.error("删除文件失败", e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.FILE_DELETE_ERROR)
+                    .build();
         }
-
     }
 
     /**
@@ -132,48 +188,47 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String uploadNetFile(String url) throws IOException, NoSuchAlgorithmException {
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("original_net_url",url);
-        wrapper.eq("source","local");
-        Rescource rescource = getOne(wrapper);
-        if(rescource != null){
-            return rescource.getWebUrl();
+        Objects.requireNonNull(url, MessageConstants.file.WEB_URL_NOT_NULL);
+
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+
+        // 检查是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getOriginalNetUrl, url)
+                .eq(Rescource::getSource, UploadType.LOCAL.getCode())
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
         }
-        String extName = url.substring(url.lastIndexOf("."));
-        String fileName = UUID.randomUUID() + extName;
-        String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
-        File uploadDir = new File(filePath);
-        if(!uploadDir.exists()){
-            if(!uploadDir.mkdirs()){
-                throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
-            }
+
+        String fileName = generateFileName(url);
+        Path filePath = Paths.get(getStaticPath(), uploadBaseInfo.getDir(), fileName);
+        createUploadDirectory(filePath.getParent().toString());
+
+        // 下载并保存文件
+        try (InputStream in = new URL(url).openStream()) {
+            Files.copy(in, filePath);
         }
-        URL neturl = new URL(url);
-        HttpURLConnection conn = (HttpURLConnection)neturl.openConnection();
-        conn.connect();
-        try (BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
-             FileOutputStream out = new FileOutputStream(filePath + fileName)) {
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = br.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            out.flush();
-            
-            String webUrl = UPLOAD_PATH + fileName;
-            rescource = new Rescource();
-            rescource.setFileName(fileName);
-            rescource.setFileSize(new java.text.DecimalFormat("#.##").format(br.read(buf)/1024)+"kb");
-            rescource.setHash(new QETag().calcETag(new File(filePath+fileName)));
-            rescource.setFileType(StringUtils.isBlank(extName)?"unknown":extName);
-            rescource.setWebUrl(webUrl);
-            rescource.setOriginalNetUrl(url);
-            rescource.setSource("local");
-            baseMapper.insert(rescource);
-            return webUrl;
-        } finally {
-            conn.disconnect();
-        }
+
+        // 计算文件大小和hash
+        File savedFile = filePath.toFile();
+        String hash = new QETag().calcETag(savedFile);
+
+        // 创建资源记录
+        String webUrl = BASE_DIR + uploadBaseInfo.getDir() + fileName;
+        String fileType = StringUtils.substringAfterLast(url, ".");
+
+        Rescource resource = createResource(
+                fileName,
+                savedFile.length(),
+                hash,
+                fileType,
+                webUrl,
+                url
+        );
+
+        save(resource);
+        return webUrl;
     }
 
     /**
@@ -182,60 +237,76 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @return 文件的Web访问URL
      */
     @Override
-    public String uploadLocalImg(String localPath) {
-        File file = new File(localPath);
-        if(!file.exists()){
-            logger.error("本地文件不存在,上传路径为：{}",localPath);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件不存在").build();
+    public String uploadLocalImg(String localPath) throws IOException, NoSuchAlgorithmException {
+        Objects.requireNonNull(localPath, MessageConstants.file.LOCAL_URL_NOT_NULL);
+
+        // 获取上传配置信息
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+
+        // 验证源文件
+        Path sourceFile = Paths.get(localPath);
+        if (!Files.exists(sourceFile)) {
+            log.error("本地文件不存在, 上传路径为: {}", localPath);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.FILE_NOT_EXIST)
+                    .build();
         }
-        QETag tag = new QETag();
-        String hash;
+
+        // 计算文件哈希值
+        String hash = new QETag().calcETag(sourceFile.toFile());
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.LOCAL.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
+        }
+
+        // 获取上传目录
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
+        }
+
+        // 生成新文件名
+        String fileName = generateFileName(sourceFile.getFileName().toString());
+        String extension = StringUtils.substringAfterLast(sourceFile.getFileName().toString(), ".");
+
+        // 创建目标路径
+        Path targetPath = Paths.get(getStaticPath(), uploadDir, fileName);
+        createUploadDirectory(targetPath.getParent().toString());
+
+        // 复制文件
         try {
-            hash = tag.calcETag(file);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            logger.error("计算文件哈希值失败", e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件哈希计算失败").build();
-        }
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("hash",hash);
-        Rescource rescource = getOne(wrapper);
-        if( rescource!= null){
-            return rescource.getWebUrl();
-        }
-        StringBuilder sb;
-        String filePath;
-        try {
-            sb = new StringBuilder(ResourceUtils.getURL("classpath:").getPath());
-            filePath = sb.append(UPLOAD_PATH).toString();
+            Files.copy(sourceFile, targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
+            log.error("文件复制失败", e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg("文件上传失败")
+                    .build();
         }
-        
-        StringBuilder name = new StringBuilder(UUID.randomUUID().toString());
-        StringBuilder returnUrl = new StringBuilder(UPLOAD_PATH);
-        String  extName = file.getName().substring(file.getName().lastIndexOf("."));
-        sb.append(name).append(extName);
-        File uploadDir;
-        uploadDir = new File(filePath);
-        if (!uploadDir.exists()) {
-            if(!uploadDir.mkdir()){
-                logger.error("上传本地图片到服务器——文件夹创建失败");
-                throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件夹创建失败").build();
-            }
-        }
-        try (InputStream input = new FileInputStream(file);
-             FileOutputStream out = new FileOutputStream(sb.toString())) {
-            byte[] buf = new byte[input.available()];
-            int len;
-            while ((len = input.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            out.flush();
-        } catch (IOException e) {
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
-        }
-        returnUrl.append(name).append(extName);
-        return returnUrl.toString();
+
+        // 构建Web访问URL
+        String webUrl = BASE_DIR + uploadDir + fileName;
+
+        // 创建并保存资源记录
+        Rescource resource = createResource(
+                fileName,
+                Files.size(sourceFile),
+                hash,
+                extension,
+                webUrl,
+                localPath
+        );
+
+        save(resource);
+        return webUrl;
     }
 
     /**
@@ -244,93 +315,80 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @return 文件的Web访问URL，上传失败返回null
      */
     @Override
-    public String uploadBase64(String base64) {
-        StringBuilder webUrl = new StringBuilder(UPLOAD_PATH);
-        String fileFormat = ToolUtil.getFileFormat(base64);
-        try {
-            // 去除base64字符串的前缀（如果有）
-            if (base64.contains(",")) {
-                base64 = base64.split(",")[1];
-            }
-            //Base64解码
-            byte[] b = Base64.getDecoder().decode(base64);
-            for(int i=0;i<b.length;++i) {
-                if(b[i]<0) {//调整异常数据
-                    b[i]+= (byte) 256;
-                }
-            }
-            //生成jpeg图片
-            String filePath = ResourceUtils.getURL("classpath:").getPath() + UPLOAD_PATH ;
-            File targetFileDir = new File(filePath);
-            if(!targetFileDir.exists()){
-                if(targetFileDir.mkdirs()){
-                    throw MyException.builder().code(MyException.SERVER_ERROR).msg("创建文件夹失败").build();
-                }
-            }
-            StringBuilder sb = new StringBuilder(targetFileDir.getPath());
-            sb.append(File.separator);
-            String fileName = UUID.randomUUID()+"."+ fileFormat;
-            sb.append(fileName);
-            String imgFilePath = sb.toString();//新生成的图片
-            try (OutputStream out = Files.newOutputStream(Paths.get(imgFilePath))) {
-                out.write(b);
-                out.flush();
-            }
-            return webUrl.append(fileName).toString();
-        }
-        catch (IOException e)
-        {
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传Base64图片失败").build();
-        }
-    }
+    public String uploadBase64(String base64){
+        Objects.requireNonNull(base64, MessageConstants.file.FILE_UPLOAD_BASE64_NOT_NULL);
 
-    /**
-     * 测试上传配置是否可用
-     * @param uploadInfo 上传配置信息
-     * @return 配置是否可用
-     */
-    @Override
-    public Boolean testAccess(UploadInfo uploadInfo) {
-        return null;
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String fileFormat = ToolUtil.getFileFormat(base64);
+        String fileName = generateFileName("." + fileFormat);
+
+        // 解码Base64数据
+        byte[] fileData = Base64.getDecoder().decode(
+                base64.contains(",") ? base64.split(",")[1] : base64
+        );
+
+        Path filePath;
+        try {
+            // 保存文件
+            filePath = Paths.get(getStaticPath(), uploadBaseInfo.getDir(), fileName);
+            createUploadDirectory(filePath.getParent().toString());
+            Files.write(filePath, fileData);
+        }catch (IOException e) {
+            log.error("【上传Base64编码的图片】文件写入失败", e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.File_CREATE_FAILED)
+                    .build();
+        }
+        try {
+            // 创建资源记录
+            String webUrl = BASE_DIR + uploadBaseInfo.getDir() + fileName;
+            String hash = new QETag().calcETag(filePath.toFile());
+            Rescource resource = createResource(
+                    fileName,
+                    fileData.length,
+                    hash,
+                    fileFormat,
+                    webUrl,
+                    null
+            );
+
+            save(resource);
+            return webUrl;
+        }catch (IOException e) {
+            log.error("【上传Base64编码的图片】计算文件哈希值失败", e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.IO_EXCEPTION)
+                    .build();
+        }catch (NoSuchAlgorithmException e) {
+            throw MyException.builder().businessError(MessageConstants.file.FILE_NOT_EXIST).build();
+        }
     }
 
     @Override
     public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
-        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
         try {
-            String uploadPath;
-            switch (ToolUtil.getOs()) {
-                case "windows" -> uploadPath = uploadBaseInfo.getLocalWindowUrl();
-                case "linux" -> uploadPath = uploadBaseInfo.getLocalLinuxUrl();
-                default -> {
-                    return false;
-                }
+            Path testFile = Paths.get("static/images/userface1.jpg");
+            Path targetPath = Paths.get(uploadBaseInfo.getDir(), "test.jpg");
+            if(!Files.exists(targetPath)){
+                Files.createDirectories(targetPath.getParent());
             }
-            File file = new File(uploadPath);
-            if(!file.exists()){
-                if(!file.mkdir()){
-                    logger.error("文件夹创建失败");
-                    return false;
-                }
+            try (InputStream in = new ClassPathResource(testFile.toString()).getInputStream()) {
+                Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
-            String name = "userface1.jpg";
-            try (InputStream input = classPathResource.getInputStream();
-             FileOutputStream out = new FileOutputStream(uploadPath + name)) {
-                byte[] buf = new byte[input.available()];
-                int len;
-                while ((len = input.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                out.flush();
-                return true;
-            } catch (IOException e) {
-                throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件上传流出现问题").build();
-            }
-        } catch (MyException e) {
-            logger.error("测试文件上传失败: {}", e.getMessage(), e);
+            uploadBaseInfo.setTestWebUrl(BASE_DIR + uploadBaseInfo.getDir() + "test.jpg");
+            return true;
+        } catch (IOException e) {
+            log.error("测试文件上传失败: {}", e.getMessage(), e);
             return false;
         }
     }
 
-    
+    @Override
+    public UploadBaseInfo getUploadBaseInfo() {
+        return uploadBaseInfoService.getInfoByType(UploadType.LOCAL.getCode());
+    }
+
+
 }

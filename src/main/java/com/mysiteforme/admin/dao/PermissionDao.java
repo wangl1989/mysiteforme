@@ -16,8 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mysiteforme.admin.entity.DTO.AssignRolePermission;
-import com.mysiteforme.admin.entity.DTO.AssignUserPermission;
 import com.mysiteforme.admin.entity.Permission;
 import com.mysiteforme.admin.entity.VO.PermissionApiVO;
 import com.mysiteforme.admin.entity.VO.PermissionVO;

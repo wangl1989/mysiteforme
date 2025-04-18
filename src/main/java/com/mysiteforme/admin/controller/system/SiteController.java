@@ -70,10 +70,15 @@ public class SiteController{
         if(uploadBaseInfo == null){
             return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_NOT_CORRECT);
         }
-        if(uploadService.testBaseInfoAccess(uploadBaseInfo)){
+        if(!uploadService.testBaseInfoAccess(uploadBaseInfo)){
             return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_NOT_CORRECT);
         }
         siteService.updateSite(site);
         return Result.success();
+    }
+
+    @GetMapping("uploadTypeList")
+    public Result uploadTypeList(){
+        return Result.success(siteService.getSiteUploadTypeList());
     }
 }

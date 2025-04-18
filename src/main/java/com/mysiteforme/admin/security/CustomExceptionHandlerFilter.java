@@ -10,13 +10,11 @@ package com.mysiteforme.admin.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.mysiteforme.admin.util.*;
-import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -49,9 +47,19 @@ public class CustomExceptionHandlerFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // 检查是否匹配排除路径
+        return path.startsWith("/druid") || path.startsWith("/actuator")
+                || path.startsWith("/static") || path.startsWith("/error")
+                || path.startsWith("/favicon.ico");
+    }
+
+    @Override
     @SuppressWarnings("UseSpecificCatch")
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 如果是 error 页面的请求，直接放行
         if (request.getRequestURI().equals("/error")) {
             filterChain.doFilter(request, response);
@@ -93,7 +101,7 @@ public class CustomExceptionHandlerFilter extends OncePerRequestFilter {
                     String errorMessage = error.getDefaultMessage();
                     errors.add(MessageUtil.getMessage(errorMessage));
                 });
-                apiToolUtil.returnSystemDate(Result.orgenalError(ResultCode.INVALID_PARAM, String.join(System.lineSeparator(),errors)), request, response);
+                apiToolUtil.returnSystemDate(Result.orgenalError(ResultCode.INVALID_PARAM, errors.size()>1?String.join(System.lineSeparator(),errors):errors.get(0)), request, response);
             } else if ((cause != null? cause : e) instanceof MyException myException) {
                 apiToolUtil.returnSystemDate(Result.orgenalError(myException.getCode(), myException.getMsg()), request, response);
             } else {

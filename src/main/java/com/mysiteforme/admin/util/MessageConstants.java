@@ -176,18 +176,6 @@ public class MessageConstants {
         public static final String VALIDATE_SORT_ERROR = "message.validate.sort.error";
     }
 
-    public static class PermissionGroup {
-        public static final String NAME_EMPTY = "message.permission.group.name.empty";
-        public static final String CODE_EMPTY = "message.permission.group.code.empty";
-        public static final String HAS_PERMISSION = "message.permission.group.has.permission";
-        public static final String PAGE_PARAM_EMPTY = "message.permission.group.page.param.empty";
-        public static final String CODE_EXISTS = "message.group.code.exists";
-        public static final String PARENT_GROUP_NOT_FOUND = "message.permission.group.parent.not.found";
-        public static final String SORT_ERROR = "message.permission.group.sort.error";
-        public static final String NOT_FOUND = "message.permission.group.not.found";
-        public static final String HAS_CHILD = "message.permission.group.has.child";
-    }
-    
     public static class Permission {
         public static final String CODE_EXISTS = "message.permission.code.exists";
         public static final String NAME_NOT_NULL = "message.permission.name.not.null";
@@ -206,6 +194,7 @@ public class MessageConstants {
         public static final String API_METHOD_EMPTY = "message.permission.api.method.empty";
         public static final String API_URL_EXISTS = "message.permission.api.url.exists";
         public static final String API_NOT_REGISTERED = "message.permission.api.not.registered";
+        public static final String PAGE_NOT_REGISTERED = "message.permission.page.not.registered";
         public static final String PAGE_URL_EMPTY = "message.permission.page.url.empty";
         public static final String PAGE_URL_EXISTS = "message.permission.page.url.exists";
         public static final String BUTTON_KEY_EMPTY = "message.permission.button.key.empty";
@@ -231,6 +220,8 @@ public class MessageConstants {
         public static final String DICT_TYPE_CAN_NOT_UPDATE = "message.dict.type.can.not.update";
         // 无效的ID
         public static final String DICT_ID_INVALID = "message.dict.id.invalid";
+
+        public static final String DICT_NOT_EXIST = "message.dict.not.exist";
         // 已存在唯一的类型对应的标签
         public static final String DICT_EXISTS_TYPE_AND_LABEL = "message.dict.exists.type.and.label";
         // 已存在唯一的类型对应的标签和值
@@ -248,6 +239,14 @@ public class MessageConstants {
 
     public static class file {
         // 文件上传相关错误消息
+        public static final String FILE_NOT_EXIST = "message.file.not.exist";
+        public static final String FILE_DIR_NOT_EXIST = "message.file.dir.not.exist";
+        public static final String FOLDER_CREATE_FAILED = "message.folder.create.failed";
+        public static final String File_CREATE_FAILED = "message.file.create.failed";
+        public static final String WEB_URL_NOT_NULL = "message.web.url.not.null";
+        public static final String LOCAL_URL_NOT_NULL = "message.local.url.not.null";
+        public static final String FILE_UPLOAD_BASE64_NOT_NULL = "message.file.upload.base64.not.null";
+        public static final String FILE_DELETE_ERROR = "message.file.delete.error";
         public static final String SITE_INFO_ERROR = "message.file.site.info.error";
         public static final String UPLOAD_EMPTY = "message.file.upload.empty";
         public static final String FORMAT_ERROR = "message.file.format.error";
@@ -258,6 +257,7 @@ public class MessageConstants {
         public static final String DOWNLOAD_NAME_EMPTY = "message.file.download.name.empty";
         public static final String IMAGE_FORMAT_ERROR = "message.file.image.format.error";
         public static final String IO_EXCEPTION = "message.file.io.exception";
+        public static final String QINIU_UPLOAD_BASE64_EXCEPTION = "message.qiniu.upload.base64.exception";
         public static final String ILLEGAL_STATE_EXCEPTION = "message.file.illegal.state.exception";
         public static final String NO_SUCH_ALGORITHM_EXCEPTION = "message.file.no.such.algorithm.exception";
         public static final String FILE_DOWNLOAD_ENCODING_EXCEPTION = "message.file.download.encoding.exception";
@@ -294,11 +294,11 @@ public class MessageConstants {
         public static final String UPLOAD_BASE_INFO_NULL = "message.upload.base.info.null";
         public static final String TYPE_EMPTY = "message.upload.base.info.type.empty";
         public static final String TYPE_INVALID = "message.upload.base.info.type.invalid";
-        public static final String LOCAL_WINDOW_URL_EMPTY = "message.upload.base.info.local.window.url.empty";
-        public static final String LOCAL_LINUX_URL_EMPTY = "message.upload.base.info.local.linux.url.empty";
+        public static final String LOCAL_DIR_EMPTY = "message.upload.base.info.local.dir.empty";
         public static final String BASE_PATH_EMPTY = "message.upload.base.info.base.path.empty";
         public static final String BUCKET_NAME_EMPTY = "message.upload.base.info.bucket.name.empty";
         public static final String DIR_EMPTY = "message.upload.base.info.dir.empty";
+        public static final String DIR_RULE_NOT_MATCH = "message.upload.rule.not.match";
         public static final String ACCESS_KEY_EMPTY = "message.upload.base.info.access.key.empty";
         public static final String SECRET_KEY_EMPTY = "message.upload.base.info.secret.key.empty";
         public static final String ENDPOINT_OSS_EMPTY = "message.upload.base.info.endpoint.oss.empty";
@@ -312,5 +312,6 @@ public class MessageConstants {
         public static final String UPLOAD_ENABLE_CAN_NOT_DELETE = "message.upload.enable.can.not.delete";
         public static final String LOCAL_UPLOAD_CAN_NOT_DELETE = "message.upload.local.can.not.delete";
         public static final String LOCAL_UPLOAD_CAN_NOT_DISABLE = "message.upload.local.can.not.disable";
+        public static final String NOT_LOCAL_UPLOAD = "message.upload.not.local.upload";
     }
 }

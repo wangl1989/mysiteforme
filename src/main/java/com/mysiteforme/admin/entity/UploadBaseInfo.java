@@ -8,6 +8,7 @@
 
 package com.mysiteforme.admin.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
@@ -26,16 +27,6 @@ public class UploadBaseInfo extends DataEntity {
 	@TableField(value = "type")
 	private String type;
 
-    /**
-     * 本地window系统上传路径
-     */
-	@TableField(value = "local_window_url")
-	private String localWindowUrl;
-    /**
-     * 本地LINUX系统上传路径
-     */
-	@TableField(value = "local_linux_url")
-	private String localLinuxUrl;
     /**
      * 前缀路径，例子如下:
 	 * (https://weizheng0301-1257429161.cos.ap-shanghai.myqcloud.com/)
@@ -57,12 +48,12 @@ public class UploadBaseInfo extends DataEntity {
     /**
      * AccessKey值
      */
-	@TableField(value = "access_key")
+	@TableField(value = "access_key",updateStrategy = FieldStrategy.NOT_EMPTY)
 	private String accessKey;
     /**
      * SecretKey值
      */
-	@TableField(value = "secret_key")
+	@TableField(value = "secret_key",updateStrategy = FieldStrategy.NOT_EMPTY)
 	private String secretKey;
 
 	/**
@@ -79,7 +70,7 @@ public class UploadBaseInfo extends DataEntity {
 	/**
 	 * 上传测试结果
 	 */
-	@TableField("test_access")
+	@TableField(value = "test_access",updateStrategy = FieldStrategy.NOT_NULL)
 	private Boolean testAccess;
 
 	/**
@@ -87,4 +78,10 @@ public class UploadBaseInfo extends DataEntity {
 	 */
 	@TableField("enable")
 	private Boolean enable;
+
+	/**
+	 * 用户测试上传的图片路径
+	 */
+	@TableField("test_web_url")
+	private String testWebUrl;
 }

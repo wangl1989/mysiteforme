@@ -8,7 +8,11 @@
 
 package com.mysiteforme.admin.config;
 
+import com.alibaba.druid.support.jakarta.StatViewServlet;
+import com.alibaba.druid.support.jakarta.WebStatFilter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -57,6 +61,29 @@ public class DruidDBConfig {
         druidDataSource.setFilters("stat,wall,slf4j");
         druidDataSource.setInitialSize(Integer.parseInt(initialSize));
         return druidDataSource;
+    }
+
+    @Bean
+    public ServletRegistrationBean<StatViewServlet> druidStatViewServlet() {
+        ServletRegistrationBean<StatViewServlet> registrationBean = new ServletRegistrationBean<>(new StatViewServlet(), "/druid/*");
+        // 添加初始化参数
+        registrationBean.addInitParameter("loginUsername", "admin");
+        registrationBean.addInitParameter("loginPassword", "admin");
+        // 是否可以重置数据
+        registrationBean.addInitParameter("resetEnable", "false");
+        registrationBean.addInitParameter("allowFrames", "true");
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<WebStatFilter> druidWebStatFilter() {
+        FilterRegistrationBean<WebStatFilter> registrationBean = new FilterRegistrationBean<>(new WebStatFilter());
+        // 添加过滤规则
+        registrationBean.addUrlPatterns("/*");
+        // 添加不需要忽略的格式信息
+        registrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid,/druid/*");
+        registrationBean.addInitParameter("registrationBean","true");
+        return registrationBean;
     }
 
 

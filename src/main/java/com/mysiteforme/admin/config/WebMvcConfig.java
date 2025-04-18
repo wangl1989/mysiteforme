@@ -10,11 +10,9 @@ package com.mysiteforme.admin.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -22,13 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.util.unit.DataSize;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -44,8 +39,6 @@ import com.mysiteforme.admin.util.ApiToolUtil;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import com.mysiteforme.admin.util.ResultCode;
-
-import jakarta.servlet.MultipartConfigElement;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -116,12 +109,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registration.setOrder(1);
         return registration;
     }
-    
+
+    @Bean
+    public XssRequestBodyAdvice xssRequestBodyAdvice() {
+        return new XssRequestBodyAdvice();
+    }
+
     @Bean
     public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter(SecurityHeadersFilter securityHeadersFilter) {
         FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(securityHeadersFilter);
         registrationBean.addUrlPatterns("/*");
+        // 添加不需要忽略的格式信息
         registrationBean.setOrder(2);
         return registrationBean;
     }
@@ -158,23 +157,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 配置文件上传大小限制
-     * @return 文件上传配置
-     */
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-        // 设置文件大小限制 ,超出设置页面会抛出异常信息，
-        // 这样在文件上传的地方就需要进行异常信息的处理了;
-        factory.setMaxFileSize(DataSize.ofMegabytes(10)); // KB,MB
-        /// 设置总上传数据总大小
-        factory.setMaxRequestSize(DataSize.ofMegabytes(50));
-        // Sets the directory location where files will be stored.
-        // factory.setLocation("路径地址");
-        return factory.createMultipartConfig();
-    }
-
-    /**
      * 配置字符串消息转换器
      * @return 字符串消息转换器
      */
@@ -192,7 +174,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MyHandlerInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login","/api/auth/refresh","/favicon.ico","/actuator/**","/error","/logout","/genCaptcha","/static/**","/showBlog/**");
+                .excludePathPatterns("/login","/api/auth/refresh","/favicon.ico","/actuator/**","/error","/logout","/genCaptcha","/static/**","/showBlog/**","/druid/**");
         registry.addInterceptor(new BlogHandlerInterceptor())
                 .addPathPatterns("/showBlog/**");
     }

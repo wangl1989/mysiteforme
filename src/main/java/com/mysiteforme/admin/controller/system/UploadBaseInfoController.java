@@ -4,28 +4,23 @@ import com.mysiteforme.admin.entity.UploadBaseInfo;
 import com.mysiteforme.admin.entity.request.AddUploadBaseInfoRequest;
 import com.mysiteforme.admin.entity.request.PageListUploadBaseInfoRequest;
 import com.mysiteforme.admin.entity.request.UpdateUploadBaseInfoRequest;
-import com.mysiteforme.admin.entity.request.UploadBaseInfoRequest;
+import com.mysiteforme.admin.util.*;
+import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.config.UploadServiceFactory;
 import com.mysiteforme.admin.service.UploadBaseInfoService;
 import com.mysiteforme.admin.service.UploadService;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
-import com.mysiteforme.admin.util.UploadType;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+
 @RestController
-@RequestMapping("/api/system/uploadBaseInfo")   
+@RequestMapping("/api/admin/uploadBaseInfo")
 @RequiredArgsConstructor
 public class UploadBaseInfoController {
 
@@ -40,9 +35,12 @@ public class UploadBaseInfoController {
 
     @SysLog(MessageConstants.SysLog.UPLOAD_BASE_INFO_ADD)
     @PostMapping("add")
-    public Result add(@RequestBody AddUploadBaseInfoRequest request) {
+    public Result add(@RequestBody @Valid AddUploadBaseInfoRequest request) {
         if(request == null){
             return Result.objectNotNull();
+        }
+        if(!uploadBaseInfoService.checkUploadBaseInfo(request.getType(),null)){
+            return Result.businessMsgError(MessageConstants.UploadBaseInfo.TYPE_EXISTS);
         }
         UploadBaseInfo uploadBaseInfo = new UploadBaseInfo();
         BeanUtils.copyProperties(request,uploadBaseInfo);
@@ -55,10 +53,13 @@ public class UploadBaseInfoController {
     }  
 
     @SysLog(MessageConstants.SysLog.UPLOAD_BASE_INFO_UPDATE)
-    @PutMapping("update")
-    public Result update(@RequestBody UpdateUploadBaseInfoRequest request) {
+    @PutMapping("edit")
+    public Result edit(@RequestBody @Valid UpdateUploadBaseInfoRequest request) {
         if(request == null){
             return Result.objectNotNull();
+        }
+        if(!uploadBaseInfoService.checkUploadBaseInfo(request.getType(),request.getId())){
+            return Result.businessMsgError(MessageConstants.UploadBaseInfo.TYPE_EXISTS);
         }
         UploadBaseInfo uploadBaseInfo = new UploadBaseInfo();
         BeanUtils.copyProperties(request,uploadBaseInfo);
@@ -89,24 +90,30 @@ public class UploadBaseInfoController {
         uploadBaseInfoService.enableUploadBaseInfo(id);
         return Result.success();
     }
+
     private Result checkUploadBaseInfo(UploadBaseInfo uploadBaseInfo) {
         try {
-            UploadType.valueOf(uploadBaseInfo.getType());
+            UploadType.getByCode(uploadBaseInfo.getType().toLowerCase());
         } catch (IllegalArgumentException e) {
             return Result.paramMsgError(MessageConstants.UploadBaseInfo.TYPE_INVALID);
         }
 
-        if (UploadType.LOCAL.getCode().equals(uploadBaseInfo.getType())) {
-            if (StringUtils.isBlank(uploadBaseInfo.getLocalWindowUrl())) {
-                return Result.paramMsgError(MessageConstants.UploadBaseInfo.LOCAL_WINDOW_URL_EMPTY);
+        if (!UploadType.LOCAL.getCode().equals(uploadBaseInfo.getType())) {
+            if(StringUtils.isBlank(uploadBaseInfo.getBucketName())){
+                return Result.paramMsgError(MessageConstants.UploadBaseInfo.BUCKET_NAME_EMPTY);
             }
-            if (StringUtils.isBlank(uploadBaseInfo.getLocalLinuxUrl())) {
-                return Result.paramMsgError(MessageConstants.UploadBaseInfo.LOCAL_LINUX_URL_EMPTY);
+            if(uploadBaseInfo.getId() == null || uploadBaseInfo.getId() == 0) {
+                if (StringUtils.isBlank(uploadBaseInfo.getAccessKey())) {
+                    return Result.paramMsgError(MessageConstants.UploadBaseInfo.ACCESS_KEY_EMPTY);
+                }
+                if (StringUtils.isBlank(uploadBaseInfo.getSecretKey())) {
+                    return Result.paramMsgError(MessageConstants.UploadBaseInfo.SECRET_KEY_EMPTY);
+                }
             }
-            return Result.success();
         }
+
         // 特定云存储校验
-        switch (UploadType.valueOf(uploadBaseInfo.getType())) {
+        switch (Objects.requireNonNull(UploadType.getByCode(uploadBaseInfo.getType()))) {
             case OSS:
                 if (StringUtils.isBlank(uploadBaseInfo.getEndpoint())) {
                     return Result.paramMsgError(MessageConstants.UploadBaseInfo.ENDPOINT_OSS_EMPTY);
@@ -133,8 +140,40 @@ public class UploadBaseInfoController {
         if (uploadService == null) {
             return Result.paramMsgError(MessageConstants.UploadBaseInfo.TYPE_NOT_USED);
         }
-        if (!uploadService.testBaseInfoAccess(uploadBaseInfo)) {
-            return Result.paramMsgError(MessageConstants.UploadBaseInfo.TEST_ACCESS_FAILED);
+        if (uploadBaseInfo.getId() == null || uploadBaseInfo.getId() == 0) {
+            if (!uploadService.testBaseInfoAccess(uploadBaseInfo)) {
+                return Result.paramMsgError(MessageConstants.UploadBaseInfo.TEST_ACCESS_FAILED);
+            } else {
+                uploadBaseInfo.setTestAccess(true);
+            }
+        } else {
+            UploadBaseInfo oldInfo = uploadBaseInfoService.getById(uploadBaseInfo.getId());
+            if (oldInfo == null) {
+                return Result.paramMsgError(MessageConstants.UploadBaseInfo.ID_NOT_EXIST);
+            }
+            if (StringUtils.isNotBlank(uploadBaseInfo.getAccessKey())) {
+                oldInfo.setAccessKey(uploadBaseInfo.getAccessKey());
+            }
+            if (StringUtils.isNotBlank(uploadBaseInfo.getSecretKey())) {
+                oldInfo.setSecretKey(uploadBaseInfo.getSecretKey());
+            }
+            // 只有在测试图片地址为空的时候才会自动测试
+            if(StringUtils.isBlank(uploadBaseInfo.getTestWebUrl())) {
+                if (!uploadService.testBaseInfoAccess(oldInfo)) {
+                    CompletableFuture.supplyAsync(() -> {
+                        // 这里是异步操作
+                        oldInfo.setTestAccess(false);
+                        oldInfo.setTestWebUrl(null);
+                        return uploadBaseInfoService.saveOrUpdateBaseInfo(oldInfo);
+                    });
+                    return Result.paramMsgError(MessageConstants.UploadBaseInfo.TEST_ACCESS_FAILED);
+                } else {
+                    if (StringUtils.isNotBlank(oldInfo.getTestWebUrl())) {
+                        uploadBaseInfo.setTestWebUrl(oldInfo.getTestWebUrl());
+                    }
+                    uploadBaseInfo.setTestAccess(true);
+                }
+            }
         }
 
         return Result.success();

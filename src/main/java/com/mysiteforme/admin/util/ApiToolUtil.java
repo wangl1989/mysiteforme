@@ -42,7 +42,7 @@ public class ApiToolUtil {
         if (corsConfiguration != null) {
             // 让 CorsProcessor 根据配置和请求信息，添加必要的 CORS 响应头
             // 例如：Access-Control-Allow-Origin 等
-            boolean isValid = false;
+            boolean isValid;
             try {
                 isValid = this.corsProcessor.processRequest(corsConfiguration, request, response);
             } catch (IOException e) {

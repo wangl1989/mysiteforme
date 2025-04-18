@@ -12,8 +12,6 @@ import java.io.IOException;
 import com.mysiteforme.admin.entity.DTO.GlobalHeadParam;
 import com.mysiteforme.admin.security.MyUserDetails;
 import com.mysiteforme.admin.util.Result;
-
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 

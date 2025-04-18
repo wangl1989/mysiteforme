@@ -46,7 +46,7 @@ public interface DictService extends IService<Dict> {
      * @param type 字典类型
      * @return 最大排序值
      */
-    Integer getMaxSortByType(String type);
+    Integer getMaxSortByType(String type,Long id);
 
     /**
      * 根据类型、标签、值获取字典数量

@@ -35,20 +35,7 @@ spring:
       maxActive: 100
       minIdle: 10
       max-wait: 60000
-      web-stat-filter:
-        enabled: true
-        url-pattern: /*
-        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/login,/genCaptcha,/druid/*"
-        profileEnable: true
-        principalCookieName: USER_COOKIE
-        principalSessionName:
       aopPatterns: com.mysiteforme.admin.service
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: false
-        login-username: admin
-        login-password: admin
       minEvictableIdleTimeMillis: 1800000
       maxEvictableIdleTimeMillis: 1800000
       timeBetweenEvictionRunsMillis: 60000
@@ -150,7 +137,7 @@ logging:
     root: INFO
     com.mysiteforme.admin.security: DEBUG
     org.springframework.security.web.FilterChainProxy: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: TRACE
     org.springframework.cache: DEBUG
 #源码生成文件夹
 source-code-dic:  D://mysite

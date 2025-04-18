@@ -21,6 +21,12 @@ import java.io.IOException;
 
 public class JsonAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final ObjectMapper objectMapper;
+
+    public JsonAuthenticationFilter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
@@ -31,7 +37,7 @@ public class JsonAuthenticationFilter extends UsernamePasswordAuthenticationFilt
 
         try {
             // 从请求体中读取登录信息
-            UserDTO userDTO = new ObjectMapper().readValue(request.getInputStream(), UserDTO.class);
+            UserDTO userDTO = objectMapper.readValue(request.getInputStream(), UserDTO.class);
 
             String username = userDTO.getUsername();
             String password = userDTO.getPassword();

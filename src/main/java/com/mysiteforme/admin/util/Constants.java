@@ -108,10 +108,24 @@ public class Constants {
 	 */
 	public static final int USER_CAPTCHA_CACHE_EXPIRE_TIME = 5;
 
+	/**
+	 * 权限类型: 路由
+	 */
 	public static final int TYPE_PAGE = 1;
 
+	/**
+	 * 权限类型：按钮
+	 */
 	public static final int TYPE_BUTTON = 2;
 
+	/**
+	 * 权限类型：接口
+	 */
 	public static final int TYPE_API = 3;
+
+	/**
+	 * 本地上传的基础目录
+	 */
+	public static final String BASE_DIR = "static/";
 
 }

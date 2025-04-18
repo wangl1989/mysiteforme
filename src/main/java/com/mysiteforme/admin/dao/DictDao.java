@@ -11,9 +11,15 @@ package com.mysiteforme.admin.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Dict;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 
 @Mapper
 public interface DictDao extends BaseMapper<Dict> {
-
+    /**
+     * 获取指定类型的字典最大排序值
+     * @param type 字典类型
+     * @return 最大排序值
+     */
+    Integer getMaxSortByType(@Param("type") String type, @Param("id") Long id);
 }

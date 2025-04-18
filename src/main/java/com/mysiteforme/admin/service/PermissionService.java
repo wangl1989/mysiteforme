@@ -12,14 +12,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.DTO.PermissionApiDTO;
 import com.mysiteforme.admin.entity.DTO.PermissionButtonDTO;
-import com.mysiteforme.admin.entity.DTO.PermissionDTO;
 import com.mysiteforme.admin.entity.DTO.PermissionPageDTO;
 import com.mysiteforme.admin.entity.Permission;
 import com.mysiteforme.admin.entity.VO.PermissionApiVO;
-import com.mysiteforme.admin.entity.request.AddPermissionRequest;
 import com.mysiteforme.admin.entity.request.BasePermissionRequest;
 import com.mysiteforme.admin.entity.request.PageListPermissionRequest;
-import com.mysiteforme.admin.entity.request.UpdatePermissionRequest;
 import com.mysiteforme.admin.exception.MyException;
 
 public interface PermissionService extends IService<Permission> {
@@ -34,7 +31,7 @@ public interface PermissionService extends IService<Permission> {
 
     // 根据url和method获取接口信息
     PermissionApiVO getApiByUrlAndMethod(String url,String method);
-    
+
     // API权限相关方法
     void saveOrUpdatePermissionApiDTO(PermissionApiDTO permissionApiDTO);
     

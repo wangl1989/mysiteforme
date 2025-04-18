@@ -15,11 +15,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.Dict;
 import com.mysiteforme.admin.dao.DictDao;
-import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.request.AddDictRequest;
 import com.mysiteforme.admin.entity.request.PageListDictRequest;
 import com.mysiteforme.admin.entity.request.UpdateDictRequest;
+import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.DictService;
+import com.mysiteforme.admin.util.MessageConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,12 +31,14 @@ import java.util.List;
 
 
 @Service
-@Transactional(readOnly = true, rollbackFor = Exception.class)
+@Transactional(rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictService {
 
     @Override
     public IPage<Dict> selectPageDict(PageListDictRequest request) {
         LambdaQueryWrapper<Dict> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Dict::getDelFlag,false);
+        wrapper.orderBy(true,true,Dict::getType);
         if(request != null){
             if(StringUtils.isNotBlank(request.getType())) {
                 wrapper.eq(Dict::getType, request.getType());
@@ -57,6 +60,8 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
             }
             wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), Dict::getCreateDate);
             wrapper.orderBy(request.getSortBySortAsc() != null, request.getSortBySortAsc() != null && request.getSortBySortAsc(), Dict::getSort);
+        } else {
+            request = new PageListDictRequest();
         }
         return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
     }
@@ -96,17 +101,8 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
      * @return 最大排序值加1
      */
     @Override
-    public Integer getMaxSortByType(String type) {
-        QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eqSql("sort","select max(sort) from sys_dict ")
-                .eq("type",type)
-                .eq("del_flag",false);
-        List<Dict> dicts = list(queryWrapper);
-        int sort = 0;
-        if(dicts != null && !dicts.isEmpty()){
-            sort =  dicts.get(0).getSort() + 1;
-        }
-        return sort;
+    public Integer getMaxSortByType(String type,Long id) {
+        return baseMapper.getMaxSortByType(type,id);
     }
 
     /**
@@ -138,7 +134,7 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
         saveOrUpdate(dict);
     }
 
-    @CacheEvict(value = "dictCache",key = "#dict.type",condition = "#dict.type ne null ")
+    @CacheEvict(value = "dictCache",key = "#request.type",condition = "#request.type ne null ")
     @Override
     public void saveDict(AddDictRequest request) {
         Dict dict = new Dict();
@@ -146,7 +142,7 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
         saveOrUpdate(dict);
     }
 
-    @CacheEvict(value = "dictCache",key = "#dict.type",condition = "#dict.type ne null ")
+    @CacheEvict(value = "dictCache",key = "#request.type",condition = "#request.type ne null ")
     @Override
     public void updateDict(UpdateDictRequest request) {
         Dict dict = new Dict();
@@ -159,11 +155,14 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
      * 同时清除对应类型的缓存
      * @param id 字典ID
      */
-    @CacheEvict(value = "dictCache",key = "#result", condition = "#result ne  null ")
+    @CacheEvict(value = "dictCache",key = "#result", condition = "#id ne  null ")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteDict(Long id) {
-        baseMapper.selectById(id);
+        Dict dict = baseMapper.selectById(id);
+        if(dict == null){
+            throw MyException.builder().businessError(MessageConstants.Dict.DICT_NOT_EXIST).build();
+        }
         baseMapper.deleteById(id);
     }
 

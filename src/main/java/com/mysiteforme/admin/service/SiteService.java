@@ -10,6 +10,9 @@ package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.entity.response.SiteUploadTypeResponse;
+
+import java.util.List;
 
 public interface SiteService extends IService<Site> {
 
@@ -24,5 +27,7 @@ public interface SiteService extends IService<Site> {
      * @param site 站点信息对象
      */
     void updateSite(Site site);
+
+    List<SiteUploadTypeResponse> getSiteUploadTypeList();
 	
 }

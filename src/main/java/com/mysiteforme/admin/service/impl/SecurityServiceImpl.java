@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.mysiteforme.admin.entity.VO.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,11 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysiteforme.admin.entity.DTO.GlobalHeadParam;
 import com.mysiteforme.admin.entity.DTO.TokenValidationResult;
 import com.mysiteforme.admin.entity.UserDevice;
-import com.mysiteforme.admin.entity.VO.PermissionApiVO;
-import com.mysiteforme.admin.entity.VO.PermissionVO;
-import com.mysiteforme.admin.entity.VO.TokenInfoVO;
-import com.mysiteforme.admin.entity.VO.UserLoginFail;
-import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.redis.JwtService;
 import com.mysiteforme.admin.redis.RedisConstants;
@@ -72,6 +68,8 @@ public class SecurityServiceImpl implements SecurityService {
     private final PermissionService permissionService;
 
     private final ApiToolUtil apiToolUtil;
+
+    private final ObjectMapper objectMapper;
  
     /**
      * 登录失败提示信息
@@ -256,8 +254,7 @@ public class SecurityServiceImpl implements SecurityService {
     private String getCaptchaFromRequest(HttpServletRequest request) throws IOException {
         // 因为是JSON请求，需要从请求体中读取验证码
         String body = request.getReader().lines().collect(Collectors.joining());
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(body);
+        JsonNode node = objectMapper.readTree(body);
         return node.get(Constants.CAPTCHA).asText();
     }
 

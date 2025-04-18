@@ -9,17 +9,21 @@
 package com.mysiteforme.admin.service.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.UUID;
+import java.text.DecimalFormat;
+import java.util.Objects;
 
+import com.aliyun.oss.model.VoidResult;
+import com.mysiteforme.admin.service.UploadBaseInfoService;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.UploadType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -29,43 +33,54 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectResult;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
-import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.RescourceService;
-import com.mysiteforme.admin.service.UploadInfoService;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
 import com.mysiteforme.admin.util.ToolUtil;
 
+@Slf4j
 @Service("ossService")
 public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
 
-    private static final Logger logger = LoggerFactory.getLogger(OssUploadServiceImpl.class);
-
     private final RescourceService rescourceService;
 
-    private final UploadInfoService uploadInfoService;
+    private final UploadBaseInfoService uploadBaseInfoService;
+
+    private static final String KB_FORMAT = "#.##kb";
+    private static final String DEFAULT_CONTENT_TYPE = "unknown";
 
     @Autowired
-    public OssUploadServiceImpl(RescourceService rescourceService, UploadInfoService uploadInfoService) {
+    public OssUploadServiceImpl(RescourceService rescourceService, UploadBaseInfoService uploadBaseInfoService) {
         this.rescourceService = rescourceService;
-        this.uploadInfoService = uploadInfoService;
+        this.uploadBaseInfoService = uploadBaseInfoService;
     }
 
-    /**
-     * 获取上传配置信息
-     * @return 上传配置对象
-     */
-    private UploadInfo getUploadInfo(){
-        return uploadInfoService.getOneInfo();
+    private String generateFileName(String originalName) {
+        String extension = StringUtils.isNotBlank(originalName)
+                ? originalName.substring(originalName.lastIndexOf("."))
+                : "";
+        return java.util.UUID.randomUUID() + extension;
+    }
+
+    private Rescource createResource(String fileName, long fileSize, String hash,
+                                     String fileType, String webUrl, String originalUrl) {
+        Rescource resource = new Rescource();
+        resource.setFileName(fileName);
+        resource.setFileSize(new DecimalFormat(KB_FORMAT).format(fileSize / 1024));
+        resource.setHash(hash);
+        resource.setFileType(StringUtils.defaultIfBlank(fileType, DEFAULT_CONTENT_TYPE));
+        resource.setWebUrl(webUrl);
+        if (originalUrl != null) {
+            resource.setOriginalNetUrl(originalUrl);
+        }
+        resource.setSource(UploadType.OSS.getCode());
+        return resource;
     }
 
     /**
@@ -73,7 +88,64 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      * @return OSS客户端
      */
     private OSS getOSSClient(){
-        return new OSSClientBuilder().build(getUploadInfo().getOssEndpoint(),getUploadInfo().getOssKeyId(), getUploadInfo().getOssKeySecret());
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        return new OSSClientBuilder().build(uploadBaseInfo.getEndpoint(),uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
+    }
+
+    @Override
+    public String upload(MultipartFile file, String fileName) throws IOException, NoSuchAlgorithmException {
+        Objects.requireNonNull(file, MessageConstants.file.UPLOAD_EMPTY);
+
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String hash = new QETag().calcETag(file);
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.OSS.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
+        }
+
+        // 处理文件名
+        String finalFileName = StringUtils.isNotBlank(fileName)
+                ? fileName
+                : generateFileName(file.getOriginalFilename());
+
+        // 获取上传路径
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
+        }
+
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + finalFileName;
+
+        OSS oss = getOSSClient();
+        PutObjectResult putResult = oss.putObject(uploadBaseInfo.getBucketName(), filePath, file.getInputStream());
+        // 构建最终文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+        if(StringUtils.isNotBlank(putResult.getETag())) {
+            // 创建资源记录
+            Rescource resource = createResource(
+                    finalFileName,
+                    file.getSize(),
+                    hash,
+                    file.getContentType(),
+                    webUrl,
+                    null
+            );
+            save(resource);
+            return webUrl;
+        } else {
+            return "";
+        }
+
     }
 
     /**
@@ -85,69 +157,7 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-        String fileName,realNames = "";
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
-        String ossDir = getUploadInfo().getOssDir();
-        OSS oss = getOSSClient();
-        try {
-            fileName = file.getOriginalFilename();
-            //上传文件
-            StringBuilder realName = new StringBuilder(UUID.randomUUID().toString());
-            String fileExtension = null;
-            if (fileName != null) {
-                fileExtension = fileName.substring(fileName.lastIndexOf("."));
-            }
-            realName.append(fileExtension);
-            QETag tag = new QETag();
-            String hash = tag.calcETag(file);
-            QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-            wrapper.eq("hash",hash);
-            Rescource rescource = getOne(wrapper);
-            if(rescource != null){
-                return rescource.getWebUrl();
-            }
-            try (InputStream is = file.getInputStream()) {
-                long fileSize = file.getSize();
-                //创建上传Object的Metadata
-                ObjectMetadata metadata = new ObjectMetadata();
-                metadata.setContentLength(is.available());
-                metadata.setCacheControl("no-cache");
-                metadata.setHeader("Pragma", "no-cache");
-                metadata.setContentEncoding("utf-8");
-                if (fileName != null) {
-                    metadata.setContentType(ToolUtil.getContentType(fileName));
-                }
-                metadata.setContentDisposition("filename/filesize=" + realNames + "/" + fileSize + "Byte.");
-
-                StringBuilder key = new StringBuilder();
-                if(ossDir != null && !ossDir.isEmpty()){
-                    key.append(ossDir).append("/");
-                    returnUrl.append(ossDir).append("/");
-                }
-                key.append(realName);
-                returnUrl.append(realName);
-                PutObjectResult putResult = oss.putObject(getUploadInfo().getOssBucketName(), key.toString(), is, metadata);
-                //解析结果
-                System.out.println("md5码为"+putResult.getETag());
-                rescource = new Rescource();
-                rescource.setFileName(realName.toString());
-                rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
-                rescource.setHash(hash);
-                rescource.setFileType(StringUtils.isBlank(fileExtension)?"unknown":fileExtension);
-                rescource.setWebUrl(returnUrl.toString());
-                rescource.setSource("oss");
-                save(rescource);
-            }
-        } catch (IOException e) {
-            logger.error("文件读写异常: {}", e.getMessage(), e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件读写异常").build();
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("文件哈希计算异常: {}", e.getMessage(), e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("文件哈希计算异常").build();
-        } finally {
-            oss.shutdown();
-        }
-        return returnUrl.toString();
+        return this.upload(file,null);
     }
 
     /**
@@ -157,26 +167,30 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      */
     @Override
     public Boolean delete(String path) {
-        path = path.replace(getUploadInfo().getOssBasePath(), "");
-        String ossDir = getUploadInfo().getOssDir();
-        StringBuilder sb = new StringBuilder();
-        if(ossDir != null && !ossDir.isEmpty()){
-            sb.append(ossDir).append("/");
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        Rescource rescource = lambdaQuery()
+                .eq(Rescource::getWebUrl,path)
+                .eq(Rescource::getDelFlag, false)
+                .eq(Rescource::getSource,UploadType.OSS.getCode())
+                .one();
+        if(rescource == null){
+            log.warn("删除阿里云OSS文件失败:地址：{}-对应的文件不在数据库中",path);
+            return false;
         }
-        String key = path.replace(sb.toString(),"");
+        path = path.replace(uploadBaseInfo.getBasePath(), "");
         OSS oss = getOSSClient();
         try {
-            oss.deleteObject(getUploadInfo().getOssBucketName(), path);
-            QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-            wrapper.eq("file_name",key);
-            wrapper.eq("source","oss");
-            return rescourceService.remove(wrapper);
+            VoidResult result = oss.deleteObject(uploadBaseInfo.getBucketName(), path);
+            if(StringUtils.isNotBlank(result.getRequestId())){
+                return rescourceService.removeById(rescource.getId());
+            }
         } catch (OSSException | ClientException e) {
-            logger.error("删除阿里云OSS文件失败: {}", e.getMessage(), e);
+            log.error("删除阿里云OSS文件失败: {}", e.getMessage(), e);
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除阿里云OSS文件失败").build();
         } finally {
             oss.shutdown();
         }
+        return false;
     }
 
     /**
@@ -187,37 +201,61 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      */
     @Override
     public String uploadNetFile(String url) throws IOException {
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("source","oss");
-        wrapper.eq("original_net_url",url);
-        Rescource rescource = rescourceService.getOne(wrapper);
-        if(rescource != null){
-            return rescource.getWebUrl();
+        Objects.requireNonNull(url, MessageConstants.file.WEB_URL_NOT_NULL);
+
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+
+        // 检查是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getOriginalNetUrl, url)
+                .eq(Rescource::getSource, UploadType.OSS.getCode())
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
         }
-        String ossDir = getUploadInfo().getOssDir(),
-                fileName = UUID.randomUUID().toString();
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
-        StringBuilder key = new StringBuilder();
-        if(ossDir != null && !ossDir.isEmpty()){
-            key.append(ossDir).append("/");
+
+        // 生成新文件名
+        String fileName = generateFileName(url);
+
+        // 获取上传路径
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
         }
-        key.append(fileName).append(".jpg");
-        StringBuilder sb = new StringBuilder(fileName);
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 获取文件类型
+        String fileType = StringUtils.substringAfterLast(url, ".");
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+
         OSS oss = getOSSClient();
-        try (InputStream inputStream = new URL(url).openStream()) {
-            PutObjectResult putObjectResult = oss.putObject(getUploadInfo().getOssBucketName(), key.toString(), inputStream);
-            returnUrl.append(key);
-            rescource = new Rescource();
-            rescource.setFileName(sb.append(".jpg").toString());
-            rescource.setHash(putObjectResult.getETag());
-            rescource.setWebUrl(returnUrl.toString());
-            rescource.setOriginalNetUrl(url);
-            rescource.setSource("oss");
-            save(rescource);
+        try {
+            PutObjectResult result = oss.putObject(uploadBaseInfo.getBucketName(), filePath, new URL(url).openStream());
+            if(StringUtils.isNotBlank(result.getETag())){
+                // 创建资源记录
+                Rescource resource = createResource(
+                        fileName,
+                        result.getResponse().getContentLength(),
+                        result.getETag(),
+                        fileType,
+                        webUrl,
+                        url
+                );
+                save(resource);
+                return webUrl;
+            }
+        } catch (OSSException | ClientException e) {
+            log.error("删除阿里云OSS文件失败: {}", e.getMessage(), e);
+            throw MyException.builder().code(MyException.SERVER_ERROR).msg("删除阿里云OSS文件失败").build();
         } finally {
             oss.shutdown();
         }
-        return returnUrl.toString();
+        return "";
     }
 
     /**
@@ -226,51 +264,67 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      * @return 上传后的文件访问URL
      */
     @Override
-    public String uploadLocalImg(String localPath) {
-        File file = new File(localPath);
-        if(!file.exists()){
-            logger.error("本地文件不存在");
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
+    public String uploadLocalImg(String localPath) throws IOException, NoSuchAlgorithmException {
+        Objects.requireNonNull(localPath, MessageConstants.file.LOCAL_URL_NOT_NULL);
+        // 获取上传配置信息
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        // 验证源文件
+        Path sourceFile = Paths.get(localPath);
+        if (!Files.exists(sourceFile)) {
+            log.error("【阿里云上传本地文件】本地文件不存在, 上传路径为: {}", localPath);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.FILE_NOT_EXIST)
+                    .build();
         }
-        QETag tag = new QETag();
-        String hash = null;
-        try {
-            hash = tag.calcETag(file);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            logger.error("阿里云上传文件出错",e);
+        // 计算文件哈希值
+        String hash = new QETag().calcETag(sourceFile.toFile());
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.OSS.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
         }
-        LambdaQueryWrapper<Rescource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Rescource::getHash,hash)
-                .eq(Rescource::getSource,"oss");
-        Rescource rescource = getOne(wrapper);
-        if( rescource!= null){
-            return rescource.getWebUrl();
+
+        // 获取上传目录
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
         }
-        String  extName,
-                ossDir = getUploadInfo().getOssDir(),
-                name = UUID.randomUUID().toString();
-        extName = file.getName().substring(
-                file.getName().lastIndexOf("."));
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
-        StringBuilder key = new StringBuilder();
-        if(ossDir != null && !ossDir.isEmpty()){
-            key.append(ossDir).append("/");
-        }
-        key.append(name).append(".").append(extName);
-        StringBuilder realName = new StringBuilder(name);
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 生成新文件名
+        String fileName = generateFileName(sourceFile.getFileName().toString());
+        String extension = StringUtils.substringAfterLast(sourceFile.getFileName().toString(), ".");
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+
         OSS oss = getOSSClient();
-        oss.putObject(getUploadInfo().getOssBucketName(), key.toString(), file);
-        returnUrl.append(realName);
-        rescource = new Rescource();
-        rescource.setFileName(realName.append(".").append(extName).toString());
-        rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.length()/1024)+"kb");
-        rescource.setHash(hash);
-        rescource.setFileType(extName);
-        rescource.setWebUrl(returnUrl.toString());
-        rescource.setSource("oss");
-        baseMapper.insert(rescource);
-        oss.shutdown();
-        return null;
+        PutObjectResult result = oss.putObject(uploadBaseInfo.getBucketName(), filePath, sourceFile.toFile());
+        if(StringUtils.isNotBlank(result.getETag())){
+            Rescource resource = createResource(
+                    fileName,
+                    Files.size(sourceFile),
+                    hash,
+                    extension,
+                    webUrl,
+                    null
+            );
+            save(resource);
+            oss.shutdown();
+            return webUrl;
+        } else {
+            log.error("【上传本地图片到七牛云】：上传文件到七牛云失败,返回数据:{}",result);
+            return "";
+        }
     }
 
     /**
@@ -280,82 +334,68 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
      */
     @Override
     public String uploadBase64(String base64) {
-        //base64数据转换为byte[]类型
-        byte[] asBytes = Base64.getDecoder().decode(base64);
-        InputStream sbs = new ByteArrayInputStream(asBytes);
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getOssBasePath());
-        StringBuilder key = new StringBuilder();
-        StringBuilder fileName = new StringBuilder(UUID.randomUUID().toString());
-        String ossDir = getUploadInfo().getOssDir();
-        int fileSize = asBytes.length;
-        OSS oss = getOSSClient();
-        //创建上传Object的Metadata
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(sbs.available());
-            metadata.setContentEncoding("utf-8");
-            metadata.setContentType("image/png");
-            metadata.setContentDisposition("filename/filesize=" + fileName + "/" + fileSize + "Byte.");
-            //上传文件
-            if(ossDir != null && !ossDir.isEmpty()){
-                key.append(ossDir).append("/");
-                returnUrl.append(ossDir).append("/");
-            }
-            key.append(fileName);
-            oss.putObject(getUploadInfo().getOssBucketName(), key.toString(), sbs, metadata);
-            returnUrl.append(fileName);
-        } catch (IOException e) {
-            logger.error("上传阿里云OSS服务器异常.{}", e.getMessage(), e);
-        } finally {
-            try {
-                sbs.close();
-            } catch (IOException e) {
-                logger.error("上传阿里云OSS出现IO异常.{}", e.getMessage(), e);
-            }
-            oss.shutdown();
-        }
-        return returnUrl.toString();
-    }
+        Objects.requireNonNull(base64, MessageConstants.file.FILE_UPLOAD_BASE64_NOT_NULL);
 
-    /**
-     * 测试阿里云OSS配置是否可用
-     * 通过上传测试图片验证配置的正确性
-     * @param uploadInfo OSS配置信息
-     * @return 配置是否可用
-     */
-    @Override
-    public Boolean testAccess(UploadInfo uploadInfo) {
-        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
-        try {
-            OSS oss = new OSSClientBuilder().build(uploadInfo.getOssEndpoint(),uploadInfo.getOssKeyId(), uploadInfo.getOssKeySecret());
-            InputStream inputStream = classPathResource .getInputStream();
-            oss.putObject(uploadInfo.getOssBucketName(), "test.jpg", inputStream, null);
-            oss.shutdown();
-            return true;
-        } catch (IOException e) {
-            logger.error("测试文件读取失败: {}", e.getMessage(), e);
-            return false;
-        } catch (OSSException | ClientException e) {
-            logger.error("测试OSS连接失败: {}", e.getMessage(), e);
-            return false;
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String fileFormat = ToolUtil.getFileFormat(base64);
+        String fileName = generateFileName("." + fileFormat);
+
+        // 解码Base64数据
+        byte[] fileData = java.util.Base64.getDecoder().decode(
+                base64.contains(",") ? base64.split(",")[1] : base64
+        );
+
+        // 获取上传目录
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
         }
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+        OSS oss = getOSSClient();
+        PutObjectResult result =  oss.putObject(uploadBaseInfo.getBucketName(),filePath, new ByteArrayInputStream(fileData));
+        if(StringUtils.isNotBlank(result.getETag())){
+            Rescource resource = createResource(
+                    fileName,
+                    fileData.length,
+                    result.getETag(),
+                    fileFormat,
+                    webUrl,
+                    null
+            );
+            save(resource);
+        }
+        return webUrl;
     }
 
     @Override
     public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
-        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
+        Path testFile = Paths.get("static/images/userface1.jpg");
         try {
+            String uploadPath = uploadBaseInfo.getDir()+"test.jpg";
             OSS oss = new OSSClientBuilder().build(uploadBaseInfo.getEndpoint(),uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
-            InputStream inputStream = classPathResource .getInputStream();
-            oss.putObject(uploadBaseInfo.getBucketName(), "test.jpg", inputStream, null);
+            PutObjectResult result =  oss.putObject(uploadBaseInfo.getBucketName(), uploadPath, new ClassPathResource(testFile.toString()).getInputStream());
+            if(StringUtils.isNotBlank(result.getETag())){
+                uploadBaseInfo.setTestWebUrl(uploadPath);
+                return true;
+            }
             oss.shutdown();
-            return true;
         } catch (IOException e) {
-            logger.error("测试文件上传失败: {}", e.getMessage(), e);
-            return false;
+            log.error("测试文件上传失败: {}", e.getMessage(), e);
         } catch (OSSException | ClientException e) {
-            logger.error("测试OSS连接失败: {}", e.getMessage(), e);
-            return false;
+            log.error("测试OSS连接失败: {}", e.getMessage(), e);
         }
+        return false;
+    }
+
+    @Override
+    public UploadBaseInfo getUploadBaseInfo() {
+        return uploadBaseInfoService.getInfoByType(UploadType.OSS.getCode());
     }
 }

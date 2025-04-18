@@ -8,7 +8,6 @@
 
 package com.mysiteforme.admin.service;
 
-import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +15,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 public interface UploadService {
+
+    String upload(MultipartFile file, String fileName) throws IOException, NoSuchAlgorithmException;
     /**
      * 上传文件
      * @param file 要上传的文件
@@ -45,7 +46,7 @@ public interface UploadService {
      * @param localPath 本地文件路径
      * @return 上传后的文件访问URL
      */
-    String uploadLocalImg(String localPath);
+    String uploadLocalImg(String localPath) throws IOException, NoSuchAlgorithmException;
 
     /**
      * 上传Base64编码的图片
@@ -55,19 +56,13 @@ public interface UploadService {
     String uploadBase64(String base64);
 
     /**
-     * 测试上传配置是否可用
-     * @param uploadInfo 上传配置信息
-     * @return 配置是否可用
-     */
-    Boolean testAccess(UploadInfo uploadInfo);
-
-
-    /**
      * 测试基础信息是否可用
      * @param uploadBaseInfo 上传配置信息
      * @return 配置是否可用
      */
     Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo);
+
+    UploadBaseInfo getUploadBaseInfo();
 
 
 }

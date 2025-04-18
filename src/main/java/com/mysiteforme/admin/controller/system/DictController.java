@@ -14,6 +14,7 @@ import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.service.DictService;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,13 +36,13 @@ public class DictController {
     }
 
     @GetMapping("list")
-    public Result list(@RequestBody PageListDictRequest request){
+    public Result list(PageListDictRequest request){
         return Result.success(dictService.selectPageDict(request));
     }
 
     @SysLog(MessageConstants.SysLog.DICT_ADD)
     @PostMapping("add")
-    public Result add(@RequestBody AddDictRequest request) {
+    public Result add(@RequestBody @Valid AddDictRequest request) {
         if(dictService.getCountByType(request.getType())==0){
             request.setSort(1);
         }else{
@@ -51,7 +52,7 @@ public class DictController {
             if(dictService.getCountByAll(request.getType(),request.getLabel(),request.getValue(),null)>0){
                 return Result.businessMsgError(MessageConstants.Dict.DICT_EXISTS_TYPE_AND_LABEL_AND_VALUE);
             }
-            request.setSort(dictService.getMaxSortByType(request.getType())+1);
+            request.setSort(dictService.getMaxSortByType(request.getType(),null)+1);
         }
         dictService.saveDict(request);
         return Result.success();
@@ -59,9 +60,9 @@ public class DictController {
 
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.DICT_UPDATE)
-    public Result edit(@RequestBody UpdateDictRequest request) {
-        if(request.getSort() == null || request.getSort() < 0){
-            return Result.paramMsgError(MessageConstants.Validate.VALIDATE_SORT_ERROR);
+    public Result edit(@RequestBody @Valid UpdateDictRequest request) {
+        if(request.getSort() == null || request.getSort() <= 1 ){
+            request.setSort(dictService.getMaxSortByType(request.getType(),request.getId())+1);
         }
         Dict oldDict = dictService.getById(request.getId());
         if(oldDict==null){
@@ -86,7 +87,7 @@ public class DictController {
 
     @PutMapping("editType")
     @SysLog(MessageConstants.SysLog.DICT_UPDATE_TYPE)
-    public Result editType(@RequestBody UpdateDictTypeRequest request){
+    public Result editType(@RequestBody @Valid UpdateDictTypeRequest request){
         if(request.getNewType().equals(request.getOldType())){
             return Result.paramMsgError(MessageConstants.Dict.DICT_TYPE_EQUAL);
         }

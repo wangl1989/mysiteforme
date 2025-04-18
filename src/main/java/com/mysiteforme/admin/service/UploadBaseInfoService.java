@@ -3,8 +3,6 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
-import com.mysiteforme.admin.entity.DTO.UploadBaseInfoDTO;
-import com.mysiteforme.admin.entity.request.AddUploadBaseInfoRequest;
 import com.mysiteforme.admin.entity.request.PageListUploadBaseInfoRequest;
 
 public interface UploadBaseInfoService extends IService<UploadBaseInfo> {
@@ -20,19 +18,21 @@ public interface UploadBaseInfoService extends IService<UploadBaseInfo> {
      * 保存或更新上传基础信息
      * @param uploadBaseInfo 上传基础信息
      */
-    void saveOrUpdateBaseInfo(UploadBaseInfo uploadBaseInfo);
+    UploadBaseInfo saveOrUpdateBaseInfo(UploadBaseInfo uploadBaseInfo);
 
     /**
      * 删除上传基础信息
      * @param id 上传基础信息ID
      */
-    void deleteUploadBaseInfo(Long id);
+    UploadBaseInfo deleteUploadBaseInfo(Long id);
 
     /**
      * 启用上传基础信息
      * @param id 上传基础信息ID
      */
-    void enableUploadBaseInfo(Long id);
+    UploadBaseInfo enableUploadBaseInfo(Long id);
+
+    Boolean checkUploadBaseInfo(String type, Long id);
 
     /**
      * 根据类型获取上传基础信息

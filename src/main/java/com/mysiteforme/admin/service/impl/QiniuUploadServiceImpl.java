@@ -8,35 +8,32 @@
 
 package com.mysiteforme.admin.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.Objects;
-
-import cn.hutool.core.lang.UUID;
-import org.apache.commons.codec.binary.Base64;
+import com.mysiteforme.admin.service.UploadBaseInfoService;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.ToolUtil;
+import com.mysiteforme.admin.util.UploadType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.RescourceDao;
 import com.mysiteforme.admin.entity.Rescource;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
-import com.mysiteforme.admin.entity.UploadInfo;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.RescourceService;
-import com.mysiteforme.admin.service.UploadInfoService;
 import com.mysiteforme.admin.service.UploadService;
 import com.mysiteforme.admin.util.QETag;
-import com.mysiteforme.admin.util.QiniuFileUtil;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -45,27 +42,21 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FetchRet;
 import com.qiniu.util.Auth;
 
+@Slf4j
 @Service("qiniuService")
 public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
 
-    private static final Logger logger = LoggerFactory.getLogger(QiniuUploadServiceImpl.class);
-
-    private final UploadInfoService uploadInfoService;
+    private final UploadBaseInfoService uploadBaseInfoService;
 
     private final RescourceService rescourceService;
 
-    @Autowired
-    public QiniuUploadServiceImpl(UploadInfoService uploadInfoService, RescourceService rescourceService) {
-        this.uploadInfoService = uploadInfoService;
-        this.rescourceService = rescourceService;
-    }
+    private static final String KB_FORMAT = "#.##kb";
+    private static final String DEFAULT_CONTENT_TYPE = "unknown";
 
-    /**
-     * 获取上传配置信息
-     * @return 上传配置对象
-     */
-    private UploadInfo getUploadInfo(){
-        return uploadInfoService.getOneInfo();
+    @Autowired
+    public QiniuUploadServiceImpl(UploadBaseInfoService uploadBaseInfoService, RescourceService rescourceService) {
+        this.uploadBaseInfoService = uploadBaseInfoService;
+        this.rescourceService = rescourceService;
     }
 
     /**
@@ -83,10 +74,11 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @throws MyException 当上传配置不存在时抛出异常
      */
     private Auth getAuth(){
-        if(getUploadInfo() == null){
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        if(uploadBaseInfo == null){
             throw MyException.builder().code(MyException.VALIDATION_ERROR).msg("上传信息配置不存在").build();
         }
-        return Auth.create(getUploadInfo().getQiniuAccessKey(), getUploadInfo().getQiniuSecretKey());
+        return Auth.create(uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
     }
 
     /**
@@ -94,7 +86,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @return 上传凭证字符串
      */
     private String getToken(){
-        return getAuth().uploadToken(getUploadInfo().getQiniuBucketName());
+        return getAuth().uploadToken(getUploadBaseInfo().getBucketName());
     }
 
     /**
@@ -102,9 +94,87 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @return 空间管理器实例
      */
     private BucketManager getBucketManager(){
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
         Configuration config = new Configuration();
-        Auth auth = Auth.create(getUploadInfo().getQiniuAccessKey(), getUploadInfo().getQiniuSecretKey());
+        Auth auth = Auth.create(uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
         return new BucketManager(auth,config);
+    }
+
+    private String generateFileName(String originalName) {
+        String extension = StringUtils.isNotBlank(originalName)
+                ? originalName.substring(originalName.lastIndexOf("."))
+                : "";
+        return java.util.UUID.randomUUID() + extension;
+    }
+
+    private Rescource createResource(String fileName, long fileSize, String hash,
+                                     String fileType, String webUrl, String originalUrl) {
+        Rescource resource = new Rescource();
+        resource.setFileName(fileName);
+        resource.setFileSize(new DecimalFormat(KB_FORMAT).format(fileSize / 1024));
+        resource.setHash(hash);
+        resource.setFileType(StringUtils.defaultIfBlank(fileType, DEFAULT_CONTENT_TYPE));
+        resource.setWebUrl(webUrl);
+        if (originalUrl != null) {
+            resource.setOriginalNetUrl(originalUrl);
+        }
+        resource.setSource(UploadType.QINIU.getCode());
+        return resource;
+    }
+
+    @Override
+    public String upload(MultipartFile file, String fileName) throws IOException, NoSuchAlgorithmException {
+        Objects.requireNonNull(file, MessageConstants.file.UPLOAD_EMPTY);
+
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String hash = new QETag().calcETag(file);
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.QINIU.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
+        }
+
+        // 处理文件名
+        String finalFileName = StringUtils.isNotBlank(fileName)
+                ? fileName
+                : generateFileName(file.getOriginalFilename());
+
+        // 获取上传路径
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
+        }
+
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + finalFileName;
+
+        byte[] data = file.getBytes();
+        Response r = getUploadManager().put(data, filePath, getToken());
+
+        // 创建资源记录
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+        if(r.isOK()) {
+            Rescource resource = createResource(
+                    finalFileName,
+                    file.getSize(),
+                    hash,
+                    file.getContentType(),
+                    webUrl,
+                    null
+            );
+            save(resource);
+            return webUrl;
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -116,40 +186,7 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-        String fileName, extName;
-        StringBuilder key = new StringBuilder();
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
-        if (null != file && !file.isEmpty()) {
-            extName = Objects.requireNonNull(file.getOriginalFilename()).substring(
-                Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf("."));
-            fileName = UUID.randomUUID() + extName;
-            byte[] data = file.getBytes();
-            QETag tag = new QETag();
-            String hash = tag.calcETag(file);
-            QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-            wrapper.eq("hash",hash);
-            Rescource rescource = getOne(wrapper);
-            if( rescource!= null){
-                return rescource.getWebUrl();
-            }
-            String qiniuDir = getUploadInfo().getQiniuDir();
-
-            if(StringUtils.isNotBlank(qiniuDir)){
-                key.append(qiniuDir).append("/");
-                returnUrl.append(qiniuDir).append("/");
-            }
-            key.append(fileName);
-            returnUrl.append(fileName);
-            Response r = getUploadManager().put(data, key.toString(), getToken());
-            if (r.isOK()) {
-                getUploadInfo();
-                rescource = QiniuFileUtil.getRescource(file, fileName, extName, hash);
-                rescource.setWebUrl(returnUrl.toString());
-                rescource.setSource("qiniu");
-                rescourceService.save(rescource);
-            }
-        }
-        return returnUrl.toString();
+        return upload(file,null);
     }
 
     /**
@@ -159,22 +196,28 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public Boolean delete(String path) {
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("web_url",path);
-        wrapper.eq("del_flag",false);
-        wrapper.eq("source","qiniu");
-        Rescource rescource = rescourceService.getOne(wrapper);
-        path = rescource.getOriginalNetUrl();
-        try {
-            //删除七牛云上的文件
-            getBucketManager().delete(getUploadInfo().getQiniuBucketName(), path);
-            //删除数据库记录
-            rescourceService.removeById(rescource.getId());
-            return true;
-        } catch (QiniuException e) {
-            logger.error("删除七牛云上的文件失败",e);
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        Rescource rescource = lambdaQuery()
+                .eq(Rescource::getWebUrl,path)
+                .eq(Rescource::getDelFlag, false)
+                .eq(Rescource::getSource,UploadType.QINIU.getCode())
+                .one();
+        if(rescource == null){
+            log.warn("地址：{}-对应的文件不在数据库中",path);
             return false;
         }
+        path = path.replace(uploadBaseInfo.getBasePath(),"");
+        try {
+            //删除七牛云上的文件
+            Response response = getBucketManager().delete(uploadBaseInfo.getBucketName(), path);
+            if(response.isOK()) {
+                //删除数据库记录
+                return rescourceService.removeById(rescource.getId());
+            }
+        } catch (QiniuException e) {
+            log.error("删除七牛云上的文件失败",e);
+        }
+        return false;
     }
 
     /**
@@ -184,41 +227,54 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String uploadNetFile(String url) {
-        String fileName = UUID.randomUUID().toString();
-        QueryWrapper<Rescource> wrapper = new QueryWrapper<>();
-        wrapper.eq("source","qiniu");
-        wrapper.eq("original_net_url",url);
-        wrapper.eq("del_flag",false);
-        Rescource rescource = rescourceService.getOne(wrapper);
-        if(rescource != null){
-            return rescource.getWebUrl();
-        }
-        StringBuilder key = new StringBuilder();
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
-        try {
-            String qiniuDir = getUploadInfo().getQiniuDir();
+        Objects.requireNonNull(url, MessageConstants.file.WEB_URL_NOT_NULL);
 
-            if(StringUtils.isNotBlank(qiniuDir)){
-                key.append(qiniuDir).append("/");
-                returnUrl.append(qiniuDir).append("/");
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+
+        // 检查是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getOriginalNetUrl, url)
+                .eq(Rescource::getSource, UploadType.QINIU.getCode())
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
+        }
+
+        // 生成新文件名
+        String fileName = generateFileName(url);
+
+        // 获取上传路径
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
+        }
+
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+        try {
+            FetchRet fetchRet = getBucketManager().fetch(url, uploadBaseInfo.getBucketName(),filePath);
+            if(fetchRet.key.equals(filePath)){
+                Rescource resource = createResource(
+                        fileName,
+                        fetchRet.fsize,
+                        fetchRet.hash,
+                        fetchRet.mimeType,
+                        webUrl,
+                        url
+                );
+                save(resource);
             }
-            key.append(fileName);
-            returnUrl.append(fileName);
-            FetchRet fetchRet = getBucketManager().fetch(url, getUploadInfo().getQiniuBucketName(),key.toString());
-            rescource = new Rescource();
-            rescource.setFileName(fetchRet.key);
-            rescource.setFileSize(new java.text.DecimalFormat("#.##").format(fetchRet.fsize/1024)+"kb");
-            rescource.setHash(fetchRet.hash);
-            rescource.setFileType(fetchRet.mimeType);
-            rescource.setWebUrl(returnUrl.toString());
-            rescource.setSource("qiniu");
-            rescource.setOriginalNetUrl(url);
-            save(rescource);
         } catch (QiniuException e) {
-            logger.error("上传网络文件失败",e);
+            log.error("【七牛云上传网络文件】上传网络文件失败",e);
             throw MyException.builder().code(MyException.SERVER_ERROR).msg("上传网络文件失败"+e.getMessage()).build();
         }
-        return returnUrl.toString();
+        return webUrl;
     }
 
     /**
@@ -228,55 +284,69 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      * @throws MyException 当本地文件不存在或上传失败时抛出异常
      */
     @Override
-    public String uploadLocalImg(String localPath) {
-        File file = new File(localPath);
-        if(!file.exists()){
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("本地文件不存在").build();
+    public String uploadLocalImg(String localPath) throws IOException, NoSuchAlgorithmException {
+        Objects.requireNonNull(localPath, MessageConstants.file.LOCAL_URL_NOT_NULL);
+
+        // 获取上传配置信息
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+
+        // 验证源文件
+        Path sourceFile = Paths.get(localPath);
+        if (!Files.exists(sourceFile)) {
+            log.error("本地文件不存在, 上传路径为: {}", localPath);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.FILE_NOT_EXIST)
+                    .build();
         }
-        QETag tag = new QETag();
-        String hash;
-        try {
-            hash = tag.calcETag(file);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            logger.error("计算文件hash失败",e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("计算文件hash失败"+e.getMessage()).build();
+
+        // 计算文件哈希值
+        String hash = new QETag().calcETag(sourceFile.toFile());
+
+        // 检查文件是否已存在
+        Rescource existingResource = lambdaQuery()
+                .eq(Rescource::getSource, UploadType.QINIU.getCode())
+                .eq(Rescource::getHash, hash)
+                .one();
+        if (existingResource != null) {
+            return existingResource.getWebUrl();
         }
-        LambdaQueryWrapper<Rescource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Rescource::getHash,hash);
-        wrapper.eq(Rescource::getSource,"qiniu");
-        Rescource rescource = getOne(wrapper);
-        if( rescource!= null){
-            return rescource.getWebUrl();
+
+        // 获取上传目录
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
         }
-        String filePath="",
-                extName,
-                name = UUID.randomUUID().toString();
-        extName = file.getName().substring(
-                file.getName().lastIndexOf("."));
-        StringBuilder key = new StringBuilder();
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
-        String qiniuDir = getUploadInfo().getQiniuDir();
-        if(StringUtils.isNotBlank(qiniuDir)){
-            key.append(qiniuDir).append("/");
-            returnUrl.append(qiniuDir).append("/");
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 生成新文件名
+        String fileName = generateFileName(sourceFile.getFileName().toString());
+        String extension = StringUtils.substringAfterLast(sourceFile.getFileName().toString(), ".");
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+
+        Response response = getUploadManager().put(sourceFile.toFile(),filePath,getToken());
+        if(response.isOK()) {
+            Rescource resource = createResource(
+                    fileName,
+                    Files.size(sourceFile),
+                    hash,
+                    extension,
+                    webUrl,
+                    null
+            );
+            save(resource);
+            return webUrl;
+        } else {
+            log.error("【上传本地图片到七牛云】：上传文件到七牛云失败,返回数据:{}",response);
+            return "";
         }
-        key.append(name).append(extName);
-        returnUrl.append(name).append(extName);
-        Response response;
-        try {
-            response = getUploadManager().put(file,key.toString(),getToken());
-        } catch (QiniuException e) {
-            logger.error("上传文件失败",e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("七牛上传文件失败"+e.getMessage()).build();
-        }
-        if(response.isOK()){
-            filePath = returnUrl.toString();
-            rescource = new Rescource();
-            rescource.setFileName(name+extName);
-            QiniuFileUtil.saveSource(file, hash, rescource, filePath, extName);
-            save(rescource);
-        }
-        return filePath;
+
     }
 
     /**
@@ -287,59 +357,74 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
      */
     @Override
     public String uploadBase64(String base64) {
-        StringBuilder key = new StringBuilder();
-        StringBuilder returnUrl = new StringBuilder(getUploadInfo().getQiniuBasePath());
-        String qiniuDir = getUploadInfo().getQiniuDir();
-        String fileName = UUID.randomUUID().toString();
-        if(StringUtils.isNotBlank(qiniuDir)){
-            key.append(qiniuDir).append("/");
-            returnUrl.append(qiniuDir).append("/");
-        }
-        key.append(fileName);
-        returnUrl.append(fileName);
-        byte[] data = Base64.decodeBase64(base64);
-        try {
-            getUploadManager().put(data,key.toString(),getToken());
-        } catch (IOException e) {
-            logger.error("七牛使用Base64方法上传文件失败",e);
-            throw MyException.builder().code(MyException.SERVER_ERROR).msg("七牛使用Base64方法上传文件失败"+e.getMessage()).build();
-        }
-        return returnUrl.toString();
-    }
+        Objects.requireNonNull(base64, MessageConstants.file.FILE_UPLOAD_BASE64_NOT_NULL);
 
-    /**
-     * 测试七牛云配置是否可用
-     * 通过上传测试图片验证配置的正确性
-     * @param uploadInfo 七牛云配置信息
-     * @return 配置是否可用
-     */
-    @Override
-    public Boolean testAccess(UploadInfo uploadInfo) {
-        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
-        try {
-            Auth auth = Auth.create(uploadInfo.getQiniuAccessKey(), uploadInfo.getQiniuSecretKey());
-            String authstr = auth.uploadToken(uploadInfo.getQiniuBucketName());
-            InputStream inputStream = classPathResource.getInputStream();
-            Response response = getUploadManager().put(inputStream,"test.jpg",authstr,null,null);
-            return response.isOK();
-        } catch (IOException e) {
-            logger.error("七牛上传文件IO异常", e);
-            return false;
+        UploadBaseInfo uploadBaseInfo = getUploadBaseInfo();
+        String fileFormat = ToolUtil.getFileFormat(base64);
+        String fileName = generateFileName("." + fileFormat);
+
+        // 解码Base64数据
+        byte[] fileData = java.util.Base64.getDecoder().decode(
+                base64.contains(",") ? base64.split(",")[1] : base64
+        );
+
+        // 获取上传目录
+        String uploadDir = uploadBaseInfo.getDir();
+        if (StringUtils.isBlank(uploadDir)) {
+            throw MyException.builder()
+                    .businessError(MessageConstants.file.FILE_DIR_NOT_EXIST)
+                    .build();
         }
+        uploadDir = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+
+        // 创建完整的文件路径
+        String filePath = uploadDir + fileName;
+        // 构建最终需要返回的详细文件地址
+        String webUrl = uploadBaseInfo.getBasePath() + filePath;
+        try {
+            Response response = getUploadManager().put(fileData,filePath,getToken());
+            if(response.isOK()){
+                Rescource resource = createResource(
+                        fileName,
+                        fileData.length,
+                        response.getResponse().header("hash"),
+                        fileFormat,
+                        webUrl,
+                        null
+                );
+                save(resource);
+            }
+        } catch (QiniuException e) {
+            log.error("七牛使用Base64方法上传文件失败",e);
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg(MessageConstants.file.QINIU_UPLOAD_BASE64_EXCEPTION)
+                    .build();
+        }
+        return webUrl;
     }
 
     @Override
     public Boolean testBaseInfoAccess(UploadBaseInfo uploadBaseInfo) {
-        ClassPathResource classPathResource = new ClassPathResource("static/images/userface1.jpg");
         try {
+            Path testFile = Paths.get("static/images/userface1.jpg");
             Auth auth = Auth.create(uploadBaseInfo.getAccessKey(), uploadBaseInfo.getSecretKey());
             String authstr = auth.uploadToken(uploadBaseInfo.getBucketName());
-            InputStream inputStream = classPathResource.getInputStream();
-            Response response = getUploadManager().put(inputStream,"test.jpg",authstr,null,null);
-            return response.isOK();
+            InputStream inputStream = new ClassPathResource(testFile.toString()).getInputStream();
+            String filePath = uploadBaseInfo.getDir() + "test.jpg";
+            Response response = getUploadManager().put(inputStream,filePath,authstr,null,null);
+            if(response.isOK()) {
+                uploadBaseInfo.setTestWebUrl(filePath);
+                return true;
+            }
         } catch (IOException e) {
-            logger.error("七牛上传文件IO异常", e);
-            return false;
+            log.error("七牛云测试文件上传失败: {}", e.getMessage(), e);
         }
+        return false;
+    }
+
+    @Override
+    public UploadBaseInfo getUploadBaseInfo() {
+        return uploadBaseInfoService.getInfoByType(UploadType.QINIU.getCode());
     }
 }

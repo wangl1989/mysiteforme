@@ -24,11 +24,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
@@ -59,24 +55,26 @@ public class FileController {
 
     @SysLog(MessageConstants.SysLog.FILE_UPLOAD)
     @PostMapping("upload")
-    public Result uploadFile(@RequestParam("file") MultipartFile file) {
+    public Result uploadFile(@RequestParam(value = "test", required = false) MultipartFile test,
+                             @RequestParam(value = "name",required = false) String name,
+                             @RequestParam(value = "uploadType",required = false) String uploadType) {
         Site site = siteService.getCurrentSite();
         if(site == null){
             return Result.paramMsgError(MessageConstants.file.SITE_INFO_ERROR);
         }
-        if(file == null){
+        if(test == null){
             return Result.paramMsgError(MessageConstants.file.UPLOAD_EMPTY);
         }
 
-        String fullName = file.getOriginalFilename();
+        String fullName = test.getOriginalFilename();
         if (fullName != null && ToolUtil.imageEasyCheck(fullName)) {
             return Result.paramMsgError(MessageConstants.file.FORMAT_ERROR);
         }
         Map<String,String> m = Maps.newHashMap();
         try {
-            String url = uploadServiceFactory.getUploadService(site.getFileUploadType()).upload(file);
+            String url = uploadServiceFactory.getUploadService(StringUtils.isBlank(uploadType)?site.getFileUploadType():uploadType).upload(test,name);
             m.put("url", url);
-            m.put("name", file.getOriginalFilename());
+            m.put("name", test.getOriginalFilename());
         } catch (IOException e) {
             log.error("文件上传失败: IO异常", e);
             return Result.businessMsgError(MessageConstants.file.IO_EXCEPTION);

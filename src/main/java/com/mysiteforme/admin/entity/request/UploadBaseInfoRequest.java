@@ -2,6 +2,7 @@ package com.mysiteforme.admin.entity.request;
 
 import com.mysiteforme.admin.util.MessageConstants;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -9,16 +10,6 @@ public class UploadBaseInfoRequest {
 
     @NotBlank(message = MessageConstants.UploadBaseInfo.TYPE_EMPTY)
     private String type;
-
-    /**
-     * 本地window系统上传路径
-     */
-    private String localWindowUrl;
-
-    /**
-     * 本地LINUX系统上传路径
-     */
-    private String localLinuxUrl;
 
     /**
      * 前缀路径，例子如下:
@@ -32,25 +23,23 @@ public class UploadBaseInfoRequest {
     /**
      * bucket的目录名称
      */
-    @NotBlank(message = MessageConstants.UploadBaseInfo.BUCKET_NAME_EMPTY)
     private String bucketName;
 
     /**
      * 文件存储目录
      */
     @NotBlank(message = MessageConstants.UploadBaseInfo.DIR_EMPTY)
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z/]*/$", message = MessageConstants.UploadBaseInfo.DIR_RULE_NOT_MATCH)
     private String dir;
 
     /**
      * AccessKey值
      */
-    @NotBlank(message = MessageConstants.UploadBaseInfo.ACCESS_KEY_EMPTY)
     private String accessKey;
 
     /**
      * SecretKey值
      */
-    @NotBlank(message = MessageConstants.UploadBaseInfo.SECRET_KEY_EMPTY)
     private String secretKey;
 
     /**
@@ -72,4 +61,14 @@ public class UploadBaseInfoRequest {
      * 是否启用
      */
     private Boolean enable;
+
+    /**
+     * 测试图片地址
+     */
+    private String testWebUrl;
+
+    /**
+     * 备注
+     */
+    private String remarks;
 }
