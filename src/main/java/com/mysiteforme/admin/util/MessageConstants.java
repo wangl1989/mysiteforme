@@ -76,8 +76,18 @@ public class MessageConstants {
 
         // 定时任务日志相关
         public static final String QUARTZ_TASK_LOG_DELETE = "message.log.quartz.task.log.delete";
+
+        // 数据表配置相关
+        public static final String TABLE_CONFIG_ADD = "message.log.table.config.add";
+        public static final String TABLE_CONFIG_UPDATE = "message.log.table.config.update";
+        public static final String TABLE_CONFIG_DELETE = "message.log.table.config.delete";
+        public static final String TABLE_CONFIG_RECOVER = "message.log.table.config.recover";
+
+        // 表字段配置相关
+        public static final String TABLE_FIELD_CONFIG_SYNC = "message.log.table.field.config.sync";
+        public static final String TABLE_FIELD_CONFIG_EDIT = "message.log.table.field.config.edit";
     }
-    
+
     public static class User {
         public static final String USERNAME_EMPTY = "message.user.username.empty";
         public static final String PASSWORD_ERROR = "message.user.password.error";
@@ -313,5 +323,42 @@ public class MessageConstants {
         public static final String LOCAL_UPLOAD_CAN_NOT_DELETE = "message.upload.local.can.not.delete";
         public static final String LOCAL_UPLOAD_CAN_NOT_DISABLE = "message.upload.local.can.not.disable";
         public static final String NOT_LOCAL_UPLOAD = "message.upload.not.local.upload";
+    }
+
+    public static class TableConfig {
+        public static final String TABLE_NAME_NOT_EMPTY = "message.table.name.not.empty";
+        public static final String SCHEMA_NAME_NOT_EMPTY = "message.schema.name.not.empty";
+        public static final String BUSINESS_NAME_NOT_EMPTY = "message.business.name.not.empty";
+
+        public static final String TABLE_CONFIG_EXISTS = "message.table.config.exists";
+        public static final String TABLE_CONFIG_NO_EXISTS = "message.table.config.no.exists";
+        public static final String TABLE_NOT_EXISTS = "message.table.not.exists";
+        public static final String TABLE_SCHEMA_NAME_NOT_EXISTS = "message.table.schema.name.not.exists";
+        public static final String TABLE_FIELDS_NOT_MATCH = "message.table.fields.not.match";
+        public static final String TABLE_PREFIX_NOT_MATCH = "message.table.prefix.not.match";
+        public static final String PATH_NOT_VALID_BY_SYSTEM = "message.path.not.valid.by.system";
+    }
+
+    public static class TableFieldConfig {
+        public static final String BUSINESS_NAME_NOT_EMPTY = "message.table.field.business.name.not.empty";
+        public static final String TABLE_CONFIG_ID_NOT_NULL = "message.table.field.table.config.id.not.null";
+        public static final String TABLE_NAME_NOT_EMPTY = "message.table.field.config.table.name.not.empty";
+        public static final String SCHEMA_NAME_NOT_EMPTY = "message.table.field.config.schema.name.not.empty";
+        public static final String FIELD_NOT_FOUND = "message.table.field.config.field.not.found";
+        public static final String FIELD_CONFIG_NOT_FOUND = "message.table.field.config.not.found";
+        public static final String FORM_COMPONENT_TYPE_INVALID = "message.table.field.config.form.component.type.invalid";
+        public static final String ASSOCIATED_TYPE_INVALID = "message.table.field.config.associated.type.invalid";
+        public static final String QUERY_TYPE_INVALID = "message.table.field.config.query.type.invalid";
+        public static final String QUERY_TYPE_NOT_NULL = "message.table.field.config.query.type.not.null";
+        public static final String DICT_TYPE_NOT_FOUND = "message.table.field.config.dict.type.not.found";
+        public static final String DICT_TYPE_REQUIRED = "message.table.field.config.dict.type.required";
+        public static final String TABLE_TYPE_REQUIRED = "message.table.field.config.table.type.required";
+        public static final String ASSOCIATED_TYPE_REQUIRED = "message.table.field.config.associated.type.required";
+        public static final String SYNC_SUCCESS = "message.table.field.config.sync.success";
+        public static final String SYNC_FAILED = "message.table.field.config.sync.failed";
+        public static final String FIELD_NOT_NULLABLE = "message.table.field.not.nullable";
+        public static final String FIELD_IDS_EMPTY = "message.table.field.ids.empty";
+        public static final String FIELD_IDS_INVALID = "message.table.field.ids.invalid";
+        public static final String ALL_FIELDS_MUST_SAME_TABLE = "message.table.field.all.fields.must.same.table";
     }
 }

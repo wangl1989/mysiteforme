@@ -1,0 +1,137 @@
+package com.mysiteforme.admin.controller.system;
+
+import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.entity.request.AddTableConfigRequest;
+import com.mysiteforme.admin.entity.request.BaseTableConfigRequest;
+import com.mysiteforme.admin.entity.request.PageListTableConfigRequest;
+import com.mysiteforme.admin.entity.request.UpdateTableConfigRequest;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.ToolUtil;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.*;
+
+import com.mysiteforme.admin.annotation.SysLog;
+import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.entity.TableConfig;
+import com.mysiteforme.admin.service.TableConfigService;
+import com.mysiteforme.admin.util.Result;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * <p>
+ * TableConfig  前端控制器
+ * </p>
+ *
+ * @author wangl
+ * @since 2025-04-19
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/admin/tableConfig")
+@RequiredArgsConstructor
+public class TableConfigController extends BaseController{
+
+    private final TableConfigService tableConfigService;
+
+    @GetMapping("list")
+    public Result list(PageListTableConfigRequest request){
+        return Result.success(tableConfigService.selectPageTableConfig(request));
+    }
+
+    @PostMapping("add")
+    @SysLog(MessageConstants.SysLog.TABLE_CONFIG_ADD)
+    public Result add(@RequestBody @Valid AddTableConfigRequest request){
+        Result result = validateParam(request);
+        if(!result.isSuccess()){
+            return result;
+        }
+        if(StringUtils.isBlank(request.getAuthor())){
+            request.setAuthor(MySecurityUser.nickName());
+        }
+        TableConfig tableConfig = new TableConfig();
+        BeanUtils.copyProperties(request,tableConfig);
+        tableConfigService.saveOrUpdateTableConfig(tableConfig);
+        return Result.success();
+    }
+
+    @PutMapping("edit")
+    @SysLog(MessageConstants.SysLog.TABLE_CONFIG_UPDATE)
+    public Result edit(@RequestBody @Valid UpdateTableConfigRequest request){
+        Result result = validateParam(request);
+        if(!result.isSuccess()){
+            return result;
+        }
+        if(StringUtils.isBlank(request.getAuthor())){
+            request.setAuthor(MySecurityUser.nickName());
+        }
+        TableConfig tableConfig = new TableConfig();
+        BeanUtils.copyProperties(request,tableConfig);
+        tableConfigService.saveOrUpdateTableConfig(tableConfig);
+        return Result.success();
+    }
+
+    @DeleteMapping("delete")
+    @SysLog(MessageConstants.SysLog.TABLE_CONFIG_DELETE)
+    public Result delete(@RequestParam(value = "id",required = false)Long id){
+        if(null == id || 0 == id){
+            return Result.idIsNullError();
+        }
+        tableConfigService.deleteTableConfig(id);
+        return Result.success();
+    }
+
+    @PostMapping("recover")
+    @SysLog(MessageConstants.SysLog.TABLE_CONFIG_RECOVER)
+    public Result recover(@RequestParam(value = "id",required = false)Long id){
+        if(null == id || 0 == id){
+            return Result.idIsNullError();
+        }
+        tableConfigService.recoverTableConfig(id);
+
+        return Result.success();
+    }
+
+    /**
+     * 获取表名列表
+     * @param schemaName 模式名
+     * @return 表名列表
+     */
+    @GetMapping("getTableNameList")
+    public Result getTableNameList(@RequestParam(value = "schemaName",required = false)String schemaName){
+        if(StringUtils.isBlank(schemaName)){
+            return Result.paramMsgError(MessageConstants.TableConfig.SCHEMA_NAME_NOT_EMPTY);
+        }
+        return Result.success(tableConfigService.getTableNameList(schemaName));
+    }
+
+    /**
+     * 获取模式名列表
+     * @return 模式名列表
+     */
+    @GetMapping("getSchemaNameList")
+    public Result getSchemaNameList(){
+        return Result.success(tableConfigService.getSchemaNameList());
+    }
+
+    public Result validateParam(BaseTableConfigRequest request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        if(StringUtils.isNotBlank(request.getTablePrefix())) {
+            if (!request.getTableName().startsWith(request.getTablePrefix())) {
+                return Result.businessMsgError(MessageConstants.TableConfig.TABLE_PREFIX_NOT_MATCH);
+            }
+        }
+        if(StringUtils.isNotBlank(request.getGeneratePath())){
+            if(ToolUtil.isValidPath(request.getGeneratePath())){
+                return Result.businessMsgError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM);
+            }
+        }
+        return Result.success();
+    }
+
+}

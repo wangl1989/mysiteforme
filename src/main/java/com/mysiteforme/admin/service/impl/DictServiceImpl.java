@@ -224,4 +224,9 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
         }
         updateBatchById(dits);
     }
+
+    @Override
+    public List<Dict> getDictTypeList() {
+        return lambdaQuery().select(Dict::getType).eq(Dict::getDelFlag,false).groupBy(Dict::getType).list();
+    }
 }

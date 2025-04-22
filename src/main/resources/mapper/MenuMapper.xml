@@ -120,6 +120,7 @@
     <if test="userId != null and userId != ''">
         AND su.id = #{userId}
     </if>
+    ORDER BY m.sort desc
     </select>
 
     <resultMap id="getUserMenusMap" type="com.mysiteforme.admin.entity.VO.MenuTreeVO">

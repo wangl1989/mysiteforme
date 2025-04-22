@@ -95,4 +95,10 @@ public interface DictService extends IService<Dict> {
      * @param newType 新字典类型
      */
     void updateByType(String oldType, String newType);
+
+    /**
+     * 获取字典类型列表
+     * @return 字典类型列表
+     */
+    List<Dict> getDictTypeList();
 }

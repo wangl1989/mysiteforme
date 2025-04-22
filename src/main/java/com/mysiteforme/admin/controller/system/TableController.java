@@ -66,14 +66,6 @@ public class TableController extends BaseController{
         this.createTableFiles = createTableFiles;
     }
 
-    /**
-     */
-    @GetMapping("list")
-    @SysLog("跳转数据表列表页面")
-    public String list(){
-        return "admin/system/table/list";
-    }
-
     /***
      * 所有数据表分页查询
      */

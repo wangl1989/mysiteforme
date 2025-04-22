@@ -16,6 +16,7 @@ import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -96,5 +97,18 @@ public class DictController {
         }
         dictService.updateByType(request.getOldType(),request.getNewType());
         return Result.success();
+    }
+
+    @GetMapping("getDictTypeList")
+    public Result getDictTypeList(){
+        return Result.success(dictService.getDictTypeList());
+    }
+
+    @GetMapping("getDictListByType")
+    public Result getDictListByType(@RequestParam(value = "type",required = false)String type){
+        if(StringUtils.isBlank(type)){
+            return Result.paramMsgError(MessageConstants.Dict.DICT_TYPE_EMPTY);
+        }
+        return Result.success(dictService.getDictByType(type));
     }
 }

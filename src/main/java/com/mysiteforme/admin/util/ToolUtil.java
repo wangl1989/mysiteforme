@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +32,7 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -45,9 +49,8 @@ import cn.hutool.http.HttpUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+@Slf4j
 public class ToolUtil {
-
-	public static final Logger LOGGER = LoggerFactory.getLogger(ToolUtil.class);
 
 	/**
 	 * 设定安全的密码，生成随机的salt并经过1024次 sha-1 hash
@@ -120,7 +123,7 @@ public class ToolUtil {
 			String file = u.getFile();
 			return file == null || !file.toLowerCase().matches(".*\\.(jpg|jpeg|gif|png|bmp|svg|ico)$");
 		} catch (MalformedURLException e) {
-			LOGGER.error("URL格式错误", e);
+			log.error("URL格式错误", e);
 			return true;
 		}
 	}
@@ -184,7 +187,7 @@ public class ToolUtil {
      */
 	public static String getClientIp(HttpServletRequest request) {
 		String ip = request.getHeader("X-Real-IP");
-		LOGGER.info("ipadd : {}" , ip);
+		log.info("ipadd : {}" , ip);
 		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("X-Forwarded-For");
 		}
@@ -197,7 +200,7 @@ public class ToolUtil {
 		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
-		LOGGER.info(" ip --> {}" , ip);
+		log.info(" ip --> {}" , ip);
 		return ip;
 	}
 	
@@ -217,7 +220,7 @@ public class ToolUtil {
 		try {
 			info = Introspector.getBeanInfo(condition.getClass());
 		} catch (IntrospectionException e) {
-			LOGGER.error("转换bean为map失败", e);
+			log.error("转换bean为map失败", e);
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("转换bean为map失败").build();
 		}
 
@@ -227,13 +230,13 @@ public class ToolUtil {
 				try {
 					objectAsMap.put(pd.getName(), reader.invoke(condition));
 				} catch (IllegalArgumentException e) {
-					LOGGER.error("出现IllegalArgumentException异常", e);
+					log.error("出现IllegalArgumentException异常", e);
 					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalArgumentException异常").throwable(e).build();
 				} catch (IllegalAccessException e) {
-					LOGGER.error("出现IllegalAccessException异常", e);
+					log.error("出现IllegalAccessException异常", e);
 					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalAccessException异常").throwable(e).build();
 				} catch (InvocationTargetException e) {
-					LOGGER.error("出现InvocationTargetException异常", e);
+					log.error("出现InvocationTargetException异常", e);
 					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现InvocationTargetException异常").throwable(e).build();
 				}
 		}
@@ -391,7 +394,7 @@ public class ToolUtil {
 				}
 			}
 		}catch (Exception e){
-			LOGGER.error("获取地理位置异常",e);
+			log.error("获取地理位置异常",e);
 			throw MyException.builder().code(MyException.SERVER_ERROR).msg("获取地理位置异常").throwable(e).build();
 		}
 
@@ -417,6 +420,91 @@ public class ToolUtil {
 			return "linux";
 		} else {
 			return "other";
+		}
+	}
+
+	/**
+	 * 验证路径格式是否正确
+	 * @param path 路径地址
+	 * @return 路径是否合法
+	 */
+	/**
+	 * 验证文件路径格式是否正确
+	 * @param path 待验证的路径
+	 * @return 路径是否合法
+	 */
+	public static boolean isValidPath(String path) {
+		if (StringUtils.isBlank(path)) {
+			return false;
+		}
+
+		// 获取操作系统类型
+		boolean isWindows = getOs().equals("windows");
+
+		try {
+			// Windows 路径特殊处理
+			if (isWindows) {
+				// 检查基本格式（驱动器号:\ 或 UNC 路径 \\）
+				if (!path.matches("^([A-Za-z]:\\\\|\\\\\\\\).*")) {
+					return false;
+				}
+
+				// Windows 路径长度限制
+				if (path.length() > 260) {
+					return false;
+				}
+
+				// 检查每个路径段是否合法
+				String[] segments = path.split("\\\\");
+				for (String segment : segments) {
+					// 跳过驱动器号检查
+					if (segment.matches("^[A-Za-z]:$")) {
+						continue;
+					}
+
+					// Windows 文件名限制
+					if (segment.matches("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$")) {
+						return false;
+					}
+
+					// 检查段名是否包含非法字符
+					if (segment.matches(".*[<>:\"/\\\\|?*\u0000-\u001F].*")) {
+						return false;
+					}
+				}
+			} else {
+				// Unix/Linux 路径处理
+				// 检查基本格式
+				if (!path.matches("^(/[^/\u0000]+)*/?$")) {
+					return false;
+				}
+
+				// Unix 路径长度限制
+				if (path.length() > 4096) {
+					return false;
+				}
+
+				// 检查每个路径段
+				String[] segments = path.split("/");
+				for (String segment : segments) {
+					if (StringUtils.isBlank(segment)) {
+						continue;
+					}
+
+					// 检查段名是否包含非法字符
+					if (segment.contains("\u0000")) {
+						return false;
+					}
+				}
+			}
+
+			// 使用 Java NIO 进行最终验证
+			Path normalizedPath = Paths.get(path).normalize();
+			// 检查路径是否被归一化（防止 .. 或 . 等相对路径成分）
+            return normalizedPath.toString().equals(path);
+        } catch (SecurityException | InvalidPathException e) {
+			log.error("路径验证失败: {} - {}", path, e.getMessage());
+			return false;
 		}
 	}
 

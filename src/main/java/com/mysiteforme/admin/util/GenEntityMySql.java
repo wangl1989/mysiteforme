@@ -27,7 +27,7 @@ public class GenEntityMySql {
         site.setName("默认站点");
         site.setDescription("这是一个默认站点");
         site.setAuthor("wangl");
-        createTableFiles.createFile(new String[]{"sys_permission_group"},2,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author, site);
+        createTableFiles.createFile(new String[]{"sys_table_config","sys_table_field_config"},1,driverName,userName,password,dataBaseUrl,baseDic,zipFile,author, site);
 
 
 	}

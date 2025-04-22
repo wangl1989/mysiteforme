@@ -145,6 +145,12 @@ public class MyException extends RuntimeException {
             return this;
         }
 
+        public Builder businessError(String msg, Object... args){
+            this.msg = MessageUtil.getMessage(msg,args);
+            this.code = ResultCode.BUSINESS_ERROR;
+            return this;
+        }
+
         /**
          * 未授权
          */

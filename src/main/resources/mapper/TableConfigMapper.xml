@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.TableConfigDao" >
+
+    <!--查询mysql数据表是否存在 -->
+    <select id="existTable" resultType="java.lang.Integer">
+        SELECT
+            COUNT(TABLE_NAME)
+        FROM
+            INFORMATION_SCHEMA.TABLES
+        WHERE
+            TABLE_SCHEMA=#{schemaName}
+          AND
+            TABLE_NAME=#{tableName}
+    </select>
+
+    <!--查询mysql数据库名称列表 -->
+    <select id="getSchemaNameList" resultType="java.lang.String">
+        SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA;
+    </select>
+
+    <!--查询mysql数据库表名称列表 -->
+    <select id="getTableNameList" resultType="java.lang.String">
+        SELECT
+            TABLE_NAME
+        FROM
+            INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA=#{schemaName}
+    </select>
+
+    <select id="getFiledList" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
+        SELECT
+            COLUMN_NAME AS columnName,
+            DATA_TYPE AS columnType,
+            COLUMN_COMMENT AS columnComment,
+            CHARACTER_MAXIMUM_LENGTH AS charLength,
+            NUMERIC_PRECISION AS numberLength,
+            IS_NULLABLE AS isNullable
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_SCHEMA=#{schemaName}
+          AND TABLE_NAME=#{tableName}
+          <if test="tableType != null">
+              <choose>
+                  <when test="tableType == 1">
+                      AND COLUMN_NAME NOT IN ('id','create_date','create_by','update_date','update_by','remarks','del_flag')
+                  </when>
+                  <when test="tableType == 2">
+                      AND COLUMN_NAME NOT IN ('id','parent_id','parent_ids','level','sort','create_date','create_by','update_date','update_by','remarks','del_flag')
+                  </when>
+              </choose>
+          </if>
+    </select>
+
+    <select id="getSimpleFiledList" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
+        SELECT
+        COLUMN_NAME AS columnName,
+        DATA_TYPE AS columnType,
+        COLUMN_COMMENT AS columnComment,
+        CHARACTER_MAXIMUM_LENGTH AS charLength,
+        NUMERIC_PRECISION AS numberLength,
+        IS_NULLABLE AS isNullable
+        FROM
+        INFORMATION_SCHEMA.COLUMNS
+        WHERE
+        TABLE_SCHEMA=#{schemaName}
+        AND TABLE_NAME=#{tableName}
+        AND COLUMN_NAME NOT IN ('id','parent_id','parent_ids','level','create_date','create_by','update_date','update_by','remarks','del_flag')
+    </select>
+
+    <select id="getFieldDetail" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
+        SELECT
+            COLUMN_NAME AS columnName,
+            DATA_TYPE AS columnType,
+            COLUMN_COMMENT AS columnComment,
+            CHARACTER_MAXIMUM_LENGTH AS charLength,
+            NUMERIC_PRECISION AS numberLength,
+            IS_NULLABLE AS isNullable
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_SCHEMA=#{schemaName}
+          AND TABLE_NAME=#{tableName}
+          AND COLUMN_NAME=#{columnName}
+    </select>
+
+    <select id="selectPageTableConfig" resultMap="pageListTableConfigResponseMap">
+        SELECT
+            t.id,
+            t.table_type,
+            t.table_name,
+            t.table_prefix,
+            t.business_name,
+            t.schema_name,
+            t.module_name,
+            t.package_name,
+            t.author,
+            t.generate_path,
+            t.options,
+            t.remarks,
+            t.create_by,
+            t.update_by,
+            u1.nick_name AS create_user,
+            u2.nick_name AS update_user,
+            t.create_date,
+            t.update_date,
+            COUNT(tfc.id) AS field_count
+        FROM
+            sys_table_config t
+        LEFT JOIN (select * from sys_table_field_config where del_flag = false order by sort DESC) tfc ON tfc.table_config_id = t.id
+        LEFT JOIN sys_user u1 ON u1.id = t.create_by AND u1.del_flag = false
+        LEFT JOIN sys_user u2 ON u2.id = t.update_by AND u2.del_flag = false
+        WHERE
+            TRUE
+        <if test="request.tableType != null">
+            AND t.table_type = #{request.tableType}
+        </if>
+        <if test="request.tableName != null and request.tableName != ''">
+            AND t.table_name LIKE CONCAT('%',#{request.tableName},'%')
+        </if>
+        <if test="request.businessName != null and request.businessName != ''">
+            AND t.business_name LIKE CONCAT('%',#{request.businessName},'%')
+        </if>
+        <if test="request.schemaName != null and request.schemaName != ''">
+            AND t.schema_name = #{request.schemaName}
+        </if>
+        <if test="request.delFlag != null">
+            AND t.del_flag = #{request.delFlag}
+        </if>
+        GROUP BY
+        t.id,
+        t.table_type,
+        t.table_name,
+        t.table_prefix,
+        t.business_name,
+        t.schema_name,
+        t.module_name,
+        t.package_name,
+        t.author,
+        t.generate_path,
+        t.options,
+        t.remarks,
+        t.create_by,
+        t.update_by,
+        u1.nick_name,
+        u2.nick_name,
+        t.create_date,
+        t.update_date
+        <if test="request.sortByUpdateDateAsc != null">
+            <if test="request.sortByUpdateDateAsc">
+                ORDER BY t.update_date
+            </if>
+            <if test="!request.sortByUpdateDateAsc">
+                ORDER BY t.update_date DESC
+            </if>
+        </if>
+    </select>
+
+    <resultMap id="pageListTableConfigResponseMap" type="com.mysiteforme.admin.entity.response.PageListTableConfigResponse">
+        <id property="id" column="id"/>
+        <result property="tableType" column="table_type"/>
+        <result property="tableName" column="table_name"/>
+        <result property="tablePrefix" column="table_prefix"/>
+        <result property="businessName" column="business_name"/>
+        <result property="schemaName" column="schema_name"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="packageName" column="package_name"/>
+        <result property="author" column="author"/>
+        <result property="generatePath" column="generate_path"/>
+        <result property="remarks" column="remarks"/>
+        <result property="options" column="options"/>
+        <result property="createId" column="create_by"/>
+        <result property="updateId" column="update_by"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="fieldCount" column="field_count"/>
+    </resultMap>
+</mapper>
