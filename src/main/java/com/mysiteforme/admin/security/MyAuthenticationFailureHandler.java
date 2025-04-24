@@ -8,18 +8,12 @@
 
 package com.mysiteforme.admin.security;
 
-import java.io.IOException;
-
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import com.mysiteforme.admin.service.SecurityService;
 import com.mysiteforme.admin.util.ApiToolUtil;
-import com.mysiteforme.admin.util.Result;
-import com.mysiteforme.admin.util.ResultCode;
-
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +32,8 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
     }
 
     @Override
-    public void onAuthenticationFailure(
-            HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
-            throws IOException, ServletException {
-                if(exception != null){
-                    log.debug("登录失败：{}",exception.getMessage());
-                    apiToolUtil.returnSystemDate(Result.orgenalError(ResultCode.LOGIN_ERROR,exception.getMessage()),request,response);
-                }else{
-                    apiToolUtil.returnSystemDate(securityService.loginFailData(request,response),request,response);
-                }
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
+        log.error("登录失败：{}", exception.getMessage(), exception);
+        apiToolUtil.returnSystemDate(securityService.loginFailData(request,response),request,response);
     }
 }

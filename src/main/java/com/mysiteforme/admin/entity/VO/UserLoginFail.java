@@ -8,15 +8,9 @@
 
 package com.mysiteforme.admin.entity.VO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Data
-@Builder
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class UserLoginFail {
 
     /**

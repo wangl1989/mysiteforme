@@ -33,7 +33,6 @@
 		<jackson.version>2.16.1</jackson.version>
 		<druid.version>1.2.20</druid.version>
 		<guava.version>32.0.1-android</guava.version>
-		<quartz.version>2.3.2</quartz.version>
 	</properties>
 
 	<repositories>
@@ -230,15 +229,8 @@
 
 		<!--定时任务-->
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>${quartz.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.mchange</groupId>
-					<artifactId>c3p0</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
 		</dependency>
 
 		<!-- Google jar -->

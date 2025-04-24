@@ -8,32 +8,15 @@
 
 package com.mysiteforme.admin.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
 import com.mysiteforme.admin.entity.request.PageListQuartzTaskLogRequest;
 import com.mysiteforme.admin.service.QuartzTaskLogService;
-import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.RestResponse;
-
 import com.mysiteforme.admin.util.Result;
-import jakarta.servlet.ServletRequest;
-
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
-
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/admin/quartzTaskLog")
@@ -46,23 +29,8 @@ public class QuartzTaskLogController {
     }
 
     @GetMapping("list")
-    public Result list(@RequestBody PageListQuartzTaskLogRequest request){
+    public Result list(PageListQuartzTaskLogRequest request){
         return Result.success(quartzTaskLogService.selectPageQuartzTaskLog(request));
-    }
-
-    @PostMapping("add")
-    public Result add(@RequestBody QuartzTaskLog quartzTaskLog){
-        quartzTaskLogService.save(quartzTaskLog);
-        return Result.success();
-    }
-
-    @PostMapping("edit")
-    public Result edit(@RequestBody QuartzTaskLog quartzTaskLog){
-        if(null == quartzTaskLog.getId() || 0 == quartzTaskLog.getId()){
-            return Result.idIsNullError();
-        }
-        quartzTaskLogService.updateById(quartzTaskLog);
-        return Result.success();
     }
 
     @DeleteMapping("delete")

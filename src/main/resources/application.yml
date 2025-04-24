@@ -48,7 +48,11 @@ spring:
           enabled: true
           logSlowSql: true
           slowSqlMillis: 2000
-    
+  quartz:
+    job-store-type: JDBC
+    jdbc:
+      initialize-schema: NEVER
+
   #缓存配置
   cache:
       type: redis

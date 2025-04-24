@@ -13,14 +13,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 @TableName("quartz_task")
 @Data
-@Getter
-@Setter
 public class QuartzTask extends DataEntity {
 
 	/**
@@ -36,6 +32,11 @@ public class QuartzTask extends DataEntity {
      * 任务表达式
      */
 	private String cron;
+	/**
+	 * 任务组名称
+	 */
+	@TableField("group_name")
+	private String groupName;
     /**
      * 执行的类
      */

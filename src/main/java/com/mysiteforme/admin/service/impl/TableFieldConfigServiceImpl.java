@@ -139,7 +139,7 @@ public class TableFieldConfigServiceImpl extends ServiceImpl<TableFieldConfigDao
                     newField.setBusinessName(tableFieldDTO.getColumnComment());
                 }
                 newField.setColumnType(tableFieldDTO.getColumnType());
-                Integer length = null;
+                Long length = null;
                 if (tableFieldDTO.getCharLength() != null) {
                     length = tableFieldDTO.getCharLength();
                 } else {

@@ -12,6 +12,4 @@ public class PageListQuartzTaskRequest extends BasePageRequest{
     private Integer status;
 
     private Boolean sortByCreateDateAsc;
-
-    private Boolean sortByCreateDateDesc;
 }

@@ -15,10 +15,13 @@ import com.mysiteforme.admin.util.ResultCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Getter
 @Setter
 public class MyException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // 验证错误
@@ -106,6 +109,18 @@ public class MyException extends RuntimeException {
 
         public Builder throwable(Throwable throwable) {
             this.throwable = throwable;
+            return this;
+        }
+
+        public Builder error(int code, String message){
+            this.msg = MessageUtil.getMessage(message);
+            this.code = code;
+            return this;
+        }
+
+        public Builder error(int code, String message, Object... args){
+            this.msg = MessageUtil.getMessage(message,args);
+            this.code = code;
             return this;
         }
         

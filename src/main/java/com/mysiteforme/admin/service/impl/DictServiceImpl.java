@@ -52,12 +52,6 @@ public class DictServiceImpl extends ServiceImpl<DictDao, Dict> implements DictS
             if(StringUtils.isNotBlank(request.getDescription())){
                 wrapper.like(Dict::getDescription,request.getDescription());
             }
-            if(request.getSortBySortAsc() != null){
-                wrapper.orderByAsc(request.getSortBySortAsc(),Dict::getSort);
-            }
-            if(request.getSortByCreateDateAsc() != null){
-                wrapper.orderByAsc(request.getSortByCreateDateAsc(),Dict::getCreateDate);
-            }
             wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), Dict::getCreateDate);
             wrapper.orderBy(request.getSortBySortAsc() != null, request.getSortBySortAsc() != null && request.getSortBySortAsc(), Dict::getSort);
         } else {

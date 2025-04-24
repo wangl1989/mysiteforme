@@ -125,4 +125,9 @@ public class GenCodeConstants {
         DB_TO_FORM_COMPONENT_TYPE_MAP.put("bit", FormComponentType.SWITCH);
         DB_TO_FORM_COMPONENT_TYPE_MAP.put("boolean", FormComponentType.SELECT);
     }
+
+    public static final String[] JAVA_KEYWORKS = {"public","protected","private","protected","class","interface","abstract","implements","extends","new",
+            "import","package","byte","char","boolean","short","int","float","long","double","void","null","true","false","if","else","while","for","switch",
+            "case","default","do","break","continue","return","instanceof","static","final","super","this","native","strictfp","synchronized","transient","volatile",
+            "catch","try","finally","throw","throws","enum","assert","throw","throws","this"};
 }

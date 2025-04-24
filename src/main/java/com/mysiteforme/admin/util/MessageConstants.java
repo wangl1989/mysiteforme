@@ -73,9 +73,24 @@ public class MessageConstants {
         public static final String QUARTZ_TASK_ADD = "message.log.quartz.task.add";
         public static final String QUARTZ_TASK_EDIT = "message.log.quartz.task.edit";
         public static final String QUARTZ_TASK_DELETE = "message.log.quartz.task.delete";
+        public static final String QUARTZ_TASK_RUN = "message.log.quartz.task.run";
+        public static final String QUARTZ_TASK_PAUSH = "message.log.quartz.task.paush";
+        public static final String QUARTZ_TASK_RESUME = "message.log.quartz.task.resume";
 
         // 定时任务日志相关
         public static final String QUARTZ_TASK_LOG_DELETE = "message.log.quartz.task.log.delete";
+
+        // Redis相关
+        public static final String REDIS_DELETE = "message.log.redis.delete";
+
+        // 创建表相关
+        public static final String TABLE_ADD = "message.log.table.add";
+        public static final String TABLE_EDIT = "message.log.table.edit";
+        public static final String FIELD_ADD = "message.log.field.add";
+        public static final String FIELD_EDIT = "message.log.field.edit";
+        public static final String FIELD_DELETE = "message.log.field.delete";
+        public static final String TABLE_DELETE = "message.log.table.delete";
+        public static final String DOWNLOAD_JAVA_CODE = "message.log.download.java.code";
 
         // 数据表配置相关
         public static final String TABLE_CONFIG_ADD = "message.log.table.config.add";
@@ -166,7 +181,13 @@ public class MessageConstants {
     }
 
     public static class Redis {
-        public static final String REDIS_DATA_EXCEPTION = "message.redis.data.exception";
+        public static final String REDIS_KEY_CAN_NOT_EMPTY = "message.redis.key.can.not.empty";
+        public static final String REDIS_KEY_NOT_FOUND = "message.redis.key.not.found";
+        // Redis 不支持的类型
+        public static final String REDIS_NOT_SUPPORT_TYPE = "message.redis.not.support.type";
+        public static final String REDIS_GET_KEY_VALUE_ERROR = "message.redis.get.key.value.error";
+        public static final String REDIS_GET_VALUE_EXCEPTION = "message.redis.get.value.exception";
+        public static final String REDIS_DELETE_VALUE_EXCEPTION = "message.redis.delete.value.exception";
     }
 
     public static class Api {
@@ -325,6 +346,38 @@ public class MessageConstants {
         public static final String NOT_LOCAL_UPLOAD = "message.upload.not.local.upload";
     }
 
+    public static class Sql {
+        public static final String SQL_PARAM_CHECK_FAILED = "message.sql.param.check.failed";
+        public static final String SQL_INJECTION_ACCEPT_DETECTED = "message.sql.injection.accept.detected";
+        public static final String SQL_INVALID_OBJECT_NAME_FORMAT = "message.sql.invalid.object.name.format";
+        public static final String SQL_OBJECT_NAME_TOO_LONG = "message.sql.object.name.too.long";
+    }
+
+    public static class Table {
+        public static final String TABLE_COMMENT_NOT_EMPTY = "message.table.comment.not.empty";
+        public static final String TABLE_TYPE_NOT_NULL = "message.table.type.not.null";
+        public static final String TABLE_NAME_CONTAINS_JAVA_KEYWORDS = "message.table.name.contains.java.keywords";
+        public static final String TABLE_FIELDS_NOT_EMPTY = "message.table.fields.not.empty";
+        public static final String TABLE_EXISTS = "message.table.exists";
+        public static final String TABLE_TYPE_INVALID = "message.table.type.invalid";
+        public static final String TABLE_CAN_NOT_CHANGE = "message.table.can.not.change";
+        public static final String TABLE_FIELD_CAN_NOT_CHANGE = "message.table.field.can.not.change";
+        public static final String TABLE_FIELD_CAN_NOT_DELETE = "message.table.field.can.not.delete";
+        public static final String TABLE_FIELD_COLUMN_NAME_NOT_EMPTY = "message.table.field.column.name.not.empty";
+        public static final String TABLE_FIELD_OLD_COLUMN_NAME_NOT_EMPTY = "message.table.field.old.column.name.not.empty";
+        public static final String TABLE_FIELD_COLUMN_LENGTH_NOT_EMPTY = "message.table.field.column.length.not.empty";
+        public static final String TABLE_FIELD_COLUMN_TYPE_NOT_EMPTY = "message.table.field.column.type.not.empty";
+        public static final String TABLE_FIELD_COLUMN_COMMENT_NOT_EMPTY = "message.table.field.column.comment.not.empty";
+        public static final String TABLE_FIELD_ISNUllVALUE_TYPE_NOT_EMPTY = "message.table.field.column.is.null.value.not.empty";
+        public static final String TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS = "message.table.field.name.contains.java.keywords";
+        public static final String BASE_TABLE_NOT_CONTAINS_COMMON_FIELD = "message.table.base.table.not.contains.common.field";
+        public static final String TREE_TABLE_NOT_CONTAINS_COMMON_FIELD = "message.table.tree.table.not.contains.common.field";
+        public static final String FIELD_NAME_NOT_EMPTY = "message.table.field.name.not.empty";
+        public static final String FIELD_HAS_EXIST = "message.table.field.has.exist";
+        public static final String SYSTEM_TABLE_CAN_NOT_DELETE = "message.table.system.table.can.not.delete";
+
+    }
+
     public static class TableConfig {
         public static final String TABLE_NAME_NOT_EMPTY = "message.table.name.not.empty";
         public static final String SCHEMA_NAME_NOT_EMPTY = "message.schema.name.not.empty";
@@ -361,4 +414,27 @@ public class MessageConstants {
         public static final String FIELD_IDS_INVALID = "message.table.field.ids.invalid";
         public static final String ALL_FIELDS_MUST_SAME_TABLE = "message.table.field.all.fields.must.same.table";
     }
+
+    public static class QuartzTask{
+        // 定时任务不存在
+        public static final String TASK_NOT_FOUND = "message.quartz.task.not.found";
+        public static final String TASK_NAME_NOT_EMPTY = "message.quartz.task.name.not.empty";
+        public static final String TASK_GROUP_NAME_NOT_EMPTY = "message.quartz.task.group.name.not.empty";
+        public static final String TASK_GROUP_NAME_NOT_MATCH = "message.quartz.task.group.name.not.match";
+        public static final String TASK_NAME_EXISTS = "message.quartz.task.name.exists";
+        public static final String TASK_CRON_NOT_EMPTY = "message.quartz.task.cron.not.empty";
+        public static final String TASK_CRON_INVALID = "message.quartz.task.cron.invalid";
+        public static final String TASK_TARGET_BEAN_NOT_EMPTY = "message.quartz.task.target.bean.not.empty";
+        public static final String TASK_TRGET_METHOD_NOT_EMPTY = "message.quartz.task.trget.method.not.empty";
+        public static final String TASK_PARAMS_NOT_EMPTY = "message.quartz.task.params.not.empty";
+        public static final String TASK_STATUS_NOT_EMPTY = "message.quartz.task.status.not.empty";
+        public static final String TASK_REMARKS_NOT_EMPTY = "message.quartz.task.remarks.not.empty";
+        public static final String TASK_EXCEPTION = "message.quartz.task.exception";
+        // 参数解析失败
+        public static final String TASK_PARAMS_PARSE_FAILED = "message.quartz.task.params.parse.failed";
+        // 执行定时任务失败
+        public static final String TASK_EXECUTE_FAILED = "message.quartz.task.execute.failed";
+
+    }
+
 }

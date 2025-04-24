@@ -111,14 +111,13 @@ public class LoginController {
 	 */
 	@GetMapping("/genCaptcha")
 	public Result genCaptcha(HttpServletRequest request) throws IOException {
-		String token = UUID.randomUUID().toString().replaceAll("-", "");
+		String deviceId = request.getHeader(Constants.DEVICE_ID);
 		String verifyCode = VerifyCodeUtil.generateTextCode(VerifyCodeUtil.TYPE_ALL_MIXED, 4, null);
 		//将验证码放到缓存里面REDIS,验证码有效期为5分钟
-		redisUtils.set(RedisConstants.USER_CAPTCHA_CACHE_KEY+token, verifyCode, Constants.USER_CAPTCHA_CACHE_EXPIRE_TIME,TimeUnit.MINUTES);
-		log.info("本次生成的验证码为[{}],已存放到Redis中,redis的key值为{}",verifyCode,RedisConstants.USER_CAPTCHA_CACHE_KEY+token);
+		redisUtils.set(RedisConstants.USER_CAPTCHA_CACHE_KEY+deviceId, verifyCode, Constants.USER_CAPTCHA_CACHE_EXPIRE_TIME,TimeUnit.MINUTES);
+		log.info("本次生成的验证码为[{}],已存放到Redis中,redis的key值为{}",verifyCode,RedisConstants.USER_CAPTCHA_CACHE_KEY+deviceId);
 		BufferedImage bufferedImage = VerifyCodeUtil.generateImageCode(verifyCode, 116, 36, 5, true, new Color(249,205,173), null, null);
 		Map<String,String> map = Maps.newHashMap();
-		map.put("key", token);
 		map.put("image", ToolUtil.getBase64FromImage(bufferedImage));
 		return Result.success(map);
 	}
@@ -127,7 +126,7 @@ public class LoginController {
 	@GetMapping("/error")
 	public Result handleError(Exception exception){
         // 根据状态码和异常类型返回合适的响应
-        log.error("系统错误，请联系管理员:{}", exception);
+        log.error("系统错误，请联系管理员:{}", exception.getMessage());
 		return Result.error(ResultCode.INTERNAL_ERROR, MessageConstants.System.SYSTEM_ERROR);
 	}
 
@@ -188,7 +187,6 @@ public class LoginController {
 
 	/**
 	 * 校验token是否有效
-	 * @param request
 	 * @return Result对象
 	 */
 	@GetMapping("/api/auth/validate")

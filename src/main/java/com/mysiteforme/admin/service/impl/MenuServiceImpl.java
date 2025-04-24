@@ -13,6 +13,7 @@ import java.util.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mysiteforme.admin.dao.PermissionDao;
 import com.mysiteforme.admin.entity.Permission;
+import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.mysiteforme.admin.entity.VO.*;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
@@ -79,37 +80,23 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         Menu menu = new Menu();
         BeanUtils.copyProperties(request,menu);
         if(request.getParentId() == null || request.getParentId() == 0){
-            request.setLevel(1);
-            if(request.getSort() == null || request.getSort() == 0){
-                QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-                wrapper.eqSql("sort","select max(sort) from sys_menu where parent_id is null");
-                List<Menu> menus = this.list(wrapper);
-                int sort = 0;
-                if(menus != null && !menus.isEmpty()){
-                    sort =  menus.get(0).getSort() +1;
-                }
-                request.setSort(sort);
+            menu.setLevel(1);
+            if(request.getSort() == null || request.getSort() == 0 || request.getSort() == 1){
+                menu.setSort(getMaxSort(request.getParentId(),null));
             }
         }else{
             Menu parentMenu = this.getById(request.getParentId());
             if(parentMenu==null){
                 throw MyException.builder().businessError(MessageConstants.Menu.MENU_PARENT_ID_INVALID).build();
             }
-            request.setParentIds(parentMenu.getParentIds());
-            request.setLevel(parentMenu.getLevel()+1);
-            if(request.getSort() == null || request.getSort() == 0) {
-                QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-                wrapper.eqSql("sort", "select max(sort) from sys_menu where parent_id =" + request.getParentId());
-                List<Menu> menus = this.list(wrapper);
-                int sort = 0;
-                if (menus != null && !menus.isEmpty()) {
-                    sort = menus.get(0).getSort() + 1;
-                }
-                request.setSort(sort);
+            menu.setParentIds(parentMenu.getParentIds());
+            menu.setLevel(parentMenu.getLevel()+1);
+            if(request.getSort() == null || request.getSort() == 0 || request.getSort() == 1) {
+                menu.setSort(getMaxSort(request.getParentId(),null));
             }
         }
         saveOrUpdate(menu);
-        request.setParentIds(StringUtils.isBlank(menu.getParentIds())? menu.getId()+"," : menu.getParentIds()+menu.getId()+",");
+        menu.setParentIds(StringUtils.isBlank(menu.getParentIds())? menu.getId()+"," : menu.getParentIds()+menu.getId()+",");
         saveOrUpdate(menu);
         cacheUtils.evictCacheOnMenuChange(menu.getId());
     }
@@ -129,17 +116,10 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         Menu menu = new Menu();
         BeanUtils.copyProperties(request,menu);
         if(request.getParentId() == null || request.getParentId() == 0){
-            request.setLevel(1);
+            menu.setLevel(1);
             if(oldMenu.getParentId() != null) {
-                QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-                wrapper.eqSql("sort", "select max(sort) from sys_menu where parent_id is null");
-                List<Menu> menus = this.list(wrapper);
-                int sort = 0;
-                if (menus != null && !menus.isEmpty()) {
-                    sort = menus.get(0).getSort() + 1;
-                }
-                request.setSort(sort);
-                request.setParentIds(request.getId() + ",");
+                menu.setSort(getMaxSort(request.getParentId(),request.getId()));
+                menu.setParentIds(request.getId() + ",");
             }
         }else{
             if(request.getId().equals(request.getParentId())){
@@ -151,19 +131,33 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
                     throw MyException.builder().businessError(MessageConstants.Menu.MENU_PARENT_ID_INVALID).build();
                 }
                 request.setLevel(parentMenu.getLevel() + 1);
-                QueryWrapper<Menu> wrapper = new QueryWrapper<>();
-                wrapper.eqSql("sort", "select max(sort) from sys_menu").eq("parent_id", request.getParentId());
-                List<Menu> menus = this.list(wrapper);
-                int sort = 0;
-                if (menus != null && !menus.isEmpty()) {
-                    sort = menus.get(0).getSort() + 1;
-                }
-                request.setSort(sort);
-                request.setParentIds(parentMenu.getParentIds()+menu.getId()+",");
+                menu.setSort(getMaxSort(request.getParentId(),request.getId()));
+                menu.setParentIds(parentMenu.getParentIds()+menu.getId()+",");
             }
         }
         saveOrUpdate(menu);
         cacheUtils.evictCacheOnMenuChange(menu.getId());
+    }
+
+    private Integer getMaxSort(Long parentId, Long id){
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        if(parentId != null){
+            wrapper.eq(Menu::getParentId, parentId);
+        }else{
+            wrapper.isNull(Menu::getParentId);
+        }
+        wrapper.eq(Menu::getDelFlag, false);
+        if(id != null) {
+            wrapper.ne(Menu::getId, id);
+        }
+        wrapper.orderByDesc(Menu::getSort);
+        wrapper.last("LIMIT 1");
+        Menu maxSortMenu = getOne(wrapper);
+        if(maxSortMenu != null) {
+            return  maxSortMenu.getSort() + 1;
+        }else{
+            return 1;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

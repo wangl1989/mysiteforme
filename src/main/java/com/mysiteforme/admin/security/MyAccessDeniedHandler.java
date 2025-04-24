@@ -8,24 +8,18 @@
 
 package com.mysiteforme.admin.security;
 
-import java.io.IOException;
-
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.mysiteforme.admin.exception.MyException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class MyAccessDeniedHandler implements AccessDeniedHandler {
     
     @Override
-    public void handle(
-            HttpServletRequest request, HttpServletResponse response,
-            AccessDeniedException accessDeniedException
-    ) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) {
         throw MyException.builder().unauthorized().build();
     }
 }

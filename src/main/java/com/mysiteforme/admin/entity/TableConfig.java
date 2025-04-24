@@ -31,7 +31,7 @@ public class TableConfig extends DataEntity {
 	private String tableName;
 
 	/**
-	 * 数据表类型：1. 普通数据表，2.树形结构数据表
+	 * 数据表类型：1. 普通数据表，2.树形结构数据表 3.关联表
 	 */
 	@TableField("table_type")
 	private Integer tableType;

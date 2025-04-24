@@ -105,30 +105,6 @@
         </collection>
     </resultMap>
 
-    <select id="selectDetailTable" resultMap="detailTable" parameterType="java.lang.String">
-        select
-        t.TABLE_NAME  as "name",
-        t.TABLE_COMMENT  as "comment",
-        c.COLUMN_NAME as "fieldList.name",
-        c.IS_NULLABLE as "fieldList.isNullValue",
-        upper(c.DATA_TYPE) as "fieldList.type",
-        if(locate('(',c.COLUMN_TYPE)=0,null,substring_index(substring_index(c.COLUMN_TYPE,'(',-1),')',1)) as "fieldList.length",
-        c.COLUMN_COMMENT as "fieldList.comment",
-        d.id as "dictlist.id",
-        d.type as "dictlist.type",
-        d.label as "dictlist.label",
-        d.value as "dictlist.value"
-        FROM
-        information_schema.TABLES t
-        left join INFORMATION_SCHEMA.Columns c on c.TABLE_NAME=t.TABLE_NAME
-        left join (select * from sys_dict where parent_id = '0' and del_flag = false) d on d.type = CONCAT(t.TABLE_NAME,"_",c.COLUMN_NAME)
-        where
-        1 = 1
-        and c.table_name=#{name}
-        and t.table_schema='mysiteforme'
-    </select>
-
-
     <!--创建mysql数据表 -->
     <update id="creatTable" parameterType="java.util.Map">
         CREATE TABLE `${name}`(

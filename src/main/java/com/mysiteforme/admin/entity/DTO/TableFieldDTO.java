@@ -12,9 +12,9 @@ public class TableFieldDTO {
 
     private String columnComment;
 
-    private Integer charLength;
+    private Long charLength;
 
-    private Integer numberLength;
+    private Long numberLength;
 
     private Boolean isNullable;
 

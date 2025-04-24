@@ -20,8 +20,6 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName("quartz_task_log")
 @Data
-@Getter
-@Setter
 public class QuartzTaskLog extends DataEntity {
 
     /**
@@ -33,6 +31,15 @@ public class QuartzTaskLog extends DataEntity {
      * 定时任务名称
      */
 	private String name;
+	/**
+	 * 任务表达式
+	 */
+	private String cron;
+	/**
+	 * 任务组名称
+	 */
+	@TableField("group_name")
+	private String groupName;
     /**
      * 定制任务执行类
      */

@@ -10,6 +10,4 @@ public class PageListQuartzTaskLogRequest extends BasePageRequest{
     private String name;
 
     private Boolean sortByCreateDateAsc;
-
-    private Boolean sortByCreateDateDesc;
 }

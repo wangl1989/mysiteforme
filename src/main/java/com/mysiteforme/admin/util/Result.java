@@ -74,6 +74,10 @@ public class Result extends HashMap<String,Object> {
         return error(code,MessageUtil.getMessage(message),null);
     }
 
+    public static Result error(Integer code,String message,Object data,Object... args){
+        return error(code,MessageUtil.getMessage(message,args),data);
+    }
+
     /**
      * 带状态码，字段定义消息，数据的返回对象
      * @param code 状态码
@@ -193,6 +197,10 @@ public class Result extends HashMap<String,Object> {
      */
     public static Result businessMsgError(String message) {
         return error(ResultCode.BUSINESS_ERROR,message);
+    }
+
+    public static Result businessMsgError(String message,Object... args) {
+        return error(ResultCode.BUSINESS_ERROR,message,null,args);
     }
 
     public static Result objectNotNull(){

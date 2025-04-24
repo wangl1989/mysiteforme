@@ -7,15 +7,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import com.mysiteforme.admin.config.JwtProperties;
 import com.mysiteforme.admin.entity.VO.DeviceTokenInfo;
-import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.util.MessageConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

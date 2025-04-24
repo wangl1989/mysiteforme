@@ -15,55 +15,85 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.dao.QuartzTaskDao;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
-import com.mysiteforme.admin.entity.request.PageListUserRequest;
+import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.QuartzTaskService;
 import com.mysiteforme.admin.util.Constants;
-import com.mysiteforme.admin.util.quartz.ScheduleUtils;
+import com.mysiteforme.admin.util.JobStatus;
+import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.quartz.QuartzJobExecution;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.CronTrigger;
-import org.quartz.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.Objects;
 
-
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
+@RequiredArgsConstructor
 public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask> implements QuartzTaskService {
 
-    private Scheduler scheduler ;
-
-    public QuartzTaskServiceImpl() {
-        super();
-    }
-
-    @Autowired
-    public QuartzTaskServiceImpl(QuartzTaskDao baseMapper,Scheduler scheduler) {
-        this.baseMapper = baseMapper;
-        this.scheduler = scheduler;
-    }
+    private final Scheduler scheduler ;
 
     /**
      * 项目启动时，初始化定时器
      */
     @PostConstruct
-    public void init(){
-        QueryWrapper<QuartzTask> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        List<QuartzTask> scheduleJobList = list(wrapper);
-        for(QuartzTask scheduleJob : scheduleJobList){
-            CronTrigger cronTrigger = ScheduleUtils.getCronTrigger(scheduler, scheduleJob);
-            //如果不存在，则创建
-            if(cronTrigger == null) {
-                ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
-            }else {
-                ScheduleUtils.updateScheduleJob(scheduler, scheduleJob);
+    public void init() throws Exception {
+        List<QuartzTask> jobList = lambdaQuery()
+                .eq(QuartzTask::getDelFlag,false)
+                .eq(QuartzTask::getStatus,JobStatus.NORMAL.getValue())
+                .list();
+        for (QuartzTask job : jobList) {
+            scheduleJob(job);
+        }
+    }
+
+    /**
+     * 增加一个job
+     *
+     * @param quartzTask 任务对象
+     */
+    public void scheduleJob(QuartzTask quartzTask) {
+        try {
+            // 构建job信息
+            JobDetail jobDetail = JobBuilder.newJob(QuartzJobExecution.class)
+                    .withIdentity(quartzTask.getName(), quartzTask.getGroupName())
+                    .withDescription(quartzTask.getRemarks())
+                    .build();
+            // 表达式调度构建器
+            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(quartzTask.getCron());
+
+            // 按新的cronExpression表达式构建一个新的trigger
+            CronTrigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(quartzTask.getName(), quartzTask.getGroupName())
+                    .withSchedule(cronScheduleBuilder)
+                    .build();
+
+            // 放入参数，运行时的方法可以获取
+            jobDetail.getJobDataMap().put(Constants.JOB_PARAM_KEY, quartzTask);
+
+            // 判断是否存在
+            JobKey jobKey = JobKey.jobKey(quartzTask.getName(), quartzTask.getGroupName());
+
+            if (scheduler.checkExists(jobKey)) {
+                // 防止创建时存在数据问题，先移除，然后在执行创建操作
+                scheduler.deleteJob(jobKey);
             }
+            scheduler.scheduleJob(jobDetail,trigger);
+            // 暂停任务
+            if (Objects.equals(quartzTask.getStatus(), JobStatus.PAUSED.getValue())) {
+                scheduler.pauseJob(jobKey);
+            }
+        } catch (SchedulerException e) {
+            log.error("[增加一个job]创建定时任务失败:{}",e.getMessage());
+            quartzTask.setStatus(JobStatus.ERROR.getValue());
+            throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
         }
     }
 
@@ -77,12 +107,7 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
             if(request.getStatus() != null){
                 wrapper.eq(QuartzTask::getStatus,request.getStatus());
             }
-            if(request.getSortByCreateDateDesc() != null){
-                wrapper.orderByDesc(request.getSortByCreateDateDesc(),QuartzTask::getCreateDate);
-            }
-            if(request.getSortByCreateDateAsc() != null){
-                wrapper.orderByAsc(request.getSortByCreateDateAsc(),QuartzTask::getCreateDate);
-            }
+            wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), QuartzTask::getCreateDate);
         }else{
             request = new PageListQuartzTaskRequest();
         }
@@ -118,7 +143,16 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
     @Override
     public void saveQuartzTask(QuartzTask quartzTask) {
         baseMapper.insert(quartzTask);
-        ScheduleUtils.createScheduleJob(scheduler,quartzTask);
+        try {
+            JobKey jobKey = JobKey.jobKey(quartzTask.getName(), quartzTask.getGroupName());
+            if (scheduler.checkExists(jobKey)) {
+                throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_NAME_EXISTS).build();
+            }
+        } catch (SchedulerException e) {
+            log.error("[保存定时任务]创建定时任务失败:{}",e.getMessage());
+            throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+        }
+        scheduleJob(quartzTask);
     }
 
     /**
@@ -128,8 +162,21 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
      */
     @Override
     public void updateQuartzTask(QuartzTask quartzTask) {
+        QuartzTask oldTask = baseMapper.selectById(quartzTask.getId());
+        if(oldTask == null){
+            throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_NOT_FOUND).build();
+        }
         baseMapper.updateById(quartzTask);
-        ScheduleUtils.updateScheduleJob(scheduler,quartzTask);
+        try {
+            JobKey jobKey = JobKey.jobKey(quartzTask.getName(), quartzTask.getGroupName());
+            if (scheduler.checkExists(jobKey)) {
+                scheduler.deleteJob(jobKey);
+            }
+        } catch (SchedulerException e) {
+            log.error("[更新定时任务]定时任务失败:{}",e.getMessage());
+            throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+        }
+        scheduleJob(quartzTask);
     }
 
     /**
@@ -138,9 +185,16 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
      */
     @Override
     public void deleteBatchTasks(List<Long> ids) {
-        for(Long id : ids){
-            ScheduleUtils.deleteScheduleJob(scheduler, id);
-        }
+        List<QuartzTask> list = listByIds(ids);
+        list.forEach(q -> {
+            JobKey jobKey = JobKey.jobKey(q.getName(), q.getGroupName());
+            try {
+                scheduler.deleteJob(jobKey);
+            } catch (SchedulerException e) {
+                log.error("[删除定时任务]定时任务失败:{}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+            }
+        });
         removeByIds(ids);
     }
 
@@ -164,9 +218,19 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
      */
     @Override
     public void run(List<Long> jobIds) {
-        for(Long jobId : jobIds){
-            ScheduleUtils.run(scheduler, queryObject(jobId));
-        }
+        List<QuartzTask> list = listByIds(jobIds);
+        list.forEach(q -> {
+            JobKey jobKey = JobKey.jobKey(q.getName(), q.getGroupName());
+            try {
+                if (!scheduler.checkExists(jobKey)) {
+                    scheduleJob(q);
+                }
+                scheduler.triggerJob(jobKey);
+            } catch (SchedulerException e) {
+                log.error("[立即执行定时任务]定时任务失败:{}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+            }
+        });
     }
 
     /**
@@ -175,10 +239,19 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
      */
     @Override
     public void paush(List<Long> jobIds) {
-        for(Long jobId : jobIds){
-            ScheduleUtils.pauseJob(scheduler, jobId);
-        }
-        updateBatchTasksByStatus(jobIds, Constants.QUARTZ_STATUS_PUSH);
+        List<QuartzTask> list = listByIds(jobIds);
+        list.forEach(q -> {
+            JobKey jobKey = JobKey.jobKey(q.getName(), q.getGroupName());
+            try {
+                if (scheduler.checkExists(jobKey)) {
+                    scheduler.pauseJob(jobKey);
+                }
+            } catch (SchedulerException e) {
+                log.error("[暂停定时任务]定时任务失败:{}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+            }
+        });
+        updateBatchTasksByStatus(jobIds, JobStatus.PAUSED.getValue());
     }
 
     /**
@@ -187,9 +260,18 @@ public class QuartzTaskServiceImpl extends ServiceImpl<QuartzTaskDao, QuartzTask
      */
     @Override
     public void resume(List<Long> jobIds) {
-        for(Long jobId : jobIds){
-            ScheduleUtils.resumeJob(scheduler, jobId);
-        }
+        List<QuartzTask> list = listByIds(jobIds);
+        list.forEach(q -> {
+            JobKey jobKey = JobKey.jobKey(q.getName(), q.getGroupName());
+            try {
+                if (scheduler.checkExists(jobKey)) {
+                    scheduler.resumeJob(jobKey);
+                }
+            } catch (SchedulerException e) {
+                log.error("[恢复多个任务]定时任务失败:{}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.QuartzTask.TASK_EXCEPTION).build();
+            }
+        });
 
         updateBatchTasksByStatus(jobIds, Constants.QUARTZ_STATUS_NOMAL);
     }

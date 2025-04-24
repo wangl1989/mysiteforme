@@ -57,7 +57,7 @@ public class TableFieldConfig extends DataEntity {
 	 * 字段长度
 	 */
 	@TableField("column_length")
-	private Integer columnLength;
+	private Long columnLength;
     /**
      * 映射的Java类型，如String
      */

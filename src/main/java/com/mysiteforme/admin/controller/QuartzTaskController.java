@@ -8,36 +8,23 @@
 
 package com.mysiteforme.admin.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysiteforme.admin.entity.request.AddQuartzTaskRequest;
 import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
+import com.mysiteforme.admin.entity.request.UpdateQuartzTaskRequest;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.service.QuartzTaskService;
-import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.RestResponse;
-
-import jakarta.servlet.ServletRequest;
-
 import com.mysiteforme.admin.annotation.SysLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
-
 import java.util.List;
-import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/api/admin/quartzTask")
 public class QuartzTaskController {
 
@@ -52,33 +39,43 @@ public class QuartzTaskController {
      * @return 分页数据
      */
     @GetMapping("list")
-    public Result list(@RequestBody PageListQuartzTaskRequest request){
+    public Result list(PageListQuartzTaskRequest request){
         return Result.success(quartzTaskService.selectPageQuartzTask(request));
     }
 
     /**
      * 保存任务
-     * @param quartzTask 任务对象
+     * @param request 任务对象
      * @return 操作结果
      */
     @PostMapping("add")
     @SysLog(MessageConstants.SysLog.QUARTZ_TASK_ADD)
-    public Result add(@RequestBody QuartzTask quartzTask){
+    public Result add(@RequestBody @Valid AddQuartzTaskRequest request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        QuartzTask quartzTask = new QuartzTask();
+        BeanUtils.copyProperties(request,quartzTask);
         quartzTaskService.saveQuartzTask(quartzTask);
         return Result.success();
     }
 
     /**
      * 更新任务
-     * @param quartzTask 任务对象
+     * @param request 任务对象
      * @return 操作结果
      */
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.QUARTZ_TASK_EDIT)
-    public Result edit(@RequestBody QuartzTask quartzTask){
-        if(null == quartzTask.getId() || 0 == quartzTask.getId()){
+    public Result edit(@RequestBody @Valid UpdateQuartzTaskRequest request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        if(null == request.getId() || 0 == request.getId()){
             return Result.idIsNullError();
         }
+        QuartzTask quartzTask = new QuartzTask();
+        BeanUtils.copyProperties(request,quartzTask);
         quartzTaskService.updateQuartzTask(quartzTask);
         return Result.success();
     }
@@ -89,9 +86,8 @@ public class QuartzTaskController {
      * @return 操作结果
      */
     @DeleteMapping("delete")
-    @ResponseBody
     @SysLog(MessageConstants.SysLog.QUARTZ_TASK_DELETE)
-    public Result delete(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    public Result delete(@RequestParam(value = "ids",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
             return Result.idIsNullError();
         }
@@ -104,8 +100,8 @@ public class QuartzTaskController {
      * @param ids 任务ID List
      */
     @PostMapping("paush")
-    @ResponseBody
-    public Result paush(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_PAUSH)
+    public Result paush(@RequestParam(value = "ids",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
             return Result.idIsNullError();
         }
@@ -118,8 +114,8 @@ public class QuartzTaskController {
      * @param ids 任务ID List
      */
     @PostMapping("resume")
-    @ResponseBody
-    public Result resume(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_RESUME)
+    public Result resume(@RequestParam(value = "ids",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
             return Result.idIsNullError();
         }
@@ -132,8 +128,8 @@ public class QuartzTaskController {
      * @param ids 任务ID List
      */
     @PostMapping("run")
-    @ResponseBody
-    public Result run(@RequestParam(value = "ids[]",required = false)List<Long> ids){
+    @SysLog(MessageConstants.SysLog.QUARTZ_TASK_RUN)
+    public Result run(@RequestParam(value = "ids",required = false)List<Long> ids){
         if(null == ids || ids.isEmpty()){
             return Result.idIsNullError();
         }

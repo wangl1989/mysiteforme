@@ -43,8 +43,6 @@ public interface TableDao {
 
     List<TableField> selectFields(Map<String,Object> map);
 
-    TableVO selectDetailTable(String name);
-
     List<TableField> selectFields(IPage<TableField> objectPage,Map<String,Object> map);
 
     void changeTableName(Map<String,Object> map);

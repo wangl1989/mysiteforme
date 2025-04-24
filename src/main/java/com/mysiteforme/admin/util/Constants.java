@@ -39,6 +39,11 @@ public class Constants {
 	public static final String DEFAULT_PASSWORD = "123456";
 
 	/**
+	 * 定时任务参数名称
+	 */
+	public static final String JOB_PARAM_KEY = "JOB_PARAM_KEY";
+
+	/**
 	 * 定时任务状态:正常
 	 */
 	public static final Integer QUARTZ_STATUS_NOMAL = 0;

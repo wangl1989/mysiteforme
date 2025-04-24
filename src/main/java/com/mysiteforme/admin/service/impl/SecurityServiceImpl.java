@@ -103,15 +103,31 @@ public class SecurityServiceImpl implements SecurityService {
             }
             if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
                 // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
-                return Result.error(ResultCode.LOGIN_FAILED_LIMIT,MessageConstants.User.USER_LOGIN_FAILED_LIMIT);
+                return Result.error(ResultCode.LOGIN_FAILED_LIMIT,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,null,showFailResultTip(deviceId));
             }else{
                 userLoginFail.setLoginCount(userLoginFail.getLoginCount()+1);
             }
             redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, userLoginFail,Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
         } else {
-            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.builder().loginName(deviceId).loginTime(System.currentTimeMillis()).loginCount(1).build());
+            UserLoginFail fail = new UserLoginFail();
+            fail.setLoginCount(1);
+            fail.setLoginTime(System.currentTimeMillis());
+            fail.setLoginName(deviceId);
+            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, fail,Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
         }
         return Result.error(ERROR_CODE,ERROR_MSG);
+    }
+
+    private String showFailResultTip(String deviceId){
+        String tips;
+        long expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, TimeUnit.MINUTES);
+        if(expireTime > 0){
+            tips = expireTime + "分钟";
+        }else{
+            expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, TimeUnit.SECONDS);
+            tips = expireTime + "秒";
+        }
+        return tips;
     }
 
     /**
@@ -122,6 +138,19 @@ public class SecurityServiceImpl implements SecurityService {
     public void loginSuccess(MyUserDetails user, HttpServletRequest request,HttpServletResponse response) {
         // 获取设备ID
         String deviceId = request.getHeader(Constants.DEVICE_ID);
+        // 验证是否有登录出错信息
+        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId)) {
+            UserLoginFail userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.class);
+            if(userLoginFail == null){
+                // 这里是类型转换异常
+                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
+                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
+            }
+            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
+                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
+                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(deviceId)).build();
+            }
+        }
         // 如果没有设备ID，说明是非法请求（因为验证码阶段已经生成过设备ID）
         if (StringUtils.isBlank(deviceId)) {
             log.error("用户设备ID为空，用户名：{}",user.getUsername());
@@ -224,31 +253,49 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public void validateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = getCaptchaFromRequest(request);
-        String key = request.getHeader(Constants.CAPTCHA_TOKEN);
         String deviceId = request.getHeader(Constants.DEVICE_ID);
+        UserLoginFail userLoginFail = null;
+        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId)) {
+            userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.class);
+            if(userLoginFail == null){
+                // 这里是类型转换异常
+                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
+                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
+            }
+            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
+                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
+                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(deviceId)).build();
+            }
+
+        }
         // 验证码为空验证
         if (StringUtils.isBlank(code)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.USER_CAPTCHA_NULL).build();
-        }
-        // 验证码token为空验证
-        if (StringUtils.isBlank(key)) {
-            throw MyException.builder().paramMsgError(MessageConstants.User.USER_CAPTCHA_TOKEN_NULL).build();
         }
         // 校验设备ID
         if (StringUtils.isBlank(deviceId)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
         }
         // 如果缓存中没有验证码，则验证码已过期或不存在
-        if (!redisUtils.hasKey(RedisConstants.USER_CAPTCHA_CACHE_KEY + key)) {
+        if (!redisUtils.hasKey(RedisConstants.USER_CAPTCHA_CACHE_KEY + deviceId)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.USER_CAPTCHA_ERROR).build();
         }
-        String cacheCode = redisUtils.get(RedisConstants.USER_CAPTCHA_CACHE_KEY + key, String.class);
+        String cacheCode = redisUtils.get(RedisConstants.USER_CAPTCHA_CACHE_KEY + deviceId, String.class);
         
         if (!code.equalsIgnoreCase(cacheCode)) {
+            if(userLoginFail == null){
+                userLoginFail = new UserLoginFail();
+                userLoginFail.setLoginCount(1);
+                userLoginFail.setLoginTime(System.currentTimeMillis());
+                userLoginFail.setLoginName(deviceId);
+            }else{
+                userLoginFail.setLoginCount(userLoginFail.getLoginCount()+1);
+            }
+            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, userLoginFail, Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
             throw MyException.builder().businessError(MessageConstants.User.USER_CAPTCHA_ERROR).build();
         }
         // 验证通过后删除验证码
-        redisUtils.del(RedisConstants.USER_CAPTCHA_CACHE_KEY + key);
+        redisUtils.del(RedisConstants.USER_CAPTCHA_CACHE_KEY + deviceId);
     }
 
     private String getCaptchaFromRequest(HttpServletRequest request) throws IOException {

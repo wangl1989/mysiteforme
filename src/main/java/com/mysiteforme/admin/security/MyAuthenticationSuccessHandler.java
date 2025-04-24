@@ -8,14 +8,11 @@
 
 package com.mysiteforme.admin.security;
 
-import java.io.IOException;
-
 import com.mysiteforme.admin.service.SecurityService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -33,9 +30,7 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
     }
  
     @Override
-    public void onAuthenticationSuccess(
-            HttpServletRequest request, HttpServletResponse response, Authentication authentication
-    ) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
         securityService.loginSuccess(user, request, response);
     }

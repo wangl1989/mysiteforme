@@ -51,7 +51,7 @@ CREATE TABLE `sys_permission` (
   `remarks` varchar(255) DEFAULT NULL COMMENT '权限备注',
   `del_flag` tinyint DEFAULT NULL COMMENT '删除标志',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 DROP TABLE IF EXISTS `sys_permission_page`;
 CREATE TABLE sys_permission_page (
@@ -145,19 +145,23 @@ CREATE TABLE `sys_user_device` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户设备表';
 
 
-ALTER TABLE sys_user ADD COLUMN color VARCHAR(200) AFTER icon COMMENT '图标颜色';
-ALTER TABLE sys_user ADD COLUMN path VARCHAR(200) AFTER permission COMMENT '前端路由地址';
-ALTER TABLE sys_user ADD COLUMN component VARCHAR(200) AFTER path COMMENT '前端组件地址';
-ALTER TABLE sys_user ADD COLUMN title VARCHAR(200) AFTER component COMMENT '菜单标题';
-ALTER TABLE sys_user ADD COLUMN show_badge tinyint DEFAULT 0 AFTER title COMMENT '是否显示徽标（菜单右侧的红色小圆点）';
-ALTER TABLE sys_user ADD COLUMN show_text_badge VARCHAR(200) AFTER show_badge COMMENT '是否显示文字徽标（菜单右侧的红色文字标签）';
-ALTER TABLE sys_user ADD COLUMN is_hide tinyint AFTER show_text_badge COMMENT '是否在菜单中隐藏（在左侧菜单栏中不显示）';
-ALTER TABLE sys_user ADD COLUMN is_hide_tab tinyint AFTER is_hide COMMENT '是否在标签页中隐藏 （在顶部标签栏中不显示）';
-ALTER TABLE sys_user ADD COLUMN link varchar(2000) AFTER is_hide_tab COMMENT '外链链接地址';
-ALTER TABLE sys_user ADD COLUMN is_iframe tinyint AFTER link COMMENT '是否为iframe';
-ALTER TABLE sys_user ADD COLUMN keep_alive tinyint AFTER is_iframe COMMENT '是否缓存';
-ALTER TABLE sys_user ADD COLUMN is_in_main_container tinyint AFTER keep_alive COMMENT '是否在主容器中';
+ALTER TABLE sys_menu ADD COLUMN color VARCHAR(200) COMMENT '图标颜色' AFTER icon;
+ALTER TABLE sys_menu ADD COLUMN path VARCHAR(200) COMMENT '前端路由地址' AFTER permission;
+ALTER TABLE sys_menu ADD COLUMN component VARCHAR(200) COMMENT '前端组件地址' AFTER path;
+ALTER TABLE sys_menu ADD COLUMN title VARCHAR(200) COMMENT '菜单标题' AFTER component;
+ALTER TABLE sys_menu ADD COLUMN show_badge tinyint DEFAULT 0 COMMENT '是否显示徽标（菜单右侧的红色小圆点）'AFTER title;
+ALTER TABLE sys_menu ADD COLUMN show_text_badge VARCHAR(200) COMMENT '是否显示文字徽标（菜单右侧的红色文字标签）' AFTER show_badge;
+ALTER TABLE sys_menu ADD COLUMN is_hide tinyint COMMENT '是否在菜单中隐藏（在左侧菜单栏中不显示）' AFTER show_text_badge;
+ALTER TABLE sys_menu ADD COLUMN is_hide_tab tinyint COMMENT '是否在标签页中隐藏 （在顶部标签栏中不显示）' AFTER is_hide;
+ALTER TABLE sys_menu ADD COLUMN link varchar(2000) COMMENT '外链链接地址' AFTER is_hide_tab;
+ALTER TABLE sys_menu ADD COLUMN is_iframe tinyint COMMENT '是否为iframe' AFTER link;
+ALTER TABLE sys_menu ADD COLUMN keep_alive tinyint COMMENT '是否缓存' AFTER is_iframe;
+ALTER TABLE sys_menu ADD COLUMN is_in_main_container tinyint COMMENT '是否在主容器中' AFTER keep_alive;
 
+
+ALTER TABLE quartz_task ADD COLUMN group_name varchar(200) COMMENT '任务组名称' AFTER `cron`;
+ALTER TABLE quartz_task_log ADD COLUMN cron varchar(200) COMMENT '任务表达式' AFTER `name`;
+ALTER TABLE quartz_task_log ADD COLUMN group_name varchar(200) COMMENT '任务组名称' AFTER `cron`;
 
 
 
