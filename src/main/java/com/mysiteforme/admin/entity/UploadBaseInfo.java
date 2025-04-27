@@ -29,9 +29,9 @@ public class UploadBaseInfo extends DataEntity {
 
     /**
      * 前缀路径，例子如下:
-	 * (https://weizheng0301-1257429161.cos.ap-shanghai.myqcloud.com/)
-	 * (https://weizhengzs.s3.bitiful.net/)
-	 * (https://weizheng0301-1257429161.cos.ap-shanghai.myqcloud.com/)
+     * (<a href="https://weizheng0301-1257429161.cos.ap-shanghai.myqcloud.com/">...</a>)
+     * (<a href="https://weizhengzs.s3.bitiful.net/">...</a>)
+     * (<a href="https://weizheng0301-1257429161.cos.ap-shanghai.myqcloud.com/">...</a>)
      */
 	@TableField(value = "base_path")
 	private String basePath;

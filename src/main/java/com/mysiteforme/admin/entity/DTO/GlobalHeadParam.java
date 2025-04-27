@@ -3,7 +3,7 @@
  * @ Create Time: 2025-02-17 18:44:32
  * @ Modified by: wangl
  * @ Modified time: 2025-02-17 18:49:38
- * @ Description:
+ * @ Description: 公用头部参数
  */
 
 package com.mysiteforme.admin.entity.DTO;

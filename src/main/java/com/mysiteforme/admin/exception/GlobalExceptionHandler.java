@@ -9,7 +9,6 @@
 
 package com.mysiteforme.admin.exception;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,9 +23,8 @@ import com.mysiteforme.admin.util.Result;
 import com.mysiteforme.admin.util.ResultCode;
 import com.mysiteforme.admin.util.ToolUtil;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -52,16 +50,11 @@ public class GlobalExceptionHandler {
     /**
      * 统一处理所有的异常，根据异常类型调用相应的处理策略。
      * @param request 当前HTTP请求对象
-     * @param response 当前HTTP响应对象
      * @param e 抛出的异常对象
      * @return 返回错误视图或null（对于Ajax请求）
-     * @throws IOException 可能抛出的IO异常
      */
     @ExceptionHandler(Exception.class)
-    public Result handleAllException(HttpServletRequest request,
-                                           HttpServletResponse response,
-                                           Exception e) throws IOException,
-                                           ServletException {
+    public Result handleAllException(HttpServletRequest request, Exception e)  {
 
         // 获取对应的异常处理器
         ExceptionStrategy handler = exceptionStrategyMap.entrySet().stream()

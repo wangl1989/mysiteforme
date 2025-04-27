@@ -12,15 +12,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.mysiteforme.admin.entity.request.LoginRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,8 +31,6 @@ import com.mysiteforme.admin.redis.RedisConstants;
 import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.redis.TokenStorageService;
 import com.mysiteforme.admin.security.MyUserDetails;
-import com.mysiteforme.admin.service.SecurityService;
-import com.mysiteforme.admin.service.UserDeviceService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
@@ -60,8 +52,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoginController {
 
-	private AuthenticationManager authenticationManager;
-
 	private final RedisUtils redisUtils;
 
 	private final JwtService jwtService;
@@ -69,41 +59,6 @@ public class LoginController {
 	private final TokenStorageService tokenStorageService;
 
 	private final UserDetailsService userDetailsService;
-
-	private final UserDeviceService userDeviceService;
-
-	private final SecurityService securityService;
-
-	 
-
-	
-//	/**
-//	 * 用户登录
-//	 * @param userDTO 用户登录信息
-//	 */
-	@PostMapping("/login")
-	public Result loginMain(@RequestBody LoginRequest request) {
-		log.info("=================用户登录===================");
-		try {
-			// 添加日志
-			log.info("用户尝试登录：{}", request.getUsername());
-
-			UsernamePasswordAuthenticationToken token =
-					new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
-
-			Authentication authentication = authenticationManager.authenticate(token);
-			// 如果认证成功，这里不会抛出异常
-
-			log.info("用户登录成功：{}", authentication.getName());
-			// ... 后续处理
-
-		} catch (AuthenticationException e) {
-			log.error("用户登录失败：{}", e.getMessage(), e);
-			// ... 异常处理
-		}
-		return Result.success();
-	}
-	
 
 	/**
 	 * 生成验证码
@@ -115,7 +70,7 @@ public class LoginController {
 		String verifyCode = VerifyCodeUtil.generateTextCode(VerifyCodeUtil.TYPE_ALL_MIXED, 4, null);
 		//将验证码放到缓存里面REDIS,验证码有效期为5分钟
 		redisUtils.set(RedisConstants.USER_CAPTCHA_CACHE_KEY+deviceId, verifyCode, Constants.USER_CAPTCHA_CACHE_EXPIRE_TIME,TimeUnit.MINUTES);
-		log.info("本次生成的验证码为[{}],已存放到Redis中,redis的key值为{}",verifyCode,RedisConstants.USER_CAPTCHA_CACHE_KEY+deviceId);
+		log.debug("本次生成的验证码为[{}],已存放到Redis中,redis的key值为{}",verifyCode,RedisConstants.USER_CAPTCHA_CACHE_KEY+deviceId);
 		BufferedImage bufferedImage = VerifyCodeUtil.generateImageCode(verifyCode, 116, 36, 5, true, new Color(249,205,173), null, null);
 		Map<String,String> map = Maps.newHashMap();
 		map.put("image", ToolUtil.getBase64FromImage(bufferedImage));

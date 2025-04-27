@@ -53,7 +53,7 @@ public class MenuController{
         if(request == null){
             return Result.objectNotNull();
         }
-        if(menuService.getCountByName(request.getName())>0){
+        if(menuService.getCountByName(request.getName(),null)>0){
             return Result.paramMsgError(MessageConstants.Menu.MENU_NAME_EXISTS);
         }
         menuService.saveMenu(request);
@@ -65,6 +65,9 @@ public class MenuController{
     public Result edit(@RequestBody UpdateMenuRequest request){
         if(request == null){
             return Result.objectNotNull();
+        }
+        if(menuService.getCountByName(request.getName(),request.getId())>0){
+            return Result.paramMsgError(MessageConstants.Menu.MENU_NAME_EXISTS);
         }
         menuService.updateMenu(request);
         return Result.success();

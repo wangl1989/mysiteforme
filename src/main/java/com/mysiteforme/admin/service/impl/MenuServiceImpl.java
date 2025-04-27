@@ -108,10 +108,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
     @Override
     public void updateMenu(UpdateMenuRequest request) {
         Menu oldMenu = this.getById(request.getId());
-        if(!oldMenu.getName().equals(request.getName())) {
-            if(this.getCountByName(request.getName())>0){
-                throw MyException.builder().businessError(MessageConstants.Menu.MENU_NAME_EXISTS).build();
-            }
+        if(oldMenu == null) {
+            throw MyException.builder().businessError(MessageConstants.Menu.MENU_NOT_FOUND).build();
         }
         Menu menu = new Menu();
         BeanUtils.copyProperties(request,menu);
@@ -189,10 +187,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
      * @return 菜单数量
      */
     @Override
-    public long getCountByName(String name) {
+    public Long getCountByName(String name,Long id) {
         QueryWrapper<Menu> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         wrapper.eq("name",name);
+        if(id != null){
+            wrapper.ne("id",id);
+        }
         return count(wrapper);
     }
 

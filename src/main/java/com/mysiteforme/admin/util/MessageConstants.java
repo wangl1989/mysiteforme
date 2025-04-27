@@ -140,6 +140,7 @@ public class MessageConstants {
     }
 
     public static class Role {
+        public static final String ROLE_ID_CAN_NOT_NULL = "message.role.id.can.not.null";
         public static final String ROLE_HAS_USER = "message.role.has.user";
         public static final String ROLE_NAME_EMPTY = "message.role.name.empty";
         public static final String ROLE_NAME_HAS_EXIST = "message.role.name.has.exist";
@@ -382,6 +383,7 @@ public class MessageConstants {
         public static final String TABLE_NAME_NOT_EMPTY = "message.table.name.not.empty";
         public static final String SCHEMA_NAME_NOT_EMPTY = "message.schema.name.not.empty";
         public static final String BUSINESS_NAME_NOT_EMPTY = "message.business.name.not.empty";
+        public static final String CURRENT_TABLE_CAN_NOT_GENERATE_CODE = "message.table.config.current.table.can.not.generate.code";
 
         public static final String TABLE_CONFIG_EXISTS = "message.table.config.exists";
         public static final String TABLE_CONFIG_NO_EXISTS = "message.table.config.no.exists";

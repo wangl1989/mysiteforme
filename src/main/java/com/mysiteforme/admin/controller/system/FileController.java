@@ -170,6 +170,9 @@ public class FileController {
                 }
                 String urlType = ToolUtil.parseImageUrl(imgSrc);
                 UploadService uploadService = uploadServiceFactory.getUploadService(site.getFileUploadType());
+                if(uploadService == null){
+                    continue;
+                }
                 uploadResult(uploadService,urlType,e,imgSrc);
             }
         } catch (IOException e) {
@@ -185,24 +188,40 @@ public class FileController {
         return Result.success(doc.body().html());
     }
 
-    private boolean uploadResult(UploadService service,String urlType ,Element e, String imgSrc) throws NoSuchAlgorithmException, IOException{
+    private void uploadResult(UploadService service,String urlType ,Element e, String imgSrc) throws NoSuchAlgorithmException, IOException{
         //区分文件的来源类型
         switch (urlType) {
             case "local" -> {
                 imgSrc = imgSrc.substring(6);
                 File file = new File(imgSrc);
                 if(!file.exists()){
-                    return false;
+                    return;
                 }
-                e.attr("src",service.uploadLocalImg(imgSrc));
+                try {
+                    e.attr("src",service.uploadLocalImg(imgSrc));
+                }catch (Exception ex){
+                    log.error("本地文件上传失败",ex);
+                    e.attr("src",imgSrc);
+                }
+
             }
-            case "web" -> e.attr("src",service.uploadNetFile(imgSrc));
-            case "base64" -> e.attr("src",service.uploadBase64(imgSrc));
-            default -> {
-                return false;
+            case "web" -> {
+                try {
+                    e.attr("src",service.uploadNetFile(imgSrc));
+                }catch (Exception ex){
+                    log.error("网络文件上传失败",ex);
+                    e.attr("src",imgSrc);
+                }
+            }
+            case "base64" -> {
+                try {
+                    e.attr("src",service.uploadBase64(imgSrc));
+                } catch (Exception ex) {
+                    log.error("上传base64文件失败",ex);
+                    e.attr("src",imgSrc);
+                }
             }
         }
-        return true;
     }
 
     @SysLog(MessageConstants.SysLog.FILE_DOWNLOAD)

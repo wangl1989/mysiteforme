@@ -13,13 +13,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.TreeEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Getter
-@Setter
 @TableName("blog_channel")
 public class BlogChannel extends TreeEntity<BlogChannel> {
 

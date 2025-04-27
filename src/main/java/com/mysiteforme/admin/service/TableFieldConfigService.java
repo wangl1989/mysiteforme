@@ -3,7 +3,6 @@ package com.mysiteforme.admin.service;
 import com.mysiteforme.admin.entity.DTO.TableFieldDTO;
 import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mysiteforme.admin.entity.DTO.TableFieldConfigDTO;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.BaseTableFieldConfigResponse;
 

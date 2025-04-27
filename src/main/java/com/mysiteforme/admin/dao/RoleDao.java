@@ -10,21 +10,16 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.request.PageListRoleRequest;
-import com.mysiteforme.admin.entity.request.PageListUserRequest;
 import com.mysiteforme.admin.entity.response.BaseRoleResponse;
 import com.mysiteforme.admin.entity.response.PageListRoleResponse;
-import com.mysiteforme.admin.entity.response.PageListUserResponse;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Set;
 
 
-@Mapper
 public interface RoleDao extends BaseMapper<Role> {
 
     IPage<PageListRoleResponse> selectPageRole(IPage<PageListRoleResponse> page, @Param("request") PageListRoleRequest request);

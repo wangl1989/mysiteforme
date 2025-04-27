@@ -8,9 +8,11 @@
 
 package com.mysiteforme.admin.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
+import com.google.common.collect.Lists;
+import com.mysiteforme.admin.entity.response.TableConfigResponse;
+import com.mysiteforme.admin.entity.response.TableFieldConfigResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +70,7 @@ public class CreateTableFiles {
         fastAutoGenerator.packageConfig(builder -> {
             builder.parent("com.mysiteforme.admin") // 设置父包名
                     .entity("entity") // 设置实体类包名
-                    .controller("controller") // 设置 Controller 类包名
+                    .controller("controller.system") // 设置 Controller 类包名
                     .mapper("dao") // 设置 Mapper 接口包名
                     .service("service") // 设置 Service 接口包名
                     .serviceImpl("service.impl") // 设置 Service 实现类包名
@@ -107,7 +109,43 @@ public class CreateTableFiles {
                     .enableFileOverride();
         });
         fastAutoGenerator.injectionConfig((tableInfo, builder) -> {
-            builder.customMap(Collections.singletonMap("abc", author + "-mp")) // 自定义参数
+            Map<String,Object> customMap = new HashMap<>();
+            TableConfigResponse tableConfig = new TableConfigResponse();
+            tableConfig.setTableName("sys_table_field_config");
+            tableConfig.setAuthor("wangl");
+            tableConfig.setBusinessName("表格字段配置");
+            tableConfig.setIsSysFile(true);
+            tableConfig.setIsValidateStringNull(true);
+            List<TableFieldConfigResponse> fieldList = Lists.newArrayList();
+            TableFieldConfigResponse columnNamefield = new TableFieldConfigResponse();
+            columnNamefield.setColumnName("column_name");
+            columnNamefield.setBusinessName("字段名");
+            columnNamefield.setIsAddVisible(true);
+            columnNamefield.setIsNullable(false);
+            columnNamefield.setIsEditVisible(true);
+            fieldList.add(columnNamefield);
+            TableFieldConfigResponse businessNamefield = new TableFieldConfigResponse();
+            businessNamefield.setColumnName("business_name");
+            businessNamefield.setBusinessName("业务名称");
+            businessNamefield.setIsAddVisible(true);
+            businessNamefield.setIsEditVisible(true);
+            businessNamefield.setIsNullable(false);
+            businessNamefield.setValidationRules("asscvff");
+            fieldList.add(businessNamefield);
+            TableFieldConfigResponse isUniquefield = new TableFieldConfigResponse();
+            isUniquefield.setColumnName("is_unique");
+            isUniquefield.setBusinessName("是否唯一");
+            isUniquefield.setIsAddVisible(true);
+            isUniquefield.setIsEditVisible(true);
+            isUniquefield.setIsNullable(false);
+            fieldList.add(isUniquefield);
+            tableConfig.setFieldList(fieldList);
+            customMap.put(GenCodeConstants.INJECT_TABLE_CONFIG_DATA_KEY_PREFIX+"sys_table_field_config",tableConfig);
+            fieldList.forEach(f -> {
+                customMap.put(GenCodeConstants.INJECT_TABLE_FIELD_CONFIG_DATA_KEY_PREFIX+f.getColumnName(),f);
+            });
+
+            builder.customMap(customMap) // 自定义参数
                     .beforeOutputFile((t, objectMap) -> {
                         System.out.println("准备生成文件: " + t.getEntityName());
                         if(t.getName().contains("sys_")){
@@ -119,34 +157,18 @@ public class CreateTableFiles {
                     }).customFile(new ArrayList<CustomFile>() {{
                         // 通过格式化函数添加文件最后缀
                         add(new CustomFile.Builder()
-                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
+                                .formatNameFunction(tableInfo -> String.format(GenCodeConstants.DEFAULT_FORMAT_ADD_REQUEST_NAME,tableInfo.getEntityName()))
                                 .enableFileOverride()
-                                .filePath(baseDic + "/")
-                                .fileName("list.ftl")
-                                .templatePath("/templates/vm/list.jsp.vm")
-                                .packageName("front")
+                                .filePath(baseDic + "/front")
+                                .fileName(GenCodeConstants.CUSTOM_JAVA_FILE_NAME)
+                                .templatePath(GenCodeConstants.DEFAULT_ADD_REQUEST_TEMPLATE_PATH)
+                                .packageName("request")
                                 .build());
                         add(new CustomFile.Builder()
                                 .enableFileOverride()
-                                .fileName("DTO.java")
-                                .templatePath("/templates/vm/entityDTO.java.vm")
-                                .packageName("entity/DTO")
-                                .build());
-                        add(new CustomFile.Builder()
-                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
-                                .enableFileOverride()
-                                .filePath(baseDic + "/")
-                                .fileName("add.ftl")
-                                .templatePath("/templates/vm/add.jsp.vm")
-                                .packageName("front")
-                                .build());
-                        add(new CustomFile.Builder()
-                                .formatNameFunction(tableInfo -> tableInfo.getEntityName() + "/")
-                                .enableFileOverride()
-                                .filePath(baseDic + "/")
-                                .fileName("edit.ftl")
-                                .templatePath("/templates/vm/edit.jsp.vm")
-                                .packageName("front")
+                                .fileName(".java")
+                                .templatePath("/templates/vm/entity.java.vm")
+                                .packageName("DTO")
                                 .build());
                     }});
         });

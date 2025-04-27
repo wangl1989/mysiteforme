@@ -9,10 +9,10 @@
 package com.mysiteforme.admin.aspect;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.util.MessageUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 
 import com.mysiteforme.admin.base.MySecurityUser;
@@ -29,7 +29,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -41,12 +40,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+
+@Slf4j
 @Aspect
 @Component
 @Order(5)
 public class WebLogAspect {
-
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(WebLogAspect.class);
 
     private LogService logService;
 
@@ -73,7 +72,7 @@ public class WebLogAspect {
      * @param joinPoint 连接点,包含被拦截方法的信息
      */
     @Before("webLog()")
-    public void doBefore(JoinPoint joinPoint) throws JsonProcessingException {
+    public void doBefore(JoinPoint joinPoint){
         startTime.set(System.currentTimeMillis());
         sysLog = new Log();
         // 接收到请求，记录请求内容
@@ -108,15 +107,12 @@ public class WebLogAspect {
             sysLog.setSessionId(session.getId());
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
             Method method = signature.getMethod();
-            com.mysiteforme.admin.annotation.SysLog mylog = method.getAnnotation(com.mysiteforme.admin.annotation.SysLog.class);
-            if (mylog != null) {
-                if(StringUtils.isNotBlank(mylog.generateValue())){
-                    //自动生成的方法注解上的描述
-                    sysLog.setTitle(mylog.generateValue());
-                } else if (StringUtils.isNotBlank(mylog.value())) {
+            com.mysiteforme.admin.annotation.SysLog myLog = method.getAnnotation(com.mysiteforme.admin.annotation.SysLog.class);
+            if (myLog != null) {
+                if (StringUtils.isNotBlank(myLog.value())) {
                     //系统方法注解上的描述
-                    System.out.println("mylog.value():" + mylog.value());
-                    sysLog.setTitle(MessageUtil.getMessage(mylog.value()));
+                    log.debug("myLog.value():{}",myLog.value());
+                    sysLog.setTitle(MessageUtil.getMessage(myLog.value()));
                 }
 
             }
@@ -161,7 +157,7 @@ public class WebLogAspect {
         try {
             return proceedingJoinPoint.proceed();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(),e);
+            log.error(e.getMessage(),e);
             sysLog.setException(e.getMessage());
             throw e;
         }

@@ -11,8 +11,6 @@ public class TokenValidationResult {
     private String errorMessage;
     private TokenErrorType errorType;
 
-    public TokenValidationResult(){}
-
     public TokenValidationResult(boolean isValid) {
         this.isValid = isValid;
     }

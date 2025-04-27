@@ -1,28 +1,21 @@
-#set($tablecomment = "")
-#set($tabletype = "")
-#foreach($e in $table.comment.split(","))
-    #if( $foreach.count == 1 )
-        #set($tablecomment = $e)
-    #elseif( $foreach.count == 2 )
-        #set($tabletype = $e)
-    #end
-#end
+#set($tableMapKey="table_config_$!table.name")
 package ${package.ServiceImpl};
 
-import org.springframework.beans.BeanUtils;
+import ${package.Entity}.request.PageList${entity}Request;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${package.Entity}.${entity};
 import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 import ${superServiceImplClassPackage};
-import ${package.Entity}.DTO.${entity}DTO;
-
 
 /**
  * <p>
- * $!{tablecomment} 服务实现类
+ * $!cfg[$tableMapKey].businessName 服务实现类
  * </p>
  *
  * @author ${author}
@@ -37,11 +30,140 @@ open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperNam
 @Transactional(rollbackFor = Exception.class)
 public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
 
+    /**
+     * 分页查询$!cfg[$tableMapKey].businessName
+     */
     @Override
-    public void save${entity}DTO(${entity}DTO ${table.entityPath}DTO) {
-        ${entity} ${table.entityPath} = new ${entity}();
-        BeanUtils.copyProperties(${table.entityPath}DTO,${table.entityPath});
-        baseMapper.insert(${table.entityPath});
+    public IPage<${entity}> selectPage${entity}(PageList${entity}Request request){
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(${entity}::getDelFlag,false);
+        if(request != null){
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#if(${field.propertyType.equals("String")})
+            if(StringUtils.isNotBlank(request.get${field.propertyType}())) {
+#else
+            if(request.get${field.propertyType}() != null){
+#end
+#if($!cfg[$fieldMapKey].queryType=="eq")
+                wrapper.eq(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="ne")
+                wrapper.ne(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="gt")
+                wrapper.gt(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="lt")
+                wrapper.lt(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="gte")
+                wrapper.ge(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="lte")
+                wrapper.le(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="like")
+                wrapper.like(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="left_like")
+                wrapper.likeLeft(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="right_like")
+                wrapper.likeRight(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="in")
+                wrapper.in(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="not_in")
+                wrapper.notIn(${entity}::get${field.propertyType}, request.get${field.propertyType}());
+#elseif($!cfg[$fieldMapKey].queryType=="is_null")
+                wrapper.isNull(${entity}::get${field.propertyType});
+#elseif($!cfg[$fieldMapKey].queryType=="is_not_null")
+                wrapper.isNotNull(${entity}::get${field.propertyType});
+#end
+            }
+#end
+#end
+        } else {
+            request = new PageList${entity}Request();
+        }
+        wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), ${entity}::getCreateDate);
+        return this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
     }
+
+    /**
+     * 新增或编辑$!cfg[$tableMapKey].businessName
+     */
+    @Override
+    public void saveOrUpdate${entity}(${entity} ${table.entityPath}) {
+#if($!cfg[$tableMapKey].hasSortField)
+        if(${table.entityPath}.getSort() == null || ${table.entityPath}.getSort() == 0 || ${table.entityPath}.getSort() == 1){
+#if($!cfg[$tableMapKey].tableType == 2)
+            ${table.entityPath}.setSort(getMaxSort(${table.entityPath}.getParentId(), ${table.entityPath}.getId()));
+#else
+            ${table.entityPath}.setSort(getMaxSort(${table.entityPath}.getId()));
+#end
+        }
+#end
+        saveOrUpdate(${table.entityPath});
+    }
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isUnique)
+    /**
+     * 检查$!cfg[$fieldMapKey].businessName唯一性
+     */
+    @Override
+    public Long get${field.capitalName}Count(${field.propertyType} ${field.propertyName},Long id) {
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(${entity}::getDelFlag,false);
+        wrapper.eq(${entity}::get${field.propertyType},${field.propertyName});
+        if(id != null){
+            wrapper.ne(${entity}::getId,id);
+        }
+    }
+
+#end
+#end
+
+#if($!cfg[$tableMapKey].hasSortField)
+#if($!cfg[$tableMapKey].tableType == 2)
+    /**
+     * 获取最大排序号
+     */
+    private Integer getMaxSort(Long parentId, Long id) {
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        if(parentId != null){
+            wrapper.eq(${entity}::getParentId, parentId);
+        }else{
+            wrapper.isNull(${entity}::getParentId);
+        }
+        wrapper.eq(${entity}::getDelFlag, false);
+        if(id != null){
+            wrapper.ne(${entity}::getId,fieldConfig.getId());
+        }
+        wrapper.orderByDesc(${entity}::getSort);
+        wrapper.last("LIMIT 1");
+        ${entity} maxSort${entity} = getOne(wrapper);
+        if(maxSort${entity} != null) {
+            return  maxSort${entity}.getSort() + 1;
+        }else{
+            return 1;
+        }
+    }
+#else
+    /**
+     * 获取最大排序号
+     */
+    private Integer getMaxSort(Long id) {
+        LambdaQueryWrapper<${entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(${entity}::getDelFlag, false);
+        if(id != null){
+            wrapper.ne(${entity}::getId, id);
+        }
+        wrapper.orderByDesc(${entity}::getSort);
+        wrapper.last("LIMIT 1");
+        ${entity} maxSort${entity} = getOne(wrapper);
+        if(maxSort${entity} != null) {
+            return  maxSort${entity}.getSort() + 1;
+        }else{
+            return 1;
+        }
+    }
+#end
+#end
 }
 #end

@@ -14,6 +14,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
 
+/**
+ * 处理所有@RequestBody 里的数据
+ * @ Author: wangl
+ * @ Create Time: 2025-02-11 14:55:13
+ * @ Modified by: wangl
+ * @ Modified time: 2025-02-15 13:19:56
+ */
 @Slf4j
 @ControllerAdvice
 public class XssRequestBodyAdvice extends RequestBodyAdviceAdapter {

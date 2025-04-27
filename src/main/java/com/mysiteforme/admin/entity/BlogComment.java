@@ -13,15 +13,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Getter
-@Setter
 @TableName("blog_comment")
 public class BlogComment extends DataEntity {
 

@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Created by wangl on 2018/1/20.
- * todo:
+ * @ Description: 系统缓存工具类
  */
 @Component
 @RequiredArgsConstructor

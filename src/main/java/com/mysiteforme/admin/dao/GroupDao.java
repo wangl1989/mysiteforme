@@ -10,9 +10,7 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Group;
-import org.apache.ibatis.annotations.Mapper;
 
-@Mapper
 public interface GroupDao extends BaseMapper<Group> {
 
 }

@@ -13,8 +13,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -22,29 +20,89 @@ import lombok.Setter;
 @Data
 public class Site extends DataEntity {
 
+	/**
+	 * 网站名称
+	 */
 	private String name;
+	/**
+	 * 当前版本
+	 */
 	private String version;
+	/**
+	 * 开发作者
+	 */
 	private String author;
+	/**
+	 * 作者头像
+	 */
 	@TableField("author_icon")
 	private String authorIcon;
+	/**
+	 * 文件上传方式
+	 */
 	@TableField("file_upload_type")
 	private String fileUploadType;
+	/**
+	 * 微博
+	 */
 	private String weibo;
+	/**
+	 * qq
+	 */
 	private String qq;
+	/**
+	 * gitee地址
+	 */
 	private String git;
+	/**
+	 * github地址
+	 */
 	private String github;
+	/**
+	 * 手机号
+	 */
 	private String phone;
+	/**
+	 * 邮箱
+	 */
 	private String email;
+	/**
+	 * 地址
+	 */
 	private String address;
+	/**
+	 * logo
+	 */
 	private String logo;
+	/**
+	 * 服务器
+	 */
 	private String server;
+	/**
+	 * 数据库
+	 */
 	@TableField("my_database")
 	private String myDatabase;
+	/**
+	 * 最大上传文件大小
+	 */
 	@TableField("max_upload")
 	private Integer maxUpload;
+	/**
+	 * 网站关键字
+	 */
 	private String keywords;
+	/**
+	 * 网站描述
+	 */
 	private String description;
+	/**
+	 * 版权
+	 */
 	private String powerby;
+	/**
+	 * 网站备案
+	 */
 	private String record;
 	/**
 	 * 网站网址

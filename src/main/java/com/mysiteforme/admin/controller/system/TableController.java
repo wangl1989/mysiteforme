@@ -31,13 +31,19 @@ import static com.mysiteforme.admin.util.GenCodeConstants.*;
 @RequestMapping("/api/admin/table")
 @RequiredArgsConstructor
 @SqlInjectionCheck
-public class TableController{
+public class TableController {
 
     private final CreateTableFiles createTableFiles;
 
     private final TableService tableService;
 
     private final SiteService siteService;
+
+    /**
+     * 分页展示数据表
+     * @param request 请求列表页参数
+     * @return 返回Result对象
+     */
     @GetMapping("list")
     public Result list(@Valid PageListTableRequest request){
         return Result.success(tableService.selectPageTable(request));
@@ -46,7 +52,7 @@ public class TableController{
     @PostMapping("add")
     @SysLog(MessageConstants.SysLog.TABLE_ADD)
     public Result add(@RequestBody @Valid AddTableRequest request){
-        if(ArrayUtils.contains(JAVA_KEYWORKS,request.getTableName())){
+        if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getTableName())){
             return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CONTAINS_JAVA_KEYWORDS);
         }
         if(request.getFieldList() == null || request.getFieldList().isEmpty()){
@@ -67,7 +73,7 @@ public class TableController{
                 if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
                     return Result.businessMsgError(MessageConstants.Table.TABLE_CAN_NOT_CHANGE,request.getTableName());
                 }
-                if(ArrayUtils.contains(JAVA_KEYWORKS,request.getTableName())){
+                if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getTableName())){
                     return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CONTAINS_JAVA_KEYWORDS);
                 }
                 if(tableService.existTable(request.getSchemaName(), request.getTableName()) > 0){
@@ -127,7 +133,7 @@ public class TableController{
         if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
             return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_CAN_NOT_CHANGE,request.getTableName());
         }
-        if(ArrayUtils.contains(JAVA_KEYWORKS,request.getColumnName())){
+        if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getColumnName())){
             return Result.paramMsgError(MessageConstants.Table.TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS);
         }
         if(tableService.existTable(request.getSchemaName(), request.getTableName()) == 0){
@@ -161,7 +167,7 @@ public class TableController{
         if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
             return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_CAN_NOT_CHANGE,request.getTableName());
         }
-        if(ArrayUtils.contains(JAVA_KEYWORKS,request.getColumnName())){
+        if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getColumnName())){
             return Result.paramMsgError(MessageConstants.Table.TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS);
         }
         if(tableService.existTable(request.getSchemaName(), request.getTableName()) == 0){
@@ -188,10 +194,10 @@ public class TableController{
 
     @GetMapping("fieldIsExist")
     public Result fieldIsExist(@Valid FieldIsExistRequest request){
-        if(ArrayUtils.contains(JAVA_KEYWORKS,request.getFieldName())){
+        if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getFieldName())){
             return Result.paramMsgError(MessageConstants.Table.TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS);
         }
-        if(ArrayUtils.contains(JAVA_KEYWORKS,request.getTableName())){
+        if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getTableName())){
             return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CONTAINS_JAVA_KEYWORDS);
         }
         if(tableService.existTableField(request.getSchemaName(),request.getTableName(),request.getFieldName())>0){

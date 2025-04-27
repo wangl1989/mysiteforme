@@ -37,7 +37,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.dao.PermissionDao;
 import com.mysiteforme.admin.dao.UserDao;
-import com.mysiteforme.admin.entity.DTO.PermissionForUserDTO;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.PermissionVO;

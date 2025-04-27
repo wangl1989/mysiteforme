@@ -174,7 +174,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MyHandlerInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login","/api/auth/refresh","/favicon.ico","/actuator/**","/error","/logout","/genCaptcha","/static/**","/showBlog/**","/druid/**");
+                .excludePathPatterns("/login",
+                        "/api/auth/refresh",
+                        "/favicon.ico",
+                        "/actuator/**",
+                        "/error",
+                        "/logout",
+                        "/genCaptcha",
+                        "/static/**",
+                        "/showBlog/**",
+                        "/druid/**");
         registry.addInterceptor(new BlogHandlerInterceptor())
                 .addPathPatterns("/showBlog/**");
     }

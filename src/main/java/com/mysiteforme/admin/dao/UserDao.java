@@ -8,26 +8,21 @@
 
 package com.mysiteforme.admin.dao;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.request.PageListUserRequest;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
-import com.mysiteforme.admin.entity.response.UserDetailResponse;
 import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mysiteforme.admin.entity.DTO.PermissionForUserDTO;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
 
 
-@Mapper
 public interface UserDao extends BaseMapper<User> {
 
 	IPage<PageListUserResponse> selectPageUser(IPage<PageListUserResponse> page, @Param("request")PageListUserRequest request);

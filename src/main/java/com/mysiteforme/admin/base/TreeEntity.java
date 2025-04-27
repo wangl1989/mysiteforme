@@ -12,14 +12,10 @@ package com.mysiteforme.admin.base;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import java.util.List;
 
 
 @EqualsAndHashCode(callSuper = true)
-@Setter
-@Getter
 @Data
 public class TreeEntity<T> extends DataEntity {
 
@@ -48,14 +44,6 @@ public class TreeEntity<T> extends DataEntity {
 
     @TableField(exist = false)
     protected T parentTree;
-
-    /**
-     * 获取父节点ID路径
-     * @return 父节点ID路径字符串
-     */
-    public String getParentIds() {
-        return parentIds;
-    }
 
     /**
      * 默认构造函数

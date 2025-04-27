@@ -20,8 +20,6 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_rescource")
 @Data
-@Getter
-@Setter
 public class Rescource extends DataEntity {
 
     /**

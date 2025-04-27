@@ -9,11 +9,9 @@
 package com.mysiteforme.admin.dao;
 
 import com.mysiteforme.admin.entity.PermissionPage;
-import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 
-@Mapper
 public interface PermissionPageDao extends BaseMapper<PermissionPage> {
 
 }

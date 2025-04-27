@@ -23,7 +23,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @Component
 public class CaptchaFilter extends OncePerRequestFilter {
@@ -48,7 +47,6 @@ public class CaptchaFilter extends OncePerRequestFilter {
         // 只拦截登录请求
         if (isLoginPost && isJson) {
             // 使用 ContentCachingRequestWrapper
-//            ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
             RequestWrapper requestWrapper = new RequestWrapper(request);
             // 读取 Body (即使在 doFilter 之前，ContentCachingRequestWrapper 第一次读取后会缓存)
             // 或者，如果必须在 doFilter 之前读取，就需要手动调用 getInputStream().read() 或类似方法触发读取和缓存

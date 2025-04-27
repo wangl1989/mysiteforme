@@ -17,16 +17,12 @@ import com.mysiteforme.admin.entity.VO.PermissionVO;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
 @Data
-@Getter
-@Setter
 public class User extends DataEntity {
 
     /**
@@ -76,12 +72,6 @@ public class User extends DataEntity {
 	@JSONField(serialize=false)
 	public String getPassword() {
 		return password;
-	}
-
-
-	@JSONField(serialize=false)
-	public String getSalt() {
-		return salt;
 	}
 
 	@Override

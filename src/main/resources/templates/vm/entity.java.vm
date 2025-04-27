@@ -1,28 +1,22 @@
 package ${package.Entity};
 
 #foreach($pkg in ${table.importPackages})
-#if( $pkg != "java.io.Serializable;" )
 import ${pkg};
 #end
+#if(${swagger})
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 #end
 #if(${entityLombokModel})
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 #end
-
-#set($tablecomment = "")
-#set($tabletype = "")
-#foreach($e in $table.comment.split(","))
-	#if( $foreach.count == 1 )
-		#set($tablecomment = $e)
-	#elseif( $foreach.count == 2 )
-		#set($tabletype = $e)
-	#end
-#end
+#set($tableMapKey="table_config_$!table.name")
 /**
  * <p>
- * $!{tablecomment}
+ *
+ * $!cfg[$tableMapKey].businessName
  * </p>
  *
  * @author ${author}
@@ -30,72 +24,49 @@ import lombok.EqualsAndHashCode;
  */
 #if(${entityLombokModel})
 @Data
+#if(${superEntityClass})
 @EqualsAndHashCode(callSuper = true)
+#else
+@EqualsAndHashCode(callSuper = false)
+#end
+@Accessors(chain = true)
 #end
 #if(${table.convert})
 @TableName("${table.name}")
 #end
+#if(${swagger})
+@ApiModel(value="${entity}对象", description="$!{table.comment}")
+#end
 #if(${superEntityClass})
 public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
 #elseif(${activeRecord})
-public class ${entity} extends Model<${entity}> {
+    public class ${entity} extends Model<${entity}> {
 #else
-public class ${entity} implements Serializable {
+    public class ${entity} implements Serializable {
 #end
 
     private static final long serialVersionUID = 1L;
-
 ## ----------  BEGIN 字段循环遍历  ----------
 #foreach($field in ${table.fields})
-#set($comment = "")
-#set($type = "")
-#set($isNullAble = true)
-#set($defaultValue = false)
-#set($listIsShow = true)
-#set($listIsSearch = false)
-#foreach( $e in $field.comment.split(","))
-#if( $foreach.count == 1 )
-#set($comment = $e)
-#elseif( $foreach.count == 2 )
-#set($type = $e)
-#elseif( $foreach.count == 3)
-#if($e == "YES")
-#set($isNullAble = true)
-#else
-#set($isNullAble = false)
-#end
-#elseif( $foreach.count == 4)
-#if($e == "true")
-#set($defaultValue = true)
-#else
-#set($defaultValue = false)
-#end
-#elseif( $foreach.count == 5)
-#if($e == "true")
-#set($listIsShow = true)
-#else
-#set($listIsShow = false)
-#end
-#elseif( $foreach.count == 6)
-#if($e == "true")
-#set($listIsSearch = true)
-#else
-#set($listIsSearch = false)
-#end
-#end
-#end
+#set($fieldMapKey="field_config_$!field.name")
 #if(${field.keyFlag})
 #set($keyPropertyName=${field.propertyName})
 #end
-#if("$!comment" != "")
+#if("$!field.comment" != "")
+#if(${swagger})
+    @ApiModelProperty(value = "${field.comment}")
+#else
     /**
-     * ${comment}
+     * $!cfg[$fieldMapKey].businessName
      */
+#end
 #end
 #if(${field.keyFlag})
 ## 主键
 #if(${field.keyIdentityFlag})
-	@TableId(value="${field.name}", type= IdType.AUTO)
+    @TableId(value = "${field.name}", type = IdType.AUTO)
+#elseif(!$null.isNull(${idType}) && "$!idType" != "")
+    @TableId(value = "${field.name}", type = IdType.${idType})
 #elseif(${field.convert})
     @TableId("${field.name}")
 #end
@@ -103,65 +74,79 @@ public class ${entity} implements Serializable {
 #elseif(${field.fill})
 ## -----   存在字段填充设置   -----
 #if(${field.convert})
-	@TableField(value = "${field.name}", fill = FieldFill.${field.fill})
+    @TableField(value = "${field.name}", fill = FieldFill.${field.fill})
 #else
-	@TableField(fill = FieldFill.${field.fill})
+    @TableField(fill = FieldFill.${field.fill})
 #end
 #elseif(${field.convert})
-	@TableField("${field.name}")
+    @TableField("${field.name}")
 #end
 ## 乐观锁注解
 #if(${versionFieldName}==${field.name})
-	@Version
+    @Version
 #end
 ## 逻辑删除注解
 #if(${logicDeleteFieldName}==${field.name})
     @TableLogic
 #end
-	private ${field.propertyType} ${field.propertyName};
+    private ${field.propertyType} ${field.propertyName};
 #end
 ## ----------  END 字段循环遍历  ----------
 
 #if(!${entityLombokModel})
 #foreach($field in ${table.fields})
+#if(${field.propertyType.equals("boolean")})
+#set($getprefix="is")
+#else
 #set($getprefix="get")
-#set($setprefix="set")
-	public ${field.propertyType} ${getprefix}${field.capitalName}() {
-		return ${field.propertyName};
-	}
+#end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
 
 #if(${entityBuilderModel})
-	public ${entity} ${setprefix}${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
 #else
-	public void ${setprefix}${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
 #end
-		this.${field.propertyName} = ${field.propertyName};
+this.${field.propertyName} = ${field.propertyName};
 #if(${entityBuilderModel})
-		return this;
+        return this;
 #end
-	}
+    }
 #end
 #end
 
 #if(${entityColumnConstant})
 #foreach($field in ${table.fields})
-	public static final String ${field.name.toUpperCase()} = "${field.name}";
+    public static final String ${field.name.toUpperCase()} = "${field.name}";
 
 #end
 #end
-
-#if(!${entityLombokModel})
-	@Override
-	public String toString() {
-		return "${entity}{" +
-#foreach($field in ${table.fields})
-#if($!{velocityCount}==1)
-			"${field.propertyName}=" + ${field.propertyName} +
+#if(${activeRecord})
+    @Override
+    protected Serializable pkVal() {
+#if(${keyPropertyName})
+        return this.${keyPropertyName};
 #else
-			", ${field.propertyName}=" + ${field.propertyName} +
+        return null;
+#end
+    }
+
+#end
+#if(!${entityLombokModel})
+    @Override
+    public String toString() {
+        return "${entity}{" +
+#foreach($field in ${table.fields})
+#if($!{foreach.index}==0)
+            "${field.propertyName}=" + ${field.propertyName} +
+#else
+            ", ${field.propertyName}=" + ${field.propertyName} +
 #end
 #end
-			"}";
-	}
+        "}";
+    }
 #end
 }

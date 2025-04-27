@@ -19,11 +19,6 @@ import lombok.EqualsAndHashCode;
 @Data
 public class QuartzTask extends DataEntity {
 
-	/**
-	 * 任务调度参数key
-	 */
-    @TableField(exist = false)
-	public static final String JOB_PARAM_KEY = "JOB_PARAM_KEY";
     /**
      * 任务名称
      */

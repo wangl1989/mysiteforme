@@ -15,14 +15,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
-@Getter
-@Setter
 @Data
 public abstract class BaseEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6962439201546719734L;
 
     /**

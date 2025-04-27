@@ -1,12 +1,4 @@
-#set($tablecomment = "")
-#set($tabletype = "")
-#foreach($e in $table.comment.split(","))
-    #if( $foreach.count == 1 )
-        #set($tablecomment = $e)
-    #elseif( $foreach.count == 2 )
-        #set($tabletype = $e)
-    #end
-#end
+#set($tableMapKey="table_config_$!table.name")
 package ${package.Mapper};
 
 import ${package.Entity}.${entity};
@@ -14,12 +6,13 @@ import ${superMapperClassPackage};
 
 /**
  * <p>
- * $!{tablecomment} Mapper 接口
+ * $!cfg[$tableMapKey].businessName Mapper 接口
  * </p>
  *
  * @author ${author}
  * @since ${date}
  */
+
 #if(${kotlin})
 interface ${table.mapperName} : ${superMapperClass}<${entity}>
 #else

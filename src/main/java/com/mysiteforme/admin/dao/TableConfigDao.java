@@ -8,7 +8,7 @@ import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.BaseTableFieldResponse;
 import com.mysiteforme.admin.entity.response.BaseTableResponse;
 import com.mysiteforme.admin.entity.response.PageListTableConfigResponse;
-import org.apache.ibatis.annotations.Mapper;
+import com.mysiteforme.admin.entity.response.TableConfigResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,11 +21,22 @@ import java.util.List;
  * @author wangl
  * @since 2025-04-19
  */
-@Mapper
 public interface TableConfigDao extends BaseMapper<TableConfig> {
 
+    /**
+     * 获取表格配置分页数据
+     * @param page 分页对象
+     * @param request 参数对象
+     * @return 分页结果
+     */
     IPage<PageListTableConfigResponse>  selectPageTableConfig(IPage<PageListTableConfigResponse> page, @Param("request") PageListTableConfigRequest request);
 
+    /**
+     * 获取表格配置详情
+     * @param id 表格配置ID
+     * @return 表格配置详情
+     */
+    TableConfigResponse getTableConfigDetail(Long id);
     /**
      * 检查表是否存在
      * @param tableName 表名

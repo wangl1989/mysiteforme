@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.entity.DTO.PermissionDTO;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.service.PermissionService;

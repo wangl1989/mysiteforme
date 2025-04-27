@@ -14,7 +14,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.TableConfig;
 import com.mysiteforme.admin.service.TableConfigService;
 import com.mysiteforme.admin.util.Result;
@@ -33,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/admin/tableConfig")
 @RequiredArgsConstructor
-public class TableConfigController extends BaseController{
+public class TableConfigController {
 
     private final TableConfigService tableConfigService;
 
@@ -45,33 +44,13 @@ public class TableConfigController extends BaseController{
     @PostMapping("add")
     @SysLog(MessageConstants.SysLog.TABLE_CONFIG_ADD)
     public Result add(@RequestBody @Valid AddTableConfigRequest request){
-        Result result = validateParam(request);
-        if(!result.isSuccess()){
-            return result;
-        }
-        if(StringUtils.isBlank(request.getAuthor())){
-            request.setAuthor(MySecurityUser.nickName());
-        }
-        TableConfig tableConfig = new TableConfig();
-        BeanUtils.copyProperties(request,tableConfig);
-        tableConfigService.saveOrUpdateTableConfig(tableConfig);
-        return Result.success();
+        return saveOrUpdate(request);
     }
 
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.TABLE_CONFIG_UPDATE)
     public Result edit(@RequestBody @Valid UpdateTableConfigRequest request){
-        Result result = validateParam(request);
-        if(!result.isSuccess()){
-            return result;
-        }
-        if(StringUtils.isBlank(request.getAuthor())){
-            request.setAuthor(MySecurityUser.nickName());
-        }
-        TableConfig tableConfig = new TableConfig();
-        BeanUtils.copyProperties(request,tableConfig);
-        tableConfigService.saveOrUpdateTableConfig(tableConfig);
-        return Result.success();
+        return saveOrUpdate(request);
     }
 
     @DeleteMapping("delete")
@@ -84,6 +63,11 @@ public class TableConfigController extends BaseController{
         return Result.success();
     }
 
+    /**
+     * 恢复删除的配置
+     * @param id 配置ID
+     * @return 返回执行结果
+     */
     @PostMapping("recover")
     @SysLog(MessageConstants.SysLog.TABLE_CONFIG_RECOVER)
     public Result recover(@RequestParam(value = "id",required = false)Long id){
@@ -91,7 +75,6 @@ public class TableConfigController extends BaseController{
             return Result.idIsNullError();
         }
         tableConfigService.recoverTableConfig(id);
-
         return Result.success();
     }
 
@@ -117,7 +100,7 @@ public class TableConfigController extends BaseController{
         return Result.success(tableConfigService.getSchemaNameList());
     }
 
-    public Result validateParam(BaseTableConfigRequest request){
+    public Result saveOrUpdate(BaseTableConfigRequest request){
         if(request == null){
             return Result.objectNotNull();
         }
@@ -131,6 +114,12 @@ public class TableConfigController extends BaseController{
                 return Result.businessMsgError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM);
             }
         }
+        if(StringUtils.isBlank(request.getAuthor())){
+            request.setAuthor(MySecurityUser.nickName());
+        }
+        TableConfig tableConfig = new TableConfig();
+        BeanUtils.copyProperties(request,tableConfig);
+        tableConfigService.saveOrUpdateTableConfig(tableConfig);
         return Result.success();
     }
 

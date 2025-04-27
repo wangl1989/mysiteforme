@@ -1,6 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mysiteforme.admin.dao.TableConfigDao" >
+
+    <resultMap  id="BaseTableConfigResponseMap" type="com.mysiteforme.admin.entity.response.TableConfigResponse">
+        <id property="id" column="id"/>
+        <result property="tableName" column="table_name"/>
+        <result property="tableType" column="table_type"/>
+        <result property="tablePrefix" column="table_prefix"/>
+        <result property="schemaName" column="schema_name"/>
+        <result property="businessName" column="tc_business_name"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="packageName" column="package_name"/>
+        <result property="author" column="author"/>
+        <result property="generatePath" column="generate_path"/>
+        <result property="options" column="options"/>
+        <collection property="fieldList" ofType="com.mysiteforme.admin.entity.response.TableFieldConfigResponse">
+            <result property="tableConfigId" column="table_config_id"/>
+            <result property="columnName" column="column_name"/>
+            <result property="businessName" column="tfc_business_name"/>
+            <result property="columnType" column="column_type"/>
+            <result property="columnComment" column="column_comment"/>
+            <result property="columnLength" column="column_length"/>
+            <result property="javaType" column="java_type"/>
+            <result property="javaFieldName" column="java_field_name"/>
+            <result property="isUnique" column="is_unique"/>
+            <result property="isNullable" column="is_nullable"/>
+            <result property="isListVisible" column="is_list_visible"/>
+            <result property="isAddVisible" column="is_add_visible"/>
+            <result property="isEditVisible" column="is_edit_visible"/>
+            <result property="isDetailVisible" column="is_detail_visible"/>
+            <result property="isQueryField" column="is_query_field"/>
+            <result property="queryType" column="query_type"/>
+            <result property="formComponentType" column="form_component_type"/>
+            <result property="associatedDictType" column="associated_dict_type"/>
+            <result property="associatedType" column="associated_type"/>
+            <result property="associatedTable" column="associated_table"/>
+            <result property="associatedTableField" column="associated_table_field"/>
+            <result property="sort" column="sort"/>
+            <result property="validationRules" column="validation_rules"/>
+        </collection>
+    </resultMap>
+
+    <select id="getTableConfigDetail" resultMap="BaseTableConfigResponseMap">
+        SELECT
+            tc.id,
+            tc.table_name,
+            tc.table_type,
+            tc.table_prefix,
+            tc.schema_name,
+            tc.business_name AS tc_business_name,
+            tc.module_name,
+            tc.package_name,
+            tc.author,
+            tc.generate_path,
+            tc.options,
+            tfc.table_config_id,
+            tfc.column_name,
+            tfc.business_name AS tfc_business_name,
+            tfc.column_type,
+            tfc.column_comment,
+            tfc.column_length,
+            tfc.java_type,
+            tfc.java_field_name,
+            tfc.is_unique,
+            tfc.is_nullable,
+            tfc.is_list_visible,
+            tfc.is_add_visible,
+            tfc.is_edit_visible,
+            tfc.is_detail_visible,
+            tfc.is_query_field,
+            tfc.query_type,
+            tfc.form_component_type,
+            tfc.associated_dict_type,
+            tfc.associated_type,
+            tfc.associated_table,
+            tfc.associated_table_field,
+            tfc.sort,
+            tfc.validation_rules
+        FROM sys_table_config tc
+        LEFT JOIN sys_table_field_config tfc ON tfc.table_config_id = tc.id AND tfc.del_flag = false
+        WHERE
+            tc.id = #{id}
+        AND tc.del_flag = false
+    </select>
+
     <!--查询mysql数据表是否存在 -->
     <select id="existTable" resultType="java.lang.Integer">
         SELECT
@@ -27,6 +110,7 @@
         WHERE TABLE_SCHEMA=#{schemaName}
     </select>
 
+    <!--查询mysql数据库表字段列表 -->
     <select id="getFiledList" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
         SELECT
             COLUMN_NAME AS columnName,
@@ -52,6 +136,7 @@
           </if>
     </select>
 
+    <!--获取表字段列表(简易内容) -->
     <select id="getSimpleFiledList" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
         SELECT
         COLUMN_NAME AS columnName,
@@ -68,6 +153,7 @@
         AND COLUMN_NAME NOT IN ('id','parent_id','parent_ids','level','create_date','create_by','update_date','update_by','remarks','del_flag')
     </select>
 
+    <!--获取表字段详情 -->
     <select id="getFieldDetail" resultType="com.mysiteforme.admin.entity.DTO.TableFieldDTO">
         SELECT
             COLUMN_NAME AS columnName,
@@ -84,6 +170,7 @@
           AND COLUMN_NAME=#{columnName}
     </select>
 
+    <!--获取表格配置分页数据-->
     <select id="selectPageTableConfig" resultMap="pageListTableConfigResponseMap">
         SELECT
             t.id,
@@ -156,7 +243,7 @@
         </if>
     </select>
 
-    <resultMap id="pageListTableConfigResponseMap" type="com.mysiteforme.admin.entity.response.PageListTableConfigResponse">
+    <resultMap  id="pageListTableConfigResponseMap" type="com.mysiteforme.admin.entity.response.PageListTableConfigResponse">
         <id property="id" column="id"/>
         <result property="tableType" column="table_type"/>
         <result property="tableName" column="table_name"/>
@@ -178,23 +265,25 @@
         <result property="fieldCount" column="field_count"/>
     </resultMap>
 
-    <!--Table创建相关内容-->
+    <!--数据库表格分页-->
     <select id="selectPageTable" resultType="com.mysiteforme.admin.entity.response.BaseTableResponse">
         SELECT
-            t.TABLE_NAME AS name,
-            t.TABLE_SCHEMA AS schemaName,
-            t.TABLE_COMMENT AS comment,
-            t.TABLE_ROWS AS tableRows,
-            t.CREATE_TIME AS createTime,
-            t.UPDATE_TIME AS updateTime,
-            CASE WHEN c1.COLUMN_NAME IS NOT NULL THEN 1 ELSE 0 END AS hasParentId,
-            CASE WHEN c2.COLUMN_NAME IS NOT NULL THEN 1 ELSE 0 END AS hasDelFlag
+        t.TABLE_NAME AS name,
+        t.TABLE_SCHEMA AS schemaName,
+        t.TABLE_COMMENT AS comment,
+        t.TABLE_ROWS AS tableRows,
+        t.CREATE_TIME AS createTime,
+        t.UPDATE_TIME AS updateTime,
+        IF(c1.COLUMN_NAME IS NOT NULL, 1, 0) AS hasParentId,
+        IF(c2.COLUMN_NAME IS NOT NULL, 1, 0) AS hasDelFlag
         FROM INFORMATION_SCHEMA.TABLES t
-        LEFT JOIN INFORMATION_SCHEMA.COLUMNS c1 ON c1.TABLE_SCHEMA = t.TABLE_SCHEMA AND c1.TABLE_NAME = t.TABLE_NAME AND c1.COLUMN_NAME = 'parent_id'
-        LEFT JOIN INFORMATION_SCHEMA.COLUMNS c2 ON c2.TABLE_SCHEMA = t.TABLE_SCHEMA AND c2.TABLE_NAME = t.TABLE_NAME AND c2.COLUMN_NAME = 'del_flag'
+        LEFT JOIN INFORMATION_SCHEMA.COLUMNS c1 ON c1.TABLE_SCHEMA = t.TABLE_SCHEMA AND c1.TABLE_NAME = t.TABLE_NAME AND
+        c1.COLUMN_NAME = 'parent_id'
+        LEFT JOIN INFORMATION_SCHEMA.COLUMNS c2 ON c2.TABLE_SCHEMA = t.TABLE_SCHEMA AND c2.TABLE_NAME = t.TABLE_NAME AND
+        c2.COLUMN_NAME = 'del_flag'
         WHERE
-            t.TABLE_SCHEMA = #{request.schemaName}
-            <if test="request.tableName != null and request.tableName != ''">
+        t.TABLE_SCHEMA = #{request.schemaName}
+        <if test="request.tableName != null and request.tableName != ''">
             AND t.TABLE_NAME LIKE CONCAT('%',#{request.tableName},'%')
             </if>
             AND t.TABLE_NAME NOT LIKE 'qrtz_%'
@@ -202,6 +291,7 @@
         ORDER BY t.TABLE_NAME DESC
     </select>
 
+    <!--创建表格-->
     <insert id="creatTable" parameterType="com.mysiteforme.admin.entity.request.AddTableRequest">
         CREATE TABLE `#{request.tableName}`(
         `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -210,38 +300,40 @@
         </foreach>
         <choose>
             <when test="request.tableType == 1">
-                `create_date` datetime DEFAULT NULL COMMENT '创建时间',
-                `create_by` bigint(20) DEFAULT NULL COMMENT '创建人',
-                `update_date` datetime DEFAULT NULL COMMENT '修改时间',
-                `update_by` bigint(20) DEFAULT NULL COMMENT '修改人',
-                `remarks` varchar(255) DEFAULT NULL COMMENT '备注',
-                `del_flag` tinyint(4) DEFAULT NULL  COMMENT '删除标记',
+                <include refid="commonField"/>
             </when>
             <when test="request.tableType == 2">
                 `parent_id` bigint(20) DEFAULT NULL COMMENT '父节点ID',
                 `parent_ids` varchar(2000) DEFAULT NULL COMMENT '父节点联集',
                 `level` bigint(2) DEFAULT NULL COMMENT '层级深度',
                 `sort` smallint(6) DEFAULT NULL COMMENT '排序',
-                `create_date` datetime DEFAULT NULL COMMENT '创建时间',
-                `create_by` bigint(20) DEFAULT NULL COMMENT '创建人',
-                `update_date` datetime DEFAULT NULL COMMENT '修改时间',
-                `update_by` bigint(20) DEFAULT NULL COMMENT '修改人',
-                `remarks` varchar(255) DEFAULT NULL COMMENT '备注',
-                `del_flag` tinyint(4) DEFAULT NULL  COMMENT '删除标记',
+                <include refid="commonField"/>
             </when>
         </choose>
         PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT= '#{request.comment}';
     </insert>
 
+    <sql id="commonField">
+        `create_date` datetime DEFAULT NULL COMMENT '创建时间',
+        `create_by` bigint(20) DEFAULT NULL COMMENT '创建人',
+        `update_date` datetime DEFAULT NULL COMMENT '修改时间',
+        `update_by` bigint(20) DEFAULT NULL COMMENT '修改人',
+        `remarks` varchar(255) DEFAULT NULL COMMENT '备注',
+        `del_flag` tinyint(4) DEFAULT NULL  COMMENT '删除标记',
+    </sql>
+
+    <!--修改表名-->
     <update id="changeTableName" parameterType="com.mysiteforme.admin.entity.request.UpdateTableRequest">
         ALTER TABLE ${request.oldTableName} RENAME '${request.tableName}';
     </update>
 
+    <!--修改表注释-->
     <update id="changeTableComment" parameterType="com.mysiteforme.admin.entity.request.UpdateTableRequest">
         ALTER TABLE ${request.tableName} COMMENT = '${request.comment}';
     </update>
 
+    <!--表格字段分页-->
     <select id="selectPageTableField" resultType="com.mysiteforme.admin.entity.response.BaseTableFieldResponse" parameterType="com.mysiteforme.admin.entity.request.PageListTableFieldRequest">
         SELECT
         t.COLUMN_NAME AS columnName,

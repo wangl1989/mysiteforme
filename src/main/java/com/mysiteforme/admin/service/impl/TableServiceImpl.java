@@ -114,6 +114,9 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void dropTableField(DeleteFieldRequest request) {
+        if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
+            throw MyException.builder().businessError(MessageConstants.Table.SYSTEM_TABLE_CAN_NOT_DELETE,request.getTableName()).build();
+        }
         tableConfigDao.dropTableField(request.getTableName(),request.getFieldName());
     }
 
@@ -123,6 +126,9 @@ public class TableServiceImpl implements TableService {
      */
     @Override
     public void dropTable(String tableName){
+        if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(tableName::startsWith)){
+            throw MyException.builder().businessError(MessageConstants.Table.SYSTEM_TABLE_CAN_NOT_DELETE,tableName).build();
+        }
         tableConfigDao.dropTable(tableName);
     }
 

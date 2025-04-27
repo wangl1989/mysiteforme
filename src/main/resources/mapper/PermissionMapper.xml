@@ -29,7 +29,7 @@
         DELETE FROM sys_user_permission WHERE user_id = #{userId}
     </delete>
 
-    <insert id="saveUserPermission" parameterType="com.mysiteforme.admin.entity.DTO.AssignUserPermission">
+    <insert id="saveUserPermission" parameterType="com.mysiteforme.admin.entity.request.AssignUserPermissionRequest">
         INSERT INTO sys_user_permission (user_id,permission_id) VALUES
         <foreach collection="ass.permissionIds" item="permissionId" separator=",">
             (#{ass.userId},#{permissionId})

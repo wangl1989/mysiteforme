@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.redis;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class CacheEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

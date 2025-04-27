@@ -44,12 +44,7 @@ public class UploadBaseInfoController {
         }
         UploadBaseInfo uploadBaseInfo = new UploadBaseInfo();
         BeanUtils.copyProperties(request,uploadBaseInfo);
-        Result result = checkUploadBaseInfo(uploadBaseInfo);
-        if(result !=null && !result.isSuccess()){
-            return result;
-        }
-        uploadBaseInfoService.saveOrUpdateBaseInfo(uploadBaseInfo);
-        return Result.success();
+        return saveOrUpdateUploadBaseInfo(uploadBaseInfo);
     }  
 
     @SysLog(MessageConstants.SysLog.UPLOAD_BASE_INFO_UPDATE)
@@ -63,12 +58,7 @@ public class UploadBaseInfoController {
         }
         UploadBaseInfo uploadBaseInfo = new UploadBaseInfo();
         BeanUtils.copyProperties(request,uploadBaseInfo);
-        Result result = checkUploadBaseInfo(uploadBaseInfo);
-        if(result !=null && !result.isSuccess()){
-            return result;
-        }
-        uploadBaseInfoService.saveOrUpdateBaseInfo(uploadBaseInfo);
-        return Result.success();
+        return saveOrUpdateUploadBaseInfo(uploadBaseInfo);
     }
 
     @SysLog(MessageConstants.SysLog.UPLOAD_BASE_INFO_DELETE)
@@ -91,8 +81,9 @@ public class UploadBaseInfoController {
         return Result.success();
     }
 
-    private Result checkUploadBaseInfo(UploadBaseInfo uploadBaseInfo) {
+    private Result saveOrUpdateUploadBaseInfo(UploadBaseInfo uploadBaseInfo) {
         try {
+            // 校验上传类型
             UploadType.getByCode(uploadBaseInfo.getType().toLowerCase());
         } catch (IllegalArgumentException e) {
             return Result.paramMsgError(MessageConstants.UploadBaseInfo.TYPE_INVALID);
@@ -175,7 +166,7 @@ public class UploadBaseInfoController {
                 }
             }
         }
-
+        uploadBaseInfoService.saveOrUpdateBaseInfo(uploadBaseInfo);
         return Result.success();
     }
 

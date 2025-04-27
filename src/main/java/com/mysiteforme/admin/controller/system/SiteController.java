@@ -50,7 +50,7 @@ public class SiteController{
         if(site.getId() == null){
             return Result.idIsNullError();
         }
-        if(site.getId() != 1){
+        if(site.getId() != 1L){
             return Result.businessMsgError(MessageConstants.Site.SITE_ID_NOT_CORRECT) ;
         }
         if(StringUtils.isBlank(site.getName())){

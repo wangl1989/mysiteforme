@@ -11,6 +11,7 @@ package com.mysiteforme.admin.controller.system;
 import java.util.List;
 
 import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.service.LogService;
@@ -19,6 +20,7 @@ import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/api/admin/log")
 @RequiredArgsConstructor

@@ -1,20 +1,15 @@
+#set($tableMapKey="table_config_$!table.name")
 package ${package.Service};
 
+import ${package.Entity}.request.PageList${entity}Request;
 import ${package.Entity}.${entity};
 import ${superServiceClassPackage};
-import ${package.Entity}.DTO.${entity}DTO;
-#set($tablecomment = "")
-#set($tabletype = "")
-#foreach($e in $table.comment.split(","))
-    #if( $foreach.count == 1 )
-        #set($tablecomment = $e)
-    #elseif( $foreach.count == 2 )
-        #set($tabletype = $e)
-    #end
-#end
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
+
 /**
  * <p>
- * $!{tablecomment} 服务类
+ * $!cfg[$tableMapKey].businessName 服务类
  * </p>
  *
  * @author ${author}
@@ -25,6 +20,25 @@ interface ${table.serviceName} : ${superServiceClass}<${entity}>
 #else
 public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
 
-    public void save${entity}DTO(${entity}DTO ${table.entityPath}DTO);
+    /**
+     * 分页查询$!cfg[$tableMapKey].businessName
+     */
+    public IPage<${entity}> selectPage${entity}(PageList${entity}Request request);
+
+    /**
+     * 新增或编辑$!cfg[$tableMapKey].businessName
+     */
+    public void saveOrUpdate${entity}(${entity} ${table.entityPath});
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isUnique)
+    /**
+     * 检查$!cfg[$fieldMapKey].businessName唯一性
+     */
+    public Long get${field.capitalName}Count(${field.propertyType} ${field.propertyName},Long id);
+
+#end
+#end
 }
 #end

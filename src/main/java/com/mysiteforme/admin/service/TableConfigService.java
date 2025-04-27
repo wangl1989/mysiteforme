@@ -3,7 +3,6 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.TableConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mysiteforme.admin.entity.DTO.TableConfigDTO;
 import com.mysiteforme.admin.entity.request.PageListTableConfigRequest;
 import com.mysiteforme.admin.entity.response.PageListTableConfigResponse;
 
@@ -30,4 +29,6 @@ public interface TableConfigService extends IService<TableConfig> {
     List<String> getTableNameList(String schemaName);
 
     List<String> getSchemaNameList();
+
+    void downloadCode(Long id);
 }

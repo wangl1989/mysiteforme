@@ -11,8 +11,6 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.VO.MenuTreeVO;
-import com.mysiteforme.admin.entity.VO.ShowMenu;
-import com.mysiteforme.admin.entity.VO.ZtreeVO;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
 
@@ -48,7 +46,7 @@ public interface MenuService extends IService<Menu> {
      * @param name 菜单名称
      * @return 菜单数量
      */
-    long getCountByName(String name);
+    Long getCountByName(String name,Long id);
 
     /**
      * 获取指定用户的显示菜单

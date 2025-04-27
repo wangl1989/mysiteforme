@@ -42,8 +42,6 @@
         <result column="click" property="click" />
         <result column="channelId" property="channelId" />
         <result column="sort" property="sort" />
-        <result column="isTop" property="top" />
-        <result column="isRecommend" property="recommend" />
         <result column="status" property="status" />
         <result property="createId" column="createId"/>
         <result property="createDate" column="createDate"/>
@@ -51,7 +49,6 @@
         <result property="updateDate" column="updateDate"/>
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="delFlag"/>
-        <result property="commentCount" column="commentCount"/>
     </resultMap>
 
     <resultMap id="indexMap" extends="baseMap" type="com.mysiteforme.admin.entity.BlogArticle">

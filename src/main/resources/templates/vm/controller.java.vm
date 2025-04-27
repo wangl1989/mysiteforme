@@ -1,262 +1,139 @@
-#set($tablecomment = "")
-#set($tabletype = "")
-#foreach($e in $table.comment.split(","))
-        #if( $foreach.count == 1 )
-                #set($tablecomment = $e)
-        #elseif( $foreach.count == 2 )
-                #set($tabletype = $e)
-        #end
-#end
-package ${package.Controller}#if($sysFile).system#end;
+#set($tableMapKey="table_config_$!table.name")
+package ${package.Controller};
 
-import org.springframework.beans.factory.annotation.Autowired;
+import ${package.Entity}.request.PageList${entity}Request;
 import org.springframework.web.bind.annotation.*;
+#if(${entityLombokModel})
+import lombok.RequiredArgsConstructor;
+#else
+import org.springframework.beans.factory.annotation.Autowired;
+#end
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.validation.Valid;
+
 import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
-import com.mysiteforme.admin.entity.DTO.${entity}DTO;
-import com.mysiteforme.admin.entity.${entity};
-import com.mysiteforme.admin.service.${entity}Service;
+import ${package.Entity}.request.Add${entity}Request;
+import ${package.Entity}.request.Update${entity}Request;
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import org.springframework.beans.BeanUtils;
+
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
 import com.mysiteforme.admin.util.Result;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
- * ${entity}  前端控制器
+ *
+ * $!cfg[$tableMapKey].businessName 前端控制器
  * </p>
  *
  * @author ${author}
  * @since ${date}
  */
 @Slf4j
+#if(${restControllerStyle})
 @RestController
-@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
-public class ${table.controllerName} extends BaseController{
+#else
+@Controller
+#end
+@RequestMapping("/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${entityLombokModel})
+@RequiredArgsConstructor
+#end
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+#if(${entityLombokModel})
+    private final ${table.serviceName} ${table.entityPath}Service;
+#else
+    private ${table.serviceName} ${table.entityPath}Service;
 
     @Autowired
-    private ${entity}Service ${table.entityPath}Service;
+    public ${table.controllerName}(${table.serviceName} ${table.entityPath}Service){
+        this.${table.entityPath}Service = ${table.entityPath}Service;
+    }
+#end
 
 
     @GetMapping("list")
-    @SysLog("请求${entity}列表数据")
-    public Result list(@RequestBody ${entity}DTO ${table.entityPath}DTO){
-        QueryWrapper<${entity}> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        //if(!map.isEmpty()){
-#foreach($field in ${table.fields})
-#set($comment = "")
-#set($type = "")
-#set($isNullAble = true)
-#set($defaultValue = false)
-#set($listIsShow = true)
-#set($listIsSearch = false)
-#foreach( $e in $field.comment.split(","))
-#if( $foreach.count == 1 )
-#set($comment = $e)
-#elseif( $foreach.count == 2 )
-#set($type = $e)
-#elseif( $foreach.count == 3)
-#if($e == "YES")
-#set($isNullAble = true)
-#else
-#set($isNullAble = false)
-#end
-#elseif( $foreach.count == 4)
-#if($e == "true")
-#set($defaultValue = true)
-#else
-#set($defaultValue = false)
-#end
-#elseif($foreach.count == 5)
-#if($e == "true")
-#set($listIsShow = true)
-#else
-#set($listIsShow = false)
-#end
-#elseif($foreach.count == 6)
-#if($e == "true")
-#set($listIsSearch = true)
-#else
-#set($listIsSearch = false)
-#end
-#end
-#end
-#if($listIsSearch == true)
-#if($type == "timer")
-            String begin${field.capitalName} = (String) map.get("begin${field.capitalName}");
-            String end${field.capitalName} = (String) map.get("end${field.capitalName}");
-            if(StringUtils.isNotBlank(begin${field.capitalName})) {
-                Date begin = DateUtil.parse(begin${field.capitalName});
-                wrapper.ge("${field.name}",begin);
-            }else{
-                map.remove("begin${field.capitalName}");
-            }
-            if(StringUtils.isNotBlank(end${field.capitalName})) {
-                Date end = DateUtil.parse(end${field.capitalName});
-                wrapper.le("${field.name}",end);
-            }else{
-                map.remove("end${field.capitalName}");
-            }
-#else
-            String ${field.propertyName} = (String) map.get("${field.propertyName}");
-            if(StringUtils.isNotBlank(${field.propertyName})) {
-#if($type == "switch" && $defaultValue == true)
-                if(${field.propertyName}.equalsIgnoreCase("true")){
-                    wrapper.eq("${field.name}",true);
-                }else if(${field.propertyName}.equalsIgnoreCase("false")){
-                    wrapper.eq("${field.name}",false);
-                }else{
-                    map.remove("${field.propertyName}");
-                }
-#elseif($type == "input" || $type == "textarea" || $type == "editor")
-                wrapper.like("${field.name}",${field.propertyName});
-#elseif($type == "select" || $type == "radio" || $type == "checkbox")
-                wrapper.eq("${field.name}",${field.propertyName});
-#end
-            }else{
-                map.remove("${field.propertyName}");
-            }
-#end
-
-#end
-#end
-       // }
-        IPage<${entity}> pageData = ${table.entityPath}Service.page(new Page<>(${table.entityPath}DTO.getPage(),${table.entityPath}DTO.getLimit()),wrapper);
-        Result result = Result.success(pageData);
-        return result;
+    public Result list(PageList${entity}Request request){
+        return  Result.success(${table.entityPath}Service.selectPage${entity}(request));
     }
 
     @PostMapping("add")
-    @SysLog("保存新增${entity}数据")
-    public Result add(@RequestBody ${entity}DTO ${table.entityPath}DTO){
+    @SysLog("新增$!cfg[$tableMapKey].businessName数据")
+    public Result add(@RequestBody @Valid Add${entity}Request request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
 #foreach($field in ${table.fields})
-#set($comment = "")
-#set($type = "")
-#set($isNullAble = true)
-#set($defaultValue = false)
-#set($listIsShow = true)
-#set($listIsSearch = false)
-#foreach( $e in $field.comment.split(","))
-#if( $foreach.count == 1 )
-#set($comment = $e)
-#elseif( $foreach.count == 2 )
-#set($type = $e)
-#elseif( $foreach.count == 3)
-#if($e == "YES")
-#set($isNullAble = true)
-#else
-#set($isNullAble = false)
-#end
-#elseif( $foreach.count == 4)
-#if($e == "true")
-#set($defaultValue = true)
-#else
-#set($defaultValue = false)
-#end
-#elseif($foreach.count == 5)
-#if($e == "true")
-#set($listIsShow = true)
-#else
-#set($listIsShow = false)
-#end
-#elseif($foreach.count == 6)
-#if($e == "true")
-#set($listIsSearch = true)
-#else
-#set($listIsSearch = false)
-#end
-#end
-#end
-#if($isNullAble == false)
-#if(${field.propertyType.equals("String")})
-        if(StringUtils.isBlank(${table.entityPath}.get${field.capitalName}())){
-            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
-        }
-#else
-        if(${table.entityPath}.get${field.capitalName}() == null){
-            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if($!cfg[$fieldMapKey].isUnique)
+        if(${table.entityPath}Service.get${field.capitalName}Count(request.get${field.propertyType}(),null)>0){
+            return Result.businessMsgError("$!cfg[$fieldMapKey].businessName已存在");
         }
 #end
 #end
 #end
-        ${table.entityPath}Service.save${entity}DTO(${table.entityPath}DTO);
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(request,${table.entityPath});
+        ${table.entityPath}Service.saveOrUpdate${entity}(${table.entityPath});
         return Result.success();
     }
 
-    @PostMapping("edit")
-    @SysLog("保存编辑${tablecomment}数据")
-    public Result edit(${entity} ${table.entityPath}){
-        if(null == ${table.entityPath}.getId() || 0 == ${table.entityPath}.getId()){
-            return Result.idIsNullError();
+    @PustMapping("edit")
+    @SysLog("编辑$!cfg[$tableMapKey].businessName数据")
+    public Result edit(@RequestBody @Valid Update${entity}Request request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        ${entity} old${table.entityPath} = ${table.entityPath}Service..getById(request.getId());
+        if(old${table.entityPath} == null){
+            return Result.businessMsgError("$!cfg[$tableMapKey].businessName的ID值无效");
         }
 #foreach($field in ${table.fields})
-#set($comment = "")
-#set($type = "")
-#set($isNullAble = true)
-#set($defaultValue = false)
-#set($listIsShow = true)
-#set($listIsSearch = false)
-#foreach( $e in $field.comment.split(","))
-#if( $foreach.count == 1 )
-#set($comment = $e)
-#elseif( $foreach.count == 2 )
-#set($type = $e)
-#elseif( $foreach.count == 3)
-#if($e == "YES")
-#set($isNullAble = true)
-#else
-#set($isNullAble = false)
-#end
-#elseif( $foreach.count == 4)
-#if($e == "true")
-#set($defaultValue = true)
-#else
-#set($defaultValue = false)
-#end
-#elseif($foreach.count == 5)
-#if($e == "true")
-#set($listIsShow = true)
-#else
-#set($listIsShow = false)
-#end
-#elseif($foreach.count == 6)
-#if($e == "true")
-#set($listIsSearch = true)
-#else
-#set($listIsSearch = false)
-#end
-#end
-#end
-#if($isNullAble == false)
-#if(${field.propertyType.equals("String")})
-        if(StringUtils.isBlank(${table.entityPath}.get${field.capitalName}())){
-            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
-        }
-#else
-        if(${table.entityPath}.get${field.capitalName}() == null){
-            return Result.error(ResultCode.INVALID_PARAM,"${comment}不能为空");
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if($!cfg[$fieldMapKey].isUnique)
+        if(${table.entityPath}Service.get${field.capitalName}Count(request.get${field.propertyType}(),request.getId())){
+            return Result.businessMsgError("$!cfg[$fieldMapKey].businessName已存在");
         }
 #end
 #end
 #end
-        ${table.entityPath}Service.getById(${table.entityPath});
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(request,${table.entityPath});
+        ${table.entityPath}Service.saveOrUpdate${entity}(${table.entityPath});
         return Result.success();
     }
 
-    @PostMapping("delete")
-    @SysLog("删除${tablecomment}数据")
+    @DeleteMapping("delete")
+    @SysLog("删除$!cfg[$tableMapKey].businessName数据")
     public Result delete(@RequestParam(value = "id",required = false)Long id){
         if(null == id || 0 == id){
             return Result.idIsNullError();
         }
         ${entity} ${table.entityPath} = ${table.entityPath}Service.getById(id);
+        if(${table.entityPath} == null){
+            return Result.businessMsgError("$!cfg[$tableMapKey].businessName的ID值无效");
+        }
         ${table.entityPath}.setDelFlag(true);
         ${table.entityPath}Service.updateById(${table.entityPath});
         return Result.success();
     }
 
 }
+#end

@@ -10,9 +10,7 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
-import org.apache.ibatis.annotations.Mapper;
 
-@Mapper
 public interface QuartzTaskLogDao extends BaseMapper<QuartzTaskLog> {
 
 }

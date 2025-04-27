@@ -15,13 +15,16 @@ import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_permission_button")
 public class PermissionButton extends DataEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+	private static final long serialVersionUID = 1L;
 
     /**
      * 关联权限表ID

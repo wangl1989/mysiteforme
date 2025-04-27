@@ -34,7 +34,7 @@ public class MessageUtil implements ApplicationContextAware, ApplicationListener
         if (!initialized) {
             return code;
         }
-        String msg = messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+        String msg = messageSource.getMessage(code, null, code, LocaleContextHolder.getLocale());
         return StringUtils.isNotBlank(msg) ? msg : "参数:"+code+"未找到对应的配置";
     }
     
@@ -48,7 +48,7 @@ public class MessageUtil implements ApplicationContextAware, ApplicationListener
         if (!initialized) {
             return code;
         }
-        String msg = messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
+        String msg = messageSource.getMessage(code, args, code, LocaleContextHolder.getLocale());
         return StringUtils.isNotBlank(msg) ? msg : "参数:"+code+"未找到对应的配置";
     }
 

@@ -1,0 +1,125 @@
+#set($tableMapKey="table_config_$!table.name")
+package ${package.Entity}.request;
+
+#foreach($pkg in $!cfg[$tableMapKey].updatePackages)
+import ${pkg};
+#end
+import com.mysiteforme.admin.util.MessageConstants;
+import jakarta.validation.constraints.NotNull;
+#if(${entityLombokModel})
+import lombok.Data;
+#end
+#if($!cfg[$tableMapKey].isValidateStringNull)
+import jakarta.validation.constraints.NotBlank;
+#end
+#if($!cfg[$tableMapKey].isValidateRuler)
+import jakarta.validation.constraints.Pattern;
+#end
+
+/**
+ * <p>
+ *
+ * 编辑 $!cfg[$tableMapKey].businessName 表单参数对象
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${entityLombokModel})
+@Data
+#end
+public class Update${entity}Request {
+    /**
+     * $!cfg[$tableMapKey].businessName ID
+     */
+#if(${entityLombokModel})
+    @NotNull(message = MessageConstants.Validate.VALIDATE_ID_ERROR)
+#end
+    private Long id;
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+    /**
+     * $!cfg[$fieldMapKey].businessName
+     */
+#if(${entityLombokModel})
+#if(!$!cfg[$fieldMapKey].isNullable)
+#if(${field.propertyType.equals("String")})
+    @NotBlank(message = "$!cfg[$fieldMapKey].businessName不能为空")
+#else
+    @NotNull(message = "$!cfg[$fieldMapKey].businessName不能为空")
+#end
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    @Pattern(regexp = "$!cfg[$fieldMapKey].validationRules", message = "$!cfg[$fieldMapKey].businessName格式不正确")
+#end
+#end
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+## ----------  END 字段循环遍历  ----------
+    /**
+     * 备注
+     */
+    private String remarks;
+
+#if($!cfg[$tableMapKey].tableType == 2)
+    /**
+     * 排序
+     */
+    private Integer sort;
+#end
+
+#if(!${entityLombokModel})
+    public Long getId() {
+        return id;
+    }
+    @NotNull(message = MessageConstants.Validate.VALIDATE_ID_ERROR)
+    public void setId(Long id) { this.id = id }
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if(${field.propertyType.equals("boolean")})
+#set($getprefix="is")
+#else
+#set($getprefix="get")
+#end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
+
+#if(!$!cfg[$fieldMapKey].isNullable)
+#if(${field.propertyType.equals("String")})
+    @NotBlank(message = "$!cfg[$fieldMapKey].businessName不能为空")
+#else
+    @NotNull(message = "$!cfg[$fieldMapKey].businessName不能为空")
+#end
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    @Pattern(regexp = "$!cfg[$fieldMapKey].validationRules", message = "$!cfg[$fieldMapKey].businessName格式不正确")
+#end
+#if(${entityBuilderModel})
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#else
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#end
+        this.${field.propertyName} = ${field.propertyName};
+#if(${entityBuilderModel})
+        return this;
+#end
+    }
+#end
+#end
+    public String getRemarks() {return remarks;}
+
+    public void setRemarks(String remarks) {this.remarks = remarks;}
+
+#if($!cfg[$tableMapKey].tableType == 2)
+    public Integer getSort() {return sort;}
+
+    public void setSort(Integer sort) {this.sort = sort;}
+#end
+#end
+}

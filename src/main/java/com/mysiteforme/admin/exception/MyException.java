@@ -27,20 +27,8 @@ public class MyException extends RuntimeException {
     // 验证错误
     public static final int VALIDATION_ERROR = 401;
 
-    // 业务错误
-    public static final int BUSINESS_ERROR = 400;
-
-    // 登录错误
-    public static final int LOGIN_ERROR = 405;
-
     // 系统错误
     public static final int SERVER_ERROR = 500;
-
-    // 错误视图地址
-    public static final String ERROR_PAGE = "admin/error/500";
-
-    // 未发现视图地址
-    public static final String NOT_FOUND_PAGE = "admin/error/404";
 
    /**
      * 错误信息

@@ -28,7 +28,7 @@ public class SysMetaObjectHandler implements MetaObjectHandler {
     //新增填充
     @Override
     public void insertFill(MetaObject metaObject) {
-        logger.info("正在调用该insert填充字段方法");
+        logger.debug("正在调用该insert填充字段方法");
         Object createDate = getFieldValByName("createDate",metaObject);
         Object createId = getFieldValByName("createId",metaObject);
         Object updateDate = getFieldValByName("updateDate",metaObject);
@@ -56,7 +56,7 @@ public class SysMetaObjectHandler implements MetaObjectHandler {
     //更新填充
     @Override
     public void updateFill(MetaObject metaObject) {
-        logger.info("正在调用该update填充字段方法");
+        logger.debug("正在调用该update填充字段方法");
         setFieldValByName("updateDate",new Date(), metaObject);
         Object updateId = getFieldValByName("updateId",metaObject);
         if (null == updateId) {

@@ -15,14 +15,11 @@ import com.mysiteforme.admin.entity.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Getter
-@Setter
 public abstract class DataEntity extends BaseEntity {
 
     /**

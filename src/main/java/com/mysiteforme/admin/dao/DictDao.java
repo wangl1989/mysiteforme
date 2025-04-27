@@ -10,11 +10,9 @@ package com.mysiteforme.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Dict;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 
-@Mapper
 public interface DictDao extends BaseMapper<Dict> {
     /**
      * 获取指定类型的字典最大排序值

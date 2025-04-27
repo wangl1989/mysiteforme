@@ -11,12 +11,8 @@ package com.mysiteforme.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.TreeEntity;
-import com.mysiteforme.admin.util.MessageConstants;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serial;
 
@@ -24,8 +20,6 @@ import java.io.Serial;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_menu")
 @Data
-@Getter
-@Setter
 public class Menu extends TreeEntity<Menu> {
 
     @Serial

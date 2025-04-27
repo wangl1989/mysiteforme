@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.mysiteforme.admin.entity.request.AssignUserPermissionRequest;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -21,7 +20,6 @@ import com.mysiteforme.admin.entity.VO.PermissionApiVO;
 import com.mysiteforme.admin.entity.VO.PermissionVO;
 
 
-@Mapper
 public interface PermissionDao extends BaseMapper<Permission> {
 
     PermissionApiVO selectApiByUrl(@Param("apiUrl") String apiUrl, @Param("method") String method);
@@ -40,9 +38,9 @@ public interface PermissionDao extends BaseMapper<Permission> {
 
     /**
      * 保存用户单独分配的权限
-     * @param assignUserPermission 分配的权限的对象
+     * @param request 分配的权限的对象
      */
-    void saveUserPermission(@Param("ass") AssignUserPermissionRequest assignUserPermission);
+    void saveUserPermission(@Param("ass") AssignUserPermissionRequest request);
 
     /**
      * 获取所有权限
