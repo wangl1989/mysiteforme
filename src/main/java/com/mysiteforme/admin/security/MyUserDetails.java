@@ -49,8 +49,7 @@ public class MyUserDetails extends UserVO implements UserDetails{
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<RoleVO> roles = this.getRoles();
-        Set<SimpleGrantedAuthority> authorities = roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
-        return authorities;
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
     }
  
     @Override

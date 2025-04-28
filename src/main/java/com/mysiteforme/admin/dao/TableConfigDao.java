@@ -33,10 +33,10 @@ public interface TableConfigDao extends BaseMapper<TableConfig> {
 
     /**
      * 获取表格配置详情
-     * @param id 表格配置ID
+     * @param ids 表格配置ID集合
      * @return 表格配置详情
      */
-    TableConfigResponse getTableConfigDetail(Long id);
+    List<TableConfigResponse> getTableConfigDetail(@Param("ids") List<Long> ids);
     /**
      * 检查表是否存在
      * @param tableName 表名

@@ -15,12 +15,21 @@ public class GenCodeConstants {
     /**
      * Windows生成路径
      */
-    public static final String WINDOWS_GENERATOR_PATH = "D://site";
+    public static final String WINDOWS_GENERATOR_PATH = "D://temp/site";
 
     /**
      * Linux生成路径
      */
     public static final String LINUX_GENERATOR_PATH = "/tmp/site";
+
+    /**
+     * Windows压缩包的路径
+     */
+    public static final String WINDOWS_SOURCE_CODE_NAME = "D://temp/%s/源码.zip";
+    /**
+     * Linux压缩包的路径
+     */
+    public static final String LINUX_SOURCE_CODE_NAME = "/tmp/%s/源码.zip";
 
     /**
      * 默认作者
@@ -255,6 +264,36 @@ public class GenCodeConstants {
      * 数据库字符串类型
      */
     public static final List<String> DB_STRING_FIELD = Arrays.asList("char","varchar","tinytext","text","mediumtext","longtext");
+
+    /**
+     * 前端boolean类型
+     */
+    public static final List<String> FRONT_BO0LEAN_FIELD = Arrays.asList("bit","boolean");
+
+    /**
+     * 前端boolean类型
+     */
+    public static final String FRONT_BOOLEAN_TYPE = "boolean";
+
+    /**
+     * 前端字符串类型
+     */
+    public static final List<String> FRONT_STRING_FIELD = Arrays.asList("char","varchar","tinytext","text","mediumtext","longtext","date","time","datetime","timestamp");
+
+    /**
+     * 前端字符串类型
+     */
+    public static final String FRONT_STRING_TYPE = "string";
+
+    /**
+     * 前端number类型
+     */
+    public static final List<String> FRONT_NUMBER_FIELD = Arrays.asList("tinyint","smallint","mediumint","int","integer","bigint","float","double","decimal");
+
+    /**
+     * 前端number类型
+     */
+    public static final String FRONT_NUMBER_TYPE = "number";
 
     /**
      * 数据库类型与Java类型映射

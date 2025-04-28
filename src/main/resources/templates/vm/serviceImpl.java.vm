@@ -6,12 +6,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+#if($!cfg[$tableMapKey].tableType == 2)
+import com.mysiteforme.admin.exception.MyException;
+#end
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${package.Entity}.${entity};
 import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 import ${superServiceImplClassPackage};
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -86,6 +90,7 @@ public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.m
     /**
      * 新增或编辑$!cfg[$tableMapKey].businessName
      */
+    @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
     public void saveOrUpdate${entity}(${entity} ${table.entityPath}) {
 #if($!cfg[$tableMapKey].hasSortField)
@@ -97,7 +102,23 @@ public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.m
 #end
         }
 #end
+#if($!cfg[$tableMapKey].tableType == 2)
+        if(${table.entityPath}.getParentId() != null && ${table.entityPath}.getParentId() != 0){
+            ${entity} parent${entity} = this.getById(${table.entityPath}.getParentId());
+            if(parent${entity} == null){
+                throw MyException.builder().businessError("父级$!cfg[$tableMapKey].businessName不存在").build();
+            }
+            ${table.entityPath}.setLevel(parent${entity}.getLevel() + 1);
+            ${table.entityPath}.setParentIds(parent${entity}.getParentIds());
+        }else{
+            ${table.entityPath}.setLevel(1);
+        }
+#end
         saveOrUpdate(${table.entityPath});
+#if($!cfg[$tableMapKey].tableType == 2)
+        ${table.entityPath}.setParentIds(StringUtils.isBlank(${table.entityPath}.getParentIds())? ${table.entityPath}.getId()+"," : ${table.entityPath}.getParentIds()+${table.entityPath}.getId()+",");
+        saveOrUpdate(${table.entityPath});
+#end
     }
 
 #foreach($field in ${table.fields})

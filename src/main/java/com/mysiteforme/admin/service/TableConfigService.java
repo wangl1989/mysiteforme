@@ -5,6 +5,7 @@ import com.mysiteforme.admin.entity.TableConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.request.PageListTableConfigRequest;
 import com.mysiteforme.admin.entity.response.PageListTableConfigResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -30,5 +31,5 @@ public interface TableConfigService extends IService<TableConfig> {
 
     List<String> getSchemaNameList();
 
-    void downloadCode(Long id);
+    void downloadCode(List<Long> ids, HttpServletResponse response);
 }

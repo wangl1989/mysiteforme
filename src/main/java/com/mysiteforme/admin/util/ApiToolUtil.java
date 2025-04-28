@@ -64,7 +64,8 @@ public class ApiToolUtil {
         //    注意：corsProcessor.processRequest 可能会修改响应状态（例如对于无效的预检请求）
         //    检查 response.isCommitted() 可能有帮助，但对于错误处理通常我们强制设置状态
         if (!response.isCommitted()) {
-            response.setStatus(HttpServletResponse.SC_OK); // 或者根据异常类型设置更具体的状态码
+            // 或者根据异常类型设置更具体的状态码
+            response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 

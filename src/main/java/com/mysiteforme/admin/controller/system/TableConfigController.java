@@ -1,24 +1,25 @@
 package com.mysiteforme.admin.controller.system;
 
 import com.mysiteforme.admin.base.MySecurityUser;
-import com.mysiteforme.admin.entity.request.AddTableConfigRequest;
-import com.mysiteforme.admin.entity.request.BaseTableConfigRequest;
-import com.mysiteforme.admin.entity.request.PageListTableConfigRequest;
-import com.mysiteforme.admin.entity.request.UpdateTableConfigRequest;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.ToolUtil;
+import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.util.*;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.TableConfig;
 import com.mysiteforme.admin.service.TableConfigService;
-import com.mysiteforme.admin.util.Result;
+import org.springframework.core.io.Resource;
 
 import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * <p>
@@ -110,7 +111,7 @@ public class TableConfigController {
             }
         }
         if(StringUtils.isNotBlank(request.getGeneratePath())){
-            if(ToolUtil.isValidPath(request.getGeneratePath())){
+            if(!ToolUtil.isValidPath(request.getGeneratePath())){
                 return Result.businessMsgError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM);
             }
         }
@@ -120,6 +121,19 @@ public class TableConfigController {
         TableConfig tableConfig = new TableConfig();
         BeanUtils.copyProperties(request,tableConfig);
         tableConfigService.saveOrUpdateTableConfig(tableConfig);
+        return Result.success();
+    }
+
+    @PostMapping("downloadCode")
+    @SysLog(MessageConstants.SysLog.DOWNLOAD_JAVA_CODE)
+    public Result download(@RequestBody DownloadCodeRequest request, HttpServletResponse response) {
+        if(request == null){
+            throw MyException.builder().businessError(MessageConstants.OBJECT_NOT_NULL).build();
+        }
+        if (CollectionUtils.isEmpty(request.getIds())) {
+            throw MyException.builder().businessError(MessageConstants.Validate.VALIDATE_ID_ERROR).build();
+        }
+        tableConfigService.downloadCode(request.getIds(),response);
         return Result.success();
     }
 

@@ -12,7 +12,7 @@ public class AssignUserPermissionRequest {
     @NotNull(message = MessageConstants.User.ASSIGN_USER_ID_EMPTY)
     private Long userId;
 
-    private String loginName;
+    private String userName;
 
     private List<Long> permissionIds;
 }

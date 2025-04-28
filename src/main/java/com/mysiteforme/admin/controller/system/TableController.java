@@ -12,7 +12,6 @@ import com.mysiteforme.admin.annotation.SqlInjectionCheck;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.service.TableService;
-import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.util.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.file.Files;
 
 import static com.mysiteforme.admin.util.GenCodeConstants.*;
 
@@ -33,11 +29,7 @@ import static com.mysiteforme.admin.util.GenCodeConstants.*;
 @SqlInjectionCheck
 public class TableController {
 
-    private final CreateTableFiles createTableFiles;
-
     private final TableService tableService;
-
-    private final SiteService siteService;
 
     /**
      * 分页展示数据表
@@ -230,55 +222,4 @@ public class TableController {
         return Result.success();
     }
 
-    @PostMapping("download")
-    @SysLog(MessageConstants.SysLog.DOWNLOAD_JAVA_CODE)
-    public RestResponse download(@RequestParam(required = false)String[] baseTables,
-            @RequestParam(required = false)String[] treeTables,
-            HttpServletResponse response) throws Exception {
-        if(baseTables != null && treeTables != null){
-            if(baseTables.length == 0 && treeTables.length == 0){
-                return RestResponse.failure("数据表不能为空");
-            }
-        }
-
-        synchronized(this){
-            File baseFloder = new File(createTableFiles.baseDic);
-            ZipUtil.deleteDir(baseFloder);
-            if(baseTables != null && baseTables.length>0){
-                createTableFiles.createFile(baseTables,1, siteService.getCurrentSite());
-            }
-            if(treeTables != null && treeTables.length>0){
-                createTableFiles.createFile(treeTables,2, siteService.getCurrentSite());
-            }
-            File f = new File(createTableFiles.zipFile);
-            try {
-                if(f.exists() && !f.delete()){
-                    log.error("下载JAVA源码---删除文件失败:{}", f.getName());
-                }
-                cn.hutool.core.util.ZipUtil.zip(createTableFiles.baseDic, createTableFiles.zipFile);
-            } catch (SecurityException e) {
-                log.error("下载JAVA源码---压缩文件失败:{}", e.getMessage());
-            }
-            String filename = new String(f.getName().getBytes("GB2312"), "ISO8859-1");
-            response.setCharacterEncoding("UTF-8");
-            response.setContentLength((int) f.length());
-            response.setContentType("application/zip");
-            response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-
-            try (BufferedInputStream br = new BufferedInputStream(Files.newInputStream(f.toPath()));
-                 OutputStream out = response.getOutputStream()) {
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = br.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                out.flush();
-            }
-
-            if(!f.delete()) {
-                log.error("删除文件失败:{}", f.getName());
-            }
-        }
-        return RestResponse.success();
-    }
 }

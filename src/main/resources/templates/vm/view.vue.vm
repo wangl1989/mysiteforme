@@ -1,0 +1,611 @@
+#set($tableMapKey="table_config_$!table.name")
+<template>
+  <div class="page-content">
+    <table-bar
+        :showTop="false"
+        @search="search"
+        @reset="resetQuery"
+        @changeColumn="changeColumn"
+        :columns="columns"
+    >
+      <template #top>
+        <el-form :model="queryParams" inline>
+          <el-row :gutter="15">
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+            <el-col :xs="19" :sm="12" :lg="6">
+              <el-form-item label="$!cfg[$fieldMapKey].businessName:">
+                <el-input v-model="queryParams.${field.propertyName}" placeholder="请输入$!cfg[$fieldMapKey].businessName搜索"></el-input>
+              </el-form-item>
+            </el-col>
+#end
+#end
+          </el-row>
+        </el-form>
+      </template>
+      <template #bottom>
+        <el-button type="primary" @click="handleAdd" v-ripple>新增$!cfg[$tableMapKey].businessName</el-button>
+      </template>
+    </table-bar>
+
+    <art-table
+        :data="${table.entityPath}List"
+        v-loading="loading"
+        pagination
+        :currentPage="pagination.current"
+        :pageSize="pagination.size"
+        :total="pagination.total"
+        @current-change="handleCurrentChange"
+        @size-change="handleSizeChange"
+    >
+#set( $filteredListIndex = -1 )
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isListVisible)
+#set( $filteredListIndex = $filteredListIndex + 1 )
+      <el-table-column label="$!cfg[$fieldMapKey].businessName" prop="${field.propertyName}" v-if="columns[$filteredListIndex].show" />
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+#set( $filteredListIndex = $filteredListIndex + 1 )
+      <el-table-column label="排序" prop="sort" sortable v-if="columns[$filteredListIndex].show" />
+#end
+#set( $filteredListIndex = $filteredListIndex + 1 )
+      <el-table-column label="创建时间" prop="createDate" sortable v-if="columns[$filteredListIndex].show" />
+#set( $filteredListIndex = $filteredListIndex + 1 )
+      <el-table-column label="更新时间" prop="updateDate" sortable v-if="columns[$filteredListIndex].show" />
+#set( $filteredListIndex = $filteredListIndex + 1 )
+      <el-table-column label="操作" fixed="right" width="280" v-if="columns[$filteredListIndex].show">
+        <template #default="scope">
+#if($!cfg[$tableMapKey].tableType == 2)
+          <el-button size="small" type="primary" link @click="handleAddSub(scope.row)">
+            新增子$!cfg[$tableMapKey].businessName
+          </el-button>
+#end
+          <el-button size="small" type="warning" link @click="handleEdit(scope.row)">
+            编辑
+          </el-button>
+          <el-button size="small" type="danger" link @click="handleDelete(scope.row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </art-table>
+
+    <!-- 新增$!cfg[$tableMapKey].businessName对话框 -->
+    <el-dialog
+        v-model="dialogAddVisible"
+        title="新增$!cfg[$tableMapKey].businessName"
+        width="500px"
+        destroy-on-close
+    >
+      <el-form
+          ref="add${entity}FormRef"
+          :model="addFormData"
+          :rules="addRules"
+          label-width="100px"
+          class="dict-form"
+      >
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+        <el-form-item label="$!cfg[$fieldMapKey].businessName" prop="${field.propertyName}">
+          <el-input v-model="addFormData.${field.propertyName}" placeholder="请输入$!cfg[$fieldMapKey].businessName"></el-input>
+        </el-form-item>
+#end
+#end
+        <el-form-item label="备注" prop="remarks">
+          <el-input v-model="addFormData.remarks" placeholder="请输入备注内容" type="textarea" :rows="3"></el-input>
+        </el-form-item>
+#if($!cfg[$tableMapKey].hasSortField)
+        <el-form-item label="排序" prop="sort">
+          <el-input-number v-model="addFormData.sort" :min="0" :max="999" controls-position="right" />
+        </el-form-item>
+#end
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogAddVisible = false">取消</el-button>
+          <el-button type="primary" @click="addSubmitForm" :loading="addSubmitLoading">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+        v-model="dialogEditVisible"
+        title="编辑$!cfg[$tableMapKey].businessName"
+        width="500px"
+        destroy-on-close
+    >
+    <el-form
+        ref="edit${entity}FormRef"
+        :model="editFormData"
+        :rules="editRules"
+        label-width="100px"
+        class="dict-form"
+    >
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+          <el-form-item label="$!cfg[$fieldMapKey].businessName" prop="${field.propertyName}">
+            <el-input v-model="editFormData.${field.propertyName}" placeholder="请输入$!cfg[$fieldMapKey].businessName"></el-input>
+          </el-form-item>
+#end
+#end
+          <el-form-item label="备注" prop="remarks">
+            <el-input v-model="editFormData.remarks" placeholder="请输入备注内容" type="textarea" :rows="3"></el-input>
+          </el-form-item>
+#if($!cfg[$tableMapKey].hasSortField)
+          <el-form-item label="排序" prop="sort">
+            <el-input-number v-model="editFormData.sort" :min="0" :max="999" controls-position="right" />
+          </el-form-item>
+#end
+    </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogEditVisible = false">取消</el-button>
+          <el-button type="primary" @click="editSubmitForm" :loading="editSubmitLoading">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+  </div>
+</template>
+
+<script setup lang="ts">
+  import { ref, reactive, onMounted } from 'vue'
+  import { ElMessage, ElMessageBox, FormInstance, FormRules } from 'element-plus'
+  import { ${entity}Service } from '@/api/${table.entityPath}Api'
+  import {
+    ${entity}Record,
+    ${entity}ListParams,
+    Add${entity}Params,
+    Edit${entity}Params
+  } from '@/api/model/${table.entityPath}Model'
+
+  // 加载状态
+  const loading = ref(false)
+
+  // $!cfg[$tableMapKey].businessName数据列表
+  const ${table.entityPath}List = ref<${entity}Record[]>([])
+
+  // 列配置
+  const columns = reactive([
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isListVisible)
+    { name: '$!cfg[$fieldMapKey].businessName', show: true },
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    { name: '排序', show: false },
+#end
+    { name: '创建时间', show: false },
+    { name: '更新时间', show: false },
+    { name: '操作', show: true }
+  ])
+
+  // 查询参数
+  const queryParams = reactive<${entity}ListParams>({
+    page: 1,
+    limit: 10,
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}: false,
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}: '',
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+    sortByCreateDateAsc: false
+  })
+
+  // 分页信息
+  const pagination = reactive({
+    current: 1,
+    size: 10,
+    total: 0,
+    pages: 0
+  })
+
+  // 对话框控制
+  const dialogAddVisible = ref(false)
+  const dialogEditVisible = ref(false)
+  const addSubmitLoading = ref(false)
+  const editSubmitLoading = ref(false)
+  const add${entity}FormRef = ref<FormInstance>()
+  const edit${entity}FormRef = ref<FormInstance>()
+
+  // 新增表单数据
+  const addFormData = reactive<Add${entity}Params>({
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}: false,
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}: '',
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    parentId: 0,
+#end
+    remarks: ''
+  })
+
+  // 编辑表单数据
+  const editFormData = reactive<Edit${entity}Params>({
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}: false,
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}: '',
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    parentId: 0,
+#end
+    remarks: ''
+  })
+
+  // 表单验证规则
+  const addRules = reactive<FormRules>({
+#set( $addRuleIndex = -1 )
+#foreach($field in ${table.fields})
+#if($!cfg[$fieldMapKey].isAddVisible)
+#set($fieldMapKey="field_config_$!field.name")
+#if(!$!cfg[$fieldMapKey].isNullable)
+#set( $addRuleIndex = $addRuleIndex + 1 )
+#if( $addRuleIndex != 0)
+    ,
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }, { pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#else
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#else
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+#set( $addRuleIndex = $addRuleIndex + 1 )
+#if( $addRuleIndex != 0)
+    ,
+#end
+    ${field.propertyName}: [{ pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#end
+#end
+#end
+  })
+
+  const editRules = reactive<FormRules>({
+#set( $editRuleIndex = -1 )
+#foreach($field in ${table.fields})
+#if($!cfg[$fieldMapKey].isEditVisible)
+#set($fieldMapKey="field_config_$!field.name")
+#if(!$!cfg[$fieldMapKey].isNullable)
+#set( $editRuleIndex = $editRuleIndex + 1 )
+#if( $editRuleIndex != 0)
+    ,
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }, { pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#else
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#else
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+#set( $editRuleIndex = $editRuleIndex + 1 )
+#if( $editRuleIndex != 0)
+    ,
+#end
+    ${field.propertyName}: [{ pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#end
+#end
+#end
+  })
+
+  // 加载$!cfg[$tableMapKey].businessName列表数据
+  const load${entity}List = async () => {
+    loading.value = true
+    try {
+      const res = await ${entity}Service.get${entity}List(queryParams)
+      if (res.success) {
+        ${table.entityPath}List.value = res.data.records
+        pagination.total = res.data.total
+        pagination.current = res.data.current
+        pagination.size = res.data.size
+        pagination.pages = res.data.pages
+      } else {
+        ElMessage.error(res.message || '获取$!cfg[$tableMapKey].businessName列表失败')
+      }
+    } catch (error) {
+      console.error('获取$!cfg[$tableMapKey].businessName列表失败:', error)
+      ElMessage.error('获取$!cfg[$tableMapKey].businessName列表时发生错误')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 搜索
+  const search = () => {
+    queryParams.page = 1 // 搜索时重置为第一页
+    load${entity}List()
+  }
+
+  // 重置查询
+  const resetQuery = () => {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#if(${field.frontType.equals("boolean")})
+    queryParams.${field.propertyName} = false,
+#elseif(${field.frontType.equals("string")})
+    queryParams.${field.propertyName} = '',
+#elseif(${field.frontType.equals("number")})
+    queryParams.${field.propertyName} = 0
+#end
+#end
+#end
+    queryParams.page = 1
+    queryParams.limit = 10
+    queryParams.sortByCreateDateAsc = false
+    load${entity}List()
+  }
+
+  // 列显示设置
+  const changeColumn = (list: any) => {
+    Object.assign(columns, list)
+  }
+
+  // 处理分页变化
+  const handleCurrentChange = (page: number) => {
+    queryParams.page = page
+    load${entity}List()
+  }
+
+  // 处理每页显示数量变化
+  const handleSizeChange = (size: number) => {
+    queryParams.limit = size
+    queryParams.page = 1 // 切换每页数量时重置为第一页
+    load${entity}List()
+  }
+
+  // 处理新增$!cfg[$tableMapKey].businessName
+  const handleAdd = () => {
+    dialogAddVisible.value = true
+
+    // 重置表单数据
+    Object.assign(addFormData, {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if(${field.frontType.equals("boolean")})
+      ${field.propertyName}: false,
+#elseif(${field.frontType.equals("string")})
+      ${field.propertyName}: '',
+#elseif(${field.frontType.equals("number")})
+      ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+      sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+      parentId: 0,
+#end
+      remarks: ''
+    })
+  }
+#if($!cfg[$tableMapKey].tableType == 2)
+  // 处理编辑$!cfg[$tableMapKey].businessName
+  const handleAddSub = (row: ${entity}Record) => {
+    dialogAddVisible.value = true
+
+    // 填充表单数据
+    Object.assign(addFormData, {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if(${field.frontType.equals("boolean")})
+        ${field.propertyName}: row.${field.propertyName} || false,
+#elseif(${field.frontType.equals("string")})
+        ${field.propertyName}: row.${field.propertyName} || '',
+#elseif(${field.frontType.equals("number")})
+        ${field.propertyName}: row.${field.propertyName} || 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+        sort: row.sort || 0,
+#end
+        parentId: row.parentId || 0,
+        remarks: row.remarks || ''
+    })
+  }
+#end
+  // 处理编辑$!cfg[$tableMapKey].businessName
+  const handleEdit = (row: ${entity}Record) => {
+    dialogEditVisible.value = true
+
+    // 填充表单数据
+    Object.assign(editFormData, {
+      id: row.id,
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if(${field.frontType.equals("boolean")})
+      ${field.propertyName}: row.${field.propertyName} || false,
+#elseif(${field.frontType.equals("string")})
+      ${field.propertyName}: row.${field.propertyName} || '',
+#elseif(${field.frontType.equals("number")})
+      ${field.propertyName}: row.${field.propertyName} || 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+      sort: row.sort || 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+      parentId: row.parentId || 0,
+#end
+      remarks: row.remarks || ''
+    })
+  }
+
+  // 处理删除$!cfg[$tableMapKey].businessName
+  const handleDelete = (row: ${entity}Record) => {
+    ElMessageBox.confirm('确认删除该$!cfg[$tableMapKey].businessName吗？此操作不可恢复！', '删除确认', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+        .then(async () => {
+          try {
+            const res = await ${entity}Service.delete${entity}(row.id)
+            if (res.success) {
+              ElMessage.success('删除成功')
+              load${entity}List() // 重新加载数据
+            } else {
+              ElMessage.error(res.message || '删除失败')
+            }
+          } catch (error) {
+            console.error('删除$!cfg[$tableMapKey].businessName失败:', error)
+            ElMessage.error('删除$!cfg[$tableMapKey].businessName时发生错误')
+          }
+        })
+        .catch(() => {
+          // 用户取消删除，不做处理
+        })
+  }
+
+  // 提交表单
+  const addSubmitForm = async () => {
+    if (!add${entity}FormRef.value) return
+
+    await add${entity}FormRef.value.validate(async (valid) => {
+      if (valid) {
+        addSubmitLoading.value = true
+
+        try {
+          let res
+          // 新增
+          const params: Add${entity}Params = {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+            ${field.propertyName}: addFormData.${field.propertyName},
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+            sort: addFormData.sort
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+            parentId: addFormData.parentId,
+#end
+            remarks: addFormData.remarks
+          }
+
+          res = await ${entity}Service.add${entity}(params)
+
+          if (res.success) {
+            ElMessage.success('新增成功')
+            dialogAddVisible.value = false
+            load${entity}List() // 重新加载数据
+          } else {
+            ElMessage.error(res.message || '操作失败')
+          }
+        } catch (error) {
+          console.error('新增失败:', error)
+          ElMessage.error('新增时发生错误')
+        } finally {
+          addSubmitLoading.value = false
+        }
+      }
+    })
+  }
+
+  const editSubmitForm = async () => {
+    if (!edit${entity}FormRef.value) return
+
+    await edit${entity}FormRef.value.validate(async (valid) => {
+      if (valid) {
+        editSubmitLoading.value = true
+
+        try {
+          let res
+          // 编辑
+          const params: Edit${entity}Params = {
+              id: editFormData.id,
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+              ${field.propertyName}: editFormData.${field.propertyName},
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+              sort: editFormData.sort
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+              parentId: editFormData.parentId,
+#end
+              remarks: editFormData.remarks
+          }
+
+          res = await ${entity}Service.edit${entity}(params)
+
+          if (res.success) {
+            ElMessage.success('编辑成功')
+            dialogEditVisible.value = false
+            load${entity}List() // 重新加载数据
+          } else {
+            ElMessage.error(res.message || '操作失败')
+          }
+        } catch (error) {
+          console.error('编辑失败:', error)
+          ElMessage.error('编辑时发生错误')
+        } finally {
+          editSubmitLoading.value = false
+        }
+      }
+    })
+  }
+
+  // 组件挂载时加载数据
+  onMounted(() => {
+    load${entity}List()
+  })
+</script>
+
+<style lang="scss" scoped>
+  .page-content {
+    width: 100%;
+    height: 100%;
+  }
+
+  .dict-form {
+    .el-input-number {
+      width: 100%;
+    }
+  }
+</style>

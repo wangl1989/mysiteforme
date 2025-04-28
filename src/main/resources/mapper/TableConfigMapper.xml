@@ -80,7 +80,10 @@
         FROM sys_table_config tc
         LEFT JOIN sys_table_field_config tfc ON tfc.table_config_id = tc.id AND tfc.del_flag = false
         WHERE
-            tc.id = #{id}
+            tc.id in
+            <foreach collection="ids" item="id" index="index" separator="," open="(" close=")" >
+                #{id}
+            </foreach>
         AND tc.del_flag = false
     </select>
 

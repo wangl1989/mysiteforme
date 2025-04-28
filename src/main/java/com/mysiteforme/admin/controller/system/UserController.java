@@ -10,6 +10,7 @@ package com.mysiteforme.admin.controller.system;
 
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.exception.MyException;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -160,7 +161,11 @@ public class UserController {
         if(request.getPermissionIds() == null || request.getPermissionIds().isEmpty()){
             return Result.paramMsgError(MessageConstants.User.ASSIGN_PERMISSION_COLLECTS_EMPTY);
         }
-        request.setLoginName(MySecurityUser.loginName());
+        User user = userService.getById(request.getUserId());
+        if(user == null || user.getDelFlag()){
+            return Result.paramMsgError(MessageConstants.Permission.ASSIGN_PERMISSION_USER_NOT_FOUND);
+        }
+        request.setUserName(user.getLoginName());
         userService.assignUserPermission(request);
         return Result.success();
     }

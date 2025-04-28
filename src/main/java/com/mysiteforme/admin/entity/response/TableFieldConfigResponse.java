@@ -105,4 +105,9 @@ public class TableFieldConfigResponse {
      * JSON格式，存储更复杂的校验规则
      */
     private String validationRules;
+
+    /**
+     * 前端类型
+     */
+    private String frontType;
 }

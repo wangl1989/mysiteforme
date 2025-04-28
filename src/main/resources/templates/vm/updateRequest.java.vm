@@ -64,11 +64,18 @@ public class Update${entity}Request {
      */
     private String remarks;
 
-#if($!cfg[$tableMapKey].tableType == 2)
+#if($!cfg[$tableMapKey].hasSortField)
     /**
      * 排序
      */
     private Integer sort;
+#end
+
+#if($!cfg[$tableMapKey].tableType == 2)
+    /**
+     * 排序
+     */
+    private Long parentId;
 #end
 
 #if(!${entityLombokModel})
@@ -116,10 +123,16 @@ public class Update${entity}Request {
 
     public void setRemarks(String remarks) {this.remarks = remarks;}
 
-#if($!cfg[$tableMapKey].tableType == 2)
+#if($!cfg[$tableMapKey].hasSortField)
     public Integer getSort() {return sort;}
 
     public void setSort(Integer sort) {this.sort = sort;}
+#end
+
+#if($!cfg[$tableMapKey].tableType == 2)
+    public Long getParentId() {return parentId;}
+
+    public void setParentId(Long parentId) {this.parentId = parentId;}
 #end
 #end
 }

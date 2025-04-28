@@ -9,7 +9,6 @@
 package com.mysiteforme.admin.service.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -292,16 +291,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	  给用户分配额外权限
 	 */
 	@Caching(evict = {
-		@CacheEvict(value = "system::user::details", key = "'loginName:'+#request.loginName", condition = "#request.loginName != null"),
+		@CacheEvict(value = "system::user::details", key = "'loginName:'+#request.userName", condition = "#request.userName != null"),
 		@CacheEvict(value = "system::user::details", key = "'id:'+#request.userId", condition = "#request.userId != null")
 	})
 	@Transactional(rollbackFor = MyException.class)
 	@Override
 	public void assignUserPermission(AssignUserPermissionRequest request) {
-		User user = baseMapper.selectById(request.getUserId());
-		if(user == null || user.getDelFlag()){
-			throw MyException.builder().businessError(MessageConstants.Permission.ASSIGN_PERMISSION_USER_NOT_FOUND).build();
-		}
 		Long currentUserId = MySecurityUser.id();
 		if(currentUserId == null){
 			throw MyException.builder().unauthorized().build();

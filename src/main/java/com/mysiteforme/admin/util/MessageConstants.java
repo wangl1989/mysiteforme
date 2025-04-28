@@ -392,6 +392,9 @@ public class MessageConstants {
         public static final String TABLE_FIELDS_NOT_MATCH = "message.table.fields.not.match";
         public static final String TABLE_PREFIX_NOT_MATCH = "message.table.prefix.not.match";
         public static final String PATH_NOT_VALID_BY_SYSTEM = "message.path.not.valid.by.system";
+
+        public static final String DOWLOAD_CODE_ERROR = "message.table.download.code.error";
+        public static final String ZIP_CODE_ERROR = "message.table.zip.code.error";
     }
 
     public static class TableFieldConfig {

@@ -23,7 +23,10 @@ import com.mysiteforme.admin.entity.response.TableConfigResponse;
 import com.mysiteforme.admin.entity.response.TableFieldConfigResponse;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.util.*;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,12 @@ import com.mysiteforme.admin.service.TableConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import javax.sql.DataSource;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,6 +55,7 @@ import java.util.stream.Collectors;
  * @author wangl
  * @since 2025-04-19
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableConfig> implements TableConfigService {
@@ -140,7 +150,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
         }
         // 如何生成路径存在，则校验是否合规
         if(StringUtils.isNotBlank(tableConfig.getGeneratePath())){
-            if(ToolUtil.isValidPath(tableConfig.getGeneratePath())){
+            if(!ToolUtil.isValidPath(tableConfig.getGeneratePath())){
                 throw MyException.builder().businessError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM).build();
             }
         }
@@ -181,12 +191,65 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
     }
 
     @Override
-    public void downloadCode(Long id) {
-        TableConfigResponse tableConfig = baseMapper.getTableConfigDetail(id);
-        if(tableConfig == null){
+    public void downloadCode(List<Long> ids, HttpServletResponse response) {
+        List<TableConfigResponse> tableConfigList = baseMapper.getTableConfigDetail(ids);
+        if(tableConfigList == null || tableConfigList.isEmpty()){
             throw MyException.builder().businessError(MessageConstants.TableConfig.TABLE_CONFIG_NO_EXISTS).build();
         }
-        generatorCode(tableConfig);
+        synchronized(this){
+
+            String basePath = getOutPutDir();
+            String zipPath = getOutZipDir();
+            File baseFolder = new File(basePath);
+            ZipUtil.deleteDir(baseFolder);
+            tableConfigList.forEach(this::generatorCode);
+            File f = new File(zipPath);
+            try {
+                if(f.exists() && !f.delete()){
+                    log.warn("下载源码---删除文件失败:{}",f.getName());
+                }
+                cn.hutool.core.util.ZipUtil.zip(basePath, zipPath);
+            } catch (SecurityException e) {
+                log.error("下载源码---压缩文件失败:{}", e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.TableConfig.ZIP_CODE_ERROR).build();
+            }
+
+            try {
+                // --- 1. 修正 Content-Type ---
+                response.setContentType("application/zip");
+                // --- 2. 修正 Content-Disposition 文件名编码 ---
+                // 获取原始名称
+                String originalFilename = f.getName();
+                // 使用 URLEncoder 进行标准编码 (推荐)
+                String encodedFilename = java.net.URLEncoder.encode(originalFilename, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+                String contentDisposition = "attachment; filename=\"" + encodedFilename + "\"; filename*=UTF-8''" + encodedFilename;
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+                // --- 3. 设置 Content-Length ---
+                response.setContentLengthLong(f.length());
+                // --- 4. 设置其他必要的头 (例如 Cache-Control) ---
+                response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+                response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+                response.setHeader(HttpHeaders.EXPIRES, "0");
+
+                try (BufferedInputStream br = new BufferedInputStream(Files.newInputStream(f.toPath()));
+                     OutputStream out = response.getOutputStream()) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = br.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    out.flush();
+                }
+
+//                if(!f.delete()) {
+//                    log.error("删除文件失败:{}",f.getName());
+//                }
+            } catch (IOException e) {
+                log.error("下载代码出现异常:{}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.TableConfig.DOWLOAD_CODE_ERROR).build();
+
+            }
+        }
     }
 
     /**
@@ -234,7 +297,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             }else{
                 builder.author(GenCodeConstants.DEFAULT_AUTHOR);
             }
-            builder.outputDir(getOutPutDir(tableConfig.getGeneratePath()));
+            builder.outputDir(getOutPutDir());
             builder.disableOpenDir();
             builder.build();
         };
@@ -242,29 +305,26 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
 
     /**
      * 获取最终的文件生成的基本路径
-     * @param generatePath 数据里的路径值
      * @return 最终路径
      */
-    private String getOutPutDir(String generatePath){
+    private String getOutPutDir(){
         String outDir;
-        if(StringUtils.isNotBlank(generatePath)){
-            if(ToolUtil.isValidPath(generatePath)){
-                outDir = generatePath;
-            }else{
-                if("windows".equals(ToolUtil.getOs())){
-                    outDir = GenCodeConstants.WINDOWS_GENERATOR_PATH;
-                }else{
-                    outDir = GenCodeConstants.LINUX_GENERATOR_PATH;
-                }
-            }
+        if("windows".equals(ToolUtil.getOs())){
+            outDir = GenCodeConstants.WINDOWS_GENERATOR_PATH;
         }else{
-            if("windows".equals(ToolUtil.getOs())){
-                outDir = GenCodeConstants.WINDOWS_GENERATOR_PATH;
-            }else{
-                outDir = GenCodeConstants.LINUX_GENERATOR_PATH;
-            }
+            outDir = GenCodeConstants.LINUX_GENERATOR_PATH;
         }
         return outDir + "/" + MySecurityUser.loginName();
+    }
+
+    private String getOutZipDir(){
+        String outZipDir;
+        if("windows".equals(ToolUtil.getOs())){
+            outZipDir = GenCodeConstants.WINDOWS_SOURCE_CODE_NAME;
+        }else{
+            outZipDir = GenCodeConstants.LINUX_SOURCE_CODE_NAME;
+        }
+        return String.format(outZipDir,MySecurityUser.loginName());
     }
     /**
      * 包配置
@@ -282,7 +342,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             builder.service(GenCodeConstants.DEFAULT_SERVICE_PACKAGE_NAME);
             builder.serviceImpl(GenCodeConstants.DEFAULT_SERVICE_IMPL_PACKAGE_NAME);
             builder.xml(GenCodeConstants.DEFAULT_MAPPER_XML_PACKAGE_NAME);
-            builder.pathInfo(Collections.singletonMap(OutputFile.xml, getOutPutDir(tableConfig.getGeneratePath()) + GenCodeConstants.DEFAULT_MAPPER_XML_PATH));
+            builder.pathInfo(Collections.singletonMap(OutputFile.xml, getOutPutDir() + GenCodeConstants.DEFAULT_MAPPER_XML_PATH));
             builder.build();
         };
     }
@@ -434,6 +494,19 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
                     if(GenCodeConstants.FIELD_SORT_STRING.equalsIgnoreCase(field.getColumnName())){
                         hasSortField = true;
                     }
+
+                    // 设置前端boolean类型
+                    if(GenCodeConstants.FRONT_BO0LEAN_FIELD.contains(field.getColumnType())){
+                        field.setFrontType(GenCodeConstants.FRONT_BOOLEAN_TYPE);
+                    }
+                    // 设置前端string类型
+                    if(GenCodeConstants.FRONT_STRING_FIELD.contains(field.getColumnType())){
+                        field.setFrontType(GenCodeConstants.FRONT_STRING_TYPE);
+                    }
+                    // 设置前端number类型
+                    if(GenCodeConstants.FRONT_NUMBER_FIELD.contains(field.getColumnType())){
+                        field.setFrontType(GenCodeConstants.FRONT_NUMBER_TYPE);
+                    }
                 }
             }
             // 如果是tree类型表则默认拥有sort字段
@@ -480,7 +553,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             // model文件 .ts类型
             CustomFile.Builder frontModelCustomFile = new CustomFile.Builder();
             frontModelCustomFile.formatNameFunction(t -> String.format(GenCodeConstants.DEFAULT_FORMAT_FRONT_MODEL_FILE_NAME,t.getEntityPath()))
-                    .filePath(getOutPutDir(tableConfig.getGeneratePath()) + GenCodeConstants.DEFAULT_FRONT_MODEL_FILE_PATH)
+                    .filePath(getOutPutDir() + GenCodeConstants.DEFAULT_FRONT_MODEL_FILE_PATH)
                     .fileName(GenCodeConstants.CUSTOM_TS_FILE_NAME)
                     .templatePath(GenCodeConstants.DEFAULT_FRONT_MODEL_TEMPLATE_PATH)
                     .enableFileOverride();
@@ -488,7 +561,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             // api文件 .ts类型
             CustomFile.Builder frontApiCustomFile = new CustomFile.Builder();
             frontApiCustomFile.formatNameFunction(t -> String.format(GenCodeConstants.DEFAULT_FORMAT_FRONT_API_FILE_NAME,t.getEntityPath()))
-                    .filePath(getOutPutDir(tableConfig.getGeneratePath()) + GenCodeConstants.DEFAULT_FRONT_API_FILE_PATH)
+                    .filePath(getOutPutDir() + GenCodeConstants.DEFAULT_FRONT_API_FILE_PATH)
                     .fileName(GenCodeConstants.CUSTOM_TS_FILE_NAME)
                     .templatePath(GenCodeConstants.DEFAULT_FRONT_API_TEMPLATE_PATH)
                     .enableFileOverride();
@@ -496,7 +569,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             // 视图文件 .vue类型
             CustomFile.Builder frontViewCustomFile = new CustomFile.Builder();
             frontViewCustomFile.formatNameFunction(t -> t.getEntityPath() + "/" + t.getEntityName())
-                    .filePath(getOutPutDir(tableConfig.getGeneratePath()) + GenCodeConstants.DEFAULT_FRONT_VIEW_FILE_PATH)
+                    .filePath(getOutPutDir() + GenCodeConstants.DEFAULT_FRONT_VIEW_FILE_PATH)
                     .fileName(GenCodeConstants.CUSTOM_VUE_FILE_NAME)
                     .templatePath(GenCodeConstants.DEFAULT_FRONT_VIEW_TEMPLATE_PATH)
                     .enableFileOverride();

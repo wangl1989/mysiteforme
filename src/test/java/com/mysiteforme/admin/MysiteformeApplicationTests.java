@@ -39,6 +39,6 @@ public class MysiteformeApplicationTests {
 
     @Test
     public void testGenerateCode() {
-        tableConfigService.downloadCode(1L);
+//        tableConfigService.downloadCode(1L);
     }
 }
