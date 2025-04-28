@@ -9,15 +9,11 @@
 package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.mysiteforme.admin.entity.VO.TableField;
-import com.mysiteforme.admin.entity.VO.TableVO;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.BaseTableFieldResponse;
 import com.mysiteforme.admin.entity.response.BaseTableResponse;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TableService {
 

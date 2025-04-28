@@ -133,4 +133,13 @@ public class Constants {
 	 */
 	public static final String BASE_DIR = "static/";
 
+	/**
+	 * windows上传基础路径
+	 */
+	public static final String WINDOWS_BASE_UPLOAD_DIR = "file:D:/upload/user/";
+	/**
+	 * linux上传基础路径
+	 */
+	public static final String UNIX_BASE_UPLOAD_DIR = "file:/user/upload/";
+
 }

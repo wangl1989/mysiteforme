@@ -9,10 +9,7 @@
 package com.mysiteforme.admin.entity.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mysiteforme.admin.entity.VO.TableField;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;

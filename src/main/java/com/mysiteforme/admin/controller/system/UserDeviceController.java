@@ -5,7 +5,6 @@ import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
 import com.mysiteforme.admin.service.UserDeviceService;
 import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

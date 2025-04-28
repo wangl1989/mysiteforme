@@ -7,7 +7,6 @@ import com.mysiteforme.admin.entity.response.RedisDataResponse;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.RedisService;
 import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.connection.DataType;

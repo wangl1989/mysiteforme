@@ -9,14 +9,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.TableConfig;
 import com.mysiteforme.admin.service.TableConfigService;
-import org.springframework.core.io.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,7 +99,7 @@ public class TableConfigController {
         return Result.success(tableConfigService.getSchemaNameList());
     }
 
-    public Result saveOrUpdate(BaseTableConfigRequest request){
+    private Result saveOrUpdate(BaseTableConfigRequest request){
         if(request == null){
             return Result.objectNotNull();
         }

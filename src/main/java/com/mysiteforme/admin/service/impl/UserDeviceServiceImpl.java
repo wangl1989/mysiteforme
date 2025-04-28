@@ -11,17 +11,14 @@ import com.mysiteforme.admin.entity.VO.DeviceInfoVO;
 import com.mysiteforme.admin.entity.VO.DeviceTokenInfo;
 import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.redis.TokenStorageService;
 import com.mysiteforme.admin.service.UserDeviceService;
-import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.ResultCode;
 import com.mysiteforme.admin.util.ToolUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,8 +35,6 @@ import java.util.stream.Collectors;
 public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice> implements UserDeviceService {
 
     private final TokenStorageService tokenStorageService;
-
-    private final RedisUtils redisUtils;
 
     @Override
     public IPage<UserDevice> selectPageUserDevice(PageListUserDeviceRequest request) {

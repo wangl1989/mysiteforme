@@ -8,10 +8,14 @@
 
 package com.mysiteforme.admin.config;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.mysiteforme.admin.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,10 +39,6 @@ import com.mysiteforme.admin.base.MyHandlerInterceptor;
 import com.mysiteforme.admin.security.CustomExceptionHandlerFilter;
 import com.mysiteforme.admin.security.SecurityHeadersFilter;
 import com.mysiteforme.admin.security.XssFilter;
-import com.mysiteforme.admin.util.ApiToolUtil;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
-import com.mysiteforme.admin.util.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -49,7 +49,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final ApiToolUtil apiToolUtil;
 
-    public WebMvcConfig(CustomExceptionHandlerFilter filter,ApiToolUtil apiToolUtil) {
+    @Value("${user-path.windows-upload-dic}")
+    private String windowsBaseUploadDir;
+
+    @Value("${user-path.linux-upload-dic}")
+    private String linuxBaseUploadDir;
+
+    public WebMvcConfig(CustomExceptionHandlerFilter filter, ApiToolUtil apiToolUtil) {
         this.filter = filter;
         this.apiToolUtil = apiToolUtil;
     }
@@ -131,7 +137,27 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**","/favicon.ico").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/static/**", "/favicon.ico").addResourceLocations("classpath:/static/");
+        String uploadDir = getBaseUploadDir();
+        if(StringUtils.isNotBlank(uploadDir)) {
+            registry.addResourceHandler("/upload/**").addResourceLocations(uploadDir);
+        }
+    }
+
+    private String getBaseUploadDir(){
+        String outDir;
+        if("windows".equals(ToolUtil.getOs())){
+            outDir = windowsBaseUploadDir;
+        }else{
+            outDir = linuxBaseUploadDir;
+        }
+        String filePath = outDir;
+        File file = new File(filePath.replace("file:",""));
+        if(!file.exists() && !file.mkdirs()){
+            log.error("创建基础上传目录失败");
+            return null;
+        }
+        return outDir;
     }
 
     /**
@@ -180,6 +206,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/actuator/**",
                         "/error",
                         "/logout",
+                        "/upload/**",
                         "/genCaptcha",
                         "/static/**",
                         "/showBlog/**",

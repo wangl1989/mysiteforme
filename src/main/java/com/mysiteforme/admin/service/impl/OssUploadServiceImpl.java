@@ -24,7 +24,6 @@ import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +54,6 @@ public class OssUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> i
     private static final String KB_FORMAT = "#.##kb";
     private static final String DEFAULT_CONTENT_TYPE = "unknown";
 
-    @Autowired
     public OssUploadServiceImpl(RescourceService rescourceService, UploadBaseInfoService uploadBaseInfoService) {
         this.rescourceService = rescourceService;
         this.uploadBaseInfoService = uploadBaseInfoService;

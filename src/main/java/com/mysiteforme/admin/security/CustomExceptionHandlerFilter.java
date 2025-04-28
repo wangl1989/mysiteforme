@@ -53,7 +53,7 @@ public class CustomExceptionHandlerFilter extends OncePerRequestFilter {
         // 检查是否匹配排除路径
         return path.startsWith("/druid") || path.startsWith("/actuator")
                 || path.startsWith("/static") || path.startsWith("/error")
-                || path.startsWith("/favicon.ico");
+                || path.startsWith("/favicon.ico") || path.startsWith("/upload");
     }
 
     @Override

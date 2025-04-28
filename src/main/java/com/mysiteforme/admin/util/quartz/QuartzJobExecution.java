@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysiteforme.admin.entity.QuartzTask;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.service.QuartzTaskLogService;
 import com.mysiteforme.admin.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

@@ -1,7 +1,5 @@
 package com.mysiteforme.admin.entity.response;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 @Data

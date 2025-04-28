@@ -11,18 +11,14 @@ package com.mysiteforme.admin.service.impl;
 import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.mysiteforme.admin.dao.PermissionDao;
 import com.mysiteforme.admin.entity.Permission;
-import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.mysiteforme.admin.entity.VO.*;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.PermissionService;
 import com.mysiteforme.admin.service.UserCacheService;
-import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mysiteforme.admin.dao.MenuDao;
 import com.mysiteforme.admin.entity.Menu;
@@ -48,8 +43,6 @@ import com.mysiteforme.admin.service.MenuService;
 public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuService {
 
     private final CacheUtils cacheUtils;
-
-    private final UserService userService;
 
     private final UserCacheService userCacheService;
 

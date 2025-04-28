@@ -22,7 +22,6 @@ import com.mysiteforme.admin.service.BlogArticleService;
 import com.mysiteforme.admin.util.DocumentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -51,7 +50,6 @@ public class BlogArticleServiceImpl extends ServiceImpl<BlogArticleDao, BlogArti
      * 构造函数注入Redis模板
      * @param redisTemplate Redis操作模板
      */
-    @Autowired
     public BlogArticleServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }

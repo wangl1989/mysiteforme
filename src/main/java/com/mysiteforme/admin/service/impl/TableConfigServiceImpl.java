@@ -26,6 +26,7 @@ import com.mysiteforme.admin.util.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,18 @@ import java.util.stream.Collectors;
 public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableConfig> implements TableConfigService {
 
     private final DataSource dataSource;
+
+    @Value("${user-path.windows-generate-dic}")
+    private String windowsGeneratPath;
+
+    @Value("${user-path.linux-generate-dic}")
+    private String linuxGeneratPath;
+
+    @Value("${user-path.windows-source-code-dic}")
+    private String windowsZipPath;
+
+    @Value("${user-path.linux-source-code-dic}")
+    private String linuxZipPath;
 
     public TableConfigServiceImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -310,9 +323,9 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
     private String getOutPutDir(){
         String outDir;
         if("windows".equals(ToolUtil.getOs())){
-            outDir = GenCodeConstants.WINDOWS_GENERATOR_PATH;
+            outDir = windowsGeneratPath;
         }else{
-            outDir = GenCodeConstants.LINUX_GENERATOR_PATH;
+            outDir = linuxGeneratPath;
         }
         return outDir + "/" + MySecurityUser.loginName();
     }
@@ -320,9 +333,9 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
     private String getOutZipDir(){
         String outZipDir;
         if("windows".equals(ToolUtil.getOs())){
-            outZipDir = GenCodeConstants.WINDOWS_SOURCE_CODE_NAME;
+            outZipDir = windowsZipPath;
         }else{
-            outZipDir = GenCodeConstants.LINUX_SOURCE_CODE_NAME;
+            outZipDir = linuxZipPath;
         }
         return String.format(outZipDir,MySecurityUser.loginName());
     }

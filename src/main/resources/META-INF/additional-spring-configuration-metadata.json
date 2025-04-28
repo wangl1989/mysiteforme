@@ -1,0 +1,47 @@
+{"properties": [
+  {
+    "name": "user-path.windows-generate-dic",
+    "type": "java.lang.String",
+    "description": "windows代码生成路径"
+  },
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "jwt密钥"
+  },
+  {
+    "name": "jwt.refresh-token-expiration",
+    "type": "java.lang.String",
+    "description": "jwt的刷新token过期时间:默认7天"
+  },
+  {
+    "name": "jwt.access-token-expiration",
+    "type": "java.lang.String",
+    "description": "jwt的token过期时间:默认30分钟"
+  },
+  {
+    "name": "user-path.linux-generate-dic",
+    "type": "java.lang.String",
+    "description": "linux代码生成路径"
+  },
+  {
+    "name": "user-path.windows-source-code-dic",
+    "type": "java.lang.String",
+    "description": "windows源码压缩包路径(%s 是占位符，用当前用户登录名替换)"
+  },
+  {
+    "name": "user-path.linux-source-code-dic",
+    "type": "java.lang.String",
+    "description": "linux源码压缩包路径(%s 是占位符，用当前用户登录名替换)"
+  },
+  {
+    "name": "user-path.windows-upload-dic",
+    "type": "java.lang.String",
+    "description": "windows基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）"
+  },
+  {
+    "name": "user-path.linux-upload-dic",
+    "type": "java.lang.String",
+    "description": "linux基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）"
+  }
+]}

@@ -22,7 +22,6 @@ import com.mysiteforme.admin.util.ToolUtil;
 import com.mysiteforme.admin.util.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +52,6 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
     private static final String KB_FORMAT = "#.##kb";
     private static final String DEFAULT_CONTENT_TYPE = "unknown";
 
-    @Autowired
     public QiniuUploadServiceImpl(UploadBaseInfoService uploadBaseInfoService, RescourceService rescourceService) {
         this.uploadBaseInfoService = uploadBaseInfoService;
         this.rescourceService = rescourceService;
@@ -173,7 +171,10 @@ public class QiniuUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
             save(resource);
             return webUrl;
         } else {
-            return "";
+            throw MyException.builder()
+                    .code(MyException.SERVER_ERROR)
+                    .msg("文件上传失败，七牛云返回错误：" + r.bodyString())
+                    .build();
         }
     }
 

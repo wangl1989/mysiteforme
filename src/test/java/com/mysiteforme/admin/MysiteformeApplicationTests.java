@@ -1,6 +1,5 @@
 package com.mysiteforme.admin;
 
-import com.mysiteforme.admin.service.TableConfigService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,6 @@ public class MysiteformeApplicationTests {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TableConfigService tableConfigService;
 
     @Test
     public void contextLoads() {
@@ -37,8 +33,4 @@ public class MysiteformeApplicationTests {
         assert matches : "Password verification should return true";
     }
 
-    @Test
-    public void testGenerateCode() {
-//        tableConfigService.downloadCode(1L);
-    }
 }

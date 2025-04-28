@@ -98,6 +98,20 @@ jwt:
   secret: B374A26A71490437AA024E4FADD5B497FDFF1A8EA6FF12F6FB65AF2720B59CCF
   access-token-expiration: 1800000      # 30分钟 = 30 * 60 * 1000
   refresh-token-expiration: 604800000  # 7天 = 7 * 24 * 60 * 1000
+#配置相关文件/文件夹路径
+user-path:
+  # windows代码生成路径
+  windows-generate-dic: D://temp/site
+  #  linux代码生成路径
+  linux-generate-dic: /tmp/site
+  #  windows源码压缩包路径(%s 是占位符，用当前用户登录名替换)
+  windows-source-code-dic: D://temp/%s/源码.zip
+  #  linux源码压缩包路径(%s 是占位符，用当前用户登录名替换)
+  linux-source-code-dic: /tmp/%s/源码.zip
+  # windows基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
+  windows-upload-dic: file:D:/upload/user/
+  #  linux基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
+  linux-upload-dic: file:/user/upload/
 
 ---
 #开发环境配置
@@ -143,9 +157,6 @@ logging:
     org.springframework.security.web.FilterChainProxy: DEBUG
     org.springframework.security: TRACE
     org.springframework.cache: DEBUG
-#源码生成文件夹
-source-code-dic:  D://mysite
-source-code-zipfile:  D://源码.rar
 
 #搜索文件生成包的位置
 #本地路径
@@ -192,12 +203,6 @@ logging:
     com.mysiteforme: DEBUG
     org.springframework: INFO
 
-#自定义配置属性
-#源码生成文件夹
-#本地路径
-source-code-dic: home/mysiteforme/mysite
-source-code-zipfile: home/mysiteforme/源码.rar
-
 #搜索文件生成包的位置
 #本地路径
 lucence-dic: home/mysiteforme/lucence
@@ -241,12 +246,6 @@ logging:
     root: INFO
     com.mysiteforme: DEBUG
     org.springframework: INFO
-#自定义配置属性
-#源码生成文件夹
-#阿里云路径
-source-code-dic:  /opt/mysite
-source-code-zipfile:  /opt/源码.rar
-
 #搜索文件生成包的位置
 #阿里云路径
 lucence-dic : /opt/lucence

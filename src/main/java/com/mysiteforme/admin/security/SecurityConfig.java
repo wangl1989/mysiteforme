@@ -107,7 +107,7 @@ public class SecurityConfig {
             // 配置请求授权
             .authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
                     // // 1. 允许直接访问的接口：验证码接口,登录放行
-                    .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh","/error","/favicon.ico","/static/**","/showBlog/**","/druid/**","/actuator/**").permitAll()
+                    .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh","/error","/favicon.ico","/static/**","/showBlog/**","/druid/**","/actuator/**","/upload/**").permitAll()
                     // 2. 添加API路径模式
                     .requestMatchers("/api/**").access((authentication, context) -> {
                         // 判断是否已认证

@@ -36,10 +36,17 @@ public class CreateTableFiles {
     private String password;
     @Value("${spring.datasource.druid.url}")
     private String dataBaseUrl;
-    @Value("${source-code-dic}")
-    public  String baseDic;
-    @Value("${source-code-zipfile}")
-    public  String zipFile;
+    @Value("${user-path.windows-generate-dic}")
+    private String windowsGeneratPath;
+
+    @Value("${user-path.linux-generate-dic}")
+    private String linuxGeneratPath;
+
+    @Value("${user-path.windows-source-code-dic}")
+    private String windowsZipPath;
+
+    @Value("${user-path.linux-source-code-dic}")
+    private String linuxZipPath;
 
     private static final String AUTHOR_NAME_STRING = "wangl";
 
@@ -56,7 +63,31 @@ public class CreateTableFiles {
             site.setAuthor("wang");
 
         }
-        createFile(tableNames,type,driverName,userName,password,dataBaseUrl,baseDic,zipFile,AUTHOR_NAME_STRING,site);
+        createFile(tableNames,type,driverName,userName,password,dataBaseUrl,getOutPutDir(),getOutZipDir(),AUTHOR_NAME_STRING,site);
+    }
+
+    /**
+     * 获取最终的文件生成的基本路径
+     * @return 最终路径
+     */
+    private String getOutPutDir(){
+        String outDir;
+        if("windows".equals(ToolUtil.getOs())){
+            outDir = windowsGeneratPath;
+        }else{
+            outDir = linuxGeneratPath;
+        }
+        return outDir;
+    }
+
+    private String getOutZipDir(){
+        String outZipDir;
+        if("windows".equals(ToolUtil.getOs())){
+            outZipDir = windowsZipPath;
+        }else{
+            outZipDir = linuxZipPath;
+        }
+        return String.format(outZipDir,"test");
     }
 
     public void createFile(String[] tableNames,int type,String driverName,String userName,String password,String dataBaseUrl,String baseDic,String zipFile,String author, Site site) {

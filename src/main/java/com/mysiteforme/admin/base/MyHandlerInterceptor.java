@@ -2,17 +2,13 @@ package com.mysiteforme.admin.base;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.mysiteforme.admin.entity.Site;
 import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.security.MyUserDetails;
 import com.mysiteforme.admin.service.SiteService;
-import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;

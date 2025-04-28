@@ -1,9 +1,6 @@
 package com.mysiteforme.admin.util;
 
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 @Getter
 public enum FormComponentType {
