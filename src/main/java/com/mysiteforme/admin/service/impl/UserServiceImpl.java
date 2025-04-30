@@ -8,30 +8,33 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.util.DesensitizedUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.entity.response.LocationResponse;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import com.mysiteforme.admin.entity.response.UserDetailResponse;
+import com.mysiteforme.admin.service.RoleService;
 import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.service.UserDeviceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.dao.PermissionDao;
@@ -42,7 +45,6 @@ import com.mysiteforme.admin.entity.VO.PermissionVO;
 import com.mysiteforme.admin.entity.VO.RoleVO;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.redis.CacheUtils;
 import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.MessageConstants;
 
@@ -56,10 +58,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 	private final PasswordEncoder passwordEncoder;
 
-	private final CacheUtils cacheUtils;
-
 	private final UserCacheService userCacheService;
 
+	private final RoleService roleService;
+
+	private final UserDeviceService userDeviceService;
 	@Override
 	public IPage<PageListUserResponse> selectPageUser(PageListUserRequest request) {
 		IPage<PageListUserResponse> page = baseMapper.selectPageUser(new Page<>(request.getPage(),request.getLimit()),request);
@@ -95,93 +98,96 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 	@Override
 	@Caching(put = {
-			@CachePut(value = "system::user", key = "'id:'+	#result.id", condition = "#result != null"),
-			@CachePut(value = "system::user", key = "'loginName:'+	#request.loginName", condition = "#request.loginName != null"),
-			@CachePut(value = "system::user", key = "'email:'+	#request.email", condition = "#request.email != null"),
-			@CachePut(value = "system::user", key = "'tel:'+	#request.tel", condition = "#request.tel != null")
+			@CachePut(value = "system::user::details", key = "'id:'+#result.id", condition = "#result != null")
 	})
 	@Transactional(rollbackFor = MyException.class)
-	public User saveUser(AddUserRequest request) {
-		User user = new User();
-		BeanUtils.copyProperties(request,user);
+	public UserVO saveUser(User user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setLocked(false);
+		String location = getLocation();
+		if(StringUtils.isNotBlank(location)){
+			user.setLocation(location);
+		}
 		baseMapper.insert(user);
-		// 检查当前登录用户是否拥有这些角色
-		this.checkUserRole(user.getRoles());
+		Set<Role> roleSet = user.getRoles();
+		if(!roleSet.isEmpty()) {
+			// 检查当前登录用户是否拥有这些角色
+			this.checkUserRole(roleSet);
+		}else{
+			roleSet = new HashSet<>();
+			roleSet.add(roleService.getDefaultRole());
+		}
 		//保存用户角色关系
-		this.saveUserRoles(user.getId(),user.getRoles());
-		return user;
+		this.saveUserRoles(user.getId(), roleSet);
+		return baseMapper.findUserDetailById(user.getId());
+	}
+
+	private String getLocation(){
+		try {
+			LocationResponse response = userDeviceService.getCurrrenntLocation();
+			if(response != null){
+				String location = response.getProvince();
+				if(StringUtils.isNotBlank(response.getCity())){
+					location = location + "," + response.getCity();
+				}
+				if(StringUtils.isNotBlank(response.getDistrict())){
+					location = location + "," +response.getDistrict();
+				}
+				return location;
+			}
+		}catch (Exception e){
+			log.error("获取地理位置出现异常:{}",e.getMessage());
+			return null;
+		}
+		return null;
 	}
 
 	@Caching(evict = {
-			@CacheEvict(value = "system::user", key = "'id:'+#result.id", condition = "#result.id != null"),
-			@CacheEvict(value = "system::user", key = "'loginName:'+#result.loginName", condition = "#result.loginName != null"),
-			@CacheEvict(value = "system::user", key = "'email:'+#result.email", condition = "#result.email != null"),
-			@CacheEvict(value = "system::user", key = "'tel:'+#result.tel", condition = "#result.tel != null"),
-			@CacheEvict(value = "system::user::details", key = "'loginName:'+#result.loginName", condition = "#result.loginName != null"),
-			@CacheEvict(value = "system::user::details", key = "'id:'+#result.id", condition = "#result.id != null"),
-			@CacheEvict(value = "system::menu::userMenu", key = "'id:'+#result.id", condition = "#result.id != null"),
+			@CacheEvict(value = "system::user::details", key = "'id:'+#request.userId", condition = "#request.userId != null"),
+			@CacheEvict(value = "system::menu::userMenu", key = "#request.userId", condition = "#request.userId != null"),
 	})
 	@Override
-	public User changePassword(ChangePasswordRequest request) {
-		Long currentUserId = MySecurityUser.id();
-		if(currentUserId == null){
-			throw MyException.builder().unauthorized().build();
+	public void changePassword(ChangePasswordRequest request) {
+		User user = this.getById(request.getUserId());
+		if(user == null){
+			throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
 		}
-		User user = this.getById(currentUserId);
 		boolean matches = passwordEncoder.matches(request.getOldPwd(), user.getPassword());
 		if(!matches){
 			throw MyException.builder().businessError(MessageConstants.User.OLD_PASSWORD_ERROR).build();
 		}
 		user.setPassword(passwordEncoder.encode(request.getNewPwd()));
-		return updateUser(user);
+		baseMapper.updateById(user);
 	}
 
 	@Caching(evict = {
-			@CacheEvict(value = "system::user", key = "'id:'+#request.id", condition = "#request.id != null"),
-			@CacheEvict(value = "system::user", key = "'loginName:'+#request.loginName", condition = "#request.loginName != null"),
-			@CacheEvict(value = "system::user", key = "'email:'+#request.email", condition = "#request.email != null"),
-			@CacheEvict(value = "system::user", key = "'tel:'+#request.tel", condition = "#request.tel != null"),
-			@CacheEvict(value = "system::user::details", key = "'loginName:'+#request.loginName", condition = "#result != null"),
-			@CacheEvict(value = "system::user::details", key = "'id:'+#request.id", condition = "#request.id != null"),
-			@CacheEvict(value = "system::menu::userMenu", key = "#request.id", condition = "#request.id != null"),
+			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null"),
+			@CacheEvict(value = "system::menu::userMenu", key = "#user.id", condition = "#user.id != null"),
+	})
+	@Override
+    public void emailChangePassword(User user){
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		baseMapper.updateById(user);
+	}
+
+	@Caching(evict = {
+			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null"),
+			@CacheEvict(value = "system::menu::userMenu", key = "#user.id", condition = "#user.id != null")
 	})
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public User updateUser(UpdateUserRequest request){
-		User user = baseMapper.selectById(request.getId());
-		if(user == null){
-			throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
+	public void updateUser(User user){
+		Set<Role> roles = user.getRoles();
+		if(!roles.isEmpty()) {
+			// 检查当前登录用户是否拥有这些角色
+			this.checkUserRole(user.getRoles());
+			//先解除用户跟角色的关系
+			this.dropUserRolesByUserId(user.getId());
+			//保存用户角色关系
+			this.saveUserRoles(user.getId(), user.getRoles());
 		}
-		BeanUtils.copyProperties(request,user);
-		Set<BaseRoleRequest> roles = request.getRoleSet();
-		user.setRoles(roles.stream().map(r -> new Role(r.getId())).collect(Collectors.toSet()));
-		// 检查当前登录用户是否拥有这些角色
-		this.checkUserRole(user.getRoles());
-		//先解除用户跟角色的关系
-		this.dropUserRolesByUserId(user.getId());
-		//保存用户角色关系
-		this.saveUserRoles(user.getId(),user.getRoles());
 
 		baseMapper.updateById(user);
-		log.debug("#result.id的值为{}",user.getId());
-		log.debug("#result.loginName的值为{}",user.getLoginName());
-		return user;
-	}
-
-	private User updateUser(User user){
-		// 检查当前登录用户是否拥有这些角色
-		this.checkUserRole(user.getRoles());
-		//先解除用户跟角色的关系
-		this.dropUserRolesByUserId(user.getId());
-		//保存用户角色关系
-		this.saveUserRoles(user.getId(),user.getRoles());
-
-		baseMapper.updateById(user);
-		log.debug("#result.id的值为{}",user.getId());
-		log.debug("#result.loginName的值为{}",user.getLoginName());
-		return user;
 	}
 
 	/**
@@ -224,17 +230,42 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		baseMapper.dropUserRolesByUserId(id);
 	}
 
-	/**
-	 * 统计指定参数的用户数量
-	 * 可以通过登录名、邮箱、电话查询
-	 * @param param 查询参数
-	 * @return 用户数量
-	 */
 	@Override
-	public long userCount(String param) {
-		QueryWrapper<User> wrapper = new QueryWrapper<>();
-		wrapper.eq("login_name",param).or().eq("email",param).or().eq("tel",param);
+	public Long userCounByEmail(String email,Long id){
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(User::getEmail,email);
+		if(id != null && 0 != id){
+			wrapper.ne(User::getId,id);
+		}
 		return baseMapper.selectCount(wrapper);
+	}
+
+	@Override
+	public Long userCounByTel(String tel,Long id){
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(User::getTel,tel);
+		if(id != null && 0 != id){
+			wrapper.ne(User::getId,id);
+		}
+		return baseMapper.selectCount(wrapper);
+	}
+
+	@Override
+	public Long userCounByLoginName(String loginName,Long id){
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(User::getLoginName,loginName);
+		if(id != null && 0 != id){
+			wrapper.ne(User::getId,id);
+		}
+		return baseMapper.selectCount(wrapper);
+	}
+
+	@Override
+	public User getUserByEmail(String email) {
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(User::getEmail,email);
+		List<User> list = list(wrapper);
+		return list.isEmpty()?null:list.get(0);
 	}
 
 	/**
@@ -243,12 +274,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	 * @param user 要删除的用户对象
 	 */
 	@Caching(evict = {
-			@CacheEvict(value = "system::user", key = "'id:'+#user.id", condition = "#user.id != null"),
-			@CacheEvict(value = "system::user", key = "'loginName:'+#user.loginName", condition = "#user.loginName != null"),
-			@CacheEvict(value = "system::user", key = "'email:'+#user.email", condition = "#user.email != null"),
-			@CacheEvict(value = "system::user", key = "'tel:'+#user.tel", condition = "#user.tel != null"),
-			@CacheEvict(value = "system::user::details", key = "'loginName:'+#user.loginName", condition = "#user.loginName != null"),
-			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null")
+			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null"),
+			@CacheEvict(value = "system::menu::userMenu", key = "#user.id", condition = "#user.id != null")
 	})
 	@Transactional(rollbackFor = MyException.class)
 	@Override
@@ -260,8 +287,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		baseMapper.dropUserRolesByUserId(user.getId());
 		// 删除用户权限关系
 		permissionDao.removeUserPermissionByUserId(user.getId());
-		// 清除用户其他相关缓存
-		cacheUtils.evictCacheOnUserChange(user.getId());
 	}
 
 	/**
@@ -270,29 +295,26 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	 * @return 用户详细信息
 	 */
 	@Override
-	@Cacheable(value = "system::user::details", key = "'loginName:'+#name", unless = "#result == null")
 	public UserVO findUserByLoginNameDetails(String name) {
-		QueryWrapper<User> wrapper = new QueryWrapper<>();
-		wrapper.eq("login_name", name);
-		wrapper.eq("del_flag", false);
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		if(name.contains("@")) {
+			wrapper.eq(User::getEmail, name);
+		}else if(StringUtils.isNumeric(name)) {
+			wrapper.eq(User::getTel, name);
+		}else {
+			wrapper.eq(User::getLoginName,name);
+		}
+		wrapper.eq(User::getDelFlag, false);
 		User user = baseMapper.selectOne(wrapper);
-		if(user == null){
-			throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
-		}
-		// 检查用户ID是否是超级管理员
-		if(user.getId().equals(1L)){
-			return userCacheService.getSuperAdminUserDetail(user);
-		}else{
-			return baseMapper.findUserByLoginNameDetails(name);
-		}
+		return userCacheService.findUserByIdDetails(user.getId());
 	}
 
 	/*
 	  给用户分配额外权限
 	 */
 	@Caching(evict = {
-		@CacheEvict(value = "system::user::details", key = "'loginName:'+#request.userName", condition = "#request.userName != null"),
-		@CacheEvict(value = "system::user::details", key = "'id:'+#request.userId", condition = "#request.userId != null")
+		@CacheEvict(value = "system::user::details", key = "'id:'+#request.userId", condition = "#request.userId != null"),
+		@CacheEvict(value = "system::menu::userMenu", key = "#request.userId", condition = "#request.userId != null")
 	})
 	@Transactional(rollbackFor = MyException.class)
 	@Override

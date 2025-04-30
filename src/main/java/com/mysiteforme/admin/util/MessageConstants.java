@@ -126,7 +126,9 @@ public class MessageConstants {
         public static final String USER_NOT_FOUND = "message.user.not.found";
         public static final String ASSIGN_ROLE_MORE = "message.user.assign.role.more";
         public static final String LOGIN_NAME_IS_NOT_NULL = "message.user.login.name.is.not.null";
+        public static final String PASSWORD_IS_NOT_NULL = "message.user.password.is.not.null";
         public static final String INCORRECT_LOGIN_NAME_FORMAT = "message.user.incorrect.login.name.format";
+        public static final String INCORRECT_PASSWORD_FORMAT = "message.user.incorrect.password.format";
         public static final String INCORRECT_EMAIL_FORMAT = "message.user.incorrect.email.format";
         public static final String INCORRECT_TEL_FORMAT = "message.user.incorrect.tel.format";
         public static final String ROLE_MUST_SELECT_ONE = "message.user.role.must.select.one";
@@ -136,6 +138,22 @@ public class MessageConstants {
         public static final String SAVE_USER_ERROR = "message.user.save.user.error";
         public static final String ASSIGN_USER_ID_EMPTY = "message.user.assign.user.id.empty";
         public static final String ASSIGN_PERMISSION_COLLECTS_EMPTY = "message.user.assign.permission.collects.empty";
+        public static final String EMAIL_SEND_FAILED = "message.user.send.email.failed";
+        public static final String SYSTEM_USER_CAN_NOT_DELETE = "message.user.system.user.can.not.delete";
+
+        public static final String USER_SEND_EMAIL_EMPTY = "message.user.send.email.empty";
+        public static final String USER_CHECK_EMAIL_CODE_EMPTY = "message.user.check.email.code.empty";
+        public static final String EMAIL_CODE_LENGTH_ERROR = "message.user.email.code.length.error";
+        // 无效的邮箱或验证码
+        public static final String EMAIL_OR_CODE_INVALID = "message.user.email.or.code.invalid";
+        public static final String EMAIL_NOT_VALIDATE = "message.user.email.not.validate";
+        // 用户被禁用
+        public static final String USER_DISABLED = "message.user.disabled";
+        // 注册失败，请联系管理员
+        public static final String REGISTER_FAILED = "message.user.register.failed";
+
+        public static final String GET_LOCATION_ERROR = "message.user.get.location.error";
+
 
     }
 
@@ -143,9 +161,13 @@ public class MessageConstants {
         public static final String ROLE_ID_CAN_NOT_NULL = "message.role.id.can.not.null";
         public static final String ROLE_HAS_USER = "message.role.has.user";
         public static final String ROLE_NAME_EMPTY = "message.role.name.empty";
+        public static final String ROLE_IS_DEFAULT_EMPTY = "message.role.is.default.empty";
         public static final String ROLE_NAME_HAS_EXIST = "message.role.name.has.exist";
+        public static final String ROLE_HAS_OTHER_ROLE_IS_DEFAULT = "message.role.has.other.role.is.default";
         public static final String ROLE_MUST_ASSIGN_ONE_MENU = "message.role.must.assign.one.menu";
         public static final String ROLE_MUST_ASSIGN_ONE_PERMISSION = "message.role.must.assign.one.permission";
+        public static final String ROLE_CURRENT_ROLE_IS_DEFAULT_DELETE = "message.role.current.role.is.default.delete";
+        public static final String ROLE_CURRENT_ROLE_IS_DEFAULT_UPDATE = "message.role.current.role.is.default.update";
     }
 
     public static class JwtToken{
@@ -189,6 +211,8 @@ public class MessageConstants {
         public static final String REDIS_GET_KEY_VALUE_ERROR = "message.redis.get.key.value.error";
         public static final String REDIS_GET_VALUE_EXCEPTION = "message.redis.get.value.exception";
         public static final String REDIS_DELETE_VALUE_EXCEPTION = "message.redis.delete.value.exception";
+        public static final String USER_CAN_NOT_DELETE_REDIS_VALUE = "message.redis.user.can.not.delete.redis.value";
+
     }
 
     public static class Api {
@@ -199,7 +223,10 @@ public class MessageConstants {
         public static final String SYSTEM_NOT_FOUND = "message.system.not.found";
         public static final String SYSTEM_ERROR = "message.system.error";
         public static final String SYSTEM_ERROR_VIEW = "message.system.error.view";
-        public static final String SYSTEM_ERROR_CONVERT = "message.system.error.convert";
+        public static final String FIELD_CONTENT_HAS_XSS_ERROR = "message.system.field.content.has.xss.error";
+        public static final String FIELD_CONTENT_HAS_XSS_PARAM_ERROR = "message.system.field.content.has.xss.param.error";
+        public static final String SYSTEM_GET_HTTP_SERVLET_REQUEST_ERROR = "message.system.get.http.servlet.request.error";
+        public static final String SYSTEM_SITE_CONFIG_ERROR = "message.system.site.config.error";
     }
 
     public static class Validate {
@@ -295,6 +322,8 @@ public class MessageConstants {
         public static final String FILE_DOWNLOAD_ENCODING_EXCEPTION = "message.file.download.encoding.exception";
         public static final String FILE_DOWNLOAD_URL_EXCEPTION = "message.file.download.url.exception";
         public static final String FILE_DOWNLOAD_IO_EXCEPTION = "message.file.download.io.exception";
+        // 创建基础上传目录失败
+        public static final String FILE_CREATE_BASE_UPLOAD_FOLDER_ERROR = "message.file.create.base.upload.folder.error";
     }
 
     public static class Menu {
@@ -319,6 +348,9 @@ public class MessageConstants {
         public static final String SITE_NAME_EMPTY = "message.site.name.empty";
         public static final String FILE_UPLOAD_TYPE_EMPTY = "message.site.file.upload.type.empty";
         public static final String FILE_UPLOAD_TYPE_NOT_CORRECT = "message.site.file.upload.type.not.correct";
+        public static final String SITE_CHECK_WEB_SERVICE_KEY_ERROR = "message.site.check.web.service.key.error";
+        public static final String SITE_CURRENT_LOCATION_WEB_SERVICE_ERROR = "message.site.current.location.web.service.error";
+        public static final String SITE_CURRENT_LOCATION_PCON_LINE_ERROR = "message.site.crrent.location.pcon.line.error";
     }
 
     public static class UploadBaseInfo {

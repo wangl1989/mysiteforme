@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.entity.request.AddRoleRequest;
@@ -26,32 +27,27 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.dao.RoleDao;
 import com.mysiteforme.admin.entity.Role;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.PermissionVO;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.redis.CacheUtils;
 import com.mysiteforme.admin.service.RoleService;
-import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.MessageConstants;
 
 @Service
 @Transactional(readOnly = true, rollbackFor = MyException.class)
 public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleService {
 
-    private final UserService userService;
 
     private final CacheUtils cacheUtils;
 
     private final UserCacheService userCacheService;
 
-    public RoleServiceImpl(UserService userService, CacheUtils cacheUtils, UserCacheService userCacheService) {
-        this.userService = userService;
+    public RoleServiceImpl(CacheUtils cacheUtils, UserCacheService userCacheService) {
         this.cacheUtils = cacheUtils;
         this.userCacheService = userCacheService;
     }
@@ -87,6 +83,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
         return baseMapper.selectRoleById(id);
     }
 
+    @Override
+    public Integer getIsDefaultRoleCount(Long id){
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Role::getIsDefault,true);
+        if(id != null){
+            wrapper.ne(Role::getId,id);
+        }
+        List<Role> roleList = list(wrapper);
+        return roleList.size();
+    }
+
     /**
      * 更新角色信息及其菜单关系
      * 同时清除相关的角色、用户、菜单缓存
@@ -110,14 +117,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteRole(Long id) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("role_id",id);
-        wrapper.eq("del_flag",false);
-        long count = userService.count(wrapper);
-        if(count > 0){
+        Set<Long> userIds = baseMapper.getUserIdsByRoleId(id);
+        if(!userIds.isEmpty()){
             throw MyException.builder().businessError(MessageConstants.Role.ROLE_HAS_USER).build();
         }
         Role role = getById(id);
+        if(role.getIsDefault()){
+            throw MyException.builder().businessError(MessageConstants.Role.ROLE_CURRENT_ROLE_IS_DEFAULT_DELETE).build();
+        }
         role.setDelFlag(true);
         baseMapper.updateById(role);
         // 删除原先的菜单关系
@@ -137,8 +144,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
      */
     @Override
     public Long getRoleNameCount(String name) {
-        QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.eq("name",name);
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Role::getName,name);
         return baseMapper.selectCount(wrapper);
     }
 
@@ -198,5 +205,21 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
         baseMapper.saveRolePermissions(request.getRoleId(),request.getPermissionIds());
         // 清除角色相关缓存
         cacheUtils.evictCacheOnRoleChange(role.getId());
+    }
+
+    /**
+     * 获取角色对象
+     * @return 角色对象
+     */
+    public Role getDefaultRole(){
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Role::getDelFlag,false);
+        wrapper.eq(Role::getIsDefault,true);
+        List<Role> roleList = list(wrapper);
+        if(roleList.isEmpty()){
+            return getById(1L);
+        }else{
+            return roleList.get(0);
+        }
     }
 }

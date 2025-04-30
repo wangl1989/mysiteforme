@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,31 @@ public class RedisUtils {
     }
 
     // ============================== 基础操作 ==============================
-    
+
+    /**
+     * 获取所有匹配模式的键
+     */
+    public Set<String> keys(String pattern) {
+        try {
+            return redisTemplate.keys(pattern);
+        } catch (Exception e) {
+            log.error("Redis数据异常:获取所有匹配模式的键异常", e);
+            throw MyException.builder().systemError(userTips).throwable(e).build();
+        }
+    }
+
+    /**
+     *  获取键类型
+     */
+    public DataType type(String key) {
+        try {
+            return redisTemplate.type(key);
+        } catch (Exception e) {
+            log.error("Redis数据异常:获取键类型异常", e);
+            throw MyException.builder().systemError(userTips).throwable(e).build();
+        }
+    }
+
     /**
      * 指定缓存失效时间
      */
@@ -230,15 +255,26 @@ public class RedisUtils {
         }
     }
 
-    /**
-     * 将数据放入set缓存
-     */
-    public boolean sSet(String key, Object... values) {
+    public boolean sSet(String key, long time, TimeUnit timeUnit, Object... values) {
         try {
             redisTemplate.opsForSet().add(key, values);
+            redisTemplate.expire(key, time, timeUnit);
             return true;
         } catch (Exception e) {
             log.error("Redis数据异常:设置set异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    /**
+     * 将数据从set缓存中移除
+     */
+    public boolean sRemove(String key, Object... values) {
+        try {
+            redisTemplate.opsForSet().remove(key, values);
+            return true;
+        } catch (Exception e) {
+            log.error("Redis数据异常:移除set异常", e);
             throw MyException.builder().systemError(userTips).build();
         }
     }
@@ -250,9 +286,34 @@ public class RedisUtils {
      */
     public boolean zAdd(String key, Object value, double score) {
         try {
-            return redisTemplate.opsForZSet().add(key, value, score);
+            return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(key, value, score));
         } catch (Exception e) {
             log.error("Redis数据异常:添加ZSet异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    /**
+     * 获取zet元素
+     */
+    public Set<Object> zRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().range(key, start, end);
+        } catch (Exception e) {
+            log.error("Redis数据异常:获取ZSet异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    /**
+     * 移除Zset元素
+     */
+    public boolean zRemove(String key, Object value) {
+        try {
+            redisTemplate.opsForZSet().remove(key, value);
+            return false;
+        } catch (Exception e) {
+            log.error("Redis数据异常:移除ZSet异常", e);
             throw MyException.builder().systemError(userTips).build();
         }
     }
@@ -302,7 +363,7 @@ public class RedisUtils {
      * @return true：在黑名单中，false：不在黑名单中
      */
     public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey("token:blacklist:" + token));
+        return redisTemplate.hasKey("token:blacklist:" + token);
     }
     
     /**

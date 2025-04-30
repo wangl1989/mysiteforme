@@ -47,26 +47,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
     private final UserCacheService userCacheService;
 
     private final PermissionService permissionService;
-    /**
-     * 查询所有菜单
-     * 结果会被缓存
-     * @param map 查询参数，包含isShow等条件
-     * @return 菜单列表
-     */
-    @Cacheable(value = "system::menu::allMenus",key = "'allMenus_isShow_'+#map['isShow'].toString()",unless = "#result == null or #result.size() == 0")
-    @Override
-    public List<Menu> selectAllMenus(Map<String,Object> map) {
-        return baseMapper.getMenus(map);
-    }
 
     /**
      * 保存或更新菜单
      * 同时清除菜单和用户相关的所有缓存
      * @param menu 菜单对象
      */
-    @Caching(evict = {
-            @CacheEvict(value = "system::menu::allMenus",allEntries = true)
-    })
     @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
     public void saveMenu(AddMenuRequest request) {
@@ -94,9 +80,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
         cacheUtils.evictCacheOnMenuChange(menu.getId());
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "system::menu::allMenus",allEntries = true)
-    })
     @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
     public void updateMenu(UpdateMenuRequest request) {

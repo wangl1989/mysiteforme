@@ -15,6 +15,22 @@ spring:
   transaction:
     default-timeout: 30s
     rollback-on-commit-failure: true
+  mail:
+    host: smtp.163.com
+    port: 25
+    protocol: smtp
+    username: 22oo00@163.com
+    password: UQy9Q3B6UCybhbkv
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+    test-connection: true
+
   #视图配置
   mvc:
     static-path-pattern: /static/**
@@ -109,7 +125,7 @@ user-path:
   #  linux源码压缩包路径(%s 是占位符，用当前用户登录名替换)
   linux-source-code-dic: /tmp/%s/源码.zip
   # windows基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
-  windows-upload-dic: file:D:/upload/user/
+  windows-upload-dic: file:D:/upload/
   #  linux基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
   linux-upload-dic: file:/user/upload/
 

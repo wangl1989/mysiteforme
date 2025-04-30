@@ -8,6 +8,7 @@
 
 package com.mysiteforme.admin.entity.VO;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoleVO implements Serializable{
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -32,5 +34,15 @@ public class RoleVO implements Serializable{
      * 角色名称
      */
     private String name;
+
+    /**
+     * 是否为默认角色
+     */
+    private Boolean isDefault;
+
+    /**
+     * 备注信息
+     */
+    private String remarks;
 
 }

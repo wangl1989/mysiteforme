@@ -62,7 +62,7 @@ public class MenuController{
 
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.MENU_UPDATE)
-    public Result edit(@RequestBody UpdateMenuRequest request){
+    public Result edit(@RequestBody @Valid UpdateMenuRequest request){
         if(request == null){
             return Result.objectNotNull();
         }

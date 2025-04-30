@@ -81,7 +81,7 @@ public class DruidDBConfig {
         // 添加过滤规则
         registrationBean.addUrlPatterns("/*");
         // 添加不需要忽略的格式信息
-        registrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid,/druid/*,/static/**,/upload/**");
+        registrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid,/druid/*,/static/**,/upload/*,/register/*");
         registrationBean.addInitParameter("registrationBean","true");
         return registrationBean;
     }

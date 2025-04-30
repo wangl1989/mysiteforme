@@ -45,21 +45,4 @@ public class TreeEntity<T> extends DataEntity {
     @TableField(exist = false)
     protected T parentTree;
 
-    /**
-     * 默认构造函数
-     * 初始化排序值为30
-     */
-    public TreeEntity() {
-        super();
-        this.sort = 30;
-    }
-
-    /**
-     * 带ID的构造函数
-     * @param id 实体ID
-     */
-    public TreeEntity(Long id) {
-        super(id);
-    }
-
 }

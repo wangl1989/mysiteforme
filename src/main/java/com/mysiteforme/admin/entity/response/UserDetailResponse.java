@@ -22,6 +22,11 @@ public class UserDetailResponse {
 
     private String remarks;
 
+    /**
+     * 位置信息
+     */
+    private String location;
+
     private Set<RoleVO> roles;
 
 }

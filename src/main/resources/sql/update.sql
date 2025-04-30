@@ -163,5 +163,11 @@ ALTER TABLE quartz_task ADD COLUMN group_name varchar(200) COMMENT '任务组名
 ALTER TABLE quartz_task_log ADD COLUMN cron varchar(200) COMMENT '任务表达式' AFTER `name`;
 ALTER TABLE quartz_task_log ADD COLUMN group_name varchar(200) COMMENT '任务组名称' AFTER `cron`;
 
+ALTER TABLE sys_role ADD COLUMN `is_default` bit(1) DEFAULT 0 COMMENT '是否默认角色' AFTER `name`;
+
+ALTER TABLE sys_site ADD COLUMN `web_service_key` varchar(200) COMMENT 'webservicekey' AFTER `logo`;
+
+ALTER TABLE sys_user ADD COLUMN `location` varchar(200) COMMENT '位置信息' AFTER `locked`;
+
 
 

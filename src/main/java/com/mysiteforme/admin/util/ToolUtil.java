@@ -9,14 +9,8 @@ package com.mysiteforme.admin.util;
 
 
 import java.awt.image.BufferedImage;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -25,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +33,6 @@ import org.springframework.web.util.HtmlUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
-import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.exception.MyException;
 import cn.hutool.http.HttpUtil;
 
@@ -49,31 +41,6 @@ import jakarta.servlet.http.HttpSession;
 
 @Slf4j
 public class ToolUtil {
-
-	/**
-	 * 设定安全的密码，生成随机的salt并经过1024次 sha-1 hash
-	 */
-	public static void entryptPassword(User user) {
-		byte[] salt = Digests.generateSalt(Constants.SALT_SIZE);
-		user.setSalt(Encodes.encodeHex(salt));
-		byte[] hashPassword = Digests.sha1(user.getPassword().getBytes(), salt, Constants.HASH_INTERATIONS);
-		user.setPassword(Encodes.encodeHex(hashPassword));
-	}
-
-	/**
-	 *
-	 * @param paramStr 输入需要加密的字符串
-     */
-	public static String entryptPassword(String paramStr,String salt) {
-		if(StringUtils.isNotEmpty(paramStr)){
-			byte[] saltStr = Encodes.decodeHex(salt);
-			byte[] hashPassword = Digests.sha1(paramStr.getBytes(), saltStr, Constants.HASH_INTERATIONS);
-            return Encodes.encodeHex(hashPassword);
-		}else{
-			return null;
-		}
-
-	}
 
 	/**
 	 * 将BufferedImage转换为Base64字符串
@@ -201,45 +168,6 @@ public class ToolUtil {
 		log.info(" ip --> {}" , ip);
 		return ip;
 	}
-	
-	/**
-     * 将bean转换成map
-     */
-    @SuppressWarnings("unchecked")
-	public static Map<String, Object> convertBeanToMap(Object condition) {
-		if (condition == null) {
-			return null;
-		}
-		if (condition instanceof Map) {
-			return (Map<String, Object>) condition;
-		}
-		Map<String, Object> objectAsMap = new HashMap<>();
-		BeanInfo info;
-		try {
-			info = Introspector.getBeanInfo(condition.getClass());
-		} catch (IntrospectionException e) {
-			log.error("转换bean为map失败", e);
-			throw MyException.builder().code(MyException.SERVER_ERROR).msg("转换bean为map失败").build();
-		}
-
-		for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
-			Method reader = pd.getReadMethod();
-			if (reader != null&&!"class".equals(pd.getName()))
-				try {
-					objectAsMap.put(pd.getName(), reader.invoke(condition));
-				} catch (IllegalArgumentException e) {
-					log.error("出现IllegalArgumentException异常", e);
-					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalArgumentException异常").throwable(e).build();
-				} catch (IllegalAccessException e) {
-					log.error("出现IllegalAccessException异常", e);
-					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现IllegalAccessException异常").throwable(e).build();
-				} catch (InvocationTargetException e) {
-					log.error("出现InvocationTargetException异常", e);
-					throw MyException.builder().code(MyException.SERVER_ERROR).msg("出现InvocationTargetException异常").throwable(e).build();
-				}
-		}
-		return objectAsMap;
-	}
 
 	/**
 
@@ -268,14 +196,6 @@ public class ToolUtil {
 		if(".xml".equalsIgnoreCase(fileExtension)) return "text/xml";
 		return "text/html";
 	}
-
-	/**
-	 * 判断请求是否是ajax请求
-     */
-	public static boolean isAjax(HttpServletRequest request){
-		String accept = request.getHeader("accept");
-        return accept != null && accept.contains("application/json") || (request.getHeader("X-Requested-With") != null && request.getHeader("X-Requested-With").contains("XMLHttpRequest"));
-    }
 
 	/**
 	 * 判断请求是否是json请求
@@ -373,10 +293,14 @@ public class ToolUtil {
 		String isp = "";
 		Map<String,String> finalMap = Maps.newHashMap();
 		try{
-			if("0:0:0:0:0:0:0:1".equals(ip)){
-				ip = "0.0.0.0";
+			String getUrl;
+			if("0:0:0:0:0:0:0:1".equals(ip) ||
+				"127.0.0.1".equals(ip)){
+				getUrl = "http://whois.pconline.com.cn/ipJson.jsp?json=true";
+			}else{
+				getUrl = "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip;
 			}
-            String result= HttpUtil.get("http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip, Charset.forName("GBK"));
+            String result= HttpUtil.get(getUrl, Charset.forName("GBK"));
 			Map<String,String> resultMap = JSON.parseObject(result,Map.class);
 			String status = resultMap.get("err");
 
@@ -421,11 +345,6 @@ public class ToolUtil {
 		}
 	}
 
-	/**
-	 * 验证路径格式是否正确
-	 * @param path 路径地址
-	 * @return 路径是否合法
-	 */
 	/**
 	 * 验证文件路径格式是否正确
 	 * @param path 待验证的路径

@@ -5,6 +5,7 @@
     <resultMap type="com.mysiteforme.admin.entity.Role" id="RoleMap">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
+        <result property="isDefault" column="is_default"/>
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="del_flag"/>
         <collection property="permissionSet" ofType="com.mysiteforme.admin.entity.Permission">
@@ -23,6 +24,7 @@
         SELECT
         r.id,
         r.name,
+        r.is_default,
         r.remarks,
         r.del_flag,
         p.id  	             AS 	"permissionSet.id",
@@ -134,7 +136,8 @@
     <select id="myRoleList" resultType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
         SELECT DISTINCT
             r.id,
-            r.name
+            r.name,
+            r.is_default AS isDefault
         FROM
             sys_role r
         LEFT JOIN sys_user_role ur ON ur.role_id = r.id
@@ -149,6 +152,7 @@
         SELECT
             r.id,
             r.name,
+            r.is_default,
             r.remarks,
             r.del_flag,
             r.create_by,
@@ -164,7 +168,7 @@
         LEFT JOIN sys_user u1 ON u1.id = r.create_by
         LEFT JOIN sys_user u2 ON u2.id = r.update_by
         WHERE
-            1 = 1
+            r.del_flag = FALSE
         <if test="request.name != null and request.name != ''">
             AND r.name LIKE CONCAT('%',#{request.name},'%')
         </if>
@@ -180,7 +184,7 @@
                 </choose>
             </when>
             <otherwise>
-                ORDER BY r.create_date DESC
+                ORDER BY r.update_date DESC
             </otherwise>
         </choose>
     </select>
@@ -200,6 +204,7 @@
     <resultMap id="pageListRoleResponseMap" type="com.mysiteforme.admin.entity.response.PageListRoleResponse">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
+        <result property="isDefault" column="is_default"/>
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="del_flag"/>
         <result property="createId" column="create_by"/>

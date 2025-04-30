@@ -12,7 +12,6 @@
 
 package com.mysiteforme.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mysiteforme.admin.dao.PermissionDao;
 import com.mysiteforme.admin.dao.RoleDao;
@@ -30,7 +29,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,7 +58,7 @@ public class UserCacheServiceImpl implements UserCacheService {
         if(id == 1L){
             return this.getSuperAdminUserDetail(user);
         }else{
-            return baseMapper.findUserByIdDetails(id);
+            return baseMapper.findUserDetailById(id);
         }
     }
 
@@ -71,22 +69,10 @@ public class UserCacheServiceImpl implements UserCacheService {
         QueryWrapper<Role> roleWrapper = new QueryWrapper<>();
         roleWrapper.eq("del_flag", false);
         List<Role> roles = roleDao.selectList(roleWrapper);
-        Set<RoleVO> roleVOs = roles.stream().map(role -> new RoleVO(role.getId(), role.getName())).collect(Collectors.toSet());
+        Set<RoleVO> roleVOs = roles.stream().map(role -> new RoleVO(role.getId(), role.getName(),role.getIsDefault(),role.getRemarks())).collect(Collectors.toSet());
         userVO.setRoles(roleVOs);
         userVO.setPermissions(permissionDao.allPermission());
         return userVO;
     }
-
-    @Cacheable(value = "system::user", key = "'all'", unless = "#result.size()>0")
-    @Override
-    public Map<Long, User> getAllUser() {
-        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<User> userList = baseMapper.selectList(lambdaQueryWrapper);
-        if(!userList.isEmpty()){
-            return userList.stream().collect(Collectors.toMap(User::getId, user -> user));
-        }
-        return Map.of();
-    }
-
 
 }

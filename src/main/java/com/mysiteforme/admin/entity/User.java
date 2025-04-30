@@ -35,6 +35,11 @@ public class User extends DataEntity {
      */
 	@TableField(value = "nick_name")
 	private String nickName;
+
+	/**
+	 * 用户头像
+	 */
+	private String icon;
     /**
      * 密码
      */
@@ -57,7 +62,10 @@ public class User extends DataEntity {
 	 */
 	private Boolean locked;
 
-	private String icon;
+	/**
+	 * 用户位置
+	 */
+	private String location;
 
 	@TableField(exist=false)
 	private Set<Role> roles = Sets.newHashSet();

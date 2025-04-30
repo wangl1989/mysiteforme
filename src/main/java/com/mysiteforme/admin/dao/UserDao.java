@@ -34,8 +34,6 @@ public interface UserDao extends BaseMapper<User> {
 	@MapKey("")
     Map<String,Object> selectUserMenuCount();
 
-    UserVO findUserByLoginNameDetails(String name);
-
-	UserVO findUserByIdDetails(Long id);
+    UserVO findUserDetailById(Long id);
 
 }

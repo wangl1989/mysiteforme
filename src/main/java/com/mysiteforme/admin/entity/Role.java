@@ -25,6 +25,12 @@ public class Role extends DataEntity {
      */
 	private String name;
 
+	/**
+	 * 是否为默认角色
+	 */
+	@TableField("is_default")
+	private Boolean isDefault;
+
 	@TableField(exist = false)
 	private Set<Menu> menuSet;
 	

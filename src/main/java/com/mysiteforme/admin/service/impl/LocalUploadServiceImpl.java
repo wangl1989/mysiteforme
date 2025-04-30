@@ -22,6 +22,7 @@ import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,12 @@ import static com.mysiteforme.admin.util.Constants.BASE_DIR;
 @Slf4j
 public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource> implements UploadService {
 
+    @Value("${user-path.windows-upload-dic}")
+    private String windowsBaseUploadDir;
+
+    @Value("${user-path.linux-upload-dic}")
+    private String linuxBaseUploadDir;
+
     private final UploadBaseInfoService uploadBaseInfoService;
 
     public LocalUploadServiceImpl(UploadBaseInfoService uploadBaseInfoService) {
@@ -52,11 +59,21 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
     private static final String DEFAULT_CONTENT_TYPE = "unknown";
 
     private String getStaticPath() throws IOException {
-        ClassPathResource resource = new ClassPathResource("static/");
-        return resource.getFile().getAbsolutePath();
+        String outDir;
+        if("windows".equals(ToolUtil.getOs())){
+            outDir = windowsBaseUploadDir;
+        }else{
+            outDir = linuxBaseUploadDir;
+        }
+        outDir = outDir.replace("file:","");
+        File file = new File(outDir);
+        if(!file.exists() && !file.mkdirs()){
+            throw MyException.builder().businessError(MessageConstants.file.FILE_CREATE_BASE_UPLOAD_FOLDER_ERROR).build();
+        }
+        return outDir;
     }
 
-    private File createUploadDirectory(String dirPath) {
+    private void createUploadDirectory(String dirPath) {
         File dir = new File(dirPath);
         if (!dir.exists() && !dir.mkdirs()) {
             throw MyException.builder()
@@ -64,7 +81,6 @@ public class LocalUploadServiceImpl extends ServiceImpl<RescourceDao, Rescource>
                     .msg(MessageConstants.file.FOLDER_CREATE_FAILED)
                     .build();
         }
-        return dir;
     }
 
     private Rescource createResource(String fileName, long fileSize, String hash,

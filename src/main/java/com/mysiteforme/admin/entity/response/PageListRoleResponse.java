@@ -12,6 +12,8 @@ public class PageListRoleResponse implements Serializable {
 
     private String name;
 
+    private Boolean isDefault;
+
     private String remarks;
 
     private Boolean delFlag;

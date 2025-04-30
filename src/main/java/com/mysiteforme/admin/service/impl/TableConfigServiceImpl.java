@@ -254,9 +254,6 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
                     out.flush();
                 }
 
-//                if(!f.delete()) {
-//                    log.error("删除文件失败:{}",f.getName());
-//                }
             } catch (IOException e) {
                 log.error("下载代码出现异常:{}",e.getMessage());
                 throw MyException.builder().businessError(MessageConstants.TableConfig.DOWLOAD_CODE_ERROR).build();
@@ -312,7 +309,6 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             }
             builder.outputDir(getOutPutDir());
             builder.disableOpenDir();
-            builder.build();
         };
     }
 
@@ -330,6 +326,10 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
         return outDir + "/" + MySecurityUser.loginName();
     }
 
+    /**
+     * 获取最终的压缩文件生成路径
+     * @return
+     */
     private String getOutZipDir(){
         String outZipDir;
         if("windows".equals(ToolUtil.getOs())){
@@ -356,7 +356,6 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             builder.serviceImpl(GenCodeConstants.DEFAULT_SERVICE_IMPL_PACKAGE_NAME);
             builder.xml(GenCodeConstants.DEFAULT_MAPPER_XML_PACKAGE_NAME);
             builder.pathInfo(Collections.singletonMap(OutputFile.xml, getOutPutDir() + GenCodeConstants.DEFAULT_MAPPER_XML_PATH));
-            builder.build();
         };
     }
 

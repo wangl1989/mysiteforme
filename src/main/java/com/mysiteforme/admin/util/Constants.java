@@ -8,12 +8,6 @@
 
 package com.mysiteforme.admin.util;
 
-/**
- * @ Modified by: wangl
- * @ Modified time: 2025-02-13 23:03:56
- * 
- * @author wangl
- */
 public class Constants {
 	/**
 	 * shiro采用加密算法
@@ -76,7 +70,20 @@ public class Constants {
 	 */
 	public static final String CAPTCHA = "captcha";
 
+	/**
+	 * webService定位API接口请求地址
+	 */
+	public static final String WEB_SERVICE_LOCATION_API = "https://apis.map.qq.com/ws/location/v1/ip?key=%s&ip=%s";
 
+	/**
+	 * 太平洋网络IP API
+	 */
+	public static final String PCON_LINE_API = "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=%s";
+
+	/**
+	 * 默认用户名（注册的时候使用）
+	 */
+	public static final String DEFAULT_USER_NICK_NAME = "用户%s";
 
 	/**
 	 * header中认证字段
@@ -114,6 +121,20 @@ public class Constants {
 	public static final int USER_CAPTCHA_CACHE_EXPIRE_TIME = 5;
 
 	/**
+	 * 验证邮箱有效期
+	 */
+	public static final int USER_EMAIL_CACHE_EXPIRE_TIME = 10;
+
+	/**
+	 * 验证成功1小时有效期，过期则不能注册或更换密码
+	 */
+	public static final int CHECK_EMAIL_SUCCESS_TIME = 1;
+
+	/**
+	 * 用户设备保存周期是30天
+	 */
+	public static final int USER_DEVICE_KEY_TIME = 30;
+	/**
 	 * 权限类型: 路由
 	 */
 	public static final int TYPE_PAGE = 1;
@@ -131,15 +152,15 @@ public class Constants {
 	/**
 	 * 本地上传的基础目录
 	 */
-	public static final String BASE_DIR = "static/";
+	public static final String BASE_DIR = "upload/";
 
-	/**
-	 * windows上传基础路径
-	 */
-	public static final String WINDOWS_BASE_UPLOAD_DIR = "file:D:/upload/user/";
-	/**
-	 * linux上传基础路径
-	 */
-	public static final String UNIX_BASE_UPLOAD_DIR = "file:/user/upload/";
+
+	public static final String DEFAULT_EMAIL_CHECK_REGISTE_SUBJECT = "验证账号注册";
+
+	public static final String DEFAULT_EMAIL_REGIST_CONTENT = "您正在注册我们网站的会员，您的验证码是:%s，请在10分钟内输入验证码完成注册。";
+
+	public static final String DEFAULT_EMAIL_REST_PASSWORD_SUBJECT = "重置账号密码";
+
+	public static final String DEFAULT_EMAIL_REST_PASSWORD_CONTENT = "您正在重置您的账号密码，您的验证码是:%s，请在10分钟内输入验证码完成验证。";
 
 }

@@ -48,23 +48,28 @@ public interface UserService extends IService<User> {
 	/**
 	 * 保存用户信息
 	 * 包含密码加密、角色关系保存
-	 * @param request 用户对象，包含角色列表
+	 * @param user 用户对象，包含角色列表
 	 */
-	User saveUser(AddUserRequest request);
-
+	UserVO saveUser(User user);
 
 	/**
-	 * 更新用户密码
+	 * 更新用户密码(登录后)
 	 * @param request 更新用户密码参数对象
 	 */
-	User changePassword(ChangePasswordRequest request);
+	void changePassword(ChangePasswordRequest request);
+
+	/**
+	 * 更新用户密码(未登录)
+	 * @param user user对象
+	 */
+	void emailChangePassword(User user);
 
 	/**
 	 * 更新用户信息
 	 * 包含更新角色关系
-	 * @param request 请求对象，包含更新后的角色列表
+	 * @param user 请求对象，包含更新后的角色列表
 	 */
-	User updateUser(UpdateUserRequest request);
+	void updateUser(User user);
 
 	/**
 	 * 保存用户角色关系
@@ -79,13 +84,18 @@ public interface UserService extends IService<User> {
 	 */
 	void dropUserRolesByUserId(Long id);
 
+	Long userCounByEmail(String email,Long id);
+
+	Long userCounByTel(String tel,Long id);
+
+	Long userCounByLoginName(String loginName,Long id);
+
 	/**
-	 * 统计指定参数的用户数量
-	 * 可以通过登录名、邮箱、电话查询
-	 * @param param 查询参数
-	 * @return 用户数量
+	 * 根据邮箱获取用户对象
+	 * @param email 邮箱地址
+	 * @return 返回用户对象
 	 */
-	long userCount(String param);
+	User getUserByEmail(String email);
 
 	/**
 	 * 删除用户（软删除）

@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -192,6 +193,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 StandardCharsets.UTF_8);
     }
 
+    @Bean
+    public ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new ForwardedHeaderFilter();
+    }
+
     /**
      * 添加拦截器
      * @param registry 拦截器注册器
@@ -210,6 +216,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/genCaptcha",
                         "/static/**",
                         "/showBlog/**",
+                        "/register/**",
                         "/druid/**");
         registry.addInterceptor(new BlogHandlerInterceptor())
                 .addPathPatterns("/showBlog/**");

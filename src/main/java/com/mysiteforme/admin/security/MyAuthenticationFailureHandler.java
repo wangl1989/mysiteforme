@@ -8,6 +8,7 @@
 
 package com.mysiteforme.admin.security;
 
+import com.mysiteforme.admin.exception.MyException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,13 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         log.error("登录失败：{}", exception.getMessage(), exception);
-        apiToolUtil.returnSystemDate(securityService.loginFailData(request,response),request,response);
+        Throwable cause = exception.getCause();
+        String errorMsg;
+        if((cause != null? cause : exception) instanceof MyException myException){
+            errorMsg = myException.getMessage();
+        }else{
+            errorMsg = null;
+        }
+        apiToolUtil.returnSystemDate(securityService.loginFailData(request,response,errorMsg),request,response);
     }
 }

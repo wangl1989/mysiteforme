@@ -13,6 +13,8 @@ public class PageListUserRequest extends BasePageRequest{
 
     private String email;
 
+    private String location;
+
     private Boolean sortByCreateDateAsc;
 
     private Boolean sortByLoginNameAsc;

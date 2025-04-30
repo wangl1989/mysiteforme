@@ -1,13 +1,13 @@
 package com.mysiteforme.admin.redis;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
+import com.mysiteforme.admin.util.Constants;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TokenStorageService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtils redisUtils;
 
     private final JwtProperties jwtProperties;
 
@@ -42,7 +42,7 @@ public class TokenStorageService {
     public void storeRefreshToken(String username, String refreshToken, String deviceId) {
         // 1. 存储刷新令牌
         String key = RedisConstants.REFRESH_TOKEN_PREFIX + username + ":" + deviceId;
-        redisTemplate.opsForValue().set(key,refreshToken,Duration.ofMillis(jwtProperties.getRefreshTokenExpiration()));
+        redisUtils.set(key, refreshToken, jwtProperties.getRefreshTokenExpiration(), TimeUnit.MILLISECONDS);
         
         // 注：用户-设备绑定关系已在 storeAccessToken 中处理
     }
@@ -60,14 +60,15 @@ public class TokenStorageService {
     public void storeAccessToken(String username, String accessToken, String deviceId) {
         // 1. 存储访问令牌
         String key = RedisConstants.ACCESS_TOKEN_PREFIX + username + ":" + deviceId;
-        redisTemplate.opsForValue().set(
+        redisUtils.set(
                 key,
                 accessToken,
-                Duration.ofMillis(jwtProperties.getAccessTokenExpiration())
+                jwtProperties.getAccessTokenExpiration(),
+                TimeUnit.MILLISECONDS
         );
         // 2. 维护用户-设备映射关系（使用Hash结构存储当前有效的刷新令牌）
-        String userDevicehKey = RedisConstants.USER_DEVICE_PREFIX + username;
-        redisTemplate.opsForSet().add(userDevicehKey, deviceId);
+        String userDeviceKey = RedisConstants.USER_DEVICE_PREFIX + username;
+        redisUtils.sSet(userDeviceKey, Constants.USER_DEVICE_KEY_TIME,TimeUnit.DAYS, deviceId);
     }
 
     /**
@@ -85,7 +86,7 @@ public class TokenStorageService {
         String key = RedisConstants.ACCESS_TOKEN_PREFIX + username + ":" + deviceId;
 
         // 从Redis中获取存储的访问令牌
-        String storedToken = redisTemplate.opsForValue().get(key);
+        String storedToken = redisUtils.get(key,String.class);
 
         // 比较传入的令牌与Redis中存储的令牌是否一致
         return token.equals(storedToken);
@@ -106,7 +107,7 @@ public class TokenStorageService {
         String key = RedisConstants.REFRESH_TOKEN_PREFIX + username + ":" + deviceId;
 
         // 从Redis中获取存储的刷新令牌
-        String storedToken = redisTemplate.opsForValue().get(key);
+        String storedToken = redisUtils.get(key,String.class);
 
         // 比较传入的令牌与Redis中存储的令牌是否一致
         return token.equals(storedToken);
@@ -124,7 +125,7 @@ public class TokenStorageService {
     public List<DeviceTokenInfo> getAllUserDevices(String username) {
         String userDeviceKey = RedisConstants.USER_DEVICE_PREFIX + username;
     
-        Set<String> deviceIds = redisTemplate.opsForSet().members(userDeviceKey);
+        Set<Object> deviceIds = redisUtils.sGet(userDeviceKey);
         if (deviceIds == null || deviceIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -132,7 +133,7 @@ public class TokenStorageService {
         return deviceIds.stream()
                 .map(deviceId -> {
                     DeviceTokenInfo tokenInfo = new DeviceTokenInfo();
-                    tokenInfo.setDeviceId(deviceId);
+                    tokenInfo.setDeviceId(deviceId.toString());
                     return tokenInfo;
                 })
                 .collect(Collectors.toList());
@@ -144,15 +145,15 @@ public class TokenStorageService {
     public void removeDeviceBinding(String username, String deviceId) {
         // 1. 删除访问令牌
         String accessTokenKey = RedisConstants.ACCESS_TOKEN_PREFIX + username + ":" + deviceId;
-        redisTemplate.delete(accessTokenKey);
+        redisUtils.del(accessTokenKey);
 
         // 2. 删除刷新令牌
         String refreshTokenKey = RedisConstants.REFRESH_TOKEN_PREFIX + username + ":" + deviceId;
-        redisTemplate.delete(refreshTokenKey);
+        redisUtils.del(refreshTokenKey);
 
         // 3. 移除设备映射
         String userDeviceKey = RedisConstants.USER_DEVICE_PREFIX + username;
-        redisTemplate.opsForSet().remove(userDeviceKey, deviceId);
+        redisUtils.sRemove(userDeviceKey, deviceId);
     }
 
     /**

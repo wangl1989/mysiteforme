@@ -24,5 +24,4 @@ public interface UserCacheService {
 
     UserVO getSuperAdminUserDetail(User user);
 
-    Map<Long,User> getAllUser();
 }

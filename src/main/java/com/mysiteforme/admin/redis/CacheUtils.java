@@ -52,35 +52,12 @@ public class CacheUtils {
         if(StringUtils.isNotBlank(user.getTel())){
             telCacheKey = "tel:" + user.getTel();
         }
-        Cache cache = cacheManager.getCache("system::user");
-        if(cache != null){
-            cache.evict(idCacheKey);
-            cache.evict(loginNameCacheKey);
-            if(StringUtils.isNotBlank(emailCacheKey)){
-                cache.evict(emailCacheKey);
-            }
-            if(StringUtils.isNotBlank(telCacheKey)){
-                cache.evict(telCacheKey);
-            }
-        }
         Cache detailCache = cacheManager.getCache("system::user::details");
         if(detailCache != null){
             detailCache.evict(idCacheKey);
-            detailCache.evict(loginNameCacheKey);
         }
     }
 
-
-    /**
-     * 清除当前用户的直接权限缓存
-     * @param userId 用户id
-     */
-    private void evictUserPermsCache(Long userId){
-        Cache cache = cacheManager.getCache("system::user::userPerms");
-        if(cache != null){
-            cache.evict(userId);
-        }
-    }
 
     /**
      * 清除当前用户的菜单缓存(菜单+权限)
@@ -111,7 +88,7 @@ public class CacheUtils {
         
         // 2. 查询拥有此角色的所有用户
         Set<Long> userIds = roleDao.getUserIdsByRoleId(roleId);
-        // 如果用户id集合不为空且不包含超级管理员的ID，则添加超级管理员ID
+        // 如果用户id集合不为空或者不包含超级管理员的ID，则添加超级管理员ID
         if(userIds.isEmpty() || !userIds.contains(1L)){
             userIds.add(1L);
         }
@@ -119,7 +96,6 @@ public class CacheUtils {
         // 3. 清除这些用户的关联缓存（包含用户基本缓存，用户直接权限缓存）
         userIds.forEach(userId -> {
             evictUserCache(userId);
-            evictUserPermsCache(userId);
             evictUserMenuCache(userId);
         });
 
@@ -127,22 +103,7 @@ public class CacheUtils {
 
     public void evictCacheOnRoleChangeSuperAdmin(){
         evictUserCache(1L);
-        evictUserPermsCache(1L);
         evictUserMenuCache(1L);
-    }
-
-    /**
-     * 更新用户时的缓存清除链条
-     * @param userId 用户id
-     */
-    public void evictCacheOnUserChange(Long userId){
-        // 1. 清除用户基本缓存，用注解形式
-
-        // 2. 清除用户直接权限缓存
-        evictUserPermsCache(userId);
-        // 3. 清除用户菜单缓存
-        evictUserMenuCache(userId);
-
     }
 
     /**
@@ -158,7 +119,6 @@ public class CacheUtils {
         }
         userIds.forEach(userId -> {
             evictUserCache(userId);
-            evictUserPermsCache(userId);
             evictUserMenuCache(userId);
         });
         // 3. 清除用户角色缓存
@@ -183,7 +143,6 @@ public class CacheUtils {
         }
         userIds.forEach(userId -> {
             evictUserCache(userId);
-            evictUserPermsCache(userId);
             evictUserMenuCache(userId);
         });
         // 3. 清除角色菜单缓存

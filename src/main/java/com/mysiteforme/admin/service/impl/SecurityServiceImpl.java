@@ -87,7 +87,7 @@ public class SecurityServiceImpl implements SecurityService {
      * @return Result准备输出前端对象
      */
     @Override
-    public Result loginFailData(HttpServletRequest request, HttpServletResponse response){
+    public Result loginFailData(HttpServletRequest request, HttpServletResponse response, String errorMsg){
         String deviceId = request.getHeader(Constants.DEVICE_ID);
         // 如果没有设备ID，说明是非法请求（因为验证码阶段已经生成过设备ID）
         if (StringUtils.isBlank(deviceId)) {
@@ -115,7 +115,7 @@ public class SecurityServiceImpl implements SecurityService {
             fail.setLoginName(deviceId);
             redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, fail,Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
         }
-        return Result.error(ERROR_CODE,ERROR_MSG);
+        return Result.error(ERROR_CODE,StringUtils.isBlank(errorMsg)?ERROR_MSG:errorMsg);
     }
 
     private String showFailResultTip(String deviceId){

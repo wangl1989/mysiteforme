@@ -21,13 +21,6 @@ import java.util.Map;
 public interface MenuService extends IService<Menu> {
 
     /**
-     * 获取所有菜单列表
-     * @param map 查询条件
-     * @return 菜单列表
-     */
-    List<Menu> selectAllMenus(Map<String, Object> map);
-
-    /**
      * 新增菜单
      * @param request 菜单对象
      */

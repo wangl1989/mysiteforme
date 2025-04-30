@@ -10,6 +10,7 @@ package com.mysiteforme.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.entity.response.LocationResponse;
 import com.mysiteforme.admin.entity.response.SiteUploadTypeResponse;
 
 import java.util.List;
@@ -29,5 +30,13 @@ public interface SiteService extends IService<Site> {
     void updateSite(Site site);
 
     List<SiteUploadTypeResponse> getSiteUploadTypeList();
-	
+
+    /**
+     * 检测webservice服务是否可用
+     * @param key 腾讯位置服务申请的key
+     * @return 是否通过测试
+     */
+    Boolean checkWebService(String key);
+
+
 }

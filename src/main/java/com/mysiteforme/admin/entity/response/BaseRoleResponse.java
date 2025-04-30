@@ -11,4 +11,6 @@ public class BaseRoleResponse implements Serializable {
 
     private String name;
 
+    private Boolean isDefault;
+
 }

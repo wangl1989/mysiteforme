@@ -8,10 +8,15 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.entity.Role;
+import com.mysiteforme.admin.entity.UpdateCurrentUserRequest;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.entity.response.LocationResponse;
+import com.mysiteforme.admin.service.UserDeviceService;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.mysiteforme.admin.annotation.SysLog;
@@ -26,6 +31,9 @@ import cn.hutool.core.util.DesensitizedUtil;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/admin/user")
 @RequiredArgsConstructor
@@ -34,6 +42,8 @@ public class UserController {
     private final UserService userService;
 
     private final MenuService menuService;
+
+    private final UserDeviceService userDeviceService;
 
     @GetMapping("list")
     public Result list(PageListUserRequest request){
@@ -57,22 +67,26 @@ public class UserController {
         if(request.getRoles() == null || request.getRoles().isEmpty()){
             return  Result.businessMsgError(MessageConstants.User.ROLE_MUST_SELECT_ONE);
         }
-        if(userService.userCount(request.getLoginName())>0){
+        if(userService.userCounByLoginName(request.getLoginName(),null)>0){
             return Result.businessMsgError(MessageConstants.User.LOGIN_NAME_HAS_EXIST);
         }
         if(StringUtils.isNotBlank(request.getEmail())){
-            if(userService.userCount(request.getEmail())>0){
+            if(userService.userCounByEmail(request.getEmail(),null)>0){
                 return Result.businessMsgError(MessageConstants.User.EMAIL_HAS_EXIST);
             }
         }
         if(StringUtils.isNoneBlank(request.getTel())){
-            if(userService.userCount(request.getTel())>0){
+            if(userService.userCounByTel(request.getTel(),null)>0){
                 return Result.businessMsgError(MessageConstants.User.TEL_HAS_EXIST);
             }
         }
         request.setPassword(Constants.DEFAULT_PASSWORD);
-        User user = userService.saveUser(request);
-        if(user == null || user.getId() == null || user.getId() == 0){
+        User user = new User();
+        BeanUtils.copyProperties(request,user);
+        Set<BaseRoleRequest> rolesRequest = request.getRoles();
+        user.setRoles(rolesRequest.stream().map(r -> new Role(r.getId())).collect(Collectors.toSet()));
+        UserVO userVO = userService.saveUser(user);
+        if(userVO == null || userVO.getId() == null || userVO.getId() == 0){
             return Result.businessMsgError(MessageConstants.User.SAVE_USER_ERROR);
         }
         return Result.success();
@@ -87,33 +101,69 @@ public class UserController {
         if(request.getRoleSet() == null || request.getRoleSet().isEmpty()){
             return  Result.businessMsgError(MessageConstants.User.ROLE_MUST_SELECT_ONE);
         }
-        User oldUser = userService.getById(request.getId());
-        if(oldUser == null){
-            return Result.businessMsgError(MessageConstants.User.USER_NOT_FOUND);
-        }
         if(StringUtils.isNotBlank(request.getEmail())){
-            if(!request.getEmail().equals(oldUser.getEmail())){
-                if(userService.userCount(request.getEmail())>0){
-                    return Result.businessMsgError(MessageConstants.User.EMAIL_HAS_EXIST);
-                }
+            if(userService.userCounByEmail(request.getEmail(),request.getId())>0){
+                return Result.businessMsgError(MessageConstants.User.EMAIL_HAS_EXIST);
             }
         }
         if(StringUtils.isNotBlank(request.getTel())){
-            if(!request.getTel().equals(oldUser.getTel())) {
-                if (userService.userCount(request.getTel()) > 0) {
-                    return Result.businessMsgError(MessageConstants.User.TEL_HAS_EXIST);
-                }
+            if (userService.userCounByTel(request.getTel(),request.getId()) > 0) {
+                return Result.businessMsgError(MessageConstants.User.TEL_HAS_EXIST);
             }
         }
-        request.setLoginName(oldUser.getLoginName());
-        return Result.success(userService.updateUser(request));
+        User user = userService.getById(request.getId());
+        if(user == null){
+            return Result.businessMsgError(MessageConstants.User.USER_NOT_FOUND);
+        }
+        request.setLoginName(user.getLoginName());
+        BeanUtils.copyProperties(request,user);
+        Set<BaseRoleRequest> roles = request.getRoleSet();
+        if(!roles.isEmpty()) {
+            user.setRoles(roles.stream().map(r -> new Role(r.getId())).collect(Collectors.toSet()));
+        }
+        userService.updateUser(user);
+        return Result.success();
     }
 
+    @PutMapping("editCurrentUser")
+    public Result editCurrent(@RequestBody @Valid UpdateCurrentUserRequest request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        Long id = MySecurityUser.id();
+        if(id == null){
+            return Result.unauthorized();
+        }
+        if(StringUtils.isNotBlank(request.getEmail())) {
+            if(userService.userCounByEmail(request.getEmail(),id)>0){
+                return Result.businessMsgError(MessageConstants.User.EMAIL_HAS_EXIST);
+            }
+        }
+        if(StringUtils.isNotBlank(request.getTel())) {
+            if (userService.userCounByTel(request.getTel(),id) > 0) {
+                return Result.businessMsgError(MessageConstants.User.TEL_HAS_EXIST);
+            }
+        }
+        request.setId(id);
+        User user = new User();
+        BeanUtils.copyProperties(request,user);
+        userService.updateUser(user);
+        return Result.success();
+    }
+
+    /**
+     * 删除用户
+     * @param id 用户ID
+     * @return result返回结果
+     */
     @DeleteMapping("delete")
     @SysLog(MessageConstants.SysLog.USER_DELETE)
     public Result delete(@RequestParam(value = "id",required = false)Long id){
-        if(id == null || id == 0 || id == 1){
+        if(id == null || id == 0){
             return Result.idIsNullError();
+        }
+        if(1L == id){
+            return Result.businessMsgError(MessageConstants.User.SYSTEM_USER_CAN_NOT_DELETE);
         }
         User user = userService.getById(id);
         if(user == null){
@@ -123,17 +173,28 @@ public class UserController {
         return Result.success();
     }
 
+    /**
+     * 修改密码（个人中心）
+     * @param request 密码参数
+     * @return result返回结果
+     */
     @PostMapping("changePassword")
     @SysLog(MessageConstants.SysLog.USER_CHANGE_PASSWORD)
     @ResponseBody
-    public Result changePassword(@RequestBody ChangePasswordRequest request){
-        if(!request.getConfirmPwd().equals(request.getNewPwd())){
-            return Result.paramMsgError(MessageConstants.User.NEW_PASSWORD_IS_NOT_EQUAL_CONFIRM_PASSWORD);
+    public Result changePassword(@RequestBody @Valid ChangePasswordRequest request){
+        Long id = MySecurityUser.id();
+        if(id == null){
+            return Result.unauthorized();
         }
+        request.setUserId(MySecurityUser.id());
         userService.changePassword(request);
         return Result.success();
     }
 
+    /**
+     * 当前用户
+     * @return result返回结果
+     */
     @GetMapping("currentUser")
 	public Result currentUser(){
         UserVO user = userService.findUserByLoginNameDetails(MySecurityUser.loginName());
@@ -164,7 +225,6 @@ public class UserController {
         if(user == null || user.getDelFlag()){
             return Result.paramMsgError(MessageConstants.Permission.ASSIGN_PERMISSION_USER_NOT_FOUND);
         }
-        request.setUserName(user.getLoginName());
         userService.assignUserPermission(request);
         return Result.success();
     }
@@ -195,6 +255,15 @@ public class UserController {
             return Result.idIsNullError();
         }
         return Result.success(userService.getAssinUserPermission(userId));
+    }
+
+    @GetMapping("location")
+    public Result getLocation(){
+        LocationResponse response = userDeviceService.getCurrrenntLocation();
+        if(response == null){
+            return Result.businessMsgError(MessageConstants.User.GET_LOCATION_ERROR);
+        }
+        return Result.success(response);
     }
 
 }

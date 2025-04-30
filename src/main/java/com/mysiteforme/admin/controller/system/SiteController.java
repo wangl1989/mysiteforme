@@ -9,6 +9,7 @@
 package com.mysiteforme.admin.controller.system;
 
 
+import cn.hutool.core.util.DesensitizedUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,7 +42,17 @@ public class SiteController{
 
     @GetMapping("current")
     public Result current(){
-        return Result.success(siteService.getCurrentSite());
+        Site site = siteService.getCurrentSite();
+        if(StringUtils.isNotBlank(site.getPhone())){
+            site.setPhone(DesensitizedUtil.mobilePhone(site.getPhone()));
+        }
+        if (StringUtils.isNotBlank(site.getEmail())) {
+            site.setEmail(DesensitizedUtil.email(site.getEmail()));
+        }
+        if (StringUtils.isNotBlank(site.getWebServicekey())) {
+            site.setWebServicekey(DesensitizedUtil.password(site.getWebServicekey()));
+        }
+        return Result.success(site);
     }
 
     @SysLog(MessageConstants.SysLog.SITE_EDIT)
@@ -61,6 +72,25 @@ public class SiteController{
         }
         if(StringUtils.isBlank(site.getFileUploadType())){
             return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_EMPTY);
+        }
+        if(StringUtils.isNotBlank(site.getWebServicekey())) {
+            if(site.getWebServicekey().contains("*")) {
+                site.setWebServicekey(null);
+            } else {
+                if (!siteService.checkWebService(site.getWebServicekey())) {
+                    return Result.businessMsgError(MessageConstants.Site.SITE_CHECK_WEB_SERVICE_KEY_ERROR);
+                }
+            }
+        }
+        if(StringUtils.isNotBlank(site.getEmail())){
+            if(site.getEmail().contains("*")){
+                site.setEmail(null);
+            }
+        }
+        if(StringUtils.isNotBlank(site.getPhone())){
+            if(site.getPhone().contains("*")){
+                site.setPhone(null);
+            }
         }
         UploadService uploadService = uploadServiceFactory.getUploadService(site.getFileUploadType());
         if(uploadService == null){

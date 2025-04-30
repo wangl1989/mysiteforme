@@ -11,6 +11,7 @@
         <result property="password"  column="password"/>
         <result property="salt"  column="salt"/>
         <result property="locked" column="locked"/>
+        <result property="location" column="location"/>
         <result property="remarks" column="remarks"/>
         <result property="delFlag" column="del_flag"/>
         <result property="icon" column="icon" />
@@ -59,16 +60,6 @@
     <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
         delete from sys_user_role where user_id = #{userId}
     </delete>
-
-    <select id="findUserByLoginNameDetails"  resultMap="UserDetailMap">
-        <include refid="userDetailSql"/>
-        AND u.login_name = #{loginName}
-        ORDER BY
-        m.sort DESC,
-        m.update_date DESC,
-        p.sort DESC,
-        p.update_date DESC
-    </select>
 
     <resultMap id="permissionsMap" type="com.mysiteforme.admin.entity.VO.PermissionVO">
         <id property="id" column="permission_id"/>
@@ -126,12 +117,15 @@
         <result property="password" column="password"/>
         <result property="remarks" column="remarks"/>
         <result property="locked" column="locked"/>
+        <result property="location" column="location"/>
 
 
         <!-- 角色集合 -->
         <collection property="roles" ofType="com.mysiteforme.admin.entity.VO.RoleVO">
             <id property="id" column="role_id"/>
             <result property="name" column="role_name"/>
+            <result property="isDefault" column="role_is_default"/>
+            <result property="remarks" column="role_remarks"/>
         </collection>
 
         <!-- 菜单+权限集合 -->
@@ -147,6 +141,7 @@
         <result property="email" column="email"/>
         <result property="tel" column="tel"/>
         <result property="locked" column="locked"/>
+        <result property="location" column="location"/>
         <result property="delFlag" column="del_flag"/>
         <result property="remarks" column="remarks"/>
         <result property="createUserNickName" column="create_user_nick_name"/>
@@ -160,6 +155,7 @@
         <collection property="roles" ofType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
             <id property="id" column="user_role_id"/>
             <result property="name" column="user_role_name" />
+            <result property="isDefault" column="user_role_is_default"/>
         </collection>
     </resultMap>
 
@@ -174,6 +170,7 @@
             u.del_flag,
             u.remarks,
             u.locked,
+            u.location,
             u.create_date,
             u.update_date,
             u.create_by,
@@ -184,7 +181,8 @@
             uu.login_name AS update_user_login_name,
             -- 角色信息
             r.id AS user_role_id,
-            r.name AS user_role_name
+            r.name AS user_role_name,
+            r.is_default AS user_role_is_default
         FROM sys_user u
         LEFT JOIN sys_user_role ur ON u.id = ur.user_id
         LEFT JOIN sys_role r ON r.id = ur.role_id AND r.del_flag = false
@@ -235,23 +233,15 @@
                     </otherwise>
                 </choose>
             </if>
-
+        </if>
+        <if test="request.location != null and request.location != ''">
+            AND u.location LIKE CONCAT('%', #{request.location}, '%')
         </if>
     </select>
 
-    <!-- findUserByIdDetails -->
-    <select id="findUserByIdDetails" resultMap="UserDetailMap">
-        <include refid="userDetailSql"/>
-        AND u.id = #{id}
-        ORDER BY
-        m.sort DESC,
-        m.update_date DESC,
-        p.sort DESC,
-        p.update_date DESC
-    </select>
-
-    <sql id="userDetailSql">
-        SELECT 
+    <!-- findUserDetailById -->
+    <select id="findUserDetailById"  resultMap="UserDetailMap">
+        SELECT
             u.id,
             u.login_name,
             u.nick_name,
@@ -260,11 +250,14 @@
             u.email,
             u.password,
             u.locked,
+            u.location,
             u.remarks,
             u.del_flag,
             -- 角色信息
             r.id AS role_id,
             r.name AS role_name,
+            r.is_default AS role_is_default,
+            r.remarks AS role_remarks,
             -- 权限信息
             p.id AS permission_id,
             p.permission_name,
@@ -297,22 +290,28 @@
             pa.api_url,
             pa.http_method,
             pa.common
-        FROM 
+        FROM
             sys_user u
-        -- 单独权限关联
-        LEFT JOIN sys_user_permission up ON u.id = up.user_id
-        -- 角色权限关联
-        LEFT JOIN sys_user_role sur ON sur.user_id = u.id
-        LEFT JOIN sys_role r ON r.id = sur.role_id AND r.del_flag = 0
-        LEFT JOIN sys_role_permission rp ON rp.role_id = r.id
-        -- 具体权限关联
-        LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
-        LEFT JOIN sys_menu m ON m.id = p.menu_id
-        -- 具体权限项关联
-        LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
-        LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
-        LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
-        WHERE 
-            u.del_flag = 0
+                -- 单独权限关联
+                LEFT JOIN sys_user_permission up ON u.id = up.user_id
+                -- 角色权限关联
+                LEFT JOIN sys_user_role sur ON sur.user_id = u.id
+                LEFT JOIN sys_role r ON r.id = sur.role_id AND r.del_flag = 0
+                LEFT JOIN sys_role_permission rp ON rp.role_id = r.id
+                -- 具体权限关联
+                LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
+                LEFT JOIN sys_menu m ON m.id = p.menu_id
+                -- 具体权限项关联
+                LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
+                LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
+                LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
+        WHERE
+            u.del_flag = FALSE
+        AND u.id = #{id}
+        ORDER BY m.sort DESC, m.update_date DESC, p.sort DESC, p.update_date DESC
+    </select>
+
+    <sql id="userDetailSql">
+
     </sql>
 </mapper>

@@ -36,12 +36,18 @@ public class RoleController {
 
     @PostMapping("add")
     @SysLog(MessageConstants.SysLog.ROLE_ADD)
-    public Result add(@RequestBody AddRoleRequest request){
+    public Result add(@RequestBody @Valid AddRoleRequest request){
         if(request == null){
             return Result.objectNotNull();
         }
         if(roleService.getRoleNameCount(request.getName())>0){
             return Result.paramMsgError(MessageConstants.Role.ROLE_NAME_HAS_EXIST);
+        }
+        // 如果前端选择了默认，则判断当前系统中是否有其他角色已经是默认状态了。
+        if(request.getIsDefault()){
+            if(roleService.getIsDefaultRoleCount(null) > 0){
+                return Result.businessMsgError(MessageConstants.Role.ROLE_HAS_OTHER_ROLE_IS_DEFAULT);
+            }
         }
         roleService.saveRole(request);
         return Result.success();
@@ -49,11 +55,26 @@ public class RoleController {
 
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.ROLE_EDIT)
-    public Result edit(@RequestBody UpdateRoleRequest request){
+    public Result edit(@RequestBody @Valid UpdateRoleRequest request){
         Role oldRole = roleService.getRoleById(request.getId());
+        if(oldRole.getIsDefault()){
+            Long currentId = MySecurityUser.id();
+            if(currentId == null){
+                return Result.unauthorized();
+            }
+            if(1L != currentId) {
+                return Result.businessMsgError(MessageConstants.Role.ROLE_CURRENT_ROLE_IS_DEFAULT_UPDATE);
+            }
+        }
         if(!oldRole.getName().equals(request.getName())){
             if(roleService.getRoleNameCount(request.getName())>0){
                 return Result.paramMsgError(MessageConstants.Role.ROLE_NAME_HAS_EXIST);
+            }
+        }
+        // 如果前端选择了默认，则判断当前系统中是否有其他角色已经是默认状态了。
+        if(request.getIsDefault()){
+            if(roleService.getIsDefaultRoleCount(request.getId()) > 0){
+                return Result.businessMsgError(MessageConstants.Role.ROLE_HAS_OTHER_ROLE_IS_DEFAULT);
             }
         }
         roleService.updateRole(request);

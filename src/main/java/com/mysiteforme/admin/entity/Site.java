@@ -74,6 +74,12 @@ public class Site extends DataEntity {
 	 * logo
 	 */
 	private String logo;
+
+	/**
+	 * qq的webservice的Key
+	 */
+	@TableField("web_service_key")
+	private String webServicekey;
 	/**
 	 * 服务器
 	 */

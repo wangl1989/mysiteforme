@@ -1,5 +1,8 @@
 package com.mysiteforme.admin.config;
 
+import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.util.MessageConstants;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
@@ -78,9 +81,14 @@ public class XssRequestBodyAdvice extends RequestBodyAdviceAdapter {
         Set<Object> processedObjects = Collections.newSetFromMap(new IdentityHashMap<>());
         try {
             cleanXss(body, processedObjects);
+        } catch (MyException e){
+            throw e;
         } catch (Exception e) {
-            // 记录日志但不中断处理
+            // 记录日志
             log.error("XSS清理失败: for request body. Class: {}, Error: {}", body.getClass().getName(), e.getMessage(), e);
+            throw MyException.builder()
+                    .businessError(MessageConstants.System.FIELD_CONTENT_HAS_XSS_ERROR)
+                    .build();
         }
         return body;
     }
@@ -137,7 +145,20 @@ public class XssRequestBodyAdvice extends RequestBodyAdviceAdapter {
                 if (value instanceof String original) {
                     // 清理字符串字段
                     String cleaned = Jsoup.clean(original, SAFELIST);
-                    if (!Objects.equals(original, cleaned)) { // 只有在内容确实被修改后才更新
+                    if (!Objects.equals(original, cleaned)) {
+                        // 只有在内容确实被修改后才更新
+                        if(cleaned.trim().isEmpty()){
+                            log.warn("XSS 清理过后是空值: '{}' in class '{}'. Original value: '{}'",
+                                    field.getName(), clazz.getName(), original);
+                            // 如果原字段是必填的话
+                            if(field.isAnnotationPresent(jakarta.validation.constraints.NotBlank.class) ||
+                                    field.isAnnotationPresent(jakarta.validation.constraints.NotNull.class) ||
+                                    field.isAnnotationPresent(jakarta.validation.constraints.NotEmpty.class)){
+                                throw MyException.builder()
+                                        .businessError(MessageConstants.System.FIELD_CONTENT_HAS_XSS_PARAM_ERROR,original)
+                                        .build();
+                            }
+                        }
                         log.trace("Cleaning field '{}': '{}' -> '{}'", field.getName(), original, cleaned); // 可选：记录清理日志
                         field.set(obj, cleaned); // 将清理后的字符串设置回字段
                     }

@@ -1,10 +1,18 @@
 package com.mysiteforme.admin.service.impl;
 
+import cn.hutool.core.util.DesensitizedUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Sets;
+import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.PageListRedisRequest;
 import com.mysiteforme.admin.entity.response.RedisDataResponse;
 import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.service.RedisService;
 import com.mysiteforme.admin.util.MessageConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +31,11 @@ public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public RedisServiceImpl(RedisTemplate<String, String> redisTemplate) {
+    private final RedisUtils redisUtils;
+
+    public RedisServiceImpl(RedisTemplate<String, String> redisTemplate,RedisUtils redisUtils) {
         this.redisTemplate = redisTemplate;
+        this.redisUtils = redisUtils;
     }
 
 
@@ -41,7 +52,6 @@ public class RedisServiceImpl implements RedisService {
 
         // 转换为列表以进行分页
         List<String> keyList = new ArrayList<>(keys);
-        keyList = keyList.stream().filter(s -> !s.startsWith("auth:access") && !s.startsWith("auth:refresh") && !s.startsWith("auth:user:device")).collect(Collectors.toList());
 
         // 如果需要，按过期时间排序
         if (Boolean.TRUE.equals(request.getSortByExpireAsc())) {
@@ -81,6 +91,11 @@ public class RedisServiceImpl implements RedisService {
 
         if (!redisTemplate.hasKey(key)) {
             throw MyException.builder().paramMsgError(MessageConstants.Redis.REDIS_KEY_NOT_FOUND).build();
+        }
+
+        Long id = MySecurityUser.id();
+        if (id == null || 1L != id){
+            throw MyException.builder().businessError(MessageConstants.Redis.USER_CAN_NOT_DELETE_REDIS_VALUE).build();
         }
 
         redisTemplate.delete(key);
@@ -126,6 +141,33 @@ public class RedisServiceImpl implements RedisService {
                 case "string" -> {
                     // 直接使用StringRedisTemplate获取字符串值
                     String value = redisTemplate.opsForValue().get(key);
+                    if(value != null) {
+                        if (key.startsWith("auth:refresh") || key.startsWith("auth:access")) {
+                            value = StringUtils.overlay(value, "********", 6, 14);
+                        }
+                        if (key.startsWith(RedisConstants.USER_CAPTCHA_CACHE_KEY)) {
+                            value = StringUtils.overlay(value, "**", 1, 3);
+                        }
+                        if(key.startsWith(RedisConstants.USER_EMAIL_KEY)){
+                            value = StringUtils.overlay(value, "**", 3, 9);
+                        }
+                        if(key.startsWith("system::user::details")){
+                            UserVO userVO = redisUtils.get(key,UserVO.class);
+                            if(userVO != null && StringUtils.isNotBlank(userVO.getPassword())){
+                                userVO.setPassword(DesensitizedUtil.password(userVO.getPassword()));
+                                value = JSON.toJSONString(userVO);
+                            }
+                        }
+                        if(key.startsWith("system::site")){
+                            Site site = redisUtils.get(key, Site.class);
+                            if(site != null){
+                                site.setPhone(DesensitizedUtil.mobilePhone(site.getPhone()));
+                                site.setEmail(DesensitizedUtil.email(site.getEmail()));
+                                site.setWebServicekey(DesensitizedUtil.password(site.getWebServicekey()));
+                                value = JSON.toJSONString(site);
+                            }
+                        }
+                    }
                     yield value != null ? value : "空值";
                 }
                 case "list" -> {
@@ -142,6 +184,14 @@ public class RedisServiceImpl implements RedisService {
                     // 直接使用低级API获取集合成员
                     try {
                         Set<String> set = redisTemplate.opsForSet().members(key);
+                        if(key.startsWith(RedisConstants.EMAIL_VALIDATE_SUCCESS) ||
+                                key.startsWith(RedisConstants.USER_DEVICE_PREFIX)){
+                            if (set != null) {
+                                Set<String> modifiedSet = Sets.newHashSet();
+                                set.forEach(e -> modifiedSet.add(StringUtils.overlay(e, "******", 3, 9)));
+                                yield modifiedSet.toString();
+                            }
+                        }
                         yield set == null ? "[]" : set.toString();
                     } catch (Exception e) {
                         log.warn("获取Redis集合[{}]的值时出现异常: {}", key, e.getMessage());

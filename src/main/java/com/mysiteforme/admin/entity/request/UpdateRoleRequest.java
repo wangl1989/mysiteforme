@@ -14,5 +14,8 @@ public class UpdateRoleRequest {
     @NotBlank(message = MessageConstants.Role.ROLE_NAME_EMPTY)
     private String name;
 
+    @NotNull(message = MessageConstants.Role.ROLE_IS_DEFAULT_EMPTY)
+    private Boolean isDefault;
+
     private String remarks;
 }

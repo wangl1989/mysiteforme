@@ -27,6 +27,8 @@ public class PageListUserResponse implements Serializable {
 
     private Boolean locked;
 
+    private String location;
+
     private Boolean delFlag;
 
     private String remarks;

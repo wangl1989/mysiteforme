@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface SecurityService {
 
-    Result loginFailData(HttpServletRequest request, HttpServletResponse response);
+    Result loginFailData(HttpServletRequest request, HttpServletResponse response, String errorMsg);
 
     void loginSuccess(MyUserDetails user, HttpServletRequest request,HttpServletResponse response);
 

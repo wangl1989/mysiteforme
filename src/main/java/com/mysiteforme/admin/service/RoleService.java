@@ -40,6 +40,12 @@ public interface RoleService extends IService<Role> {
     Role getRoleById(Long id);
 
     /**
+     * 获取当前系统中已经设置了默认角色的数量
+     * @param id 角色ID
+     * @return 返回已经设置了默认角色的数量
+     */
+    Integer getIsDefaultRoleCount(Long id);
+    /**
      * 更新角色
      * @param request 角色对象
      */
@@ -75,4 +81,10 @@ public interface RoleService extends IService<Role> {
     RoleMenuPerResponse getUserRoleMenusPermissions(Long id);
 
     void assignRoleMenusPermissions(SaveRoleMenuPerRequest request);
+
+    /**
+     * 获取默认角色
+     * @return 角色对象
+     */
+    Role getDefaultRole();
 }

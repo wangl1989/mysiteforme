@@ -14,7 +14,12 @@ public class ResultCode {
      * 成功
      */
     public static final int SUCCESS = 200;
-    
+
+    /**
+     * 验证邮箱成功
+     */
+    public static final int CHECK_EMAIL_SUCCESS = 203;
+
     /**
      * 客户端错误 (4xx)
      */
