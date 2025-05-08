@@ -55,24 +55,19 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
      */
     @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
-    public void saveMenu(AddMenuRequest request) {
-        Menu menu = new Menu();
-        BeanUtils.copyProperties(request,menu);
-        if(request.getParentId() == null || request.getParentId() == 0){
+    public void saveMenu(Menu menu) {
+        if(menu.getSort() == null || menu.getSort() == 0 || menu.getSort() == 1){
+            menu.setSort(getMaxSort(menu.getParentId(),null));
+        }
+        if(menu.getParentId() == null || menu.getParentId() == 0){
             menu.setLevel(1);
-            if(request.getSort() == null || request.getSort() == 0 || request.getSort() == 1){
-                menu.setSort(getMaxSort(request.getParentId(),null));
-            }
         }else{
-            Menu parentMenu = this.getById(request.getParentId());
+            Menu parentMenu = this.getById(menu.getParentId());
             if(parentMenu==null){
                 throw MyException.builder().businessError(MessageConstants.Menu.MENU_PARENT_ID_INVALID).build();
             }
             menu.setParentIds(parentMenu.getParentIds());
             menu.setLevel(parentMenu.getLevel()+1);
-            if(request.getSort() == null || request.getSort() == 0 || request.getSort() == 1) {
-                menu.setSort(getMaxSort(request.getParentId(),null));
-            }
         }
         saveOrUpdate(menu);
         menu.setParentIds(StringUtils.isBlank(menu.getParentIds())? menu.getId()+"," : menu.getParentIds()+menu.getId()+",");
@@ -82,30 +77,32 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
 
     @Transactional(readOnly = false, rollbackFor = Exception.class)
     @Override
-    public void updateMenu(UpdateMenuRequest request) {
-        Menu oldMenu = this.getById(request.getId());
+    public void updateMenu(Menu menu) {
+        Menu oldMenu = this.getById(menu.getId());
         if(oldMenu == null) {
             throw MyException.builder().businessError(MessageConstants.Menu.MENU_NOT_FOUND).build();
         }
-        Menu menu = new Menu();
-        BeanUtils.copyProperties(request,menu);
-        if(request.getParentId() == null || request.getParentId() == 0){
+        // 设置排序值
+        if(menu.getSort() == null || menu.getSort() == 0 || menu.getSort() == 1){
+            menu.setSort(getMaxSort(menu.getParentId(),menu.getId()));
+        }
+        if(menu.getParentId() == null || menu.getParentId() == 0){
+            // 如果是顶级菜单，直接设置level是1，一级parentIds（它本身）
             menu.setLevel(1);
-            if(oldMenu.getParentId() != null) {
-                menu.setSort(getMaxSort(request.getParentId(),request.getId()));
-                menu.setParentIds(request.getId() + ",");
-            }
+            menu.setParentIds(menu.getId() + ",");
         }else{
-            if(request.getId().equals(request.getParentId())){
+            if(menu.getId().equals(menu.getParentId())){
                 throw MyException.builder().businessError(MessageConstants.Menu.PARENT_ID_ERROR).build();
             }
-            if(!request.getParentId().equals(oldMenu.getParentId())) {
-                Menu parentMenu = this.getById(request.getParentId());
+            // 如果父目录更换了（这里的parentId一定不为NULL），那么就要重新设置level以及parentIds
+            if(!menu.getParentId().equals(oldMenu.getParentId())) {
+                Menu parentMenu = this.getById(menu.getParentId());
                 if (parentMenu == null) {
                     throw MyException.builder().businessError(MessageConstants.Menu.MENU_PARENT_ID_INVALID).build();
                 }
-                request.setLevel(parentMenu.getLevel() + 1);
-                menu.setSort(getMaxSort(request.getParentId(),request.getId()));
+                menu.setLevel(parentMenu.getLevel() + 1);
+                // 如果父目录更换了就需要重设排序值
+                menu.setSort(getMaxSort(menu.getParentId(),menu.getId()));
                 menu.setParentIds(parentMenu.getParentIds()+menu.getId()+",");
             }
         }

@@ -28,9 +28,9 @@ public interface RoleService extends IService<Role> {
 
     /**
      * 保存角色
-     * @param request 角色对象
+     * @param role 角色对象
      */
-    void saveRole(AddRoleRequest request);
+    void saveRole(Role role);
 
     /**
      * 根据ID获取角色
@@ -47,9 +47,9 @@ public interface RoleService extends IService<Role> {
     Integer getIsDefaultRoleCount(Long id);
     /**
      * 更新角色
-     * @param request 角色对象
+     * @param role 角色对象
      */
-    void updateRole(UpdateRoleRequest request);
+    void updateRole(Role role);
 
     /**
      * 删除角色
@@ -64,12 +64,6 @@ public interface RoleService extends IService<Role> {
      */
     Long getRoleNameCount(String name);
 
-    /**
-	 * 获取已经被权限ID:permissionId 分配的权角色ID集合
-	 * @param permissionId 权限
-	 * @return 角色ID集合
-	 */
-	List<Long> getRoleIdsByPermissionId(Long permissionId);
 
     List<BaseRoleResponse> userAllRole(Long id);
 

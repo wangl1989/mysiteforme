@@ -10,7 +10,12 @@ package com.mysiteforme.admin.aspect;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.mysiteforme.admin.entity.DTO.AgentDTO;
+import com.mysiteforme.admin.entity.DTO.IndexLogDTO;
+import com.mysiteforme.admin.entity.DTO.LocationDTO;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
+import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.util.MessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
@@ -29,7 +34,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -39,7 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Aspect
@@ -47,16 +51,19 @@ import java.util.Map;
 @Order(5)
 public class WebLogAspect {
 
-    private LogService logService;
+    private final LogService logService;
+
+    private final RedisUtils redisUtils;
+
+    private final UserCacheService userCacheService;
 
 
     public static ThreadLocal<Long> startTime = new ThreadLocal<>();
 
-    public WebLogAspect() {}
-
-    @Autowired
-    public WebLogAspect(LogService logService) {
+    public WebLogAspect(LogService logService, RedisUtils redisUtils, UserCacheService userCacheService) {
         this.logService = logService;
+        this.redisUtils = redisUtils;
+        this.userCacheService = userCacheService;
     }
 
     private Log sysLog;
@@ -73,8 +80,8 @@ public class WebLogAspect {
      */
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint){
-        startTime.set(System.currentTimeMillis());
         sysLog = new Log();
+        startTime.set(System.currentTimeMillis());
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if(attributes != null) {
@@ -98,12 +105,7 @@ public class WebLogAspect {
                 String str = JSONObject.toJSONString(objs.size()>1?objs:objs.get(0));
                 sysLog.setParams(str.length() > 5000 ? JSONObject.toJSONString("请求参数数据过长不与显示") : str);
             }
-            String ip = ToolUtil.getClientIp(request);
-            if ("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)) {
-                ip = "127.0.0.1" ;
-            }
-            sysLog.setRemoteAddr(ip);
-            sysLog.setRequestUri(request.getRequestURL().toString());
+            sysLog.setRequestUri(request.getRequestURI());
             sysLog.setSessionId(session.getId());
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
             Method method = signature.getMethod();
@@ -116,30 +118,15 @@ public class WebLogAspect {
                 }
 
             }
+            LocationDTO locationDTO = userCacheService.getLocationByIp(ToolUtil.getClientIp(request));
+            sysLog.setRemoteAddr(locationDTO.getIp());
+            AgentDTO browserMap = ToolUtil.getOsAndBrowserInfo(request);
 
-            Map<String, String> browserMap = ToolUtil.getOsAndBrowserInfo(request);
-            sysLog.setBrowser(browserMap.get("os") + "-" + browserMap.get("browser"));
-            if (!"127.0.0.1".equals(ip)) {
-                Map<String, String> map = null;
-                if (session.getAttribute("addressIp") != null) {
-                    map = ToolUtil.getSessionMapAttribute(session,"addressIp",String.class, String.class);
-                }
-                if (map == null) {
-                    map = ToolUtil.getAddressByIP(ToolUtil.getClientIp(request));
-                    // Sanitize the map values before setting them in the session
-                    Map<String, String> cleanedMap = Maps.newHashMap();
-                    map.forEach((k, v) ->
-                            cleanedMap.put(k, v != null ? StringEscapeUtils.escapeHtml4(v) : "")
-                    );
-                    session.setAttribute("addressIp", cleanedMap);
-                } else {
-                    map.replaceAll((k, v) -> StringEscapeUtils.escapeHtml4(v));
-                }
-                sysLog.setArea(StringEscapeUtils.escapeHtml4(map.get("area")));
-                sysLog.setProvince(StringEscapeUtils.escapeHtml4(map.get("province")));
-                sysLog.setCity(StringEscapeUtils.escapeHtml4(map.get("city")));
-                sysLog.setIsp(StringEscapeUtils.escapeHtml4(map.get("isp")));
-            }
+            sysLog.setBrowser(browserMap.getBrowser());
+            sysLog.setArea(StringEscapeUtils.escapeHtml4(locationDTO.getRegion()));
+            sysLog.setProvince(StringEscapeUtils.escapeHtml4(locationDTO.getProvince()));
+            sysLog.setCity(StringEscapeUtils.escapeHtml4(locationDTO.getCity()));
+            sysLog.setIsp(StringEscapeUtils.escapeHtml4(locationDTO.getIp()));
             if (MySecurityUser.securityUser() != null) {
                 sysLog.setUsername(StringUtils.isNotBlank(MySecurityUser.nickName()) ? MySecurityUser.nickName() : MySecurityUser.loginName());
             }
@@ -176,5 +163,23 @@ public class WebLogAspect {
         sysLog.setResponse(retString.length()>5000?JSONObject.toJSONString("请求参数数据过长不与显示"):retString);
         sysLog.setUseTime(System.currentTimeMillis() - startTime.get());
         logService.save(sysLog);
+        IndexLogDTO response = new IndexLogDTO();
+        response.setId(sysLog.getId());
+        response.setUserName(sysLog.getUsername());
+        response.setMethod(sysLog.getHttpMethod());
+        response.setTitle(sysLog.getTitle());
+        response.setCreateDate(sysLog.getCreateDate());
+        response.setHttpMethod(sysLog.getHttpMethod());
+        response.setRequestUri(sysLog.getRequestUri());
+        if(redisUtils.hasKey(RedisConstants.ANALYTICS_USER_OPERATOR_LOG_KEY)){
+            redisUtils.leftPushList(RedisConstants.ANALYTICS_USER_OPERATOR_LOG_KEY,response);
+            redisUtils.expire(RedisConstants.ANALYTICS_USER_OPERATOR_LOG_KEY,20, TimeUnit.MINUTES);
+            Long size = redisUtils.getListSize(RedisConstants.ANALYTICS_USER_OPERATOR_LOG_KEY);
+            if(size != null && size > RedisConstants.ANALYTICS_INDEX_LOG_SIZE){
+                redisUtils.removeRightList(RedisConstants.ANALYTICS_USER_OPERATOR_LOG_KEY);
+            }
+        }else{
+            logService.getIndexLogList(RedisConstants.ANALYTICS_INDEX_LOG_SIZE);
+        }
     }
 }

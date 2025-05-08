@@ -100,9 +100,14 @@ public class SiteController{
         if(uploadBaseInfo == null){
             return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_NOT_CORRECT);
         }
-        if(!uploadService.testBaseInfoAccess(uploadBaseInfo)){
-            return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_NOT_CORRECT);
+        Site oldSite = siteService.getCurrentSite();
+        // 如果原先的网站设置里的上传方式和现在的不一致，才会对新的上传方式进行校验
+        if(!oldSite.getFileUploadType().equalsIgnoreCase(site.getFileUploadType())) {
+            if (!uploadService.testBaseInfoAccess(uploadBaseInfo)) {
+                return Result.businessMsgError(MessageConstants.Site.FILE_UPLOAD_TYPE_NOT_CORRECT);
+            }
         }
+
         siteService.updateSite(site);
         return Result.success();
     }

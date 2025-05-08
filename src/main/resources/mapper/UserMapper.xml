@@ -134,24 +134,24 @@
 
 
     <resultMap id="pageListUserResponseMap" type="com.mysiteforme.admin.entity.response.PageListUserResponse">
-        <id property="id" column="id"/>
-        <result property="loginName" column="login_name"/>
-        <result property="nickName" column="nick_name"/>
-        <result property="icon" column="icon"/>
-        <result property="email" column="email"/>
-        <result property="tel" column="tel"/>
-        <result property="locked" column="locked"/>
-        <result property="location" column="location"/>
-        <result property="delFlag" column="del_flag"/>
-        <result property="remarks" column="remarks"/>
+        <id property="id" column="u_id"/>
+        <result property="loginName" column="u_login_name"/>
+        <result property="nickName" column="u_nick_name"/>
+        <result property="icon" column="u_icon"/>
+        <result property="email" column="u_email"/>
+        <result property="tel" column="u_tel"/>
+        <result property="locked" column="u_locked"/>
+        <result property="location" column="u_location"/>
+        <result property="delFlag" column="u_del_flag"/>
+        <result property="remarks" column="u_remarks"/>
         <result property="createUserNickName" column="create_user_nick_name"/>
         <result property="createUserLoginName" column="create_user_login_name"/>
-        <result property="createId" column="create_by"/>
-        <result property="createDate" column="create_date"/>
+        <result property="createId" column="u_create_by"/>
+        <result property="createDate" column="u_create_date"/>
         <result property="updateUserNickName" column="update_user_nick_name"/>
         <result property="updateUserLoginName" column="update_user_login_name"/>
-        <result property="updateId" column="update_by"/>
-        <result property="updateDate" column="update_date"/>
+        <result property="updateId" column="u_update_by"/>
+        <result property="updateDate" column="u_update_date"/>
         <collection property="roles" ofType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
             <id property="id" column="user_role_id"/>
             <result property="name" column="user_role_name" />
@@ -161,20 +161,20 @@
 
     <select id="selectPageUser" resultMap="pageListUserResponseMap">
         SELECT
-            u.id,
-            u.login_name,
-            u.nick_name,
-            u.icon,
-            u.tel,
-            u.email,
-            u.del_flag,
-            u.remarks,
-            u.locked,
-            u.location,
-            u.create_date,
-            u.update_date,
-            u.create_by,
-            u.update_by,
+            u.id    AS u_id,
+            u.login_name AS u_login_name,
+            u.nick_name AS u_nick_name,
+            u.icon AS u_icon,
+            u.tel AS u_tel,
+            u.email AS u_email,
+            u.del_flag AS u_del_flag,
+            u.remarks AS u_remarks,
+            u.locked AS u_locked,
+            u.location AS u_location,
+            u.create_date AS u_create_date,
+            u.update_date AS u_update_date,
+            u.create_by AS u_create_by,
+            u.update_by AS u_update_by,
             cu.nick_name AS create_user_nick_name,
             cu.login_name AS create_user_login_name,
             uu.nick_name AS update_user_nick_name,
@@ -188,55 +188,16 @@
         LEFT JOIN sys_role r ON r.id = ur.role_id AND r.del_flag = false
         LEFT JOIN sys_user cu ON cu.id = u.create_by
         LEFT JOIN sys_user uu ON uu.id = u.update_by
-        WHERE u.del_flag = false
-        <if test="request.loginName != null and request.loginName != ''">
-            AND u.login_name LIKE CONCAT('%', #{request.loginName}, '%')
-        </if>
-        <if test="request.tel != null and request.tel != ''">
-            AND u.tel = #{request.tel}
-        </if>
-        <if test="request.email != null and request.email != ''">
-            AND u.email LIKE CONCAT('%', #{request.email}, '%')
-        </if>
-        <if test="request.sortByLoginNameAsc != null or request.sortByCreateDateAsc != null or request.sortByUpdateDateAsc != null">
-            ORDER BY 1
-            <if test="request.sortByLoginNameAsc != null">
-                ,
-                <choose>
-                    <when test="request.sortByLoginNameAsc">
-                        u.login_name ASC
-                    </when>
-                    <otherwise>
-                        u.login_name DESC
-                    </otherwise>
-                </choose>
+        WHERE TRUE
+
+            <if test="ids != null and ids.size() > 0">
+                AND
+                u.id
+                in
+                <foreach item="item" index="index" collection="ids" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
             </if>
-            <if test="request.sortByCreateDateAsc != null">
-                ,
-                <choose>
-                    <when test="request.sortByCreateDateAsc">
-                        u.create_date ASC
-                    </when>
-                    <otherwise>
-                        u.create_date DESC
-                    </otherwise>
-                </choose>
-            </if>
-            <if test="request.sortByUpdateDateAsc != null">
-                ,
-                <choose>
-                    <when test="request.sortByUpdateDateAsc">
-                        u.update_date ASC
-                    </when>
-                    <otherwise>
-                        u.update_date DESC
-                    </otherwise>
-                </choose>
-            </if>
-        </if>
-        <if test="request.location != null and request.location != ''">
-            AND u.location LIKE CONCAT('%', #{request.location}, '%')
-        </if>
     </select>
 
     <!-- findUserDetailById -->

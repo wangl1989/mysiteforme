@@ -169,5 +169,86 @@ ALTER TABLE sys_site ADD COLUMN `web_service_key` varchar(200) COMMENT 'webservi
 
 ALTER TABLE sys_user ADD COLUMN `location` varchar(200) COMMENT '位置信息' AFTER `locked`;
 
+create table analytics_click_events
+(
+    id  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id       BIGINT  comment '用户ID，未登录用户为NULL',
+    login_name    varchar(200) comment '登录账号',
+    nick_name     varchar(200) comment '用户昵称',
+    device_id     varchar(100) not null comment '设备ID',
+    page_url      varchar(200) comment '当前页面地址',
+    element_id    varchar(255) comment '点击元素ID',
+    element_class varchar(255) comment '点击元素类名',
+    element_text  varchar(255) comment '元素文字内容',
+    element_path  varchar(255) comment '元素的DOM路径',
+    element_href  varchar(255) comment '元素链接路径',
+    event_type    varchar(255) comment '元素类型(button/link/image等)',
+    click_time    timestamp    not null comment '访问时间',
+    create_date   datetime DEFAULT CURRENT_TIMESTAMP    comment '创建时间',
+    create_by     bigint       comment '创建人',
+    update_date   datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP    comment '修改时间',
+    update_by     bigint       comment '修改人',
+    remarks       varchar(255) comment '备注',
+    del_flag      bit          comment '删除标记'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点击事件表';
+
+create index idx_device_id
+    on analytics_click_events (device_id);
+
+create index idx_user_id
+    on analytics_click_events (user_id);
+
+create table analytics_daily_stats
+(
+    id  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    stat_date          date         comment '统计日期',
+    total_visits       int          comment '总访问量',
+    unique_visitors    int          comment '独立访客数',
+    new_users          int          comment '新用户',
+    total_clicks       int          comment '总点击量',
+    bounce_rate        decimal(5)   comment '跳出率',
+    avg_visit_duration int          comment '平均访问时长(秒)',
+    create_date        datetime DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+    create_by          bigint       comment '创建人',
+    update_date        datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '修改时间',
+    update_by          bigint       comment '修改人',
+    remarks            varchar(255) comment '备注',
+    del_flag           bit          comment '删除标记'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统计汇总表(按天)';
+
+create index idx_stat_date
+    on analytics_daily_stats (stat_date);
 
 
+create table analytics_visit_logs
+(
+    id  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id      bigint       comment '用户ID，未登录用户为NULL',
+    login_name   varchar(200) comment '登录账号',
+    nick_name    varchar(200) comment '用户昵称',
+    device_id    varchar(100) not null comment '设备ID',
+    ip_address   varchar(100) comment 'IP地址',
+    user_agent   varchar(255) comment '浏览器UA信息',
+    referrer     varchar(255) comment '来源页面',
+    entry_page   varchar(255) comment '当前页面',
+    visit_time   timestamp    not null comment '访问时间',
+    title        varchar(255) comment '页面标题',
+    screen_size  varchar(255) comment '当前页面长宽比',
+    time_on_page int          comment '上一个页面停留时间(毫秒数)',
+    language     varchar(200) comment '当前页面的语言',
+    country      varchar(100) comment '国家',
+    region       varchar(100) comment '地区',
+    city         varchar(100) comment '城市',
+    province     varchar(100) comment '省',
+    os           varchar(20)  comment '系统类型',
+    browser      varchar(255) comment '浏览器',
+    create_date  datetime DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+    create_by    bigint       comment '创建人',
+    update_date  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  comment '修改时间',
+    update_by    bigint       comment '修改人',
+    remarks      varchar(255) comment '备注',
+    del_flag     bit          comment '删除标记'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='访问记录表';
+
+create index idx_user_id
+    on analytics_visit_logs (user_id);

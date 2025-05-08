@@ -11,6 +11,7 @@ package com.mysiteforme.admin.controller.system;
 import com.mysiteforme.admin.annotation.SqlInjectionCheck;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.service.TableConfigService;
 import com.mysiteforme.admin.service.TableService;
 import com.mysiteforme.admin.util.*;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.mysiteforme.admin.util.GenCodeConstants.*;
 
@@ -30,6 +33,8 @@ import static com.mysiteforme.admin.util.GenCodeConstants.*;
 public class TableController {
 
     private final TableService tableService;
+
+    private final TableConfigService tableConfigService;
 
     /**
      * 分页展示数据表
@@ -44,6 +49,13 @@ public class TableController {
     @PostMapping("add")
     @SysLog(MessageConstants.SysLog.TABLE_ADD)
     public Result add(@RequestBody @Valid AddTableRequest request){
+        if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CAN_NOT_BEGIN_WITH,GenCodeConstants.TABLE_NAME_FILTER_PREFIX.toString());
+        }
+        List<String> schemaNameList = tableConfigService.getSchemaNameList();
+        if(!schemaNameList.contains(request.getSchemaName())){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_SCHEMA_NAME_NOT_MATCH,request.getSchemaName());
+        }
         if(ArrayUtils.contains(GenCodeConstants.JAVA_KEY_WORKS,request.getTableName())){
             return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CONTAINS_JAVA_KEYWORDS);
         }
@@ -53,6 +65,27 @@ public class TableController {
         if(tableService.existTable(request.getSchemaName(), request.getTableName()) > 0){
             return Result.businessMsgError(MessageConstants.Table.TABLE_EXISTS,request.getTableName());
         }
+        List<BaseTableFieldRequest> fieldList = request.getFieldList();
+        for (BaseTableFieldRequest f : fieldList) {
+            if (ArrayUtils.contains(JAVA_KEY_WORKS, f.getTableName())) {
+                return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS,request.getTableName());
+            }
+            try {
+                ColumnLengthType dbColumnType = ColumnLengthType.getByType(f.getType().toLowerCase());
+                if (dbColumnType == null) {
+                    return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),f.getColumnName());
+                }
+                if (dbColumnType.getLength() == 0) {
+                    f.setLength(0);
+                } else {
+                    if (dbColumnType.getLength() < f.getLength()) {
+                        return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_LEGTH_TOO_LONG,f.getColumnName(),f.getLength(),dbColumnType.getLength());
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),f.getColumnName());
+            }
+        }
         tableService.creatTable(request);
         return Result.success();
     }
@@ -60,6 +93,13 @@ public class TableController {
     @PutMapping("edit")
     @SysLog(MessageConstants.SysLog.TABLE_EDIT)
     public Result edit(@RequestBody @Valid UpdateTableRequest request){
+        if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getOldTableName()::startsWith)){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_NAME_CAN_NOT_BEGIN_WITH,GenCodeConstants.TABLE_NAME_FILTER_PREFIX.toString());
+        }
+        List<String> schemaNameList = tableConfigService.getSchemaNameList();
+        if(!schemaNameList.contains(request.getSchemaName())){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_SCHEMA_NAME_NOT_MATCH,request.getSchemaName());
+        }
         if(StringUtils.isNotBlank(request.getOldTableName()) && StringUtils.isNotBlank(request.getTableName())){
             if(!request.getOldTableName().equalsIgnoreCase(request.getTableName())){
                 if(GenCodeConstants.TABLE_NAME_FILTER_PREFIX.stream().anyMatch(request.getTableName()::startsWith)){
@@ -136,6 +176,21 @@ public class TableController {
         }catch ( IllegalArgumentException e ){
             return Result.businessMsgError(MessageConstants.Table.TABLE_TYPE_INVALID);
         }
+        try {
+            ColumnLengthType dbColumnType =  ColumnLengthType.getByType(request.getType().toLowerCase());
+            if (dbColumnType == null){
+                return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),request.getColumnName());
+            }
+            if(dbColumnType.getLength() == 0) {
+                request.setLength(0);
+            } else {
+                if(dbColumnType.getLength() < request.getLength()){
+                    return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_LEGTH_TOO_LONG,request.getColumnName(),request.getLength(),dbColumnType.getLength());
+                }
+            }
+        }catch (IllegalArgumentException e){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),request.getColumnName());
+        }
         if(tableService.existTableField(request.getSchemaName(),request.getTableName(),request.getColumnName())>0){
             return Result.businessMsgError(MessageConstants.Table.FIELD_HAS_EXIST);
         }
@@ -169,6 +224,21 @@ public class TableController {
             TableType.getByCode(request.getTableType());
         }catch ( IllegalArgumentException e ){
             return Result.businessMsgError(MessageConstants.Table.TABLE_TYPE_INVALID);
+        }
+        try {
+            ColumnLengthType dbColumnType =  ColumnLengthType.getByType(request.getType().toLowerCase());
+            if (dbColumnType == null){
+                return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),request.getColumnName());
+            }
+            if(dbColumnType.getLength() == 0) {
+                request.setLength(0);
+            } else {
+                if(dbColumnType.getLength() < request.getLength()){
+                    return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_LEGTH_TOO_LONG,request.getColumnName(),request.getLength(),dbColumnType.getLength());
+                }
+            }
+        }catch (IllegalArgumentException e){
+            return Result.businessMsgError(MessageConstants.Table.TABLE_FIELD_TYPE_INVALID,request.getTableName(),request.getColumnName());
         }
         if(TableType.DATA_TABLE.getCode().equals(request.getTableType())){
             if(DATA_TABLE_COMMON_FIELD.contains(request.getColumnName())){

@@ -1,28 +1,21 @@
 package com.mysiteforme.admin.service.impl;
 
-import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysiteforme.admin.entity.DTO.PconlineDTO;
-import com.mysiteforme.admin.entity.DTO.WebServiceAdInfoDTO;
-import com.mysiteforme.admin.entity.DTO.WebServiceDTO;
-import com.mysiteforme.admin.entity.DTO.WebServiceResultDTO;
-import com.mysiteforme.admin.entity.Site;
+import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.dao.UserDao;
+import com.mysiteforme.admin.entity.DTO.*;
+import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.dao.UserDeviceDao;
-import com.mysiteforme.admin.entity.VO.DeviceInfoVO;
 import com.mysiteforme.admin.entity.VO.DeviceTokenInfo;
 import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
-import com.mysiteforme.admin.entity.response.LocationResponse;
+import com.mysiteforme.admin.entity.response.DeviceInfoResponse;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.redis.TokenStorageService;
-import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserDeviceService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.MessageConstants;
@@ -35,9 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,22 +42,19 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
 
     private final TokenStorageService tokenStorageService;
 
-    private final SiteService siteService;
+    private final UserDao userDao;
 
-    private final ObjectMapper objectMapper;
+    private final UserCacheService userCacheService;
 
     @Override
     public IPage<UserDevice> selectPageUserDevice(PageListUserDeviceRequest request) {
         LambdaQueryWrapper<UserDevice> wrapper = new LambdaQueryWrapper<>();
         if(request != null){
-            if(StringUtils.isNotBlank(request.getDeviceName())) {
-                wrapper.like(UserDevice::getDeviceName, request.getDeviceName());
+            if(request.getUserId() != null) {
+                wrapper.like(UserDevice::getUserId, request.getUserId());
             }
             if(StringUtils.isNotBlank(request.getDeviceId())){
                 wrapper.eq(UserDevice::getDeviceId,request.getDeviceId());
-            }
-            if(StringUtils.isNotBlank(request.getDeviceName())){
-                wrapper.like(UserDevice::getDeviceName,request.getDeviceName());
             }
             wrapper.orderBy(request.getSortByCreateDateAsc() != null, request.getSortByCreateDateAsc() != null && request.getSortByCreateDateAsc(), UserDevice::getCreateDate);
         }else{
@@ -75,106 +64,40 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
     }
 
     @Override
-    public LocationResponse getCurrrenntLocation() {
-        HttpServletRequest request = getCurrentRequest();
-        String ip = request.getRemoteAddr();
-        if("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)){
-            ip = "";
-        }
-        Site site = siteService.getCurrentSite();
-        if(site == null || StringUtils.isBlank(site.getWebServicekey())){
-            return backLocation(ip);
-        } else {
-            String result = HttpUtil.get(String.format(Constants.WEB_SERVICE_LOCATION_API,site.getWebServicekey(),StringUtils.isNotBlank(ip)? ip:""));
-            if(StringUtils.isNotBlank(result)){
-                try {
-                    JavaType type = objectMapper.getTypeFactory().constructType(WebServiceDTO.class);
-                    WebServiceDTO webService = objectMapper.readValue(result,type);
-                    if(webService != null){
-                        if(webService.getStatus() == 0){
-                            WebServiceResultDTO res = webService.getResult();
-                            if(res != null){
-                                LocationResponse response = new LocationResponse();
-                                response.setIp(res.getIp());
-                                WebServiceAdInfoDTO info = res.getAd_info();
-                                if(info != null){
-                                    response.setProvince(info.getProvince());
-                                    response.setCity(info.getCity());
-                                    response.setDistrict(info.getDistrict());
-                                    return response;
-                                }
-                            }else{
-                                return backLocation(ip);
-                            }
-                        }else{
-                            return backLocation(ip);
-                        }
-                    }else{
-                        return backLocation(ip);
-                    }
-                } catch (JsonProcessingException e) {
-                    log.error("webservice检测是否可用时，json转换异常");
-                    throw MyException.builder().businessError(MessageConstants.Site.SITE_CURRENT_LOCATION_WEB_SERVICE_ERROR).build();
-                }
-            }
-        }
-        return null;
-    }
-
-    private LocationResponse backLocation(String ip){
-        String result = HttpUtil.get(String.format(Constants.PCON_LINE_API,StringUtils.isNotBlank(ip)? ip:""));
-        if(StringUtils.isNotBlank(result)){
-            try {
-                JavaType type = objectMapper.getTypeFactory().constructType(PconlineDTO.class);
-                PconlineDTO pconline = objectMapper.readValue(result,type);
-                if(pconline != null){
-                    LocationResponse response = new LocationResponse();
-                    response.setIp(pconline.getIp());
-                    response.setProvince(pconline.getPro());
-                    response.setCity(pconline.getCity());
-                    response.setDistrict(pconline.getRegion());
-                    return response;
-                }
-            } catch (JsonProcessingException e) {
-                log.error("pconline检测是否可用时，json转换异常");
-                throw MyException.builder().businessError(MessageConstants.Site.SITE_CURRENT_LOCATION_PCON_LINE_ERROR).build();
-            }
-        }
-        return null;
-    }
-
-    // 获取当前请求的 HttpServletRequest
-    public static HttpServletRequest getCurrentRequest() {
-        try {
-            // 从 RequestContextHolder 获取当前请求
-            ServletRequestAttributes attributes = (ServletRequestAttributes)
-                    RequestContextHolder.currentRequestAttributes();
-            return attributes.getRequest();
-        } catch (IllegalStateException e) {
-            // 当前线程没有绑定请求（如异步任务、定时任务等）
-            log.error("获取HttpServletRequest出现异常:{}",e.getMessage());
-            throw MyException.builder().businessError(MessageConstants.System.SYSTEM_GET_HTTP_SERVLET_REQUEST_ERROR).build();
-        }
-    }
-
-    @Override
-    public void handleDeviceLogin(String userName, UserDevice deviceInfo) {
+    public void handleDeviceLogin(Long userId, String deviceId) {
         // 设置设备信息
-        if(StringUtils.isNotBlank(userName)) {
+        if(userId != null && userId != 0L) {
             LambdaQueryWrapper<UserDevice> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(UserDevice::getUserName,userName);
-            wrapper.eq(UserDevice::getDeviceId,deviceInfo.getDeviceId());
+            wrapper.eq(UserDevice::getUserId,userId);
+            wrapper.eq(UserDevice::getDeviceId,deviceId);
             // 1. 更新或创建MySQL中的设备记录
             List<UserDevice> userDeviceList = baseMapper.selectList(wrapper);
             UserDevice userDevice;
             if(userDeviceList.isEmpty()){
                 userDevice = new UserDevice();
+                userDevice.setDeviceId(deviceId);
+                userDevice.setUserId(userId);
+                userDevice.setFirstSeen(LocalDateTime.now());
             }else{
                 userDevice = userDeviceList.get(0);
             }
-            userDevice.setUserName(userName);
-            BeanUtils.copyProperties(deviceInfo,userDevice);
-            userDevice.setUpdateDate(new Date());
+            try {
+                HttpServletRequest request = ToolUtil.getCurrentRequest();
+                LocationDTO location =  userCacheService.getLocationByIp(ToolUtil.getClientIp(request));
+                if(location != null){
+                    userDevice.setLastLoginIp(userDevice.getThisLoginIp());
+                    userDevice.setThisLoginIp(location.getIp());
+                }
+                AgentDTO agent = ToolUtil.getOsAndBrowserInfo(request);
+                userDevice.setUserAgent(agent.getUserAgent());
+            } catch (Exception ex){
+                log.error("【保存用户设备信息】出现异常",ex);
+            }
+            // 设置活跃时间
+            userDevice.setLastSeen(LocalDateTime.now());
+            // 设置登录时间
+            userDevice.setLastLoginTime(userDevice.getThisLoginTime());
+            userDevice.setThisLoginTime(LocalDateTime.now());
             baseMapper.insertOrUpdate(userDevice);
         }else {
             log.error("未能获取到用户名");
@@ -183,13 +106,17 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
     }
 
     @Override
-    public List<UserDevice> getUserDevices(String userName) {
-        QueryWrapper<UserDevice> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_name",userName);
+    public List<DeviceInfoResponse> getUserDevices(Long userId) {
+        User user = userDao.selectById(userId);
+        if(user == null || user.getLocked() || user.getDelFlag()){
+            throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
+        }
+        LambdaQueryWrapper<UserDevice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDevice::getUserId,userId);
         // 1. 获取MySQL中的设备基本信息
         List<UserDevice> userDeviceList = baseMapper.selectList(wrapper);
         // 2. 获取Redis中的令牌信息
-        List<DeviceTokenInfo> deviceTokenInfoList = tokenStorageService.getAllUserDevices(userName);
+        List<DeviceTokenInfo> deviceTokenInfoList = tokenStorageService.getAllUserDevices(user.getLoginName());
 
         // 将 List 转换为 Map，方便查找
         Map<String, DeviceTokenInfo> tokenInfoMap = deviceTokenInfoList.stream()
@@ -197,82 +124,46 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
         // 3. 组合数据
         return userDeviceList.stream()
                 .map(device -> {
-                    DeviceInfoVO vo = new DeviceInfoVO();
-                    // 设置基本设备信息
-                    BeanUtils.copyProperties(device, vo);
-
+                    DeviceInfoResponse response = new DeviceInfoResponse();
+                    // 设置IP相关信息
+                    LocationDTO location = userCacheService.getLocationByIp(device.getLastLoginIp());
+                    BeanUtils.copyProperties(location,response);
                     // 设置令牌信息（如果存在）
                     DeviceTokenInfo tokenInfo = tokenInfoMap.get(device.getDeviceId());
                     if (tokenInfo != null && StringUtils.isNotBlank(tokenInfo.getAccessToken())) {
-                        vo.setOnline(true);
-                        vo.setCurrentDevice(isCurrentDevice(tokenInfo.getAccessToken()));
+                        response.setOnline(true);
+                        response.setCurrentDevice(isCurrentDevice(tokenInfo.getAccessToken()));
                     } else {
-                        vo.setOnline(false);
-                        vo.setCurrentDevice(false);
+                        response.setOnline(false);
+                        response.setCurrentDevice(false);
                     }
-
-                    return vo;
+                    // 设置浏览器信息解析
+                    if(StringUtils.isNotBlank(device.getUserAgent())) {
+                        AgentDTO agent = ToolUtil.getOsAndBrowserInfo(device.getUserAgent());
+                        BeanUtils.copyProperties(agent,response);
+                    }
+                    return response;
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDevice extractDeviceInfo(String userName, HttpServletRequest request) {
-        UserDevice deviceInfo = getInfoFromRequest(request);
-        deviceInfo.setUserName(userName);
-        // 获取IP地址
-        String ip = ToolUtil.getClientIp(request);
-        if ("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)) {
-            ip = "127.0.0.1" ;
-        }
-        deviceInfo.setLastLoginIp(ip);
-        // 地址关联地区
-        if(!"127.0.0.1".equals(ip)){
-            Map<String, String> map = ToolUtil.getAddressByIP(ip);
-            if(!map.isEmpty()) {
-                deviceInfo.setLastLoginLocation(String.join("-", map.values()));
-            }
-        }
-        return deviceInfo;
-    }
-
-    @Override
-    public void handleDeviceLogout(String userName, String deviceId) {
+    public void handleDeviceLogout(Long userId, String deviceId) {
         // 1. 清除Redis中的令牌信息
-        tokenStorageService.removeDeviceBinding(userName, deviceId);
+        // tokenStorageService.removeDeviceBinding(userName, deviceId);
 
         // 2. 更新MySQL中的最后登出时间（如果需要）
-        QueryWrapper<UserDevice> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_name",userName);
-        wrapper.eq("device_id",deviceId);
-        wrapper.orderByDesc("create_date");
+        LambdaQueryWrapper<UserDevice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDevice::getUserId,userId);
+        wrapper.eq(UserDevice::getDeviceId,deviceId);
         // 1. 获取MySQL中的设备基本信息
         List<UserDevice> userDeviceList = baseMapper.selectList(wrapper);
         if(!userDeviceList.isEmpty()){
             UserDevice userDevice = userDeviceList.get(0);
             userDevice.setCreateDate(new Date());
-            userDevice.setLoginOutDate(new Date());
+            userDevice.setLoginOutDate(LocalDateTime.now());
             baseMapper.updateById(userDevice);
         }
-    }
-
-    private UserDevice getInfoFromRequest(HttpServletRequest request){
-        UserDevice deviceInfo = new UserDevice();
-        Map<String,String> osAndBrowserInfo = ToolUtil.getOsAndBrowserInfo(request);
-        // 获取请求头信息agent
-        if(StringUtils.isNotBlank(osAndBrowserInfo.get("agent"))) {
-            deviceInfo.setUserAgent(osAndBrowserInfo.get("agent"));
-        }
-        // 获取os信息
-        if(StringUtils.isNotBlank(osAndBrowserInfo.get("os"))) {
-            deviceInfo.setBrowserInfo(osAndBrowserInfo.get("os"));
-        }
-        // 获取浏览器信息
-        if(StringUtils.isNotBlank(osAndBrowserInfo.get("browser"))) {
-            deviceInfo.setOsVersion(osAndBrowserInfo.get("browser"));
-        }
-
-        return deviceInfo;
     }
 
     /**
@@ -292,6 +183,31 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
             log.warn("Failed to determine current device status", e);
             return false;
         }
+    }
+
+    @Override
+    public UserDevice getCurrentUserDevice(){
+        Long userId = MySecurityUser.id();
+        if(userId == null){
+            throw MyException.builder().unauthorized().build();
+        }
+        try {
+            HttpServletRequest request = ToolUtil.getCurrentRequest();
+            String deviceId = request.getHeader(Constants.DEVICE_ID);
+            if(StringUtils.isBlank(deviceId)){
+                throw MyException.builder().businessError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
+            }
+            LambdaQueryWrapper<UserDevice> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(UserDevice::getUserId,userId);
+            lambdaQueryWrapper.eq(UserDevice::getDeviceId,deviceId);
+            List<UserDevice> list = list(lambdaQueryWrapper);
+            if(!list.isEmpty()){
+                return list.get(0);
+            }
+        }catch (Exception e){
+            log.error("获取用户当前设备出错:",e);
+        }
+        return null;
     }
 
 }

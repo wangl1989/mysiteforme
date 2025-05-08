@@ -1,13 +1,12 @@
 package com.mysiteforme.admin.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.mysiteforme.admin.base.DataEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * UserDevice 类用于表示用户设备信息，继承自 DataEntity 类。
@@ -17,65 +16,65 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_user_device")
 @Data
-@Getter
-@Setter
 public class UserDevice extends DataEntity {
     /**
-     * 用户登录名称，表示该设备所属的用户。
+     * 用户Id
      */
-    private String userName;
+    @TableField("user_id")
+    private Long userId;
 
-    /**
-     * 用户浏览器信息
-     */
-    private String userAgent;
     /**
      * 设备ID，唯一标识一个设备。
      */
+    @TableField("device_id")
     private String deviceId;
 
     /**
-     * 设备类型，描述设备的种类（如手机、平板、电脑等）。
+     * 用户设备信息
      */
-    private String deviceType;
-
-    /**
-     * 设备名称，用户自定义的设备名称。
-     */
-    private String deviceName;
-
-    /**
-     * 设备型号，描述设备的具体型号。
-     */
-    private String deviceModel;
-
-    /**
-     * 操作系统版本，描述设备上安装的操作系统版本。
-     */
-    private String osVersion;
-
-    /**
-     * 浏览器信息，描述设备上使用的浏览器信息。
-     */
-    private String browserInfo;
+    @TableField("user_agent")
+    private String userAgent;
 
     /**
      * 最后登录IP，记录设备最后一次登录的IP地址。
      */
+    @TableField("last_login_ip")
     private String lastLoginIp;
 
     /**
-     * 最后登录位置，记录设备最后一次登录的地理位置。
+     * 当前登录IP
      */
-    private String lastLoginLocation;
+    @TableField("this_login_ip")
+    private String thisLoginIp;
 
     /**
-     * 设备指纹，用于唯一标识设备的指纹信息。
+     * 上次登录时间
      */
-    private String deviceFingerprint;
+    @TableField("last_login_time")
+    private LocalDateTime lastLoginTime;
+
+    /**
+     * 本次登录时间
+     */
+    @TableField("this_login_time")
+    private LocalDateTime thisLoginTime;
 
     /**
      * 用户登出时间
      */
-    private Date loginOutDate;
+    @TableField("login_out_date")
+    private LocalDateTime loginOutDate;
+
+    /**
+     * 首次出现时间
+     */
+    @TableField("first_seen")
+    private LocalDateTime firstSeen;
+
+    /**
+     * 最后活跃时间
+     */
+    @TableField("last_seen")
+    private LocalDateTime lastSeen;
+
 }

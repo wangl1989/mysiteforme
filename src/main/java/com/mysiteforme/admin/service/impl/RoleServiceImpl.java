@@ -15,15 +15,12 @@ import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mysiteforme.admin.entity.request.AddRoleRequest;
 import com.mysiteforme.admin.entity.request.PageListRoleRequest;
 import com.mysiteforme.admin.entity.request.SaveRoleMenuPerRequest;
-import com.mysiteforme.admin.entity.request.UpdateRoleRequest;
 import com.mysiteforme.admin.entity.response.BaseRoleResponse;
 import com.mysiteforme.admin.entity.response.PageListRoleResponse;
 import com.mysiteforme.admin.entity.response.RoleMenuPerResponse;
 import com.mysiteforme.admin.service.UserCacheService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,13 +57,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     /**
      * 保存角色信息及其菜单关系
      * 同时更新角色缓存并清除角色列表缓存
-     * @param request 角色对象，包含菜单集合
+     * @param role 角色对象
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveRole(AddRoleRequest request) {
-        Role role = new Role();
-        BeanUtils.copyProperties(request,role);
+    public void saveRole(Role role) {
         baseMapper.insert(role);
         //清除超级管理员缓存
         cacheUtils.evictCacheOnRoleChangeSuperAdmin();
@@ -97,13 +92,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
     /**
      * 更新角色信息及其菜单关系
      * 同时清除相关的角色、用户、菜单缓存
-     * @param request 角色对象，包含更新后的菜单集合
+     * @param role 角色对象
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateRole(UpdateRoleRequest request) {
-        Role role = new Role();
-        BeanUtils.copyProperties(request,role);
+    public void updateRole(Role role) {
         baseMapper.updateById(role);
         // 清除角色相关缓存
         cacheUtils.evictCacheOnRoleChange(role.getId());
@@ -147,11 +140,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, Role> implements RoleS
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Role::getName,name);
         return baseMapper.selectCount(wrapper);
-    }
-
-    @Override
-    public List<Long> getRoleIdsByPermissionId(Long permissionId){
-        return baseMapper.getRoleIdsByPermissionId(permissionId);
     }
 
     @Override

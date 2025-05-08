@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Log;
 import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
+import com.mysiteforme.admin.entity.response.IndexLogResponse;
 
 
 public interface LogService extends IService<Log> {
@@ -30,5 +31,12 @@ public interface LogService extends IService<Log> {
      * @return 分页查询结果
      */
     IPage<Log> selectPageLogs(PageListSystemLogRequest request);
+
+    /**
+     * 获取首页用户操作数据
+     * @param limit 显示几条数据
+     * @return 操作日志集合
+     */
+    List<IndexLogResponse> getIndexLogList(Integer limit);
 
 }

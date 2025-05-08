@@ -100,7 +100,7 @@ public class SecurityConfig {
             .headers(headers -> headers
                     .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable) // 禁用 X-Frame-Options
             )
-            //  允许跨域请求
+            //  允许跨域请求----> 注意这里的跨域配置文件是自定义的CorsConfiguration
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             //  基于token，不需要session
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -109,9 +109,9 @@ public class SecurityConfig {
                     // // 1. 允许直接访问的接口：验证码接口,登录放行
                     .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh",
                             "/error","/favicon.ico","/static/**",
-                            "/druid/**","/actuator/**","/upload/**","/register/**").permitAll()
+                            "/druid/**","/actuator/**","/upload/**","/register/**","/api/analytics/**").permitAll()
                     // 2. 添加API路径模式
-                    .requestMatchers("/api/**").access((authentication, context) -> {
+                    .requestMatchers("/api/admin/**").access((authentication, context) -> {
                         // 判断是否已认证
                         if (authentication == null) {
                             return new AuthorizationDecision(false);
@@ -272,7 +272,7 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(this.userDetailsService);
         authProvider.setPasswordEncoder(this.passwordEncoder);
         // 添加日志
-        authProvider.setPreAuthenticationChecks(user -> System.out.println("===========正在进行预认证检查：{}========="+user.getUsername()+"==密码=="+user.getPassword()));
+        authProvider.setPreAuthenticationChecks(user -> log.debug("===正在进行预认证检查：{}===密码:{}===",user.getUsername(),user.getPassword()));
         return authProvider;
     }
 

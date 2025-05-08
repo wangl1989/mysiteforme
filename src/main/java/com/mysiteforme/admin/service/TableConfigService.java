@@ -25,6 +25,8 @@ public interface TableConfigService extends IService<TableConfig> {
 
     void deleteTableConfig(Long id);
 
+    void completelyDelete(Long id);
+
     void recoverTableConfig(Long id);
 
     List<String> getTableNameList(String schemaName);

@@ -62,6 +62,16 @@ public class TableConfigController {
         return Result.success();
     }
 
+    @DeleteMapping("completelyDelete")
+    @SysLog(MessageConstants.SysLog.TABLE_CONFIG_COMPLETELY_DELETE)
+    public Result completelyDelete(@RequestParam(value = "id",required = false)Long id){
+        if(null == id || 0 == id){
+            return Result.idIsNullError();
+        }
+        tableConfigService.completelyDelete(id);
+        return Result.success();
+    }
+
     /**
      * 恢复删除的配置
      * @param id 配置ID
@@ -109,7 +119,7 @@ public class TableConfigController {
             }
         }
         if(StringUtils.isNotBlank(request.getGeneratePath())){
-            if(!ToolUtil.isValidPath(request.getGeneratePath())){
+            if(ToolUtil.isValidPath(request.getGeneratePath())){
                 return Result.businessMsgError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM);
             }
         }

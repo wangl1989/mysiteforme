@@ -190,6 +190,7 @@
             t.remarks,
             t.create_by,
             t.update_by,
+            t.del_flag,
             u1.nick_name AS create_user,
             u2.nick_name AS update_user,
             t.create_date,
@@ -265,6 +266,7 @@
         <result property="updateUser" column="update_user"/>
         <result property="createDate" column="create_date"/>
         <result property="updateDate" column="update_date"/>
+        <result property="delFlag" column="del_flag"/>
         <result property="fieldCount" column="field_count"/>
     </resultMap>
 
@@ -296,10 +298,10 @@
 
     <!--创建表格-->
     <insert id="creatTable" parameterType="com.mysiteforme.admin.entity.request.AddTableRequest">
-        CREATE TABLE `#{request.tableName}`(
+        CREATE TABLE `${request.tableName}`(
         `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-        <foreach collection="fieldList" item="field">
-            `#{field.columnName}` #{field.type}<if test="field.length != null and field.length != 0">(#{field.length})</if> <if test="field.isNullable != null and field.isNullable">not null</if> COMMENT '#{field.comment}',
+        <foreach collection="request.fieldList" item="field">
+            `${field.columnName}` ${field.type}<if test="field.length != null and field.length != 0">(${field.length})</if> <if test="field.isNullable != null and field.isNullable">not null</if> COMMENT '${field.comment}',
         </foreach>
         <choose>
             <when test="request.tableType == 1">
@@ -314,7 +316,7 @@
             </when>
         </choose>
         PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT= '#{request.comment}';
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT= '${request.comment}';
     </insert>
 
     <sql id="commonField">
@@ -328,7 +330,7 @@
 
     <!--修改表名-->
     <update id="changeTableName" parameterType="com.mysiteforme.admin.entity.request.UpdateTableRequest">
-        ALTER TABLE ${request.oldTableName} RENAME '${request.tableName}';
+        ALTER TABLE ${request.oldTableName} RENAME ${request.tableName};
     </update>
 
     <!--修改表注释-->
@@ -347,7 +349,7 @@
         t.COLUMN_KEY AS columnKey,
         t.EXTRA AS extra,
         CASE
-        WHEN t.DATA_TYPE IN ('text', 'tinytext', 'mediumtext', 'longtext', 'json', 'blob', 'mediumblob', 'longblob') THEN 0
+        WHEN t.DATA_TYPE IN ('text', 'tinytext', 'mediumtext', 'longtext', 'json', 'blob', 'mediumblob', 'longblob','int','bigint') THEN 0
         WHEN t.CHARACTER_MAXIMUM_LENGTH IS NOT NULL THEN t.CHARACTER_MAXIMUM_LENGTH
         WHEN t.NUMERIC_PRECISION IS NOT NULL THEN t.NUMERIC_PRECISION
         ELSE 0
@@ -358,7 +360,7 @@
         t.TABLE_SCHEMA = #{request.schemaName}
         AND t.TABLE_NAME = #{request.tableName}
         <if test="request.columnName != null and request.columnName != ''">
-            t.COLUMN_NAME LIKE CONCAT('%',#{request.columnName},'%')
+            AND t.COLUMN_NAME LIKE CONCAT('%',#{request.columnName},'%')
         </if>
         <choose>
             <when test="request.tableType == 1">

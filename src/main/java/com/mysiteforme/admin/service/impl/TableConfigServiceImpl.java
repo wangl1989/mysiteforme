@@ -16,7 +16,9 @@ import com.google.common.collect.Lists;
 import com.mysiteforme.admin.base.DataEntity;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.base.TreeEntity;
+import com.mysiteforme.admin.dao.TableFieldConfigDao;
 import com.mysiteforme.admin.entity.DTO.TableFieldDTO;
+import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.mysiteforme.admin.entity.request.PageListTableConfigRequest;
 import com.mysiteforme.admin.entity.response.PageListTableConfigResponse;
 import com.mysiteforme.admin.entity.response.TableConfigResponse;
@@ -63,6 +65,8 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
 
     private final DataSource dataSource;
 
+    private final TableFieldConfigDao tableFieldConfigDao;
+
     @Value("${user-path.windows-generate-dic}")
     private String windowsGeneratPath;
 
@@ -75,8 +79,9 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
     @Value("${user-path.linux-source-code-dic}")
     private String linuxZipPath;
 
-    public TableConfigServiceImpl(DataSource dataSource) {
+    public TableConfigServiceImpl(DataSource dataSource,TableFieldConfigDao tableFieldConfigDao) {
         this.dataSource = dataSource;
+        this.tableFieldConfigDao = tableFieldConfigDao;
     }
 
 
@@ -131,6 +136,18 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
     }
 
     @Override
+    public void completelyDelete(Long id) {
+        TableConfig tableConfig = baseMapper.selectById(id);
+        if(tableConfig == null){
+            throw MyException.builder().businessError(MessageConstants.TableConfig.TABLE_CONFIG_NO_EXISTS).build();
+        }
+        baseMapper.deleteById(id);
+        LambdaQueryWrapper<TableFieldConfig> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(TableFieldConfig::getTableConfigId,id);
+        tableFieldConfigDao.delete(lambdaQueryWrapper);
+    }
+
+    @Override
     public void recoverTableConfig(Long id) {
         TableConfig tableConfig = baseMapper.selectById(id);
         if(tableConfig == null){
@@ -163,7 +180,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
         }
         // 如何生成路径存在，则校验是否合规
         if(StringUtils.isNotBlank(tableConfig.getGeneratePath())){
-            if(!ToolUtil.isValidPath(tableConfig.getGeneratePath())){
+            if(ToolUtil.isValidPath(tableConfig.getGeneratePath())){
                 throw MyException.builder().businessError(MessageConstants.TableConfig.PATH_NOT_VALID_BY_SYSTEM).build();
             }
         }
@@ -328,7 +345,7 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
 
     /**
      * 获取最终的压缩文件生成路径
-     * @return
+     * @return 返回压缩文件的物理生成路径
      */
     private String getOutZipDir(){
         String outZipDir;

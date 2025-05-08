@@ -94,13 +94,13 @@ public class ${table.controllerName} {
         return Result.success();
     }
 
-    @PustMapping("edit")
+    @PutMapping("edit")
     @SysLog("编辑$!cfg[$tableMapKey].businessName数据")
     public Result edit(@RequestBody @Valid Update${entity}Request request){
         if(request == null){
             return Result.objectNotNull();
         }
-        ${entity} old${table.entityPath} = ${table.entityPath}Service..getById(request.getId());
+        ${entity} old${table.entityPath} = ${table.entityPath}Service.getById(request.getId());
         if(old${table.entityPath} == null){
             return Result.businessMsgError("$!cfg[$tableMapKey].businessName的ID值无效");
         }

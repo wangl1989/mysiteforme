@@ -100,6 +100,22 @@
             permission_type = #{menuType}
     </select>
 
+    <!--获取API图标基础信息-->
+    <select id="getApiIconInfo" resultType="com.mysiteforme.admin.entity.DTO.ApiDTO">
+        SELECT
+            p.id,
+            p.icon,
+            a.api_url AS url,
+            a.http_method as method
+        FROM
+            sys_permission p
+        LEFT JOIN
+            sys_permission_api a on a.permission_id = p.id AND a.del_flag = FALSE
+        WHERE p.del_flag = FALSE
+        AND a.api_url is not null
+
+    </select>
+
     <resultMap type="com.mysiteforme.admin.entity.VO.PermissionVO" id="allPermissionMap">
         <id property="id" column="id"/>
         <result property="permissionName" column="permission_name"/>

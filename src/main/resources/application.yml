@@ -19,8 +19,8 @@ spring:
     host: smtp.163.com
     port: 25
     protocol: smtp
-    username: 22oo00@163.com
-    password: UQy9Q3B6UCybhbkv
+    username: mysiteforme@163.com
+    password: DFbdcXzG9C3wueLP
     properties:
       mail:
         smtp:

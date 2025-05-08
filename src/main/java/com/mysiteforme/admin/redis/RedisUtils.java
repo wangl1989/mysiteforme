@@ -166,6 +166,13 @@ public class RedisUtils {
     /**
      * 递增
      */
+    public long incr(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+    /**
+     * 递增
+     */
     public long incr(String key, long delta) {
         if (delta < 0) {
             log.error("Redis数据异常:递增因子必须大于0");
@@ -204,6 +211,19 @@ public class RedisUtils {
     /**
      * HashSet
      */
+    public boolean hmset(String key, String mapKey, Object mapVlue) {
+        try {
+            redisTemplate.opsForHash().put(key, mapKey, mapVlue);
+            return true;
+        } catch (Exception e) {
+            log.error("Redis数据异常:Hash设置异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    /**
+     * HashSet
+     */
     public boolean hmset(String key, Map<String, Object> map) {
         try {
             redisTemplate.opsForHash().putAll(key, map);
@@ -215,6 +235,33 @@ public class RedisUtils {
     }
 
     // ============================== List操作 ==============================
+
+    public Long getListSize(String key){
+        try {
+            return redisTemplate.opsForList().size(key);
+        } catch (Exception e) {
+            log.error("Redis数据异常:获取list长度出现异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    public void leftPushList(String key, Object value){
+        try {
+            redisTemplate.opsForList().leftPush(key, value);
+        } catch (Exception e) {
+            log.error("Redis数据异常:设置list左边数据异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
+    public void rightPushListAll(String key,Object... objects){
+        try {
+            redisTemplate.opsForList().rightPushAll(key, objects);
+        } catch (Exception e) {
+            log.error("Redis数据异常:设置list全部数据异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
 
     /**
      * 获取list缓存的内容
@@ -241,7 +288,24 @@ public class RedisUtils {
         }
     }
 
+    /**
+     * 将list右边的最后一个数据移除
+     */
+    public boolean removeRightList(String key) {
+        try {
+            redisTemplate.opsForList().rightPop(key);
+            return true;
+        } catch (Exception e) {
+            log.error("Redis数据异常:移除右边的list数据异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
     // ============================== Set操作 ==============================
+
+    public Long getSetSize(String key){
+        return redisTemplate.opsForSet().size(key);
+    }
 
     /**
      * 根据key获取Set中的所有值

@@ -23,12 +23,12 @@ public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
     /**
      * 分页查询$!cfg[$tableMapKey].businessName
      */
-    public IPage<${entity}> selectPage${entity}(PageList${entity}Request request);
+    IPage<${entity}> selectPage${entity}(PageList${entity}Request request);
 
     /**
      * 新增或编辑$!cfg[$tableMapKey].businessName
      */
-    public void saveOrUpdate${entity}(${entity} ${table.entityPath});
+    void saveOrUpdate${entity}(${entity} ${table.entityPath});
 
 #foreach($field in ${table.fields})
 #set($fieldMapKey="field_config_$!field.name")
@@ -36,7 +36,7 @@ public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
     /**
      * 检查$!cfg[$fieldMapKey].businessName唯一性
      */
-    public Long get${field.capitalName}Count(${field.propertyType} ${field.propertyName},Long id);
+    Long get${field.capitalName}Count(${field.propertyType} ${field.propertyName},Long id);
 
 #end
 #end

@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
 import com.mysiteforme.admin.service.UserDeviceService;
@@ -17,6 +18,19 @@ public class UserDeviceController {
     @GetMapping("list")
     public Result list(@RequestBody PageListUserDeviceRequest request){
         return  Result.success(userDeviceService.selectPageUserDevice(request));
+    }
+
+    /**
+     * 获取当前登录用的设备列表
+     * @return Result返回对象
+     */
+    @GetMapping("userDevices")
+    public Result getUserDeviceList(){
+        Long currentId = MySecurityUser.id();
+        if(currentId == null || currentId == 0){
+            return Result.unauthorized();
+        }
+        return Result.success(userDeviceService.getUserDevices(currentId));
     }
 
     @PostMapping("add")

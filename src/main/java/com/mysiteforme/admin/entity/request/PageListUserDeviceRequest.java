@@ -7,13 +7,9 @@ import lombok.EqualsAndHashCode;
 @Data
 public class PageListUserDeviceRequest extends BasePageRequest{
 
-    private String userName;
+    private Long userId;
 
     private String deviceId;
-
-    private String deviceType;
-
-    private String deviceName;
 
     private Boolean sortByCreateDateAsc;
 

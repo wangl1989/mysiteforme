@@ -15,6 +15,7 @@ import com.mysiteforme.admin.entity.request.SaveRoleMenuPerRequest;
 import com.mysiteforme.admin.entity.request.UpdateRoleRequest;
 import com.mysiteforme.admin.util.MessageConstants;
 import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.Role;
@@ -49,7 +50,9 @@ public class RoleController {
                 return Result.businessMsgError(MessageConstants.Role.ROLE_HAS_OTHER_ROLE_IS_DEFAULT);
             }
         }
-        roleService.saveRole(request);
+        Role role = new Role();
+        BeanUtils.copyProperties(request,role);
+        roleService.saveRole(role);
         return Result.success();
     }
 
@@ -77,7 +80,9 @@ public class RoleController {
                 return Result.businessMsgError(MessageConstants.Role.ROLE_HAS_OTHER_ROLE_IS_DEFAULT);
             }
         }
-        roleService.updateRole(request);
+        Role role = new Role();
+        BeanUtils.copyProperties(request,role);
+        roleService.updateRole(role);
         return Result.success();
     }
 

@@ -15,7 +15,6 @@ import ${package.Entity}.${entity};
 import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 import ${superServiceImplClassPackage};
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>

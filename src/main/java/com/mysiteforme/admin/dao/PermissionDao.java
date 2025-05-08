@@ -11,6 +11,7 @@ package com.mysiteforme.admin.dao;
 import java.util.List;
 import java.util.Set;
 
+import com.mysiteforme.admin.entity.DTO.ApiDTO;
 import com.mysiteforme.admin.entity.request.AssignUserPermissionRequest;
 import org.apache.ibatis.annotations.Param;
 
@@ -55,4 +56,9 @@ public interface PermissionDao extends BaseMapper<Permission> {
      * @return 返回最大排序值
      */
     Integer permissionMaxSort(@Param("menuId") Long menuId,@Param("menuType") Integer menuType);
+
+    /**
+     * 获取API图标基础信息
+     */
+    List<ApiDTO> getApiIconInfo();
 }

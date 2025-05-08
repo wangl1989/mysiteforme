@@ -8,28 +8,38 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.util.DesensitizedUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysiteforme.admin.entity.DTO.LocationDTO;
+import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.entity.request.*;
-import com.mysiteforme.admin.entity.response.LocationResponse;
+import com.mysiteforme.admin.entity.response.AnalyticsUserResponse;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import com.mysiteforme.admin.entity.response.UserDetailResponse;
+import com.mysiteforme.admin.redis.RedisConstants;
 import com.mysiteforme.admin.service.RoleService;
 import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserDeviceService;
+import com.mysiteforme.admin.util.ToolUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,6 +57,7 @@ import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.MessageConstants;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service("userService")
@@ -63,26 +74,60 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	private final RoleService roleService;
 
 	private final UserDeviceService userDeviceService;
+
 	@Override
 	public IPage<PageListUserResponse> selectPageUser(PageListUserRequest request) {
-		IPage<PageListUserResponse> page = baseMapper.selectPageUser(new Page<>(request.getPage(),request.getLimit()),request);
-		List<PageListUserResponse> newList = page.getRecords().stream().map(user -> {
-			// 创建新对象避免修改原始数据
-			PageListUserResponse newUser = new PageListUserResponse();
-			BeanUtils.copyProperties(user, newUser);
-			// 手机号脱敏
-			if (StringUtils.isNotBlank(user.getTel())) {
-				newUser.setTel(DesensitizedUtil.mobilePhone(user.getTel()));
+		LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+		if(request != null){
+			if(StringUtils.isNotBlank(request.getLoginName())){
+				lambdaQueryWrapper.like(User::getLoginName,request.getLoginName());
 			}
+			if(StringUtils.isNotBlank(request.getLocation())){
+				lambdaQueryWrapper.like(User::getLocation,request.getLocation());
+			}
+			if(StringUtils.isNotBlank(request.getEmail())){
+				lambdaQueryWrapper.like(User::getEmail,request.getEmail());
+			}
+			if(request.getSortByCreateDateAsc() != null){
+				lambdaQueryWrapper.orderBy(true,request.getSortByCreateDateAsc(),User::getCreateDate);
+			}
+			if(request.getSortByUpdateDateAsc() != null){
+				lambdaQueryWrapper.orderBy(true,request.getSortByUpdateDateAsc(),User::getUpdateDate);
+			}
+			if(request.getSortByLoginNameAsc() != null){
+				lambdaQueryWrapper.orderBy(true,request.getSortByLoginNameAsc(),User::getLoginName);
+			}
+		}else{
+			request = new PageListUserRequest();
+			lambdaQueryWrapper.orderByDesc(User::getUpdateDate);
+		}
+		IPage<User> userPage = baseMapper.selectPage(new Page<>(request.getPage(),request.getLimit()),lambdaQueryWrapper);
+		// 获取主表ID集合
+		List<Long> userIds = userPage.getRecords().stream().map(User::getId).toList();
+		IPage<PageListUserResponse> result = new Page<>();
+		if(!CollectionUtils.isEmpty(userIds)){
+			List<PageListUserResponse> page = baseMapper.selectPageUser(userIds);
+			List<PageListUserResponse> newList = page.stream().map(user -> {
+				// 创建新对象避免修改原始数据
+				PageListUserResponse newUser = new PageListUserResponse();
+				BeanUtils.copyProperties(user, newUser);
+				// 手机号脱敏
+				if (StringUtils.isNotBlank(user.getTel())) {
+					newUser.setTel(DesensitizedUtil.mobilePhone(user.getTel()));
+				}
 
-			// 邮箱脱敏
-			if (StringUtils.isNotBlank(user.getEmail())) {
-				newUser.setEmail(DesensitizedUtil.email(user.getEmail()));
-			}
-			return newUser;
-		}).collect(Collectors.toList());
-		page.setRecords(newList);
-		return page;
+				// 邮箱脱敏
+				if (StringUtils.isNotBlank(user.getEmail())) {
+					newUser.setEmail(DesensitizedUtil.email(user.getEmail()));
+				}
+				return newUser;
+			}).collect(Collectors.toList());
+			result.setRecords(newList);
+		}
+		result.setCurrent(request.getPage());
+		result.setSize(request.getLimit());
+		result.setTotal(userPage.getTotal());
+		return result;
 	}
 
 	@Override
@@ -97,9 +142,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	}
 
 	@Override
-	@Caching(put = {
-			@CachePut(value = "system::user::details", key = "'id:'+#result.id", condition = "#result != null")
-	})
+	@Caching(put = @CachePut(value = "system::user::details", key = "'id:'+#result.id", condition = "#result != null"),
+			evict = @CacheEvict(value = RedisConstants.ANALYTICS_USER_LIST_KEY, key = "'list'" , condition = "#user.id != null")
+	)
 	@Transactional(rollbackFor = MyException.class)
 	public UserVO saveUser(User user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -109,6 +154,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 			user.setLocation(location);
 		}
 		baseMapper.insert(user);
+		if(user.getCreateId() != null && user.getCreateId() != 0){
+			user.setCreateId(user.getId());
+			baseMapper.updateById(user);
+		}
 		Set<Role> roleSet = user.getRoles();
 		if(!roleSet.isEmpty()) {
 			// 检查当前登录用户是否拥有这些角色
@@ -124,14 +173,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 	private String getLocation(){
 		try {
-			LocationResponse response = userDeviceService.getCurrrenntLocation();
-			if(response != null){
-				String location = response.getProvince();
-				if(StringUtils.isNotBlank(response.getCity())){
-					location = location + "," + response.getCity();
+			HttpServletRequest request = ToolUtil.getCurrentRequest();
+			LocationDTO dto = userCacheService.getLocationByIp(ToolUtil.getClientIp(request));
+			if(dto != null){
+				String location = dto.getProvince();
+				if(StringUtils.isNotBlank(dto.getCity())){
+					location = location + "," + dto.getCity();
 				}
-				if(StringUtils.isNotBlank(response.getDistrict())){
-					location = location + "," +response.getDistrict();
+				if(StringUtils.isNotBlank(dto.getRegion())){
+					location = location + "," +dto.getRegion();
 				}
 				return location;
 			}
@@ -172,6 +222,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 	@Caching(evict = {
 			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null"),
+			@CacheEvict(value = RedisConstants.ANALYTICS_USER_LIST_KEY, key = "'list'" , condition = "#user.id != null"),
 			@CacheEvict(value = "system::menu::userMenu", key = "#user.id", condition = "#user.id != null")
 	})
 	@Transactional(rollbackFor = Exception.class)
@@ -275,6 +326,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	 */
 	@Caching(evict = {
 			@CacheEvict(value = "system::user::details", key = "'id:'+#user.id", condition = "#user.id != null"),
+			@CacheEvict(value = RedisConstants.ANALYTICS_USER_LIST_KEY ,key = "'list'" , condition = "#user.id != null"),
 			@CacheEvict(value = "system::menu::userMenu", key = "#user.id", condition = "#user.id != null")
 	})
 	@Transactional(rollbackFor = MyException.class)
@@ -342,9 +394,85 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	}
 
 	@Override
+	public UserVO getCurrentUser(){
+		String loginName = MySecurityUser.loginName();
+		if(StringUtils.isBlank(loginName)){
+			throw MyException.builder().unauthorized().build();
+		}
+		UserVO user = this.findUserByLoginNameDetails(loginName);
+		user.setPassword(null);
+		if(StringUtils.isNotBlank(user.getTel())) {
+			user.setTel(DesensitizedUtil.mobilePhone(user.getTel()));
+		}
+		if(StringUtils.isNotBlank(user.getEmail())) {
+			user.setEmail(DesensitizedUtil.email(user.getEmail()));
+		}
+		UserDevice userDevice = userDeviceService.getCurrentUserDevice();
+		if(userDevice != null){
+			String lastLoginIp = userDevice.getLastLoginIp();
+			if(StringUtils.isNotBlank(lastLoginIp)){
+				user.setLastLoginIp(lastLoginIp);
+				LocationDTO location =  userCacheService.getLocationByIp(lastLoginIp);
+				if(location != null){
+					user.setLastLoginLocation(StrUtil.join(",",location.getCountry(),location.getProvince(),location.getCity(),location.getRegion()));
+				}
+			}
+			LocalDateTime lastLoginTime = userDevice.getLastLoginTime();
+			if(lastLoginTime != null) {
+				user.setLastLoginTime(lastLoginTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			}
+		}
+		return user;
+	}
+
+	@Override
 	public List<Long> getAssinUserPermission(Long userId) {
 
 		return permissionDao.getAssinUserPermission(userId);
+	}
+
+	@Cacheable(value = RedisConstants.ANALYTICS_USER_LIST_KEY, key = "'list'", unless = "#result == null or #result.size() == 0")
+	@Override
+	public List<AnalyticsUserResponse> getAnalyticsUserResponseList(Integer limit){
+		LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+		lambdaQueryWrapper.eq(User::getDelFlag,false);
+		lambdaQueryWrapper.eq(User::getLocked,false);
+		lambdaQueryWrapper.orderByDesc(User::getCreateDate);
+		Page<User> userPage = page(new Page<>(1,limit),lambdaQueryWrapper);
+		List<User> userList = userPage.getRecords();
+		if(!CollectionUtils.isEmpty(userList)){
+			return userList.stream().map(u -> {
+                AnalyticsUserResponse response = new AnalyticsUserResponse();
+                BeanUtils.copyProperties(u,response);
+				response.setEmail(DesensitizedUtil.email(response.getEmail()));
+				// 设置基础属性为0
+				int baseAttr = 0;
+				if(StringUtils.isNotBlank(u.getIcon())){
+					baseAttr = baseAttr + 1;
+				}
+				if(StringUtils.isNotBlank(u.getNickName())){
+					baseAttr = baseAttr + 1;
+				} else if (u.getNickName().startsWith("用户")) {
+					baseAttr = baseAttr + 1;
+				}
+				if(StringUtils.isNotBlank(u.getTel())){
+					baseAttr = baseAttr + 1;
+				}
+				if(StringUtils.isNotBlank(u.getEmail())){
+					baseAttr = baseAttr + 1;
+				}
+				if(StringUtils.isNotBlank(u.getLocation())){
+					baseAttr = baseAttr + 1;
+				}
+				if(StringUtils.isNotBlank(u.getRemarks())){
+					baseAttr = baseAttr + 1;
+				}
+				int percent = (baseAttr * 100) / 6;
+				response.setPercent(percent);
+                return response;
+            }).collect(Collectors.toList());
+		}
+		return new ArrayList<>();
 	}
 
 }

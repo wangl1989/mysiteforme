@@ -11,26 +11,23 @@ package com.mysiteforme.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.VO.MenuTreeVO;
-import com.mysiteforme.admin.entity.request.AddMenuRequest;
-import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
 
 import java.util.List;
-import java.util.Map;
 
 
 public interface MenuService extends IService<Menu> {
 
     /**
      * 新增菜单
-     * @param request 菜单对象
+     * @param menu 菜单对象
      */
-    void saveMenu(AddMenuRequest request);
+    void saveMenu(Menu menu);
 
     /**
      * 更新菜单
-     * @param request 菜单对象
+     * @param menu 菜单对象
      */
-    void updateMenu(UpdateMenuRequest request);
+    void updateMenu(Menu menu);
 
     void deleteMenu(Long id);
 

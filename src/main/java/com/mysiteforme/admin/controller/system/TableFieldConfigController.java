@@ -3,7 +3,6 @@ package com.mysiteforme.admin.controller.system;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.MessageUtil;
-import com.mysiteforme.admin.util.ResultCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
@@ -31,16 +30,14 @@ public class TableFieldConfigController{
 
     private final TableFieldConfigService tableFieldConfigService;
 
-    @DeleteMapping("delete")
-    @SysLog("删除数据")
-    public Result delete(@RequestParam(value = "id",required = false)Long id){
-        if(null == id || 0 == id){
-            return Result.idIsNullError();
-        }
-        TableFieldConfig tableFieldConfig = tableFieldConfigService.getById(id);
-        tableFieldConfig.setDelFlag(true);
-        tableFieldConfigService.updateById(tableFieldConfig);
-        return Result.success();
+    /**
+     * 根据表名获取字段对象集合
+     * @param request 查询参数对象
+     * @return 字段对象集合
+     */
+    @GetMapping("list")
+    public Result getFieldsByTableConfigId(@Valid PageListTableFieldsRequest request){
+        return Result.success(tableFieldConfigService.selectPageTableFieldConfig(request));
     }
 
     @GetMapping("getSimpleTableField")
@@ -49,19 +46,6 @@ public class TableFieldConfigController{
             return Result.objectNotNull();
         }
         return Result.success(tableFieldConfigService.getSimpleTableField(request));
-    }
-
-    /**
-     * 根据表名获取字段对象集合
-     * @param tableConfigId 表配置ID
-     * @return 字段对象集合
-     */
-    @GetMapping("getFieldsByTableConfigId")
-    public Result getFieldsByTableConfigId(@RequestParam(name = "tableConfigId",required = false)Long tableConfigId){
-        if(tableConfigId == null || tableConfigId == 0){
-            return Result.error(ResultCode.INVALID_PARAM,MessageConstants.TableFieldConfig.TABLE_CONFIG_ID_NOT_NULL);
-        }
-        return Result.success(tableFieldConfigService.getFieldsByTableConfigId(tableConfigId));
     }
 
     /**
@@ -100,6 +84,18 @@ public class TableFieldConfigController{
             return Result.paramMsgError(MessageConstants.TableFieldConfig.FIELD_IDS_EMPTY);
         }
         tableFieldConfigService.sortFields(request.getIds());
+        return Result.success();
+    }
+
+    @DeleteMapping("delete")
+    @SysLog("删除数据")
+    public Result delete(@RequestParam(value = "id",required = false)Long id){
+        if(null == id || 0 == id){
+            return Result.idIsNullError();
+        }
+        TableFieldConfig tableFieldConfig = tableFieldConfigService.getById(id);
+        tableFieldConfig.setDelFlag(true);
+        tableFieldConfigService.updateById(tableFieldConfig);
         return Result.success();
     }
 }

@@ -1,11 +1,13 @@
 package com.mysiteforme.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.google.common.collect.Lists;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.dao.TableConfigDao;
 import com.mysiteforme.admin.entity.DTO.TableFieldDTO;
 import com.mysiteforme.admin.entity.TableConfig;
 import com.mysiteforme.admin.entity.request.GetSimpleFieldRequest;
+import com.mysiteforme.admin.entity.request.PageListTableFieldsRequest;
 import com.mysiteforme.admin.entity.request.SyncTableFieldConfigRequest;
 import com.mysiteforme.admin.entity.request.UpdateTableFieldConfigRequest;
 import com.mysiteforme.admin.entity.response.BaseTableFieldConfigResponse;
@@ -22,6 +24,7 @@ import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.mysiteforme.admin.dao.TableFieldConfigDao;
 import com.mysiteforme.admin.service.TableFieldConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,28 +72,47 @@ public class TableFieldConfigServiceImpl extends ServiceImpl<TableFieldConfigDao
         return DB_TO_FORM_COMPONENT_TYPE_MAP.getOrDefault(baseType, null);
     }
     @Override
-    public List<BaseTableFieldConfigResponse> getFieldsByTableConfigId(Long tableConfigId) {
+    public IPage<BaseTableFieldConfigResponse> selectPageTableFieldConfig(PageListTableFieldsRequest request) {
         // 查询表配置
-        TableConfig tableConfig = tableConfigDao.selectById(tableConfigId);
+        TableConfig tableConfig = tableConfigDao.selectById(request.getTableConfigId());
         if(tableConfig == null){
             throw MyException.builder().businessError(MessageConstants.TableConfig.TABLE_CONFIG_NO_EXISTS).build();
         }
+        IPage<BaseTableFieldConfigResponse> result = new Page<>();
         // 查询表字段配置
         LambdaQueryWrapper<TableFieldConfig> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TableFieldConfig::getTableConfigId, tableConfig.getId());
         wrapper.eq(TableFieldConfig::getDelFlag, false);
+        if(StringUtils.isNotBlank(request.getColumnName())){
+            wrapper.like(TableFieldConfig::getColumnName,request.getColumnName());
+        }
+        if(StringUtils.isNotBlank(request.getBusinessName())){
+            wrapper.like(TableFieldConfig::getBusinessName,request.getBusinessName());
+        }
+        if(StringUtils.isNotBlank(request.getFormComponentType())){
+            wrapper.eq(TableFieldConfig::getFormComponentType,request.getFormComponentType());
+        }
+        if(request.getIsQueryField() != null){
+            wrapper.eq(TableFieldConfig::getIsQueryField,request.getIsQueryField());
+        }
         wrapper.orderByAsc(TableFieldConfig::getSort);
-        List<TableFieldConfig> fieldConfigs = list(wrapper);
-        List<BaseTableFieldConfigResponse> fields = Lists.newArrayList();
-        fieldConfigs.forEach(fieldConfig -> {
-            BaseTableFieldConfigResponse response = new BaseTableFieldConfigResponse();
-            BeanUtils.copyProperties(fieldConfig, response);
-            response.setTableName(tableConfig.getTableName());
-            response.setSchemaName(tableConfig.getSchemaName());
-            response.setTableConfigId(tableConfigId);
-            fields.add(response);
-        });
-        return fields;
+        IPage<TableFieldConfig> fieldConfigs = this.page(new Page<>(request.getPage(),request.getLimit()),wrapper);
+        List<TableFieldConfig> recordList = fieldConfigs.getRecords();
+        if(!CollectionUtils.isEmpty(recordList)){
+            List<BaseTableFieldConfigResponse> resultList = recordList.stream().map(t -> {
+                BaseTableFieldConfigResponse response = new BaseTableFieldConfigResponse();
+                BeanUtils.copyProperties(t, response);
+                response.setTableName(tableConfig.getTableName());
+                response.setSchemaName(tableConfig.getSchemaName());
+                response.setTableConfigId(request.getTableConfigId());
+                return response;
+            }).toList();
+            result.setRecords(resultList);
+            result.setTotal(fieldConfigs.getTotal());
+        }
+        result.setSize(request.getLimit());
+        result.setCurrent(request.getPage());
+        return result;
     }
 
     @Override

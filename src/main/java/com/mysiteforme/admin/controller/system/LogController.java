@@ -10,7 +10,9 @@ package com.mysiteforme.admin.controller.system;
 
 import java.util.List;
 
+import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
+import com.mysiteforme.admin.util.MessageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,7 @@ public class LogController{
     }
 
     @DeleteMapping("delete")
+    @SysLog(MessageConstants.SysLog.LOG_BATCH_DELETE)
     public Result delete(@RequestParam(value = "ids",required = false)List<Integer> ids){
         if(ids == null || ids.isEmpty()){
             return Result.idIsNullError();

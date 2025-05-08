@@ -9,9 +9,11 @@
 package com.mysiteforme.admin.controller.system;
 
 import com.mysiteforme.admin.base.MySecurityUser;
+import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
 import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +58,9 @@ public class MenuController{
         if(menuService.getCountByName(request.getName(),null)>0){
             return Result.paramMsgError(MessageConstants.Menu.MENU_NAME_EXISTS);
         }
-        menuService.saveMenu(request);
+        Menu menu = new Menu();
+        BeanUtils.copyProperties(request,menu);
+        menuService.saveMenu(menu);
         return Result.success();
     }
 
@@ -69,7 +73,9 @@ public class MenuController{
         if(menuService.getCountByName(request.getName(),request.getId())>0){
             return Result.paramMsgError(MessageConstants.Menu.MENU_NAME_EXISTS);
         }
-        menuService.updateMenu(request);
+        Menu menu = new Menu();
+        BeanUtils.copyProperties(request,menu);
+        menuService.updateMenu(menu);
         return Result.success();
     }
 

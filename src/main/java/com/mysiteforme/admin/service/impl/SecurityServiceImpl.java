@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysiteforme.admin.entity.DTO.GlobalHeadParam;
 import com.mysiteforme.admin.entity.DTO.TokenValidationResult;
-import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.redis.JwtService;
 import com.mysiteforme.admin.redis.RedisConstants;
@@ -157,9 +156,6 @@ public class SecurityServiceImpl implements SecurityService {
             throw MyException.builder().paramMsgError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
         }
 
-        // 1. 获取设备信息
-        UserDevice deviceInfo = userDeviceService.extractDeviceInfo(user.getUsername(),request);
-        deviceInfo.setDeviceId(deviceId);
         user.setDeviceId(deviceId);
         // 生成访问令牌和刷新令牌
         String accessToken = jwtService.generateToken(user);
@@ -170,9 +166,11 @@ public class SecurityServiceImpl implements SecurityService {
         tokenStorageService.storeAccessToken(user.getLoginName(), accessToken, deviceId);
         tokenStorageService.storeRefreshToken(user.getLoginName(), refreshToken, deviceId);
 
-        // 4. 更新设备信息
-        userDeviceService.handleDeviceLogin(user.getLoginName(), deviceInfo);
-
+        // 更新或记录设备信息
+        Long id = user.getId();
+        if(id != null && StringUtils.isNotBlank(deviceId)) {
+            userDeviceService.handleDeviceLogin(id, deviceId);
+        }
         // 将token返回给前端
         apiToolUtil.returnSystemDate(Result.success(TokenInfoVO.builder().accessToken(accessToken).refreshToken(refreshToken).deviceId(deviceId).build()),request, response);
     }

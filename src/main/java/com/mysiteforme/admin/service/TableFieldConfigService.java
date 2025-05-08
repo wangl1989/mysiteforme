@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mysiteforme.admin.entity.DTO.TableFieldDTO;
 import com.mysiteforme.admin.entity.TableFieldConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -20,10 +21,10 @@ public interface TableFieldConfigService extends IService<TableFieldConfig> {
 
     /**
      * 根据表名获取字段配置列表
-     * @param tableConfigId 请求参数
+     * @param request 请求参数对象
      * @return 字段配置列表
      */
-    List<BaseTableFieldConfigResponse> getFieldsByTableConfigId(Long tableConfigId);
+    IPage<BaseTableFieldConfigResponse> selectPageTableFieldConfig(PageListTableFieldsRequest request);
 
     /**
      * 根据表配置ID获取字段配置列表

@@ -8,10 +8,9 @@
 
 package com.mysiteforme.admin.service;
 
+import com.mysiteforme.admin.entity.DTO.LocationDTO;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
-
-import java.util.Map;
 
 public interface UserCacheService {
 
@@ -23,5 +22,7 @@ public interface UserCacheService {
     UserVO findUserByIdDetails(Long id);
 
     UserVO getSuperAdminUserDetail(User user);
+
+    LocationDTO getLocationByIp(String ip);
 
 }

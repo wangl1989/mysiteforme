@@ -18,16 +18,18 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.mysiteforme.admin.entity.DTO.AgentDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.HtmlUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -37,7 +39,6 @@ import com.mysiteforme.admin.exception.MyException;
 import cn.hutool.http.HttpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Slf4j
 public class ToolUtil {
@@ -128,31 +129,13 @@ public class ToolUtil {
 		return "jpg";
 	}
 
-
-	/**
-	 * 通过泛型检查工具方法封装
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K, V> Map<K, V> getSessionMapAttribute(HttpSession session, String attributeName, Class<K> keyType, Class<V> valueType) {
-		Object attr = session.getAttribute(attributeName);
-		if (attr instanceof Map<?, ?> rawMap) {
-            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
-				if (!keyType.isInstance(entry.getKey()) || !valueType.isInstance(entry.getValue())) {
-					return null;
-				}
-			}
-			return Collections.checkedMap((Map<K, V>) rawMap, keyType, valueType);
-		}
-		return null;
-	}
-
 	/**
 	 * 获取客户端的ip信息
 	 *
      */
 	public static String getClientIp(HttpServletRequest request) {
 		String ip = request.getHeader("X-Real-IP");
-		log.info("ipadd : {}" , ip);
+		log.debug("ipadd : {}" , ip);
 		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("X-Forwarded-For");
 		}
@@ -165,7 +148,7 @@ public class ToolUtil {
 		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
-		log.info(" ip --> {}" , ip);
+		log.debug(" ip --> {}" , ip);
 		return ip;
 	}
 
@@ -206,14 +189,36 @@ public class ToolUtil {
     }
 
 	/**
+	 * 获取当前请求的 HttpServletRequest
+	 * @return HttpServletRequest对象
+	 */
+	public static HttpServletRequest getCurrentRequest() {
+		try {
+			// 从 RequestContextHolder 获取当前请求
+			ServletRequestAttributes attributes = (ServletRequestAttributes)
+					RequestContextHolder.currentRequestAttributes();
+			return attributes.getRequest();
+		} catch (IllegalStateException e) {
+			// 当前线程没有绑定请求（如异步任务、定时任务等）
+			log.error("获取HttpServletRequest出现异常:{}",e.getMessage());
+			throw MyException.builder().businessError(MessageConstants.System.SYSTEM_GET_HTTP_SERVLET_REQUEST_ERROR).build();
+		}
+	}
+
+	/**
 	 * 获取操作系统,浏览器及浏览器版本信息
      */
-	public static Map<String,String> getOsAndBrowserInfo(HttpServletRequest request){
-		Map<String,String> map = Maps.newHashMap();
-        String  userAgent       = request.getHeader("User-Agent");
-		map.put("agent",userAgent);
-		String  user            =   userAgent.toLowerCase();
+	public static AgentDTO getOsAndBrowserInfo(HttpServletRequest request){
+		return getOsAndBrowserInfo(request.getHeader("User-Agent"));
+	}
 
+	/**
+	 * 获取操作系统,浏览器及浏览器版本信息
+	 */
+	public static AgentDTO getOsAndBrowserInfo(String  userAgent){
+		AgentDTO agent = new AgentDTO();
+		agent.setUserAgent(userAgent);
+		String  user = userAgent.toLowerCase();
 		String os;
 		String browser = "";
 
@@ -278,9 +283,9 @@ public class ToolUtil {
 		{
 			browser = "UnKnown, More-Info: "+userAgent;
 		}
-		map.put("os", HtmlUtils.htmlEscape(os));
-		map.put("browser",HtmlUtils.htmlEscape(browser));
-		return map;
+		agent.setOs(HtmlUtils.htmlEscape(os));
+		agent.setBrowser(HtmlUtils.htmlEscape(browser));
+		return agent;
 	}
 
 	/**
@@ -352,7 +357,7 @@ public class ToolUtil {
 	 */
 	public static boolean isValidPath(String path) {
 		if (StringUtils.isBlank(path)) {
-			return false;
+			return true;
 		}
 
 		// 获取操作系统类型
@@ -363,12 +368,12 @@ public class ToolUtil {
 			if (isWindows) {
 				// 检查基本格式（驱动器号:\ 或 UNC 路径 \\）
 				if (!path.matches("^([A-Za-z]:\\\\|\\\\\\\\).*")) {
-					return false;
+					return true;
 				}
 
 				// Windows 路径长度限制
 				if (path.length() > 260) {
-					return false;
+					return true;
 				}
 
 				// 检查每个路径段是否合法
@@ -381,24 +386,24 @@ public class ToolUtil {
 
 					// Windows 文件名限制
 					if (segment.matches("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$")) {
-						return false;
+						return true;
 					}
 
 					// 检查段名是否包含非法字符
 					if (segment.matches(".*[<>:\"/\\\\|?*\u0000-\u001F].*")) {
-						return false;
+						return true;
 					}
 				}
 			} else {
 				// Unix/Linux 路径处理
 				// 检查基本格式
 				if (!path.matches("^(/[^/\u0000]+)*/?$")) {
-					return false;
+					return true;
 				}
 
 				// Unix 路径长度限制
 				if (path.length() > 4096) {
-					return false;
+					return true;
 				}
 
 				// 检查每个路径段
@@ -410,7 +415,7 @@ public class ToolUtil {
 
 					// 检查段名是否包含非法字符
 					if (segment.contains("\u0000")) {
-						return false;
+						return true;
 					}
 				}
 			}
@@ -418,10 +423,10 @@ public class ToolUtil {
 			// 使用 Java NIO 进行最终验证
 			Path normalizedPath = Paths.get(path).normalize();
 			// 检查路径是否被归一化（防止 .. 或 . 等相对路径成分）
-            return normalizedPath.toString().equals(path);
+            return !normalizedPath.toString().equals(path);
         } catch (SecurityException | InvalidPathException e) {
 			log.error("路径验证失败: {} - {}", path, e.getMessage());
-			return false;
+			return true;
 		}
 	}
 

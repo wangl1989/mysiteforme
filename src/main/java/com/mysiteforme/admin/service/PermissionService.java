@@ -41,4 +41,6 @@ public interface PermissionService extends IService<Permission> {
     // 按钮权限相关方法
     void saveOrUpdatePermissionButtonDTO(PermissionButtonDTO permissionButtonDTO);
 
+    String getApiIconInfo(String api,String method);
+
 }

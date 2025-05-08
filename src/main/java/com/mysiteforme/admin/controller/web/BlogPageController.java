@@ -17,6 +17,7 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.BlogArticle;
 import com.mysiteforme.admin.entity.BlogChannel;
 import com.mysiteforme.admin.entity.BlogComment;
+import com.mysiteforme.admin.entity.DTO.AgentDTO;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.lucene.LuceneSearch;
 import com.mysiteforme.admin.service.BlogArticleService;
@@ -165,9 +166,9 @@ public class BlogPageController extends BaseController{
         }
         blogComment.setContent(content);
         blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
-        Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
-        blogComment.setSystem(map.get("os"));
-        blogComment.setBrowser(map.get("browser"));
+        AgentDTO agent = ToolUtil.getOsAndBrowserInfo(request);
+        blogComment.setSystem(agent.getOs());
+        blogComment.setBrowser(agent.getBrowser());
         String ip = ToolUtil.getClientIp(request);
         if("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)){
             ip = "内网地址";
@@ -218,9 +219,9 @@ public class BlogPageController extends BaseController{
         }
         blogComment.setContent(content);
         blogComment.setFloor(blogCommentService.getMaxFloor(blogComment.getArticleId())+1);
-        Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
-        blogComment.setSystem(map.get("os"));
-        blogComment.setBrowser(map.get("browser"));
+        AgentDTO agent = ToolUtil.getOsAndBrowserInfo(request);
+        blogComment.setSystem(agent.getOs());
+        blogComment.setBrowser(agent.getBrowser());
         String ip = ToolUtil.getClientIp(request);
         if("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)){
             ip = "内网地址";
@@ -260,9 +261,9 @@ public class BlogPageController extends BaseController{
         }
         blogComment.setContent(content);
         blogComment.setFloor(blogCommentService.getMaxFloorByReply(blogComment.getReplyId())+1);
-        Map<String,String> map = ToolUtil.getOsAndBrowserInfo(request);
-        blogComment.setSystem(map.get("os"));
-        blogComment.setBrowser(map.get("browser"));
+        AgentDTO agent = ToolUtil.getOsAndBrowserInfo(request);
+        blogComment.setSystem(agent.getOs());
+        blogComment.setBrowser(agent.getBrowser());
         String ip = ToolUtil.getClientIp(request);
         if("0.0.0.0".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "localhost".equals(ip) || "127.0.0.1".equals(ip)){
             ip = "内网地址";

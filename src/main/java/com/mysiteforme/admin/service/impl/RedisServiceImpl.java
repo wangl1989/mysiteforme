@@ -56,6 +56,8 @@ public class RedisServiceImpl implements RedisService {
         // 如果需要，按过期时间排序
         if (Boolean.TRUE.equals(request.getSortByExpireAsc())) {
             keyList.sort(Comparator.comparing(key -> redisTemplate.getExpire(key, TimeUnit.SECONDS)));
+        }else {
+            keyList.sort(String::compareTo);
         }
 
         // 计算分页

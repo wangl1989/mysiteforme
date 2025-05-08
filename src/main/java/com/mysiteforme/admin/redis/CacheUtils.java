@@ -3,7 +3,6 @@ package com.mysiteforme.admin.redis;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -43,15 +42,6 @@ public class CacheUtils {
             throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
         }
         String idCacheKey = "id:" + user.getId();
-        String loginNameCacheKey = "loginName:" + user.getLoginName();
-        String emailCacheKey = null;
-        if(StringUtils.isNotBlank(user.getEmail())){
-            emailCacheKey = "email:" + user.getEmail();
-        }
-        String telCacheKey = null;
-        if(StringUtils.isNotBlank(user.getTel())){
-            telCacheKey = "tel:" + user.getTel();
-        }
         Cache detailCache = cacheManager.getCache("system::user::details");
         if(detailCache != null){
             detailCache.evict(idCacheKey);
@@ -80,12 +70,25 @@ public class CacheUtils {
             cache.evict(roleId);
         }
     }
+
+    /**
+     * 清除用户首页系统数据缓存（菜单/角色/权限 数量）
+     * @param userId 用户ID
+     */
+    private void evictUserIndexSystemData(Long userId){
+        Cache cache = cacheManager.getCache(RedisConstants.ANALYTICS_USER_SYSTEM_DATA_KEY);
+        if(cache != null){
+            String idCacheKey = "id:" + userId;
+            cache.evict(idCacheKey);
+        }
+    }
+
     /**
      * 更新角色时的缓存清除链条
      * @param roleId 角色id
      */
     public void evictCacheOnRoleChange(Long roleId) {
-        
+
         // 2. 查询拥有此角色的所有用户
         Set<Long> userIds = roleDao.getUserIdsByRoleId(roleId);
         // 如果用户id集合不为空或者不包含超级管理员的ID，则添加超级管理员ID
@@ -97,6 +100,7 @@ public class CacheUtils {
         userIds.forEach(userId -> {
             evictUserCache(userId);
             evictUserMenuCache(userId);
+            evictUserIndexSystemData(userId);
         });
 
     }
@@ -104,6 +108,7 @@ public class CacheUtils {
     public void evictCacheOnRoleChangeSuperAdmin(){
         evictUserCache(1L);
         evictUserMenuCache(1L);
+        evictUserIndexSystemData(1L);
     }
 
     /**
@@ -120,6 +125,7 @@ public class CacheUtils {
         userIds.forEach(userId -> {
             evictUserCache(userId);
             evictUserMenuCache(userId);
+            evictUserIndexSystemData(userId);
         });
         // 3. 清除用户角色缓存
         List<Long> roleIds = roleDao.getRoleIdsByPermissionId(permId);
@@ -144,6 +150,7 @@ public class CacheUtils {
         userIds.forEach(userId -> {
             evictUserCache(userId);
             evictUserMenuCache(userId);
+            evictUserIndexSystemData(userId);
         });
         // 3. 清除角色菜单缓存
         Set<Long> roleIds = roleDao.getRoleIdsByMenuId(menuId);

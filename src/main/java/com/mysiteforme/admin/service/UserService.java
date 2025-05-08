@@ -17,6 +17,7 @@ import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.entity.response.AnalyticsUserResponse;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import com.mysiteforme.admin.entity.response.UserDetailResponse;
 
@@ -72,6 +73,12 @@ public interface UserService extends IService<User> {
 	void updateUser(User user);
 
 	/**
+	 * 获取当前登录用户详情
+	 * @return 用户详情VO
+	 */
+	UserVO getCurrentUser();
+
+	/**
 	 * 保存用户角色关系
 	 * @param id 用户ID
 	 * @param roleSet 角色集合
@@ -84,6 +91,12 @@ public interface UserService extends IService<User> {
 	 */
 	void dropUserRolesByUserId(Long id);
 
+	/**
+	 * 邮箱账号数量
+	 * @param email 邮箱地址
+	 * @param id 用户ID
+	 * @return 已经在系统中注册的邮箱数量
+	 */
 	Long userCounByEmail(String email,Long id);
 
 	Long userCounByTel(String tel,Long id);
@@ -108,8 +121,14 @@ public interface UserService extends IService<User> {
 
 	/**
 	 * 根据用户ID获取他对应的单独分配的权限集合
-	 * @param userId
-	 * @return
+	 * @param userId 用户ID
+	 * @return 单独分配的权限集合
 	 */
 	List<Long> getAssinUserPermission(Long userId);
+
+	/**
+	 * 获取最新N条用户信息
+	 * @return 用户信息集合
+	 */
+	List<AnalyticsUserResponse> getAnalyticsUserResponseList(Integer limit);
 }

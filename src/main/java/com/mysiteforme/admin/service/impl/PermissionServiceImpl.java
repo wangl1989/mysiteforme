@@ -8,16 +8,23 @@
 
 package com.mysiteforme.admin.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mysiteforme.admin.entity.*;
+import com.mysiteforme.admin.entity.DTO.ApiDTO;
 import com.mysiteforme.admin.entity.request.BasePermissionRequest;
 import com.mysiteforme.admin.entity.request.PageListPermissionRequest;
 import com.mysiteforme.admin.entity.request.UpdatePermissionRequest;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -51,6 +58,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
     private final PermissionButtonService permissionButtonService;
     
     private final CacheUtils cacheUtils;
+
+    private final RedisUtils redisUtils;
 
     @Override
     public IPage<Permission> selectPagePermission(PageListPermissionRequest request) {
@@ -101,6 +110,16 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
                 handlePermissionData(request.getApi(), permission,
                         this::saveOrUpdatePermissionApiDTO,
                         MessageConstants.Permission.API_DATA_INVALID);
+                // 映射图标和地址的关系
+                if(request.getApi() != null){
+                    String apiUrl = request.getApi().getApiUrl();
+                    String icon = request.getIcon();
+                    String method = request.getApi().getHttpMethod();
+                    if(StringUtils.isNotBlank(apiUrl) && StringUtils.isNotBlank(icon) && StringUtils.isNotBlank(method)) {
+                        redisUtils.hmset(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY, StrUtil.join("_", apiUrl, method), icon);
+                        redisUtils.expire(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY, 2, TimeUnit.DAYS);
+                    }
+                }
                 break;
             case Constants.TYPE_BUTTON: // 页面类型
                 handlePermissionData(request.getButton(), permission,
@@ -201,6 +220,23 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         PermissionButton permissionButton = new PermissionButton();
         BeanUtils.copyProperties(permissionButtonDTO, permissionButton);
         permissionButtonService.saveOrUpdate(permissionButton);
+    }
+
+
+    @Override
+    public String getApiIconInfo(String api,String method) {
+        String mapKey = StrUtil.join("_",api,method);
+        if(redisUtils.hasKey(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY)){
+            Object icon = redisUtils.hget(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY,mapKey);
+            return icon == null? "":icon.toString();
+        }
+        List<ApiDTO> apiDto = baseMapper.getApiIconInfo();
+        Map<String,Object> apiMap = new HashMap<>();
+        apiDto.forEach(a -> apiMap.put(StrUtil.join("_",a.getUrl(),a.getMethod()),a.getIcon()));
+        redisUtils.hmset(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY,apiMap);
+        redisUtils.expire(RedisConstants.ANALYTICS_API_URL_TO_ICON_KEY,2, TimeUnit.DAYS);
+        Object icon = apiMap.get(mapKey);
+        return icon == null?"":icon.toString();
     }
 
     @Transactional(rollbackFor = Exception.class)

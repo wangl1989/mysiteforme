@@ -51,8 +51,7 @@ public class RedisConfig {
         GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
-        template.setDefaultSerializer(jsonSerializer);
-        
+
         // 是 Spring 的 InitializingBean 接口中定义的方法，它的主要作用是在 bean 的所有属性被设置完成后，执行自定义的初始化逻辑。
         // 1. 检查必要配置：验证 connectionFactory 是否已经设置；如果没有设置，会抛出 IllegalStateException
         // 2. 初始化默认序列化器：如果没有手动设置各种序列化器，会初始化默认的序列化器；默认使用 JdkSerializationRedisSerializer，但这不是最优选择
@@ -67,9 +66,11 @@ public class RedisConfig {
      */
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringSerializer))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
             .entryTtl(Duration.ofHours(1)); // 设置默认过期时间
 
         return RedisCacheManager.builder(redisConnectionFactory)

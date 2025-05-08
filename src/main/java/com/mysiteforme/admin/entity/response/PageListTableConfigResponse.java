@@ -46,4 +46,6 @@ public class PageListTableConfigResponse implements Serializable {
 
     private Integer fieldCount;
 
+    private Boolean delFlag;
+
 }

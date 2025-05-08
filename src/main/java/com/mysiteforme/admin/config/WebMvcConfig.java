@@ -61,6 +61,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         this.apiToolUtil = apiToolUtil;
     }
 
+    /**
+     * 地址找不到（存疑，是否和全局异常里的地址找不到判断功能重复？）
+     */
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.add((request, response, handler, ex) -> {
@@ -73,19 +76,25 @@ public class WebMvcConfig implements WebMvcConfigurer {
         });
     }
 
+    /**
+     * 配合XSS过滤器过滤器生成一个全局bean
+     */
     @Bean
     public XssFilter xssFilter() {
         return new XssFilter();
     }
 
+    /**
+     * 具体配置Security请求的安全头
+     */
     @Bean
     public SecurityHeadersFilter securityHeadersFilter() {
         return new SecurityHeadersFilter();
     }
 
     /**
-     * 配置异常处理过滤器
-     * @return 异常处理过滤器注册器
+     * 配置全局自定义异常处理过滤器，处在Security流程链路最前端
+     * 范围：除静态资源目录以及druid目录等
      */
     @Bean
     public FilterRegistrationBean<CustomExceptionHandlerFilter> exceptionFilterRegistration() {
@@ -97,9 +106,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 配置XSS过滤器
-     * @param xssFilter XSS过滤器
-     * @return XSS过滤器注册器
+     * 配置XSS过滤器（针对Form内容进行安全过滤）
+     * 范围：所有地址
      */
     @Bean
     public FilterRegistrationBean<XssFilter> xssFilterRegistration(XssFilter xssFilter) {
@@ -117,11 +125,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return registration;
     }
 
+    /**
+     * &#064;RequestBody  注解内容过滤器
+     * 解析json内容，并确保不会注入Xss数据
+     * 范围：所有 &#064;RequestBody注解的数据
+     */
     @Bean
     public XssRequestBodyAdvice xssRequestBodyAdvice() {
         return new XssRequestBodyAdvice();
     }
 
+    /**
+     * 安全头过滤器
+     * 范围：所有链接（如果是 /druid/* 路径，则不设置 X-Frame-Options）
+     */
     @Bean
     public FilterRegistrationBean<SecurityHeadersFilter> xssSecurityHeadersFilter(SecurityHeadersFilter securityHeadersFilter) {
         FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
@@ -134,7 +151,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 配置静态资源映射
-     * @param registry 资源处理器注册器
+     * 配置1： 添加class目录下的static为静态资源目录
+     * 配置2： 添加系统默认上传目录为资源目录（windowsBaseUploadDir/linuxBaseUploadDir）
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -163,7 +181,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 配置消息转换器
-     * @param converters 消息转换器列表
+     * 配置方式：FastJson
      */
     @Override
     public void configureMessageConverters(@NotNull List<HttpMessageConverter<?>> converters) {
@@ -185,7 +203,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 配置字符串消息转换器
-     * @return 字符串消息转换器
+     * 配置内容：UTF_8
      */
     @Bean
     public HttpMessageConverter<String> responseBodyConverter() {
@@ -193,6 +211,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 StandardCharsets.UTF_8);
     }
 
+    /**
+     * 部署在反向代理（Reverse Proxy）或负载均衡器（Load Balancer）后面时，
+     * HttpServletRequest 对象无法获取到原始客户端请求信息的问题
+     * 客户端 (浏览器) <--- HTTPS ---> 反向代理 (Nginx/Apache/ELB等) <--- HTTP ---> Spring Boot 应用
+     * 让应用程序能够像直接面向客户端一样获取到正确的协议、域名、端口和客户端 IP 地址
+     */
     @Bean
     public ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
@@ -200,7 +224,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 添加拦截器
-     * @param registry 拦截器注册器
+     * 拦截已经登录的地址
+     * 排除未登录的地址：/login，/favicon.ico ......
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -217,6 +242,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/static/**",
                         "/showBlog/**",
                         "/register/**",
+                        "/api/analytics/**",
                         "/druid/**");
         registry.addInterceptor(new BlogHandlerInterceptor())
                 .addPathPatterns("/showBlog/**");

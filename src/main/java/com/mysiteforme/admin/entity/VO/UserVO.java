@@ -12,9 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -91,6 +89,21 @@ public class UserVO implements Serializable{
      * 位置信息
      */
     private String location;
+
+    /**
+     * 上次登录IP
+     */
+    private String lastLoginIp;
+
+    /**
+     * 上次登录时间
+     */
+    private String lastLoginTime;
+
+    /**
+     * 上次登录地址
+     */
+    public String lastLoginLocation;
 
 
 }

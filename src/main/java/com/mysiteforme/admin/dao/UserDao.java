@@ -8,11 +8,10 @@
 
 package com.mysiteforme.admin.dao;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.mysiteforme.admin.entity.request.PageListUserRequest;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -25,7 +24,7 @@ import com.mysiteforme.admin.entity.VO.UserVO;
 
 public interface UserDao extends BaseMapper<User> {
 
-	IPage<PageListUserResponse> selectPageUser(IPage<PageListUserResponse> page, @Param("request")PageListUserRequest request);
+	List<PageListUserResponse> selectPageUser(@Param("ids")List<Long> ids);
 
 	void saveUserRoles(@Param("userId")Long id, @Param("roleIds")Set<Role> roles);
 

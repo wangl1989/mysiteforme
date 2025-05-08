@@ -8,12 +8,15 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.entity.DTO.LocationDTO;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.UpdateCurrentUserRequest;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.LocationResponse;
-import com.mysiteforme.admin.service.UserDeviceService;
+import com.mysiteforme.admin.service.UserCacheService;
+import com.mysiteforme.admin.util.ToolUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +30,6 @@ import com.mysiteforme.admin.service.UserService;
 import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
-import cn.hutool.core.util.DesensitizedUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +45,7 @@ public class UserController {
 
     private final MenuService menuService;
 
-    private final UserDeviceService userDeviceService;
+    private final UserCacheService userCacheService;
 
     @GetMapping("list")
     public Result list(PageListUserRequest request){
@@ -197,15 +199,7 @@ public class UserController {
      */
     @GetMapping("currentUser")
 	public Result currentUser(){
-        UserVO user = userService.findUserByLoginNameDetails(MySecurityUser.loginName());
-        user.setPassword(null);
-        if(StringUtils.isNotBlank(user.getTel())) {
-            user.setTel(DesensitizedUtil.mobilePhone(user.getTel()));
-        }
-        if(StringUtils.isNotBlank(user.getEmail())) {
-            user.setEmail(DesensitizedUtil.email(user.getEmail()));
-        }
-		return Result.success(user);
+		return Result.success(userService.getCurrentUser());
 	}
 
     /**
@@ -258,11 +252,14 @@ public class UserController {
     }
 
     @GetMapping("location")
-    public Result getLocation(){
-        LocationResponse response = userDeviceService.getCurrrenntLocation();
-        if(response == null){
+    public Result getLocation(HttpServletRequest request){
+        LocationDTO location = userCacheService.getLocationByIp(ToolUtil.getClientIp(request));
+        if(location == null){
             return Result.businessMsgError(MessageConstants.User.GET_LOCATION_ERROR);
         }
+        LocationResponse response = new LocationResponse();
+        BeanUtils.copyProperties(location,response);
+        response.setDistrict(location.getRegion());
         return Result.success(response);
     }
 

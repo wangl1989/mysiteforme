@@ -44,6 +44,9 @@ public class MessageConstants {
         public static final String DICT_UPDATE = "message.log.dict.update";
         public static final String DICT_UPDATE_TYPE = "message.log.dict.update.type";
 
+        // 日志相关
+        public static final String LOG_BATCH_DELETE = "message.log.log.batch.delete";
+
         // 菜单相关
         public static final String MENU_DELETE = "message.log.menu.delete";
         public static final String MENU_ADD = "message.log.menu.add";
@@ -96,6 +99,7 @@ public class MessageConstants {
         public static final String TABLE_CONFIG_ADD = "message.log.table.config.add";
         public static final String TABLE_CONFIG_UPDATE = "message.log.table.config.update";
         public static final String TABLE_CONFIG_DELETE = "message.log.table.config.delete";
+        public static final String TABLE_CONFIG_COMPLETELY_DELETE = "message.log.table.config.completely.delete";
         public static final String TABLE_CONFIG_RECOVER = "message.log.table.config.recover";
 
         // 表字段配置相关
@@ -104,15 +108,9 @@ public class MessageConstants {
     }
 
     public static class User {
-        public static final String USERNAME_EMPTY = "message.user.username.empty";
-        public static final String PASSWORD_ERROR = "message.user.password.error";
-        public static final String USER_NO_PERMISSION = "message.user.no.permission";
-        public static final String USER_NO_LOGIN = "message.user.no.login";
         public static final String OLD_PASSWORD_ERROR = "message.user.old.password.error";
         public static final String OLD_PASSWORD_NOT_NULL = "message.user.old.password.not.null";
         public static final String NEW_PASSWORD_NOT_NULL = "message.user.new.password.not.null";
-        public static final String CONFIRM_PASSWORD_NOT_NULL = "message.user.confirm.password.not.null";
-        public static final String NEW_PASSWORD_IS_NOT_EQUAL_CONFIRM_PASSWORD = "message.user.new.password.is.not.equal.confirm.password";
         public static final String DEVICE_ID_REQUIRED = "message.user.device.id.required";
         public static final String USER_LOGOUT_SUCCESS = "message.user.logout.success";
         public static final String USER_LOGIN_FAILED = "message.user.login.failed";
@@ -120,8 +118,6 @@ public class MessageConstants {
         public static final String USER_LOGIN_FAILED_UNAUTHORIZED = "message.user.login.failed.unauthorized";
         public static final String USER_LOGIN_FAILED_FORBIDDEN = "message.user.login.failed.forbidden";
         public static final String USER_CAPTCHA_NULL = "message.user.captcha.null";
-        public static final String USER_CAPTCHA_TOKEN_NULL = "message.user.captcha.token.null";
-        public static final String USER_CAPTCHA_EXPIRED = "message.user.captcha.expired";
         public static final String USER_CAPTCHA_ERROR = "message.user.captcha.error";
         public static final String USER_NOT_FOUND = "message.user.not.found";
         public static final String ASSIGN_ROLE_MORE = "message.user.assign.role.more";
@@ -153,6 +149,8 @@ public class MessageConstants {
         public static final String REGISTER_FAILED = "message.user.register.failed";
 
         public static final String GET_LOCATION_ERROR = "message.user.get.location.error";
+
+        public static final String CLICK_EVENT_EMPTY = "message.user.click.event.empty";
 
 
     }
@@ -387,6 +385,8 @@ public class MessageConstants {
     }
 
     public static class Table {
+        public static final String TABLE_NAME_CAN_NOT_BEGIN_WITH = "message.table.name.can.not.begin.with";
+        public static final String TABLE_SCHEMA_NAME_NOT_MATCH = "message.table.schema.name.not.match";
         public static final String TABLE_COMMENT_NOT_EMPTY = "message.table.comment.not.empty";
         public static final String TABLE_TYPE_NOT_NULL = "message.table.type.not.null";
         public static final String TABLE_NAME_CONTAINS_JAVA_KEYWORDS = "message.table.name.contains.java.keywords";
@@ -403,6 +403,8 @@ public class MessageConstants {
         public static final String TABLE_FIELD_COLUMN_COMMENT_NOT_EMPTY = "message.table.field.column.comment.not.empty";
         public static final String TABLE_FIELD_ISNUllVALUE_TYPE_NOT_EMPTY = "message.table.field.column.is.null.value.not.empty";
         public static final String TABLE_FIELD_NAME_CONTAINS_JAVA_KEYWORDS = "message.table.field.name.contains.java.keywords";
+        public static final String TABLE_FIELD_TYPE_INVALID = "message.table.field.type.invalid";
+        public static final String TABLE_FIELD_LEGTH_TOO_LONG = "message.table.field.length.too.long";
         public static final String BASE_TABLE_NOT_CONTAINS_COMMON_FIELD = "message.table.base.table.not.contains.common.field";
         public static final String TREE_TABLE_NOT_CONTAINS_COMMON_FIELD = "message.table.tree.table.not.contains.common.field";
         public static final String FIELD_NAME_NOT_EMPTY = "message.table.field.name.not.empty";
