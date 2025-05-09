@@ -6,6 +6,11 @@ import lombok.Data;
 public class DeviceInfoResponse {
 
     /**
+     * 设备ID
+     */
+    private String deviceId;
+
+    /**
      * 最后登录IP
      */
     private String ip;

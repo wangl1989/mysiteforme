@@ -57,6 +57,12 @@ public class MenuMetaVO implements Serializable{
      * 当前菜单拥有的菜单集合
      */
     private Set<PermissionVO> authList;
+
+    /**
+     * 按钮权限集合
+     */
+    private Set<String> buttonKeys;
+
     /**
      * 是否在主容器中
      */

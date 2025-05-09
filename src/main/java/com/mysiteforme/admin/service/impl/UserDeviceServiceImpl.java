@@ -10,11 +10,11 @@ import com.mysiteforme.admin.entity.DTO.*;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.dao.UserDeviceDao;
-import com.mysiteforme.admin.entity.VO.DeviceTokenInfo;
 import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
 import com.mysiteforme.admin.entity.response.DeviceInfoResponse;
 import com.mysiteforme.admin.exception.MyException;
-import com.mysiteforme.admin.redis.TokenStorageService;
+import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserDeviceService;
 import com.mysiteforme.admin.util.Constants;
@@ -26,13 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,11 +39,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice> implements UserDeviceService {
 
-    private final TokenStorageService tokenStorageService;
-
     private final UserDao userDao;
 
     private final UserCacheService userCacheService;
+
+    private final RedisUtils redisUtils;
 
     @Override
     public IPage<UserDevice> selectPageUserDevice(PageListUserDeviceRequest request) {
@@ -115,24 +114,17 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
         wrapper.eq(UserDevice::getUserId,userId);
         // 1. 获取MySQL中的设备基本信息
         List<UserDevice> userDeviceList = baseMapper.selectList(wrapper);
-        // 2. 获取Redis中的令牌信息
-        List<DeviceTokenInfo> deviceTokenInfoList = tokenStorageService.getAllUserDevices(user.getLoginName());
-
-        // 将 List 转换为 Map，方便查找
-        Map<String, DeviceTokenInfo> tokenInfoMap = deviceTokenInfoList.stream()
-                .collect(Collectors.toMap(DeviceTokenInfo::getDeviceId, info -> info));
-        // 3. 组合数据
-        return userDeviceList.stream()
+        // 2. 组合数据
+        List<DeviceInfoResponse> result =  userDeviceList.stream()
                 .map(device -> {
                     DeviceInfoResponse response = new DeviceInfoResponse();
                     // 设置IP相关信息
-                    LocationDTO location = userCacheService.getLocationByIp(device.getLastLoginIp());
+                    LocationDTO location = userCacheService.getLocationByIp(device.getThisLoginIp());
                     BeanUtils.copyProperties(location,response);
-                    // 设置令牌信息（如果存在）
-                    DeviceTokenInfo tokenInfo = tokenInfoMap.get(device.getDeviceId());
-                    if (tokenInfo != null && StringUtils.isNotBlank(tokenInfo.getAccessToken())) {
-                        response.setOnline(true);
-                        response.setCurrentDevice(isCurrentDevice(tokenInfo.getAccessToken()));
+                    if (StringUtils.isNotBlank(device.getDeviceId())) {
+                        response.setOnline(isOnline(user.getLoginName(),device.getDeviceId()));
+                        response.setCurrentDevice(isCurrentDevice(device.getDeviceId()));
+                        response.setDeviceId(StringUtils.overlay(device.getDeviceId(), "******", 3, 28));
                     } else {
                         response.setOnline(false);
                         response.setCurrentDevice(false);
@@ -144,6 +136,10 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
                     }
                     return response;
                 })
+                .toList();
+        return result.stream()
+                .sorted(Comparator.comparing(DeviceInfoResponse::getCurrentDevice, Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(DeviceInfoResponse::getOnline, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 
@@ -170,19 +166,28 @@ public class UserDeviceServiceImpl extends ServiceImpl<UserDeviceDao, UserDevice
      * 判断是否是当前设备
      * 通过比对请求中的token来判断
      */
-    private boolean isCurrentDevice(String tokenFromRedis) {
+    private boolean isCurrentDevice(String redisDeviceId) {
         try {
-            // 从当前请求上下文中获取token
-            String currentToken = SecurityContextHolder.getContext()
-                    .getAuthentication()
-                    .getCredentials()
-                    .toString();
-
-            return tokenFromRedis.equals(currentToken);
+            HttpServletRequest request = ToolUtil.getCurrentRequest();
+            String deviceId = request.getHeader(Constants.DEVICE_ID);
+            if(StringUtils.isNotBlank(deviceId)){
+                return deviceId.equalsIgnoreCase(redisDeviceId);
+            }
+            return false;
         } catch (Exception e) {
             log.warn("Failed to determine current device status", e);
             return false;
         }
+    }
+
+    /**
+     * 校验用户是否在线
+     * @param loginName 登录账号
+     * @param deviceId 设备ID
+     * @return 是否在线的判断
+     */
+    private boolean isOnline(String loginName,String deviceId){
+        return redisUtils.hasKey(String.format(RedisConstants.ACCESS_TOKEN_STR_FORMAT_KEY,loginName,deviceId));
     }
 
     @Override

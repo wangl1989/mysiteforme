@@ -41,8 +41,9 @@ public interface MenuService extends IService<Menu> {
     /**
      * 获取指定用户的显示菜单
      * @param id 用户ID
+     * @param isDetail 是否展示详情
      * @return 用户可见的菜单列表
      */
-    List<MenuTreeVO> getShowMenuByUser(Long id);
+    List<MenuTreeVO> getShowMenuByUser(Long id, Boolean isDetail);
 
 }

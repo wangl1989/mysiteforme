@@ -54,7 +54,6 @@ public class MessageConstants {
         public static final String MENU_UPDATE_STATUS = "message.log.menu.update.status";
 
         // 权限相关
-        public static final String PERMISSION_LIST = "message.log.permission.list";
         public static final String PERMISSION_DELETE = "message.log.permission.delete";
         public static final String PERMISSION_ADD = "message.log.permission.add";
         public static final String PERMISSION_UPDATE = "message.log.permission.update";

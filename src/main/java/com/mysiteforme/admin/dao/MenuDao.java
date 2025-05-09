@@ -11,6 +11,7 @@ package com.mysiteforme.admin.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.VO.MenuTreeVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ public interface MenuDao extends BaseMapper<Menu> {
 
     List<Menu> getMenus(Map<String,Object> map);
 
-    List<MenuTreeVO> getUserMenus(Map<String,Object> map);
+    List<MenuTreeVO> getUserMenus(@Param("userId") Long userId);
 
     Set<Long> getUserIdsByMenuId(Long menuId);
 }

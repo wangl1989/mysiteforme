@@ -18,6 +18,7 @@ import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.AnalyticsUserResponse;
+import com.mysiteforme.admin.entity.response.CurrentUserResponse;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import com.mysiteforme.admin.entity.response.UserDetailResponse;
 
@@ -76,7 +77,7 @@ public interface UserService extends IService<User> {
 	 * 获取当前登录用户详情
 	 * @return 用户详情VO
 	 */
-	UserVO getCurrentUser();
+	CurrentUserResponse getCurrentUser();
 
 	/**
 	 * 保存用户角色关系

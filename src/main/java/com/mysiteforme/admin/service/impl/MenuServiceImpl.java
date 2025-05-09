@@ -9,6 +9,7 @@
 package com.mysiteforme.admin.service.impl;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mysiteforme.admin.entity.Permission;
@@ -16,13 +17,16 @@ import com.mysiteforme.admin.entity.VO.*;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
 import com.mysiteforme.admin.exception.MyException;
+import com.mysiteforme.admin.redis.RedisConstants;
 import com.mysiteforme.admin.service.PermissionService;
 import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.util.MessageConstants;
+import com.mysiteforme.admin.util.PermissionType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,7 @@ import com.mysiteforme.admin.dao.MenuDao;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.redis.CacheUtils;
 import com.mysiteforme.admin.service.MenuService;
+import org.springframework.util.CollectionUtils;
 
 
 @Service("menuService")
@@ -174,16 +179,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
      * 获取指定用户的显示菜单
      * 结果会被缓存
      * @param id 用户ID
+     * @param isDetail 是否展示详情
      * @return 用户可见的菜单列表
      */
-    @Cacheable(value = "system::menu::userMenu",key = "T(String).valueOf(#id)",unless = "#result == null or #result.size() == 0")
+    @Cacheable(value = "system::menu::userMenu", key = "T(String).valueOf(#id)", condition = "#isCurrent != null and #isCurrent == false ")
     @Override
-    public List<MenuTreeVO> getShowMenuByUser(Long id) {
-        Map<String,Object> map = Maps.newHashMap();
-        if(1L != id) {
-            map.put("userId", id);
-        }
-        List<MenuTreeVO> total = baseMapper.getUserMenus(map);
+    public List<MenuTreeVO> getShowMenuByUser(Long id, Boolean isDetail) {
+        List<MenuTreeVO> total = baseMapper.getUserMenus(id == 1L ? null : id);
         UserVO userVO = userCacheService.findUserByIdDetails(id);
         Set<PermissionVO> permissions = userVO.getPermissions();
         Map<Long,Set<PermissionVO>> permissionMap = Maps.newHashMap();
@@ -197,7 +199,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
             }
         });
 
-        return getMenuTree(total, permissionMap);
+        return getMenuTree(total, permissionMap, isDetail);
     }
 
     /**
@@ -205,9 +207,10 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
      * @param parentMenu 父菜单
      * @param totalMenus 所有菜单
      * @param treeVOs 树形菜单列表
+     * @param isCurrent 是否为展示当前菜单
      * @return 树形菜单列表
      */
-    private List<MenuTreeVO> getMenuTree(List<MenuTreeVO> total, Map<Long,Set<PermissionVO>> permissionMap) {
+    private List<MenuTreeVO> getMenuTree(List<MenuTreeVO> total, Map<Long,Set<PermissionVO>> permissionMap, Boolean isDetail) {
         // 用于存储根节点
         List<MenuTreeVO> rootNodes = new ArrayList<>();
         // 用于快速查找子节点
@@ -223,7 +226,21 @@ public class MenuServiceImpl extends ServiceImpl<MenuDao, Menu> implements MenuS
             });
             // 设置权限列表（使用空集合兜底）
             // TreeSet已经排好序，直接使用
-            meta.setAuthList(permissionMap.getOrDefault(m.getId(), Collections.emptySet()));
+            Set<PermissionVO> permissionSet = permissionMap.getOrDefault(m.getId(), Collections.emptySet());
+            if(isDetail) {
+                // 如果是正常展示正常详情(包含权限详细信息)
+                meta.setAuthList(permissionSet);
+            } else {
+                // 如果是展示当前用户菜单(包含权限按钮key的集合)
+                if(!CollectionUtils.isEmpty(permissionSet)) {
+                    Set<String> buttonKeys = permissionSet.stream()
+                            .filter(p -> p.getButton() != null &&
+                                    p.getPermissionType() == PermissionType.BUTTON.getCode())
+                            .map(p -> p.getButton().getButtonKey())
+                            .collect(Collectors.toSet());
+                    meta.setButtonKeys(buttonKeys);
+                }
+            }
             nodeMap.put(m.getId(), m);
         }
 

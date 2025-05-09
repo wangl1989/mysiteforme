@@ -208,6 +208,7 @@ public class UserController {
      * @return Result 包含当前用户可见菜单列表的Result对象，Result.success表示操作成功
      */
     @PostMapping("assignUserPermission")
+    @SysLog(MessageConstants.SysLog.PERMISSION_ASSIGN_USER)
     public Result assignUserPermission(@RequestBody AssignUserPermissionRequest request){
         if(request == null){
             return Result.objectNotNull();
@@ -235,7 +236,7 @@ public class UserController {
         // 获取当前登录用户的ID
         Long userId = MySecurityUser.id();
         // 根据用户ID获取可见菜单列表，并返回成功结果
-        return Result.success(menuService.getShowMenuByUser(userId));
+        return Result.success(menuService.getShowMenuByUser(userId,false));
     }
 
     /**

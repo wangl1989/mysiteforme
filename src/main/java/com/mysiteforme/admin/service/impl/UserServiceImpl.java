@@ -25,13 +25,16 @@ import com.mysiteforme.admin.entity.DTO.LocationDTO;
 import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.AnalyticsUserResponse;
+import com.mysiteforme.admin.entity.response.CurrentUserResponse;
 import com.mysiteforme.admin.entity.response.PageListUserResponse;
 import com.mysiteforme.admin.entity.response.UserDetailResponse;
 import com.mysiteforme.admin.redis.RedisConstants;
+import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.service.RoleService;
 import com.mysiteforme.admin.service.UserCacheService;
 import com.mysiteforme.admin.service.UserDeviceService;
 import com.mysiteforme.admin.util.ToolUtil;
+import com.mysiteforme.admin.util.UserStatusType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +78,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 	private final UserDeviceService userDeviceService;
 
+	private final RedisUtils redisUtils;
 	@Override
 	public IPage<PageListUserResponse> selectPageUser(PageListUserRequest request) {
 		LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -120,6 +124,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 				if (StringUtils.isNotBlank(user.getEmail())) {
 					newUser.setEmail(DesensitizedUtil.email(user.getEmail()));
 				}
+
+				// 设置用户状态
+				newUser.setStatus(getUserStatus(user.getLoginName(),user.getDelFlag()));
 				return newUser;
 			}).collect(Collectors.toList());
 			result.setRecords(newList);
@@ -128,6 +135,51 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		result.setSize(request.getLimit());
 		result.setTotal(userPage.getTotal());
 		return result;
+	}
+
+	/**
+	 * 获取用户状态
+	 * @param loginName 登录账号
+	 * @param delFlag 是否删除
+	 * @return 用户状态
+	 */
+	private Integer getUserStatus(String loginName, boolean delFlag){
+		if(delFlag) {
+			return UserStatusType.DELED.getCode();
+		}
+		if(StringUtils.isNotBlank(loginName)){
+			// 先获取用户所有设备列表
+			String userDeviceKey = RedisConstants.USER_DEVICE_PREFIX + loginName;
+
+			Set<Object> deviceIds = redisUtils.sGet(userDeviceKey);
+			if(!CollectionUtils.isEmpty(deviceIds)){
+				boolean online = false,offline = false,locked = false;
+				for(Object d : deviceIds){
+					if(redisUtils.hasKey(String.format(RedisConstants.ACCESS_TOKEN_STR_FORMAT_KEY,loginName,d.toString()))){
+						online = true;
+					}
+					if (redisUtils.hasKey(String.format(RedisConstants.REFRESH_TOKEN_STR_FORMAT_KEY,loginName, d))) {
+						offline = true;
+					}
+					if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + d)) {
+						locked = true;
+					}
+				}
+				if(locked){
+					return UserStatusType.LOCKED.getCode();
+				}
+				if(online){
+					return UserStatusType.ONLINE.getCode();
+				}
+				if(offline){
+					return UserStatusType.OFFLINE.getCode();
+				}
+			}else{
+				return UserStatusType.NORMAL.getCode();
+			}
+
+		}
+		return UserStatusType.NORMAL.getCode();
 	}
 
 	@Override
@@ -394,35 +446,36 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	}
 
 	@Override
-	public UserVO getCurrentUser(){
+	public CurrentUserResponse getCurrentUser(){
 		String loginName = MySecurityUser.loginName();
 		if(StringUtils.isBlank(loginName)){
 			throw MyException.builder().unauthorized().build();
 		}
 		UserVO user = this.findUserByLoginNameDetails(loginName);
-		user.setPassword(null);
-		if(StringUtils.isNotBlank(user.getTel())) {
-			user.setTel(DesensitizedUtil.mobilePhone(user.getTel()));
+		CurrentUserResponse response = new CurrentUserResponse();
+		BeanUtils.copyProperties(user,response);
+		if(StringUtils.isNotBlank(response.getTel())) {
+			response.setTel(DesensitizedUtil.mobilePhone(response.getTel()));
 		}
-		if(StringUtils.isNotBlank(user.getEmail())) {
-			user.setEmail(DesensitizedUtil.email(user.getEmail()));
+		if(StringUtils.isNotBlank(response.getEmail())) {
+			response.setEmail(DesensitizedUtil.email(response.getEmail()));
 		}
 		UserDevice userDevice = userDeviceService.getCurrentUserDevice();
 		if(userDevice != null){
 			String lastLoginIp = userDevice.getLastLoginIp();
 			if(StringUtils.isNotBlank(lastLoginIp)){
-				user.setLastLoginIp(lastLoginIp);
+				response.setLastLoginIp(lastLoginIp);
 				LocationDTO location =  userCacheService.getLocationByIp(lastLoginIp);
 				if(location != null){
-					user.setLastLoginLocation(StrUtil.join(",",location.getCountry(),location.getProvince(),location.getCity(),location.getRegion()));
+					response.setLastLoginLocation(StrUtil.join(",",location.getCountry(),location.getProvince(),location.getCity(),location.getRegion()));
 				}
 			}
 			LocalDateTime lastLoginTime = userDevice.getLastLoginTime();
 			if(lastLoginTime != null) {
-				user.setLastLoginTime(lastLoginTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				response.setLastLoginTime(lastLoginTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 			}
 		}
-		return user;
+		return response;
 	}
 
 	@Override

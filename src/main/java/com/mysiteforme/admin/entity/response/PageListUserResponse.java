@@ -49,5 +49,10 @@ public class PageListUserResponse implements Serializable {
 
     private Long updateId;
 
+    /**
+     * 用户状态
+     */
+    private Integer status;
+
     private List<BaseRoleResponse> roles;
 }

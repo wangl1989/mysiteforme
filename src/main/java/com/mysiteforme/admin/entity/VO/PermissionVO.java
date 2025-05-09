@@ -33,14 +33,14 @@ public class PermissionVO implements Serializable,Comparable<PermissionVO>{
     private String permissionName;
 
     /** 
-     * 权限编码 1. page_menu_list  2. api_user_add. 3.button_user_add
+     * 权限编码 1. page_menu_list  2. button_user_add 3.api_user_add.
      */
     private String permissionCode;
 
     /**
-     * 权限类型: 1.可访问页面地址(page) 2. 可访问接口地址(api)    3. 可显示按钮可显示按钮(button)
+     * 权限类型: 1.可访问页面地址(page) 2. 可显示按钮可显示按钮(button)    3. 可访问接口地址(api)
      */
-    private String permissionType;
+    private Integer permissionType;
 
     /**
      * 权限图标

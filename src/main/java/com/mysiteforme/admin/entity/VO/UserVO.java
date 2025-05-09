@@ -90,20 +90,5 @@ public class UserVO implements Serializable{
      */
     private String location;
 
-    /**
-     * 上次登录IP
-     */
-    private String lastLoginIp;
-
-    /**
-     * 上次登录时间
-     */
-    private String lastLoginTime;
-
-    /**
-     * 上次登录地址
-     */
-    public String lastLoginLocation;
-
 
 }

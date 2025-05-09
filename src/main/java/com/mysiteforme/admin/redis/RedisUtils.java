@@ -90,7 +90,7 @@ public class RedisUtils {
      */
     public boolean hasKey(String key) {
         try {
-            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+            return redisTemplate.hasKey(key);
         } catch (Exception e) {
             log.error("Redis数据异常:判断key存在异常", e);
             throw MyException.builder().systemError(userTips).throwable(e).build();

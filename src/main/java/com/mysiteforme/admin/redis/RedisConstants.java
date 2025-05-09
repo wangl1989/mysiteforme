@@ -166,4 +166,14 @@ public class RedisConstants {
 	 */
 	public static final String ANALYTICS_API_URL_TO_ICON_KEY = "analytics:api:urlToIcon";
 
+	/**
+	 * 当前登录TOKEN的KEY
+	 */
+	public static final String ACCESS_TOKEN_STR_FORMAT_KEY = "auth:access:%s:%s";
+
+	/**
+	 * 当前登录刷新TOKEN的KEY
+	 */
+	public static final String REFRESH_TOKEN_STR_FORMAT_KEY = "auth:refresh:%s:%s";
+
 }

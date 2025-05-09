@@ -42,11 +42,11 @@ public class MenuController{
 
     @GetMapping("tree")
     public Result tree(){
-        Long currentUserId = MySecurityUser.id();
-        if(currentUserId == null){
+        Long userId = MySecurityUser.id();
+        if(userId == null || userId == 0){
             return Result.unauthorized();
         }
-        return Result.success(menuService.getShowMenuByUser(currentUserId));
+        return Result.success(menuService.getShowMenuByUser(userId,true));
     }
 
     @SysLog(MessageConstants.SysLog.MENU_ADD)

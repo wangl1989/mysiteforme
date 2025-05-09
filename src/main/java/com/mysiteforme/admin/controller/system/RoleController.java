@@ -124,6 +124,7 @@ public class RoleController {
      * @return Result
      */
     @PostMapping("saveRoleMenusPers")
+    @SysLog(MessageConstants.SysLog.PERMISSION_ASSIGN_ROLE)
     public Result saveUserRoleMenusPermissions(@RequestBody @Valid SaveRoleMenuPerRequest request){
         if(request == null){
             return Result.objectNotNull();
