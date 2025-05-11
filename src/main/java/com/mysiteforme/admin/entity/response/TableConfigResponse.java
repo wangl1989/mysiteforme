@@ -79,6 +79,16 @@ public class TableConfigResponse {
     private Boolean isValidateRuler;
 
     /**
+     * 是否检测图片地址
+     */
+    private Boolean isCheckImgUrl;
+
+    /**
+     * 是否校验字典
+     */
+    private Boolean isDictList;
+
+    /**
      * 新增时需要导入的包的集合
      */
     private Set<String> addPackages;

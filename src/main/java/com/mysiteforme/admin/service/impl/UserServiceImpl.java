@@ -441,7 +441,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		// 先移除 用户-权限数据
 		permissionDao.removeUserPermissionByUserId(request.getUserId());
 		// 再插入数据
-		permissionDao.saveUserPermission(request);
+		List<Long> permissionIds = request.getPermissionIds();
+		if(permissionIds != null) {
+			if (!CollectionUtils.isEmpty(request.getPermissionIds())) {
+				permissionDao.saveUserPermission(request);
+			}
+		}
 
 	}
 

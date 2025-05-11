@@ -13,25 +13,6 @@ public class GenCodeConstants {
     public static final String BASE_PACKAGE = "com.mysiteforme.admin";
 
     /**
-     * Windows生成路径
-     */
-    public static final String WINDOWS_GENERATOR_PATH = "D://temp/site";
-
-    /**
-     * Linux生成路径
-     */
-    public static final String LINUX_GENERATOR_PATH = "/tmp/site";
-
-    /**
-     * Windows压缩包的路径
-     */
-    public static final String WINDOWS_SOURCE_CODE_NAME = "D://temp/%s/源码.zip";
-    /**
-     * Linux压缩包的路径
-     */
-    public static final String LINUX_SOURCE_CODE_NAME = "/tmp/%s/源码.zip";
-
-    /**
      * 默认作者
      */
     public static final String DEFAULT_AUTHOR = "wangl";
@@ -331,6 +312,75 @@ public class GenCodeConstants {
     }
 
     /**
+     * 数据库类型可配置前端字段类型
+     */
+    public static final Map<String,List<String>> DB_TO_FRONT_TYPE = new HashMap<>();
+    static {
+        // 数值类型
+        DB_TO_FRONT_TYPE.put("tinyint", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("smallint", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("mediumint", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("int", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("integer", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("bigint", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("float", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("double", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+        DB_TO_FRONT_TYPE.put("decimal", List.of(FormComponentType.INPUT_NUMBER.getCode() ));
+
+        // char字符串类型
+        DB_TO_FRONT_TYPE.put("char", List.of(FormComponentType.INPUT.getCode(),
+                FormComponentType.SELECT.getCode(),
+                FormComponentType.RADIO.getCode(),
+                FormComponentType.CHECKBOX.getCode(),
+                FormComponentType.ICON_PICKER.getCode(),
+                FormComponentType.SWITCH.getCode(),
+                FormComponentType.IMAGE_UPLOAD.getCode(),
+                FormComponentType.FILE_UPLOAD.getCode(),
+                FormComponentType.COLOR_PICKER.getCode()));
+        // varchar字符串类型
+        DB_TO_FRONT_TYPE.put("varchar", List.of(FormComponentType.INPUT.getCode(),
+                FormComponentType.SELECT.getCode(),
+                FormComponentType.RADIO.getCode(),
+                FormComponentType.CHECKBOX.getCode(),
+                FormComponentType.ICON_PICKER.getCode(),
+                FormComponentType.SWITCH.getCode(),
+                FormComponentType.IMAGE_UPLOAD.getCode(),
+                FormComponentType.FILE_UPLOAD.getCode(),
+                FormComponentType.COLOR_PICKER.getCode()));
+        // tinytext字符串类型
+        DB_TO_FRONT_TYPE.put("tinytext", List.of(FormComponentType.INPUT.getCode(),
+                FormComponentType.SELECT.getCode(),
+                FormComponentType.RADIO.getCode(),
+                FormComponentType.CHECKBOX.getCode(),
+                FormComponentType.ICON_PICKER.getCode(),
+                FormComponentType.SWITCH.getCode(),
+                FormComponentType.IMAGE_UPLOAD.getCode(),
+                FormComponentType.FILE_UPLOAD.getCode(),
+                FormComponentType.RICH_TEXT.getCode(),
+                FormComponentType.TEXTAREA.getCode(),
+                FormComponentType.COLOR_PICKER.getCode()));
+
+        // text
+        DB_TO_FRONT_TYPE.put("text", List.of(FormComponentType.RICH_TEXT.getCode(), FormComponentType.TEXTAREA.getCode()));
+        // mediumtext
+        DB_TO_FRONT_TYPE.put("mediumtext", List.of(FormComponentType.RICH_TEXT.getCode(), FormComponentType.TEXTAREA.getCode()));
+        // longtext
+        DB_TO_FRONT_TYPE.put("longtext", List.of(FormComponentType.RICH_TEXT.getCode(), FormComponentType.TEXTAREA.getCode()));
+        // date
+        DB_TO_FRONT_TYPE.put("date", List.of(FormComponentType.DATE_PICKER.getCode(), FormComponentType.DATETIME_PICKER.getCode(), FormComponentType.TIME_PICKER.getCode()));
+        // time
+        DB_TO_FRONT_TYPE.put("time", List.of(FormComponentType.TIME_PICKER.getCode(), FormComponentType.DATETIME_PICKER.getCode(), FormComponentType.DATE_PICKER.getCode()));
+        // datetime
+        DB_TO_FRONT_TYPE.put("datetime", List.of(FormComponentType.TIME_PICKER.getCode(), FormComponentType.DATETIME_PICKER.getCode(), FormComponentType.DATE_PICKER.getCode()));
+        // timestamp
+        DB_TO_FRONT_TYPE.put("timestamp", List.of(FormComponentType.TIME_PICKER.getCode(), FormComponentType.DATETIME_PICKER.getCode(), FormComponentType.DATE_PICKER.getCode()));
+        // 布尔类型:bit
+        DB_TO_FRONT_TYPE.put("bit", List.of(FormComponentType.SWITCH.getCode()));
+        // 布尔类型:boolean
+        DB_TO_FRONT_TYPE.put("boolean", List.of(FormComponentType.SWITCH.getCode()));
+    }
+
+    /**
      * 数据库类型与表单组件类型映射
      */
     public static final  Map<String, FormComponentType> DB_TO_FORM_COMPONENT_TYPE_MAP = new HashMap<>();
@@ -362,7 +412,7 @@ public class GenCodeConstants {
 
         // 布尔类型
         DB_TO_FORM_COMPONENT_TYPE_MAP.put("bit", FormComponentType.SWITCH);
-        DB_TO_FORM_COMPONENT_TYPE_MAP.put("boolean", FormComponentType.SELECT);
+        DB_TO_FORM_COMPONENT_TYPE_MAP.put("boolean", FormComponentType.SWITCH);
     }
 
     /**

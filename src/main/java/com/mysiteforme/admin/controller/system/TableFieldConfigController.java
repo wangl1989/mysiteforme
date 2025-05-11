@@ -76,6 +76,7 @@ public class TableFieldConfigController{
     }
 
     @PostMapping("sortFields")
+    @SysLog(MessageConstants.SysLog.TABLE_FIELD_CONFIG_SORT)
     public Result sortFields(@RequestBody SortFieldsRequest request){
         if(request == null){
             return Result.objectNotNull();
@@ -88,12 +89,15 @@ public class TableFieldConfigController{
     }
 
     @DeleteMapping("delete")
-    @SysLog("删除数据")
+    @SysLog(MessageConstants.SysLog.TABLE_FIELD_CONFIG_DELETE)
     public Result delete(@RequestParam(value = "id",required = false)Long id){
         if(null == id || 0 == id){
             return Result.idIsNullError();
         }
         TableFieldConfig tableFieldConfig = tableFieldConfigService.getById(id);
+        if(tableFieldConfig == null){
+            return Result.businessMsgError(MessageConstants.TableFieldConfig.FIELD_CONFIG_NOT_FOUND);
+        }
         tableFieldConfig.setDelFlag(true);
         tableFieldConfigService.updateById(tableFieldConfig);
         return Result.success();

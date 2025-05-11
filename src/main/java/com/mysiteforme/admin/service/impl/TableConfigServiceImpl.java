@@ -479,17 +479,21 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             Map<String,Object> customMap = new HashMap<>();
             // 是否有sort字段
             boolean hasSortField = false;
-            // 是否需要验证字符串
+            // 是否需要验证字符串(为了java模板中是否导入 import jakarta.validation.constraints.NotBlank;)
             boolean isValidateStringNull = false;
-            // 是否需要验证对象
+            // 是否需要验证对象(为了java模板中是否导入 import jakarta.validation.constraints.NotNull;)
             boolean isValidateObjectNull = false;
-            // 是否需要验证正则
+            // 是否需要验证正则 (为了java模板中是否导入 import jakarta.validation.constraints.Pattern;)
             boolean isValidateRuler = false;
-            // 新增时需要导入的包
+            // 是否检测前端图片地址
+            boolean isCheckImgUrl = false;
+            // 校验前端是否有字典列表
+            boolean isDictList = false;
+            // 新增时JAVA文件需要导入的包
             Set<String> addPackages = new HashSet<>();
-            // 编辑时需要导入的包
+            // 编辑时JAVA文件需要导入的包
             Set<String> updatePackages = new HashSet<>();
-            // 列表页参数需要导入的包
+            // 列表页JAVA文件参数需要导入的包
             Set<String> pageListPackages = new HashSet<>();
             List<TableFieldConfigResponse> fieldList = tableConfig.getFieldList();
             if(!fieldList.isEmpty()){
@@ -507,8 +511,6 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
                             pageListPackages.add(dbColumnType.getPkg());
                         }
                     }
-                    // 添加字段信息数据到map
-                    customMap.put(GenCodeConstants.INJECT_TABLE_FIELD_CONFIG_DATA_KEY_PREFIX + field.getColumnName(), field);
                     if(!field.getIsNullable()){
                         if(GenCodeConstants.DB_STRING_FIELD.contains(field.getColumnType())){
                             isValidateStringNull = true;
@@ -523,19 +525,34 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
                     if(GenCodeConstants.FIELD_SORT_STRING.equalsIgnoreCase(field.getColumnName())){
                         hasSortField = true;
                     }
+                    // 判断前端是否需要检测上传图片
+                    if(StringUtils.isNotBlank(field.getFormComponentType())){
+                        if(field.getFormComponentType().equalsIgnoreCase(FormComponentType.IMAGE_UPLOAD.getCode())){
+                            isCheckImgUrl = true;
+                        }
+                    }
+                    // 判断前端是否有字典列表
+                    if(field.getAssociatedType() != null && field.getAssociatedType() != 0){
+                        if(Objects.equals(AssociatedType.DICT.getCode(), field.getAssociatedType())){
+                            isDictList = true;
+                        }
+                    }
 
                     // 设置前端boolean类型
                     if(GenCodeConstants.FRONT_BO0LEAN_FIELD.contains(field.getColumnType())){
                         field.setFrontType(GenCodeConstants.FRONT_BOOLEAN_TYPE);
-                    }
-                    // 设置前端string类型
-                    if(GenCodeConstants.FRONT_STRING_FIELD.contains(field.getColumnType())){
+                    } else if(GenCodeConstants.FRONT_STRING_FIELD.contains(field.getColumnType())){
+                        // 设置前端string类型
                         field.setFrontType(GenCodeConstants.FRONT_STRING_TYPE);
-                    }
-                    // 设置前端number类型
-                    if(GenCodeConstants.FRONT_NUMBER_FIELD.contains(field.getColumnType())){
+                    } else if(GenCodeConstants.FRONT_NUMBER_FIELD.contains(field.getColumnType())){
+                        // 设置前端number类型
                         field.setFrontType(GenCodeConstants.FRONT_NUMBER_TYPE);
+                    } else {
+                        throw MyException.builder().businessError(MessageConstants.TableFieldConfig.TABLE_FIELD_CONFIG_TYPE_ERROR,field.getColumnName(),field.getColumnType()).build();
                     }
+
+                    // 添加字段信息数据到map
+                    customMap.put(GenCodeConstants.INJECT_TABLE_FIELD_CONFIG_DATA_KEY_PREFIX + field.getColumnName(), field);
                 }
             }
             // 如果是tree类型表则默认拥有sort字段
@@ -547,9 +564,12 @@ public class TableConfigServiceImpl extends ServiceImpl<TableConfigDao, TableCon
             tableConfig.setIsValidateStringNull(isValidateStringNull);
             tableConfig.setIsValidateObjectNull(isValidateObjectNull);
             tableConfig.setIsValidateRuler(isValidateRuler);
+            tableConfig.setIsCheckImgUrl(isCheckImgUrl);
+            tableConfig.setIsDictList(isDictList);
             tableConfig.setAddPackages(addPackages);
             tableConfig.setUpdatePackages(updatePackages);
             tableConfig.setPageListPackages(pageListPackages);
+            tableConfig.setFieldList(fieldList);
             customMap.put(GenCodeConstants.INJECT_TABLE_CONFIG_DATA_KEY_PREFIX+tableConfig.getTableName(),tableConfig);
             builder.customMap(customMap);
             List<CustomFile> customFileList = Lists.newArrayList();

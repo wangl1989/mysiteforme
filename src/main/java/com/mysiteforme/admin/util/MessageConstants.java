@@ -104,6 +104,8 @@ public class MessageConstants {
         // 表字段配置相关
         public static final String TABLE_FIELD_CONFIG_SYNC = "message.log.table.field.config.sync";
         public static final String TABLE_FIELD_CONFIG_EDIT = "message.log.table.field.config.edit";
+        public static final String TABLE_FIELD_CONFIG_SORT = "message.log.table.field.config.sort";
+        public static final String TABLE_FIELD_CONFIG_DELETE = "message.log.table.field.config.delete";
     }
 
     public static class User {
@@ -132,7 +134,6 @@ public class MessageConstants {
         public static final String TEL_HAS_EXIST = "message.user.tel.has.exist";
         public static final String SAVE_USER_ERROR = "message.user.save.user.error";
         public static final String ASSIGN_USER_ID_EMPTY = "message.user.assign.user.id.empty";
-        public static final String ASSIGN_PERMISSION_COLLECTS_EMPTY = "message.user.assign.permission.collects.empty";
         public static final String EMAIL_SEND_FAILED = "message.user.send.email.failed";
         public static final String SYSTEM_USER_CAN_NOT_DELETE = "message.user.system.user.can.not.delete";
 
@@ -451,6 +452,8 @@ public class MessageConstants {
         public static final String FIELD_IDS_EMPTY = "message.table.field.ids.empty";
         public static final String FIELD_IDS_INVALID = "message.table.field.ids.invalid";
         public static final String ALL_FIELDS_MUST_SAME_TABLE = "message.table.field.all.fields.must.same.table";
+        public static final String TABLE_FIELD_CONFIG_TYPE_ERROR = "message.table.field.config.type.error";
+        public static final String TABLE_FIELD_CONFIG_FRONT_TYPE_NOT_MATCH = "message.table.field.config.front.type.not.match";
     }
 
     public static class QuartzTask{

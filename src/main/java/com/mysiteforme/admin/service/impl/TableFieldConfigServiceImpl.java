@@ -224,6 +224,10 @@ public class TableFieldConfigServiceImpl extends ServiceImpl<TableFieldConfigDao
             } catch (IllegalArgumentException e) {
                 throw MyException.builder().businessError(MessageConstants.TableFieldConfig.FORM_COMPONENT_TYPE_INVALID).build();
             }
+            List<String> typeList = GenCodeConstants.DB_TO_FRONT_TYPE.get(field.getColumnType());
+            if(!typeList.contains(request.getFormComponentType().toUpperCase())){
+                throw MyException.builder().businessError(MessageConstants.TableFieldConfig.TABLE_FIELD_CONFIG_FRONT_TYPE_NOT_MATCH,request.getFormComponentType(),field.getColumnType()).build();
+            }
             fieldConfig.setFormComponentType(request.getFormComponentType().toUpperCase());
 
             // 验证字典类型

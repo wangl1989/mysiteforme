@@ -213,9 +213,6 @@ public class UserController {
         if(request == null){
             return Result.objectNotNull();
         }
-        if(request.getPermissionIds() == null || request.getPermissionIds().isEmpty()){
-            return Result.paramMsgError(MessageConstants.User.ASSIGN_PERMISSION_COLLECTS_EMPTY);
-        }
         User user = userService.getById(request.getUserId());
         if(user == null || user.getDelFlag()){
             return Result.paramMsgError(MessageConstants.Permission.ASSIGN_PERMISSION_USER_NOT_FOUND);
