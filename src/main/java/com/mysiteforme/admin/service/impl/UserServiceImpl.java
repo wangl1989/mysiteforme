@@ -153,7 +153,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 			Set<Object> deviceIds = redisUtils.sGet(userDeviceKey);
 			if(!CollectionUtils.isEmpty(deviceIds)){
-				boolean online = false,offline = false,locked = false;
+				boolean online = false,
+						offline = false,
+						deviceLocked = false,
+						accountLocked = false;
 				for(Object d : deviceIds){
 					if(redisUtils.hasKey(String.format(RedisConstants.ACCESS_TOKEN_STR_FORMAT_KEY,loginName,d.toString()))){
 						online = true;
@@ -162,11 +165,17 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 						offline = true;
 					}
 					if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + d)) {
-						locked = true;
+						deviceLocked = true;
+					}
+					if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + loginName)) {
+						accountLocked = true;
 					}
 				}
-				if(locked){
-					return UserStatusType.LOCKED.getCode();
+				if(deviceLocked){
+					return UserStatusType.DEVICE_LOCKED.getCode();
+				}
+				if(accountLocked){
+					return UserStatusType.ACCOUNT_LOCKED.getCode();
 				}
 				if(online){
 					return UserStatusType.ONLINE.getCode();

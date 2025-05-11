@@ -115,6 +115,7 @@ public class MessageConstants {
         public static final String DEVICE_ID_REQUIRED = "message.user.device.id.required";
         public static final String USER_LOGOUT_SUCCESS = "message.user.logout.success";
         public static final String USER_LOGIN_FAILED = "message.user.login.failed";
+        public static final String USER_GET_LOGIN_NAME_ERROR = "message.user.get.login.name.error";
         public static final String USER_LOGIN_FAILED_LIMIT = "message.user.login.failed.limit";
         public static final String USER_LOGIN_FAILED_UNAUTHORIZED = "message.user.login.failed.unauthorized";
         public static final String USER_LOGIN_FAILED_FORBIDDEN = "message.user.login.failed.forbidden";
@@ -187,14 +188,9 @@ public class MessageConstants {
     }
 
     public static class Exception {
-        public static final String EXCEPTION_LOGIN = "message.exception.login";
-        public static final String EXCEPTION_LOGIN_LIMIT = "message.exception.login.limit";
-        public static final String EXCEPTION_LOGIN_OUT = "message.exception.login.out";
         public static final String EXCEPTION_REDIS_DATA = "message.exception.redis.data";
         public static final String EXCEPTION_USER_NOT_FOUND = "message.exception.user.not.found";
-        public static final String EXCEPTION_USER_NO_ROLE = "message.exception.user.no.role";
         public static final String EXCEPTION_USER_NO_PERMISSION = "message.exception.user.no.permission";
-        public static final String EXCEPTION_SECURITY = "message.exception.security";
         public static final String EXCEPTION_REQUEST_BODY_ERROR = "message.exception.request.body.error";
         public static final String EXCEPTION_REQUEST_METHOD_NOT_SUPPORTED = "message.exception.request.method.not.supported";
         public static final String EXCEPTION_DATABASE_OPERATION_FAILED = "message.exception.database.operation.failed";

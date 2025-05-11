@@ -71,6 +71,11 @@ public class Constants {
 	public static final String CAPTCHA = "captcha";
 
 	/**
+	 * 登录时输入的用户名
+	 */
+	public static final String USER_NAME = "username";
+
+	/**
 	 * webService定位API接口请求地址
 	 */
 	public static final String WEB_SERVICE_LOCATION_API = "https://apis.map.qq.com/ws/location/v1/ip?key=%s&ip=%s";
@@ -96,9 +101,14 @@ public class Constants {
 	public static final String GRANT_TYPE = "Bearer ";
 
 	/**
-	 * 设置用户需要等待多长时间(分钟)后重新登录
+	 * 设置用户账号被锁定需要等待多长时间(分钟)后重新登录
 	 */
 	public static final int USER_WAIT_TO_LOGIN = 10;
+
+	/**
+	 * 设置用户设备被锁定需要等待多长时间(分钟)后重新登录
+	 */
+	public static final int USER_DEVICE_WAIT_TO_LOGIN = 24 * 60 ;
 
 	/**
 	 * 允许用户尝试登录次数

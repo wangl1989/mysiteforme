@@ -36,13 +36,6 @@ public class SecurityUserDetailsServiceImpl implements UserDetailsService{
         //1.从数据库中查询用户名信息及权限 2.封装成UserDetails数据返回
         UserVO user = userService.findUserByLoginNameDetails(username);
         Optional.ofNullable(user).orElseThrow(() -> MyException.builder().validationError(MessageUtil.getMessage(MessageConstants.Exception.EXCEPTION_USER_NOT_FOUND)).build());
-        if (ObjectUtils.isEmpty(user.getRoles())) {
-            throw MyException.builder().validationError(MessageUtil.getMessage(MessageConstants.Exception.EXCEPTION_USER_NO_ROLE)).build();
-        }
-        if (ObjectUtils.isEmpty(user.getPermissions())) {
-            throw MyException.builder().validationError(MessageUtil.getMessage(MessageConstants.Exception.EXCEPTION_USER_NO_PERMISSION)).build();
-        }
-
         return new MyUserDetails(user);
     }
     

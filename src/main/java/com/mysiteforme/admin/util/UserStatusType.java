@@ -8,8 +8,9 @@ public enum UserStatusType {
     ONLINE(1,"在线"),
     OFFLINE(2,"离线"),
     NORMAL(3,"正常"),
-    LOCKED(4,"锁定"),
-    DELED(5,"注销");
+    DEVICE_LOCKED(4,"设备锁定"),
+    ACCOUNT_LOCKED(5,"账号锁定"),
+    DELED(6,"注销");
 
     private final Integer code;
 

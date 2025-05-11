@@ -69,6 +69,8 @@ public class SecurityServiceImpl implements SecurityService {
     private final ApiToolUtil apiToolUtil;
 
     private final ObjectMapper objectMapper;
+
+    private final UserServiceImpl userService;
  
     /**
      * 登录失败提示信息
@@ -78,7 +80,7 @@ public class SecurityServiceImpl implements SecurityService {
      * 登录失败错误代码
      */
     private final static int ERROR_CODE = ResultCode.LOGIN_ERROR;
-    private final UserServiceImpl userService;
+
 
     /**
      * 登录失败，用户被锁定Redis操作
@@ -92,41 +94,93 @@ public class SecurityServiceImpl implements SecurityService {
         if (StringUtils.isBlank(deviceId)) {
             return Result.paramMsgError(MessageConstants.User.DEVICE_ID_REQUIRED);
         }
-        // 判定是否有用户登录相关的key
-        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId)) {
-            UserLoginFail userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.class);
-            if(userLoginFail == null){
-                // 这里是类型转换异常
-                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
-                return Result.error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR);
+        String loginIdentifier = null;
+        // 尝试从SecurityContextHolder获取
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() != null) {
+            loginIdentifier = auth.getPrincipal().toString();
+        }
+        if(StringUtils.isBlank(loginIdentifier)){
+            try {
+                loginIdentifier = this.getUserNameFromRequest(request);
+            } catch (IOException e) {
+                log.error("【登录失败】无法从请求中获取用户名: {}",e.getMessage());
+                throw MyException.builder().businessError(MessageConstants.User.USER_GET_LOGIN_NAME_ERROR).build();
             }
-            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
-                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
-                return Result.error(ResultCode.LOGIN_FAILED_LIMIT,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,null,showFailResultTip(deviceId));
-            }else{
-                userLoginFail.setLoginCount(userLoginFail.getLoginCount()+1);
-            }
-            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, userLoginFail,Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
+        }
+        if(StringUtils.isBlank(loginIdentifier)){
+            log.error("【登录失败】获取用户名失败");
+            throw MyException.builder().businessError(MessageConstants.User.USER_GET_LOGIN_NAME_ERROR).build();
+        }
+        // 根据用户名查询用户
+        UserVO user = userService.findUserByLoginNameDetails(loginIdentifier);
+        //如果用户不存在则记录设备登录失败次数
+        if(user == null) {
+            updateLoginFailRedisData(deviceId, Constants.USER_DEVICE_WAIT_TO_LOGIN);
         } else {
-            UserLoginFail fail = new UserLoginFail();
-            fail.setLoginCount(1);
-            fail.setLoginTime(System.currentTimeMillis());
-            fail.setLoginName(deviceId);
-            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, fail,Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
+            // 如果用户存在则记录用户登录账户名失败的次数
+            updateLoginFailRedisData(user.getLoginName(), Constants.USER_WAIT_TO_LOGIN);
         }
         return Result.error(ERROR_CODE,StringUtils.isBlank(errorMsg)?ERROR_MSG:errorMsg);
     }
 
-    private String showFailResultTip(String deviceId){
+    private void updateLoginFailRedisData(String key, Integer lockedTime){
+        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key)) {
+            UserLoginFail userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, UserLoginFail.class);
+            if (userLoginFail == null) {
+                // 这里是类型转换异常
+                log.error("【登录失败】用户登录redis类型转换异常：RedisKey：{}", RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key);
+                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
+            }
+            if (userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
+                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
+                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(key)).build();
+            } else {
+                userLoginFail.setLoginCount(userLoginFail.getLoginCount() + 1);
+            }
+            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, userLoginFail, lockedTime, TimeUnit.MINUTES);
+        } else {
+            UserLoginFail fail = new UserLoginFail();
+            fail.setLoginCount(1);
+            fail.setLoginTime(System.currentTimeMillis());
+            fail.setLoginName(key);
+            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, fail, lockedTime, TimeUnit.MINUTES);
+        }
+    }
+
+    private String showFailResultTip(String key){
         String tips;
-        long expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, TimeUnit.MINUTES);
+        long expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, TimeUnit.HOURS);
         if(expireTime > 0){
-            tips = expireTime + "分钟";
+            tips = expireTime + "小时";
         }else{
-            expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, TimeUnit.SECONDS);
-            tips = expireTime + "秒";
+            expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, TimeUnit.MINUTES);
+            if(expireTime > 0){
+                tips = expireTime + "分钟";
+            }else {
+                expireTime = redisUtils.getExpire(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, TimeUnit.SECONDS);
+                tips = expireTime + "秒";
+            }
         }
         return tips;
+    }
+
+    /**
+     * 验证设备/账号是否被锁定
+     */
+    private void checkLoginIdentifier(String key){
+        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key)) {
+            UserLoginFail userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key, UserLoginFail.class);
+            if(userLoginFail == null){
+                // 这里是类型转换异常
+                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + key);
+                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
+            }
+            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
+                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
+                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(key)).build();
+            }
+        }
     }
 
     /**
@@ -137,24 +191,15 @@ public class SecurityServiceImpl implements SecurityService {
     public void loginSuccess(MyUserDetails user, HttpServletRequest request,HttpServletResponse response) {
         // 获取设备ID
         String deviceId = request.getHeader(Constants.DEVICE_ID);
-        // 验证是否有登录出错信息
-        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId)) {
-            UserLoginFail userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.class);
-            if(userLoginFail == null){
-                // 这里是类型转换异常
-                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
-                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
-            }
-            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
-                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
-                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(deviceId)).build();
-            }
-        }
         // 如果没有设备ID，说明是非法请求（因为验证码阶段已经生成过设备ID）
         if (StringUtils.isBlank(deviceId)) {
             log.error("用户设备ID为空，用户名：{}",user.getUsername());
             throw MyException.builder().paramMsgError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
         }
+        // 验证设备是否有被锁定的信息
+        this.checkLoginIdentifier(deviceId);
+        // 验证账号是否有被锁定的信息
+        this.checkLoginIdentifier(user.getLoginName());
 
         user.setDeviceId(deviceId);
         // 生成访问令牌和刷新令牌
@@ -162,6 +207,7 @@ public class SecurityServiceImpl implements SecurityService {
         String refreshToken = jwtService.generateRefreshToken(user);
         //  这里已经登录成功，删除登录尝试错误对象的缓存
         redisUtils.del(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
+        redisUtils.del(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + user.getLoginName());
         // 在Redis中换成访问令牌和刷新令牌
         tokenStorageService.storeAccessToken(user.getLoginName(), accessToken, deviceId);
         tokenStorageService.storeRefreshToken(user.getLoginName(), refreshToken, deviceId);
@@ -219,6 +265,9 @@ public class SecurityServiceImpl implements SecurityService {
         if (ObjectUtils.isEmpty(userDetails)) {
             return false;
         }
+        if (ObjectUtils.isEmpty(userDetails.getAuthorities())) {
+            throw MyException.builder().validationError(MessageUtil.getMessage(MessageConstants.Exception.EXCEPTION_USER_NO_PERMISSION)).build();
+        }
         //  MyUserDetails对象放到上下文中
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
@@ -252,20 +301,6 @@ public class SecurityServiceImpl implements SecurityService {
     public void validateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = getCaptchaFromRequest(request);
         String deviceId = request.getHeader(Constants.DEVICE_ID);
-        UserLoginFail userLoginFail = null;
-        if (redisUtils.hasKey(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId)) {
-            userLoginFail = redisUtils.get(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, UserLoginFail.class);
-            if(userLoginFail == null){
-                // 这里是类型转换异常
-                log.error("用户登录redis类型转换异常：RedisKey：{}",RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId);
-                throw MyException.builder().error(ResultCode.INTERNAL_ERROR,MessageConstants.System.SYSTEM_ERROR).build();
-            }
-            if(userLoginFail.getLoginCount() >= Constants.ALLOW_USER_LOGIN_FAIL_COUNT) {
-                // 用户登录失败次数超过限制，返回锁定用户,这里用Redis来控制次数，不用通过数据库
-                throw MyException.builder().error(ResultCode.LOGIN_ERROR,MessageConstants.User.USER_LOGIN_FAILED_LIMIT,showFailResultTip(deviceId)).build();
-            }
-
-        }
         // 验证码为空验证
         if (StringUtils.isBlank(code)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.USER_CAPTCHA_NULL).build();
@@ -274,6 +309,9 @@ public class SecurityServiceImpl implements SecurityService {
         if (StringUtils.isBlank(deviceId)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
         }
+        // 验证码这里只验证设备是否锁定
+        this.checkLoginIdentifier(deviceId);
+
         // 如果缓存中没有验证码，则验证码已过期或不存在
         if (!redisUtils.hasKey(RedisConstants.USER_CAPTCHA_CACHE_KEY + deviceId)) {
             throw MyException.builder().paramMsgError(MessageConstants.User.USER_CAPTCHA_ERROR).build();
@@ -281,15 +319,6 @@ public class SecurityServiceImpl implements SecurityService {
         String cacheCode = redisUtils.get(RedisConstants.USER_CAPTCHA_CACHE_KEY + deviceId, String.class);
         
         if (!code.equalsIgnoreCase(cacheCode)) {
-            if(userLoginFail == null){
-                userLoginFail = new UserLoginFail();
-                userLoginFail.setLoginCount(1);
-                userLoginFail.setLoginTime(System.currentTimeMillis());
-                userLoginFail.setLoginName(deviceId);
-            }else{
-                userLoginFail.setLoginCount(userLoginFail.getLoginCount()+1);
-            }
-            redisUtils.set(RedisConstants.USER_LOGIN_FAIL_CACHE_KEY + deviceId, userLoginFail, Constants.USER_WAIT_TO_LOGIN,TimeUnit.MINUTES);
             throw MyException.builder().businessError(MessageConstants.User.USER_CAPTCHA_ERROR).build();
         }
         // 验证通过后删除验证码
@@ -301,6 +330,12 @@ public class SecurityServiceImpl implements SecurityService {
         String body = request.getReader().lines().collect(Collectors.joining());
         JsonNode node = objectMapper.readTree(body);
         return node.get(Constants.CAPTCHA).asText();
+    }
+
+    private String getUserNameFromRequest(HttpServletRequest request) throws IOException{
+        String body = request.getReader().lines().collect(Collectors.joining());
+        JsonNode node = objectMapper.readTree(body);
+        return node.get(Constants.USER_NAME).asText();
     }
 
     @Override
