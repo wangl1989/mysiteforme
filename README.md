@@ -10,24 +10,22 @@
 ## 技术栈
 项目使用了以下主流技术框架：
 - **后端**：
-    - Spring Boot 2.2.13：快速构建独立运行的 Java 应用。
+    - Spring Boot 3.2.2：快速构建独立运行的 Java 应用。
     - Shiro 1.9.1：权限管理框架，支持认证和授权。
     - MyBatis Plus 3.5.10.1：简化 MyBatis 操作，提升开发效率。
     - Quartz：任务调度框架，用于定时任务管理。
     - Redis：高性能的缓存数据库。
     - Druid 1.2.20：数据库连接池，支持监控和 SQL 优化。
 - **前端**：
-    - Layui：轻量级 UI 框架，提供丰富的前端组件。
+    - Art-design-pro：轻量级开源VUE3后台框架，基于 Vue3、TypeScript、Vite 和 Element-Plus 精心打造的后台管理系统模板。
 - **其他**：
-    - Lucene：全文检索引擎。
     - Maven：项目构建和依赖管理。
 
 ## 功能模块
 - **系统管理**：
     - 用户管理：支持用户的增删改查及角色分配。
     - 角色管理：支持角色的创建、修改及分配权限。
-    - 权限管理：基于 Shiro 实现的权限分配和验证。
-    - 资源管理：管理系统中的菜单和接口资源。
+    - 权限管理：基于 Spring-Security 实现的权限分配和验证。
 - **日志管理**：
     - 操作日志：记录用户的关键操作。
     - 登录日志：记录用户登录信息。
@@ -37,14 +35,14 @@
 - **任务调度**：
     - 定时任务：支持任务的创建、修改和执行。
 - **系统设置**：
-    - 文件上传：支持本地和云存储。
+    - 文件上传：支持本地和多种云存储。
     - 系统字典：管理系统中的配置项。
     - 网站配置：设置网站的基础信息。
 
 ## 快速体验
 按以下步骤即可快速启动项目：
 1. **环境准备**：
-    - 安装 JDK 1.8 及以上版本。
+    - 安装 JDK 17 及以上版本。
     - 安装 MySQL 数据库。
     - 安装 Redis。
 2. **导入数据库**：
@@ -70,15 +68,15 @@
 
 ## 截图预览
 ### 系统登录
-![](/src/main/resources/static/images/%E7%99%BB%E5%BD%95%E9%A1%B5.png)
+![](/src/main/resources/static/images/login.png)
+### 系统菜单
+![](/src/main/resources/static/images/menu_manager.png)
 ### 系统权限
-![](/src/main/resources/static/images/%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D.png)
-### 系统日志
-![](/src/main/resources/static/images/%E7%B3%BB%E7%BB%9F%E6%97%A5%E5%BF%97.png)
+![](/src/main/resources/static/images/permission_manager.png)
 ### 数据表
-![](/src/main/resources/static/images/%E6%95%B0%E6%8D%AE%E8%A1%A8.png)
+![](/src/main/resources/static/images/table.png)
 ### 权限分配
-![](/src/main/resources/static/images/%E7%B3%BB%E7%BB%9F%E6%9D%83%E9%99%90.png)
+![](/src/main/resources/static/images/permission_assgin.png)
 
 ## 贡献指南
 欢迎提交 Issue 或 Pull Request，为项目贡献代码或建议。
