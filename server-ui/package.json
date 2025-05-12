@@ -61,7 +61,7 @@
     "qrcode.vue": "^3.6.0",
     "vue": "^3.5.12",
     "vue-draggable-plus": "^0.6.0",
-    "vue-i18n": "^9.14.0",
+    "vue-i18n": "^9.14.3",
     "vue-router": "^4.4.2",
     "vue3-count-to": "^1.1.2",
     "xgplayer": "^3.0.20",
