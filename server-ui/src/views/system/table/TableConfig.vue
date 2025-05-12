@@ -224,7 +224,7 @@
   }
 
   // 响应式搜索表单数据
-  const formFilters = reactive<TableConfigListParams & { delFlag?: string }>({
+  const formFilters = ref<TableConfigListParams & { delFlag?: string }>({
     ...initialSearchState,
     delFlag: undefined
   })
@@ -438,8 +438,8 @@
     loading.value = true
     try {
       const queryParams: TableConfigListParams = params || {
-        ...formFilters,
-        delFlag: formFilters.delFlag === '1' ? true : false
+        ...formFilters.value,
+        delFlag: formFilters.value.delFlag === '1' ? true : false
       }
       const res = await TableService.getTableConfigList(queryParams)
       if (res.success) {
@@ -458,12 +458,12 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     // 将字符串类型的delFlag转换为布尔值传给API
-    const params: TableConfigListParams = { ...formFilters }
-    if (formFilters.delFlag === '1') {
+    const params: TableConfigListParams = { ...formFilters.value }
+    if (formFilters.value.delFlag === '1') {
       params.delFlag = true
-    } else if (formFilters.delFlag === '0') {
+    } else if (formFilters.value.delFlag === '0') {
       params.delFlag = false
     } else {
       params.delFlag = undefined
@@ -474,7 +474,7 @@
 
   // 重置查询
   const resetQuery = () => {
-    Object.assign(formFilters, {
+    Object.assign(formFilters.value, {
       ...initialSearchState,
       delFlag: undefined
     }) // 重置为初始状态
@@ -715,14 +715,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadTableConfigList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadTableConfigList()
   }
 

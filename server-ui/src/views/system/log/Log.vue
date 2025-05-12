@@ -131,7 +131,7 @@
     limit: 10,
     sortByCreateDateAsc: false // 保留排序参数
   }
-  const formFilters = reactive({ ...initialSearchState })
+  const formFilters = ref({ ...initialSearchState })
 
   // 分页信息 (用于驱动 ArtTable 分页器显示)
   const pagination = reactive({
@@ -315,7 +315,7 @@
     loading.value = true
     try {
       // 使用 formFilters 发送请求
-      const res = await LogService.getLogList(formFilters as LogListParams)
+      const res = await LogService.getLogList(formFilters.value as LogListParams)
       if (res.success) {
         logList.value = res.data.records
         pagination.total = res.data.total
@@ -335,13 +335,13 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadLogList()
   }
 
   // 重置查询 (handleReset for ArtSearchBar)
   const handleReset = () => {
-    Object.assign(formFilters, { ...initialSearchState })
+    Object.assign(formFilters.value, { ...initialSearchState })
     loadLogList()
   }
 
@@ -385,14 +385,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadLogList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadLogList()
   }
 

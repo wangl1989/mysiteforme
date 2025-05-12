@@ -10,7 +10,6 @@ import com.mysiteforme.admin.redis.RedisStatsUtil;
 import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.service.RoleService;
-import com.mysiteforme.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -48,8 +47,6 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
 
     private final RedisUtils redisUtils;
 
-    private final UserService userService;
-
     private final MenuService menuService;
 
     private final PermissionDao permissionDao;
@@ -80,8 +77,8 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
         // 访问总数
         Integer thisTotalCount = response.getAllTotalVisits();
         // 上周访问总数
-        Integer lastTotalCount = totalStatsResponse.getTotalTotalVisits();
-        if(lastTotalCount != null && lastTotalCount != 0){
+        int lastTotalCount = totalStatsResponse == null ? 0 : totalStatsResponse.getTotalTotalVisits();
+        if(lastTotalCount != 0){
             if(thisTotalCount == null || thisTotalCount  == 0){
                 response.setVisitsPercent(0);
             }else {
@@ -100,10 +97,10 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
         // 获取上周各项平均数据
         LastWeekStatsResponse lastWeekAvgData =  redisStatsUtil.getLastWeekStats(baseMapper);
         // 获取上周平均每天独立访客数量
-        Integer lastWeekUniqueVisitors = lastWeekAvgData.getAvgUniqueVisitors();
+        int lastWeekUniqueVisitors = lastWeekAvgData == null ? 0 :lastWeekAvgData.getAvgUniqueVisitors();
         // 获取今天的独立访客数量
         Integer todayUniqueVisitors = response.getUniqueVisitors();
-        if(lastWeekUniqueVisitors != null && lastWeekUniqueVisitors != 0){
+        if(lastWeekUniqueVisitors != 0){
             if(todayUniqueVisitors == null || todayUniqueVisitors == 0){
                 response.setVisitorsPercent(0);
             }else{
@@ -121,10 +118,10 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
             response.setVisitorsPercent(100);
         }
         // 获取上周平均每天的点击量
-        Integer lastWeekClick = lastWeekAvgData.getAvgTotalClicks();
+        int lastWeekClick = lastWeekAvgData == null ? 0 : lastWeekAvgData.getAvgTotalClicks();
         // 获取今天的点击量
         Integer todayClick = response.getTotalClicks();
-        if(lastWeekClick != null && lastWeekClick != 0){
+        if(lastWeekClick != 0){
             if(todayClick == null || todayClick == 0){
                 response.setClickPercent(0);
             }else{
@@ -141,10 +138,10 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
             response.setClickPercent(100);
         }
         // 获取上周平均每天的新用户数量
-        Integer lastWeekNewUser = lastWeekAvgData.getAvgNewUsers();
+        int lastWeekNewUser = lastWeekAvgData == null ? 0 : lastWeekAvgData.getAvgNewUsers();
         // 获取今天的新用户数量
         Integer todayNewUser = response.getNewUsers();
-        if(lastWeekNewUser != null && lastWeekNewUser != 0){
+        if(lastWeekNewUser != 0){
             if(todayNewUser == null || todayNewUser == 0){
                 response.setNewUserPercent(0);
             }else{
@@ -158,10 +155,10 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsDao, DailyStats
                 }
             }
         }else{
-            if(todayNewUser > 0) {
-                response.setNewUserPercent(100);
-            }else{
+            if(todayNewUser == null || todayNewUser == 0) {
                 response.setNewUserPercent(0);
+            }else{
+                response.setNewUserPercent(100);
             }
         }
         // 设置总用户数量

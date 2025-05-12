@@ -253,7 +253,7 @@
   }
 
   // 响应式搜索表单数据 (包含来自 props 的固定参数)
-  const formFilters = reactive<TableFieldListParam>({
+  const formFilters = ref<TableFieldListParam>({
     ...initialSearchState,
     schemaName: props.schemaName,
     tableName: props.tableName,
@@ -356,7 +356,7 @@
     try {
       // 使用 formFilters (已包含 schema, table 等信息)
       const res = await TableService.getFieldList({
-        ...formFilters,
+        ...formFilters.value,
         tableName: tableInfo.tableName, // 确保使用最新的tableInfo值
         schemaName: tableInfo.schemaName,
         tableType: tableInfo.tableType
@@ -386,16 +386,16 @@
         tableInfo.schemaName = props.schemaName
         tableInfo.tableType = props.tableType
 
-        formFilters.tableName = props.tableName
-        formFilters.schemaName = props.schemaName
-        formFilters.tableType = props.tableType
+        formFilters.value.tableName = props.tableName
+        formFilters.value.schemaName = props.schemaName
+        formFilters.value.tableType = props.tableType
         // 重置搜索条件和分页
-        formFilters.columnName = initialSearchState.columnName
-        formFilters.page = initialSearchState.page
-        formFilters.limit = initialSearchState.limit
+        formFilters.value.columnName = initialSearchState.columnName
+        formFilters.value.page = initialSearchState.page
+        formFilters.value.limit = initialSearchState.limit
 
         // 确保有表名和数据库名再加载数据
-        if (formFilters.tableName && formFilters.schemaName) {
+        if (formFilters.value.tableName && formFilters.value.schemaName) {
           loadFieldList()
         } else {
           console.error('表名或数据库名为空，无法加载字段列表')
@@ -413,9 +413,9 @@
       tableInfo.schemaName = props.schemaName
       tableInfo.tableType = props.tableType
 
-      formFilters.tableName = props.tableName
-      formFilters.schemaName = props.schemaName
-      formFilters.tableType = props.tableType
+      formFilters.value.tableName = props.tableName
+      formFilters.value.schemaName = props.schemaName
+      formFilters.value.tableType = props.tableType
 
       loadFieldList()
     }
@@ -450,16 +450,16 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadFieldList()
   }
 
   // 重置查询
   const handleReset = () => {
     // 只重置搜索字段和分页，保持 schema/table 信息
-    formFilters.columnName = initialSearchState.columnName
-    formFilters.page = initialSearchState.page
-    formFilters.limit = initialSearchState.limit
+    formFilters.value.columnName = initialSearchState.columnName
+    formFilters.value.page = initialSearchState.page
+    formFilters.value.limit = initialSearchState.limit
     loadFieldList()
   }
 
@@ -470,14 +470,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadFieldList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadFieldList()
   }
 

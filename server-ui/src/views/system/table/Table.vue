@@ -327,7 +327,7 @@
   }
 
   // 响应式搜索表单数据
-  const formFilters = reactive<TableListParam>({ ...initialSearchState })
+  const formFilters = ref<TableListParam>({ ...initialSearchState })
 
   // 分页信息 (保留用于显示总数，或者可以直接从 formFilters 读取 current 和 size)
   const pagination = reactive({
@@ -462,7 +462,7 @@
     loading.value = true
     try {
       // 使用 formFilters 作为参数
-      const params: TableListParam = { ...formFilters }
+      const params: TableListParam = { ...formFilters.value }
       const res = await TableService.getTableList(params)
       if (res.success) {
         tableList.value = res.data.records
@@ -480,16 +480,16 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadTableList()
   }
 
   // 重置查询
   const handleReset = () => {
-    Object.assign(formFilters, initialSearchState) // 重置为初始状态
+    Object.assign(formFilters.value, initialSearchState) // 重置为初始状态
     // 可能需要保留 schemaName，如果它有默认值的话
     if (schemaNameList.value.length > 0 && !initialSearchState.schemaName) {
-      formFilters.schemaName = schemaNameList.value[0]
+      formFilters.value.schemaName = schemaNameList.value[0]
     }
     loadTableList()
   }
@@ -501,14 +501,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadTableList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadTableList()
   }
 
@@ -519,11 +519,11 @@
       if (res.success && res.data) {
         schemaNameList.value = res.data
         // 如果当前没有选择数据库，且有数据库列表，则默认选择第一个
-        if (!formFilters.schemaName && res.data.length > 0) {
-          formFilters.schemaName = res.data[0]
+        if (!formFilters.value.schemaName && res.data.length > 0) {
+          formFilters.value.schemaName = res.data[0]
           // 使用选择的数据库名称加载表格列表
           loadTableList()
-        } else if (formFilters.schemaName) {
+        } else if (formFilters.value.schemaName) {
           // 如果已经有选中的数据库，则直接加载
           loadTableList()
         }
@@ -538,7 +538,7 @@
 
   // 处理数据库名称变更 (通过 ArtSearchBar 的 change 事件或 Select 的 change 事件触发)
   const handleSchemaChange = () => {
-    formFilters.page = 1 // 切换数据库时重置到第一页
+    formFilters.value.page = 1 // 切换数据库时重置到第一页
     loadTableList()
   }
 
@@ -568,7 +568,7 @@
         formData.tableName = ''
 
         // 3. 设置新增时的默认值 (在 resetFields 之后设置)
-        formData.schemaName = formFilters.schemaName || '' // 使用当前选中的库名，或为空
+        formData.schemaName = formFilters.value.schemaName || '' // 使用当前选中的库名，或为空
       }
     })
   }

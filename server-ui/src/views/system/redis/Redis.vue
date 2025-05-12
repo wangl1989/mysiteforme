@@ -35,9 +35,7 @@
                 active-text="过期时间升序"
                 inactive-text="过期时间降序"
                 inline-prompt
-                style="
-
---el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
               />
             </el-form-item>
           </template>
@@ -115,7 +113,7 @@
   const sortByExpireAsc = ref(false)
 
   // 统一搜索和分页状态
-  const formFilters = reactive({ ...initialSearchState })
+  const formFilters = ref({ ...initialSearchState })
 
   // 搜索栏配置
   const formItems: SearchFormItem[] = [
@@ -319,7 +317,7 @@
     try {
       // Construct params including the separate sort state
       const params: RedisListParam = {
-        ...formFilters,
+        ...formFilters.value,
         sortByExpireAsc: sortByExpireAsc.value // Add sort param here
       }
       const res = await RedisApi.getRedisRecord(params)
@@ -339,13 +337,13 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // Ensure page reset on explicit search / sort change
+    formFilters.value.page = 1 // Ensure page reset on explicit search / sort change
     loadRedisList()
   }
 
   // 重置查询
   const handleReset = () => {
-    Object.assign(formFilters, initialSearchState)
+    Object.assign(formFilters.value, initialSearchState)
     sortByExpireAsc.value = false // Reset sort state as well
     loadRedisList()
   }
@@ -423,14 +421,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadRedisList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1
+    formFilters.value.limit = size
+    formFilters.value.page = 1
     loadRedisList()
   }
 

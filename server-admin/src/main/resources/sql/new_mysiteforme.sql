@@ -47,7 +47,7 @@ create table if not exists analytics_daily_stats
     remarks            varchar(255) null comment '备注',
     del_flag           tinyint      null comment '删除标记'
 )
-    comment '统计汇总表(按天)' charset = utf8mb3;
+    comment '统计汇总表(按天)' charset = utf8mb4;
 
 create table if not exists analytics_visit_logs
 (
@@ -79,7 +79,7 @@ create table if not exists analytics_visit_logs
     remarks      varchar(255) null comment '备注',
     del_flag     bit          null comment '删除标记'
 )
-    comment '访问记录表' charset = utf8mb3;
+    comment '访问记录表' charset = utf8mb4;
 
 create index idx_user_id
     on analytics_visit_logs (user_id);
@@ -111,7 +111,7 @@ create table if not exists blog_article
     remarks      varchar(255) null comment '备注',
     del_flag     tinyint      null comment '删除标记'
 )
-    comment '博客内容' charset = utf8mb3;
+    comment '博客内容' charset = utf8mb4;
 
 create table if not exists blog_article_tags
 (
@@ -120,7 +120,7 @@ create table if not exists blog_article_tags
     article_id bigint not null comment '文章ID,0,NO,false,false,false',
     tags_id    bigint not null comment '标签ID,0,NO,false,false,false'
 )
-    comment '博客标签' charset = utf8mb3;
+    comment '博客标签' charset = utf8mb4;
 
 create table if not exists blog_channel
 (
@@ -148,7 +148,7 @@ create table if not exists blog_channel
     remarks         varchar(255)  null comment '备注',
     del_flag        tinyint       null comment '删除标记'
 )
-    comment '博客栏目' charset = utf8mb3;
+    comment '博客栏目' charset = utf8mb4;
 
 create table if not exists blog_comment
 (
@@ -172,7 +172,7 @@ create table if not exists blog_comment
     remarks        varchar(255) null comment '备注',
     del_flag       tinyint      null comment '删除标记'
 )
-    comment '博客评论' charset = utf8mb3;
+    comment '博客评论' charset = utf8mb4;
 
 create table if not exists blog_tags
 (
@@ -187,7 +187,7 @@ create table if not exists blog_tags
     remarks     varchar(255) null comment '备注',
     del_flag    tinyint      null comment '删除标记'
 )
-    comment '博客标签' charset = utf8mb3;
+    comment '博客标签' charset = utf8mb4;
 
 create table if not exists gw_channel
 (
@@ -206,7 +206,7 @@ create table if not exists gw_channel
     remarks     varchar(255)  null comment '备注',
     del_flag    tinyint       null comment '删除标记'
 )
-    comment '官网栏目' charset = utf8mb3;
+    comment '官网栏目' charset = utf8mb4;
 
 create table if not exists hat_area
 (
@@ -216,7 +216,7 @@ create table if not exists hat_area
     area   varchar(255) null,
     father varchar(255) null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 create table if not exists qrtz_calendars
 (
@@ -440,7 +440,7 @@ create table if not exists quartz_task
     remarks      varchar(255) null comment '备注',
     del_flag     tinyint      null comment '删除标记'
 )
-    comment '定时任务' charset = utf8mb3;
+    comment '定时任务' charset = utf8mb4;
 
 
 create table if not exists quartz_task_log
@@ -464,7 +464,7 @@ create table if not exists quartz_task_log
     remarks      varchar(255) null comment '备注',
     del_flag     tinyint      null comment '删除标记'
 )
-    comment '任务执行日志' charset = utf8mb3;
+    comment '任务执行日志' charset = utf8mb4;
 
 
 create table if not exists sys_dict
@@ -484,7 +484,7 @@ create table if not exists sys_dict
     remarks     varchar(255)            null comment '备注信息',
     del_flag    char        default '0' not null comment '删除标记'
 )
-    comment '字典表,测试表' collate = utf8mb3_bin;
+    comment '字典表,测试表' collate = utf8mb4_bin;
 
 create index sys_dict_del_flag
     on sys_dict (del_flag);
@@ -523,7 +523,7 @@ create table if not exists sys_group
     remarks     varchar(255)  null,
     del_flag    tinyint       null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 create table if not exists sys_group_ur
 (
@@ -532,7 +532,7 @@ create table if not exists sys_group_ur
     user_id  bigint null comment '用户ID',
     role_id  bigint null comment '角色ID'
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 create table if not exists sys_log
 (
@@ -562,7 +562,7 @@ create table if not exists sys_log
     remarks      varchar(255)            null,
     del_flag     bit                     null
 )
-    comment '系统日志' collate = utf8mb3_bin;
+    comment '系统日志' collate = utf8mb4_bin;
 
 create index sys_log_create_by
     on sys_log (create_by);
@@ -610,7 +610,7 @@ create table if not exists sys_menu
     remarks              varchar(255)                       null,
     del_flag             tinyint                            null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 
 create index parent_id_pk
@@ -1102,7 +1102,7 @@ create table if not exists sys_rescource
     remarks          varchar(255) null comment '备注',
     del_flag         tinyint      null comment '删除标记'
 )
-    comment '系统资源' charset = utf8mb3;
+    comment '系统资源' charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_rescource (id, file_name, source, web_url, hash, file_size, file_type, original_net_url, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (29, 'd64aaf61-b3c5-4a06-98d5-63e03d578e7f.png', 'local', '/static/upload/d64aaf61-b3c5-4a06-98d5-63e03d578e7f.png', 'FtV6l-OYlq-pQRZ04Khozsb7xMLA', '13kb', 'image/png', null, '2025-02-12 01:30:58', 1, '2025-02-12 01:30:58', 1, null, 0);
 INSERT INTO mysiteforme.sys_rescource (id, file_name, source, web_url, hash, file_size, file_type, original_net_url, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (30, 'b3940187-4baf-457b-9c65-326c3668dfcf.jpg', 'local', '/static/upload/b3940187-4baf-457b-9c65-326c3668dfcf.jpg', 'Foyb-OM9yBiVEI4VZtHSMsuj9CZf', '0kb', '.jpg', 'https://d00.paixin.com/thumbs/1093689/42768051/staff_1024.jpg', '2025-02-12 01:33:12', 1, '2025-02-12 01:33:12', 1, null, 0);
@@ -1145,7 +1145,7 @@ create table if not exists sys_role
     remarks     varchar(255)     null,
     del_flag    tinyint          null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_role (id, name, is_default, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (1, '仅浏览', true, '2017-11-02 14:19:07', 1, '2025-05-11 22:04:54', 1, '只能仅浏览', 0);
 INSERT INTO mysiteforme.sys_role (id, name, is_default, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (2, '系统管理员', false, '2017-11-29 19:36:37', 1, '2025-04-27 13:47:11', 1, '123', 0);
@@ -1159,7 +1159,7 @@ create table if not exists sys_role_menu
     menu_id bigint not null,
     primary key (role_id, menu_id)
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_role_menu (role_id, menu_id) VALUES (1, 1);
 INSERT INTO mysiteforme.sys_role_menu (role_id, menu_id) VALUES (1, 2);
@@ -1375,7 +1375,7 @@ create table if not exists sys_site
     remarks          text         null,
     del_flag         bit          null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_site (id, name, url, open_message, is_no_name, version, author, author_icon, file_upload_type, weibo, qq, git, github, phone, email, address, logo, web_service_key, server, my_database, max_upload, keywords, description, powerby, record, create_by, create_date, update_by, update_date, remarks, del_flag) VALUES (1, '浪子回头', '暂无', true, false, '1.0', '', 'https://mysiteforme.oss-cn-beijing.aliyuncs.com/upload/d8aa0bdc-54e1-4a06-93b8-8d1b1676f262.jpg', 'local', 'https://weibo.com/u/2173866382', '111111', 'https://gitee.com/wanglingxiao/', 'https://github.com/wangl1989', '13776055111', '111111111@qq.com', 'avss', 'http://sup683keh.hn-bkt.clouddn.com/base/upload/9f8bd5d7-f5dc-4f81-bd10-5057ebc35616.png', 'EECBZ-AN3L4-SMRUX-K3VVE-GPHCZ-N3FEO', 'Windows', 'mysql', 3, '默认', '网站描述', '', '苏ICP备17063650号', 1, '2017-12-30 22:46:15', 1, '2025-05-06 13:48:45', '<p>北京时间2月11日，2025年WTA1000多哈站女单第二轮，中国一姐郑钦文迎来澳网后首秀，她作为7号种子对阵贾巴尔。郑钦文表现低迷以4-6和2-6连丢两盘，其中首盘挥霍3-1领先优势，最终总分0-2爆冷遭贾巴尔横扫止步次轮，也是生涯首次输给贾巴尔。</p><p><img src=\'https://nimg.ws.126.net/?url=http%3A%2F%2Fdingyue.ws.126.net%2F2025%2F0211%2F5847f514j00sriz3s00jld000md00elm.jpg&thumbnail=660x2147483647&quality=80&type=jpg\' alt=\'\' data-href=\'\' style=\'\'/><img src=\'http://sup683keh.hn-bkt.clouddn.com/base/upload/70ad0523-e837-440d-8af7-59e6de40b57f.png\' alt=\'QQ图片20240627013652.png\' data-href=\'\' style=\'\'/></p><p><img src=\'https://mysiteforme.oss-cn-beijing.aliyuncs.com/upload/d713fa7e-8fce-49bd-8758-509c1d9e192c.png\' alt=\'地图页-区域详情.png\' data-href=\'\' style=\'\'/></p><p><strong>【世界排名】</strong></p><p><strong>郑钦文世界排名第8名，是本站赛事女单7号种子，贾巴尔世界排名第35名。</strong></p><p><strong>【交锋情况】</strong></p><p><strong>双方过往生涯有过两次交锋，郑钦文取得两战全胜战绩。</strong></p><p><br></p><p><strong>【比赛回顾】</strong></p><p><strong>在今年的澳网赛事，作为上届澳网女单亚军的郑钦文，带伤作战总分0-2爆冷输给德国老将西格蒙德。如今郑钦文迎来澳网后首秀，她迎来与贾巴尔的对决。</strong></p><p><strong>本场首盘比赛，郑钦文首局比赛率先破发，贾巴尔立即回破追到1-1，郑钦文连破带保扩大3-1领先优势。贾巴尔连保带破再保发连赢三局比赛，郑钦文第8局保发追到4-4。贾巴尔连保带破再赢两局，郑钦文以4-6被逆转先丢一盘。</strong></p><p><strong>进入第二盘比赛，郑钦文状态依然低迷，被贾巴尔压制连丢三局0-3落后，且已经在比赛中连丢五局比赛。郑钦文第4局保发略微止住颓势，贾巴尔连保带破再赢两局，郑钦文前六局已经1-5落后。郑钦文第6局破发，但贾巴尔随后完成回破，郑钦文以2-6再丢一盘，最终总分0-2爆冷被贾巴尔横扫止步次轮。</strong></p><p><strong> </strong></p><p><br></p><p>&lt;script&gt;alert(1)&lt;/script&gt;</p><p><br></p><p><br></p><p>&lt;html&gt; </p><p style=\'text-align: justify;\'>花灯映月圆，万家共此时！中央广播电视总台《2025年元宵晚会》将于2月12日晚8点档与海内外观众见面。晚会在“欢乐吉祥、喜气洋洋”的总基调中，通过歌曲、舞蹈、相声、小品、戏曲、魔术等各类型的节目，呈上一席兼具传统意蕴与现代活力的团圆家宴，与全球观众共度上元之夜。</p><p style=\'text-align: justify;\'><br></p><p><strong> </strong></p><p style=\'text-align: center;\'><img src=\'https://nimg.ws.126.net/?url=http%3A%2F%2Fcms-bucket.ws.126.net%2F2025%2F0212%2Fea47dc73j00srjs9f00dfc001hc00u0c.jpg&amp;thumbnail=660x2147483647&amp;quality=80&amp;type=jpg\' alt=\'节目单来了！中央广播电视总台《2025年元宵晚会》邀您共度上元夜\' data-href=\'\' style=\'\'></p><p style=\'text-align: justify;\'>此前，美国有线电视新闻网（CNN）2月披露，CIA已向全体员工提出“买断”方案，承诺向主动辞职的员工提供八个月的薪资补偿。此外，美国国家情报总监办公室（ODNI）也已经向雇员提供了名为“分岔路”的提前退休计划，为其持续发放工资至9月30日。据悉，目前已有超过100人选择了该计划。</p><p style=\'text-align: center;\'><img src=\'https://nimg.ws.126.net/?url=http%3A%2F%2Fdingyue.ws.126.net%2F2025%2F0501%2Ff91e4074j00svkj8x0021d000m800etg.jpg&amp;thumbnail=660x2147483647&amp;quality=80&amp;type=jpg\' alt=\'\' data-href=\'\' style=\'\'><br><br></p><p style=\'text-align: justify;\'><br></p><p style=\'text-align: justify;\'>当地时间4月30日，马斯克参加特朗普的内阁会议</p><p><br></p>', false);
 
@@ -1539,7 +1539,7 @@ create table if not exists sys_upload_info
     remarks           varchar(255) null comment '备注',
     del_flag          tinyint      null comment '删除标记'
 )
-    comment '文件上传配置' charset = utf8mb3;
+    comment '文件上传配置' charset = utf8mb4;
 
 create table if not exists sys_user
 (
@@ -1561,7 +1561,7 @@ create table if not exists sys_user
     remarks     varchar(255)  null,
     del_flag    tinyint       null
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_user (id, login_name, nick_name, icon, password, salt, tel, email, locked, location, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (1, 'test', '超级管理员', 'http://sup683keh.hn-bkt.clouddn.com/base/upload/f4a7d874-0838-4864-961b-63bddb660370.png', '$2a$10$FPnBPlXZY1qqs7T/htZzqukLGve7QGqJNEUkh16tf56LaDri/BnGm', '3fb62b5aeede1bbf', '13776055177', '111@qq.com', 0, '江苏省南通市如皋市', '2017-11-27 21:19:39', 1, '2025-05-12 12:20:59', 1, '121313121313hhhhhh1212', 0);
 INSERT INTO mysiteforme.sys_user (id, login_name, nick_name, icon, password, salt, tel, email, locked, location, create_date, create_by, update_date, update_by, remarks, del_flag) VALUES (2, '22oo00', '我是测试员工', '/static/upload/0f02f26e-ec05-4bd3-94c6-3f48d5d6f614.png', '$2a$10$1XhANfIJwUCsDjmk6tXo/OhIoIYtVlpDYLm68AMhOXcnAWedqaJkG', '3fb62b5aeede1bbf', '13776055179', 'b21313@qq.com', 0, null, '2017-11-27 22:19:39', 1, '2025-04-30 22:19:19', 1, 'ssss', 0);
@@ -1633,7 +1633,7 @@ create table if not exists sys_user_role
     role_id bigint not null,
     primary key (user_id, role_id)
 )
-    charset = utf8mb3;
+    charset = utf8mb4;
 
 INSERT INTO mysiteforme.sys_user_role (user_id, role_id) VALUES (1, 1);
 INSERT INTO mysiteforme.sys_user_role (user_id, role_id) VALUES (1, 2);

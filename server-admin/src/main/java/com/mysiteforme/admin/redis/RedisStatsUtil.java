@@ -72,8 +72,10 @@ public class RedisStatsUtil {
             return (TotalStatsResponse)redisTemplate.opsForValue().get(RedisConstants.ANALYTICS_LAST_WEEK_TOTAL_KEY);
         }
         TotalStatsResponse response = dao.findTotalStats(true);
-        redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_LAST_WEEK_TOTAL_KEY,response);
-        redisTemplate.expire(RedisConstants.ANALYTICS_LAST_WEEK_TOTAL_KEY,2,TimeUnit.DAYS);
+        if(response != null) {
+            redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_LAST_WEEK_TOTAL_KEY, response);
+            redisTemplate.expire(RedisConstants.ANALYTICS_LAST_WEEK_TOTAL_KEY, 2, TimeUnit.DAYS);
+        }
         return response;
     }
 
@@ -85,16 +87,25 @@ public class RedisStatsUtil {
             return;
         }
         TotalStatsResponse response = dao.findTotalStats(false);
-        // 设置当天的SQL查询缓存
-        redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_TOTAL_DATA_KEY + getTodayKey(),response);
-        redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_DATA_KEY + getTodayKey(),2,TimeUnit.DAYS);
-        // 设置总访问缓存
-        redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_VISITS_KEY,response.getTotalTotalVisits());
-        redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_VISITS_KEY,2,TimeUnit.DAYS);
-        // 设置总点击缓存
-        redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_CLICK_KEY, response.getTotalTotalVisits());
-        redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_CLICK_KEY,2,TimeUnit.DAYS);
-
+        if(response != null) {
+            // 设置当天的SQL查询缓存
+            redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_TOTAL_DATA_KEY + getTodayKey(), response);
+            redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_DATA_KEY + getTodayKey(), 2, TimeUnit.DAYS);
+            // 设置总访问缓存
+            if (response.getTotalTotalVisits() != null && response.getTotalTotalVisits() != 0) {
+                redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_VISITS_KEY, response.getTotalTotalVisits());
+            } else {
+                redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_VISITS_KEY);
+            }
+            redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_VISITS_KEY, 2, TimeUnit.DAYS);
+            // 设置总点击缓存
+            if (response.getTotalClicks() != null && response.getTotalClicks() != 0) {
+                redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_CLICK_KEY, response.getTotalClicks());
+            } else {
+                redisTemplate.opsForValue().increment(RedisConstants.ANALYTICS_TOTAL_CLICK_KEY);
+            }
+            redisTemplate.expire(RedisConstants.ANALYTICS_TOTAL_CLICK_KEY,2,TimeUnit.DAYS);
+        }
     }
 
     /**
@@ -105,8 +116,10 @@ public class RedisStatsUtil {
             return (LastWeekStatsResponse)redisTemplate.opsForValue().get(RedisConstants.ANALYTICS_LAST_WEEK_DATA_KEY);
         }
         LastWeekStatsResponse response = dao.findLastWeekAvgData();
-        redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_LAST_WEEK_DATA_KEY,response);
-        redisTemplate.expire(RedisConstants.ANALYTICS_LAST_WEEK_DATA_KEY,2,TimeUnit.DAYS);
+        if(response != null) {
+            redisTemplate.opsForValue().set(RedisConstants.ANALYTICS_LAST_WEEK_DATA_KEY, response);
+            redisTemplate.expire(RedisConstants.ANALYTICS_LAST_WEEK_DATA_KEY, 2, TimeUnit.DAYS);
+        }
         return response;
     }
 
