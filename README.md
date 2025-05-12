@@ -3,6 +3,7 @@
 **mysiteforme** 是一个基于 Spring Boot 开发的轻量级系统脚手架，旨在帮助开发者快速搭建属于自己的系统后台。系统集成了用户管理、角色管理、权限管理、资源管理、数据库管理、代码生成等功能，适合作为中小型项目的基础框架。
 
 ## 项目特点
+- **前后端分离**：server-admin为后端项目源码,server-ui为前端项目源码。
 - **快速开发**：提供了自动生成前后台基本代码的功能，减少重复劳动。
 - **轻量高效**：基于 Spring Boot，性能优越，部署简单。
 - **功能全面**：内置用户、角色、权限等管理模块，支持扩展。
@@ -57,26 +58,29 @@
 ## 项目结构
 ```
 ├── docs/                 # 项目文档
-├── src/                  # 源代码
-│   ├── main/             # 主程序
-│   │   ├── java/         # Java 源代码
-│   │   ├── resources/    # 配置文件及静态资源
-│   └── test/             # 测试代码
-├── pom.xml               # Maven 配置文件
+├── server-admin/         # 后端项目
+│   └─ src/                  # 源码
+│       ├── main/             # 主程序
+│       │   ├── java/         # Java 源码
+│       │   ├── resources/    # 配置文件及静态资源
+│       └── test/             # 测试代码
+│       └── pom.xml           # Maven 配置文件
+├── server-ui/            # 前端项目
+│   └─ src/                   # 源码
 └── README.md             # 项目说明文件
 ```
 
 ## 截图预览
 ### 系统登录
-![](/src/main/resources/static/images/login.png)
+![](server-admin/src/main/resources/static/images/login.png)
 ### 系统菜单
-![](/src/main/resources/static/images/menu_manager.png)
+![](server-admin/src/main/resources/static/images/menu_manager.png)
 ### 系统权限
-![](/src/main/resources/static/images/permission_manager.png)
+![](server-admin/src/main/resources/static/images/permission_manager.png)
 ### 数据表
-![](/src/main/resources/static/images/table.png)
+![](server-admin/src/main/resources/static/images/table.png)
 ### 权限分配
-![](/src/main/resources/static/images/permission_assgin.png)
+![](server-admin/src/main/resources/static/images/permission_assgin.png)
 
 ## 贡献指南
 欢迎提交 Issue 或 Pull Request，为项目贡献代码或建议。
