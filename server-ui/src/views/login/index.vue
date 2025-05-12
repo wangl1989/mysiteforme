@@ -266,7 +266,8 @@
           refreshToken: userStore.info.refreshToken || ''
         })
         userStore.setLoginStatus(true)
-        showLoginSuccessNotice()
+        userStore.saveUserData()
+        showLoginSuccessNotice(userData.nickName ? userData.nickName : userData.loginName)
         router.push(HOME_PAGE)
       } else {
         // 获取用户信息失败视为登录流程失败
@@ -285,7 +286,7 @@
   }
 
   // 登录成功提示
-  const showLoginSuccessNotice = () => {
+  const showLoginSuccessNotice = (name: string) => {
     setTimeout(() => {
       ElNotification({
         title: t('login.success.title'),
@@ -293,7 +294,7 @@
         showClose: false,
         duration: 2500,
         zIndex: 10000,
-        message: `${t('login.success.message')}, ${systemName}!`
+        message: `${t('login.success.message')}, ${name}!`
       })
     }, 300)
   }

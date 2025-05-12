@@ -17,18 +17,22 @@ spring:
     rollback-on-commit-failure: true
   mail:
     host: smtp.163.com
-    port: 25
+    port: 465
     protocol: smtp
     username: mysiteforme@163.com
     password: DFbdcXzG9C3wueLP
     properties:
       mail:
         smtp:
+          port:  465
           auth: true
           starttls:
             enable: true
           connectiontimeout: 10000
           timeout: 10000
+          socketFactory:
+            fallback: false
+            class: javax.net.ssl.SSLSocketFactory
     test-connection: true
 
   #视图配置
@@ -250,8 +254,8 @@ spring:
   datasource:
     druid:
       url: jdbc:mysql://localhost:3306/mysiteforme?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-      username: root
-      password: 123456
+      username: mysiteforme
+      password: rYhkf3riLyaAGsMR
 
 #日志
 logging:

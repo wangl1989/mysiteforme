@@ -214,11 +214,11 @@
   }
 
   // 响应式表单数据
-  const formFilters = reactive({ ...initialSearchState })
+  const formFilters = ref({ ...initialSearchState })
 
   // 重置表单
   const handleReset = () => {
-    Object.assign(formFilters, { ...initialSearchState })
+    Object.assign(formFilters.value, { ...initialSearchState })
     // 重新加载数据
     loadUserData()
   }
@@ -404,7 +404,7 @@
     loading.value = true
     try {
       // 直接使用 formFilters，因为它现在包含了所有参数
-      const response = await UserService.getUserList(formFilters as UserListParams)
+      const response = await UserService.getUserList(formFilters.value as UserListParams)
       if (response.success) {
         tableData.value = response.data.records
         // 更新分页组件状态 (pagination 对象)
@@ -529,20 +529,20 @@
   }
 
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadUserData()
   }
 
   // 处理分页变化
   const handlePageChange = (page: number) => {
-    formFilters.page = page // 更新 formFilters 中的页码
+    formFilters.value.page = page // 更新 formFilters 中的页码
     loadUserData()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size // 更新 formFilters 中的每页数量
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size // 更新 formFilters 中的每页数量
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadUserData()
   }
 

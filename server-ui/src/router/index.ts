@@ -6,7 +6,6 @@ import {
   RouteRecordRaw
 } from 'vue-router'
 import { ref } from 'vue'
-import Home from '@views/index/index.vue'
 import AppConfig from '@/config'
 import { useUserStore } from '@/store/modules/user'
 import { menuService } from '@/api/menuApi'
@@ -34,6 +33,9 @@ NProgress.configure({
 export type AppRouteRecordRaw = RouteRecordRaw & {
   hidden?: boolean
 }
+
+// 在 router/index.ts 中，将静态导入改为动态定义
+const Home = () => import('@views/index/index.vue')
 
 /** 首页路径常量 */
 export const HOME_PAGE = '/dashboard/console'

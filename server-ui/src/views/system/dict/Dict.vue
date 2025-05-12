@@ -173,7 +173,7 @@
   }
 
   // 统一搜索和分页状态
-  const formFilters = reactive({ ...initialSearchState })
+  const formFilters = ref({ ...initialSearchState })
 
   // 搜索栏配置 (Aligned with Account.vue structure)
   const formItems: SearchFormItem[] = [
@@ -301,7 +301,7 @@
     loading.value = true
     try {
       const params: DictListParams = {
-        ...formFilters,
+        ...formFilters.value,
         sortByCreateDateAsc: false,
         sortBySortAsc: true
       }
@@ -323,26 +323,26 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1
+    formFilters.value.page = 1
     loadDictList()
   }
 
   // 重置查询
   const handleReset = () => {
-    Object.assign(formFilters, initialSearchState)
+    Object.assign(formFilters.value, initialSearchState)
     loadDictList()
   }
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadDictList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1
+    formFilters.value.limit = size
+    formFilters.value.page = 1
     loadDictList()
   }
 

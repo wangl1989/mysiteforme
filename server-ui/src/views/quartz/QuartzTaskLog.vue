@@ -84,7 +84,7 @@
   }
 
   // 搜索表单数据
-  const formFilters = reactive<QuartzTaskLogListParams>({ ...initialSearchState })
+  const formFilters = ref<QuartzTaskLogListParams>({ ...initialSearchState })
 
   // 分页信息
   const pagination = reactive({
@@ -190,7 +190,7 @@
   const loadLogList = async () => {
     loading.value = true
     try {
-      const res = await QuartzTaskLogService.getQuartzTaskLogPageList(formFilters)
+      const res = await QuartzTaskLogService.getQuartzTaskLogPageList(formFilters.value)
       if (res.success) {
         logList.value = res.data.records
         pagination.total = res.data.total
@@ -207,13 +207,13 @@
 
   // 搜索
   const search = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadLogList()
   }
 
   // 重置查询
   const handleReset = () => {
-    Object.assign(formFilters, initialSearchState)
+    Object.assign(formFilters.value, initialSearchState)
     loadLogList()
   }
 
@@ -224,14 +224,14 @@
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadLogList()
   }
 
   // 处理每页显示数量变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadLogList()
   }
 

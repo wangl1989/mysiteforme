@@ -491,9 +491,14 @@
 
   // 处理头像URL
   const formatAvatar = (icon: string, userId: number) => {
-    if (!icon || icon === '' || !icon.startsWith('http')) {
+    if (!icon) {
       return `https://api.dicebear.com/9.x/adventurer/svg?seed=${userId}`
     }
+
+    if (icon.startsWith('upload')) {
+      return `${import.meta.env.VITE_API_URL}/` + icon
+    }
+
     return icon
   }
 

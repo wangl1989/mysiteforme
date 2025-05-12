@@ -140,12 +140,16 @@
             popper-style="border: 1px solid var(--art-border-dashed-color); border-radius: calc(var(--custom-radius) / 2 + 4px); padding: 5px 16px; 5px 16px;"
           >
             <template #reference>
-              <img class="cover" :src="userInfo.avatar" />
+              <img class="cover" :src="getImgUrl(`${userInfo.avatar}`, `${userInfo.id}`)" />
             </template>
             <template #default>
               <div class="user-menu-box">
                 <div class="user-head">
-                  <img class="cover" :src="userInfo.avatar" style="float: left" />
+                  <img
+                    class="cover"
+                    :src="getImgUrl(`${userInfo.avatar}`, `${userInfo.id}`)"
+                    style="float: left"
+                  />
                   <div class="user-wrap">
                     <span class="name">{{ userInfo.username }}</span>
                     <span class="email" v-if="userInfo.email">{{ userInfo.email }}</span>
@@ -275,6 +279,19 @@
 
   const visibleMenu = () => {
     settingStore.setMenuOpen(!menuOpen.value)
+  }
+
+  // 获取图片url
+  const getImgUrl = (url: string | undefined, userId: string | number) => {
+    if (!url) {
+      return `https://api.dicebear.com/9.x/adventurer/svg?seed=${userId}`
+    }
+
+    if (url.startsWith('upload')) {
+      return `${import.meta.env.VITE_API_URL}/` + url
+    }
+
+    return url
   }
 
   const goPage = (path: string) => {

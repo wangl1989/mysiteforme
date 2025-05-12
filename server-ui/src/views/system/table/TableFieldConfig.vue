@@ -445,7 +445,7 @@
   }
 
   // 响应式搜索表单数据
-  const formFilters = reactive<TableFieldConfigListParams & { isQueryField?: string }>({
+  const formFilters = ref<TableFieldConfigListParams & { isQueryField?: string }>({
     ...initialSearchState,
     isQueryField: undefined
   })
@@ -657,11 +657,11 @@
     fieldListLoading.value = true
     try {
       const params: TableFieldConfigListParams = {
-        ...formFilters,
+        ...formFilters.value,
         isQueryField:
-          formFilters.isQueryField === '1'
+          formFilters.value.isQueryField === '1'
             ? true
-            : formFilters.isQueryField === '0'
+            : formFilters.value.isQueryField === '0'
               ? false
               : undefined,
         tableConfigId: props.tableConfig.id
@@ -684,26 +684,26 @@
 
   // 搜索方法
   const handleSearch = () => {
-    formFilters.page = 1 // 搜索时重置为第一页
+    formFilters.value.page = 1 // 搜索时重置为第一页
     loadFieldData()
   }
 
   // 重置搜索
   const handleReset = () => {
-    Object.assign(formFilters, initialSearchState)
+    Object.assign(formFilters.value, initialSearchState)
     loadFieldData()
   }
 
   // 处理分页变化
   const handleCurrentChange = (page: number) => {
-    formFilters.page = page
+    formFilters.value.page = page
     loadFieldData()
   }
 
   // 处理每页条数变化
   const handleSizeChange = (size: number) => {
-    formFilters.limit = size
-    formFilters.page = 1 // 切换每页数量时重置为第一页
+    formFilters.value.limit = size
+    formFilters.value.page = 1 // 切换每页数量时重置为第一页
     loadFieldData()
   }
 
