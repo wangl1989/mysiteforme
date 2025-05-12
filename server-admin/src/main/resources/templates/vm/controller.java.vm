@@ -1,0 +1,139 @@
+#set($tableMapKey="table_config_$!table.name")
+package ${package.Controller};
+
+import ${package.Entity}.request.PageList${entity}Request;
+import org.springframework.web.bind.annotation.*;
+#if(${entityLombokModel})
+import lombok.RequiredArgsConstructor;
+#else
+import org.springframework.beans.factory.annotation.Autowired;
+#end
+
+import jakarta.validation.Valid;
+
+import com.mysiteforme.admin.annotation.SysLog;
+import ${package.Entity}.request.Add${entity}Request;
+import ${package.Entity}.request.Update${entity}Request;
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import org.springframework.beans.BeanUtils;
+
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+import com.mysiteforme.admin.util.Result;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * <p>
+ *
+ * $!cfg[$tableMapKey].businessName 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Slf4j
+#if(${restControllerStyle})
+@RestController
+#else
+@Controller
+#end
+@RequestMapping("/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${entityLombokModel})
+@RequiredArgsConstructor
+#end
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+#if(${entityLombokModel})
+    private final ${table.serviceName} ${table.entityPath}Service;
+#else
+    private ${table.serviceName} ${table.entityPath}Service;
+
+    @Autowired
+    public ${table.controllerName}(${table.serviceName} ${table.entityPath}Service){
+        this.${table.entityPath}Service = ${table.entityPath}Service;
+    }
+#end
+
+
+    @GetMapping("list")
+    public Result list(PageList${entity}Request request){
+        return  Result.success(${table.entityPath}Service.selectPage${entity}(request));
+    }
+
+    @PostMapping("add")
+    @SysLog("新增$!cfg[$tableMapKey].businessName数据")
+    public Result add(@RequestBody @Valid Add${entity}Request request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if($!cfg[$fieldMapKey].isUnique)
+        if(${table.entityPath}Service.get${field.capitalName}Count(request.get${field.propertyType}(),null)>0){
+            return Result.businessMsgError("$!cfg[$fieldMapKey].businessName已存在");
+        }
+#end
+#end
+#end
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(request,${table.entityPath});
+        ${table.entityPath}Service.saveOrUpdate${entity}(${table.entityPath});
+        return Result.success();
+    }
+
+    @PutMapping("edit")
+    @SysLog("编辑$!cfg[$tableMapKey].businessName数据")
+    public Result edit(@RequestBody @Valid Update${entity}Request request){
+        if(request == null){
+            return Result.objectNotNull();
+        }
+        ${entity} old${table.entityPath} = ${table.entityPath}Service.getById(request.getId());
+        if(old${table.entityPath} == null){
+            return Result.businessMsgError("$!cfg[$tableMapKey].businessName的ID值无效");
+        }
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if($!cfg[$fieldMapKey].isUnique)
+        if(${table.entityPath}Service.get${field.capitalName}Count(request.get${field.propertyType}(),request.getId())){
+            return Result.businessMsgError("$!cfg[$fieldMapKey].businessName已存在");
+        }
+#end
+#end
+#end
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(request,${table.entityPath});
+        ${table.entityPath}Service.saveOrUpdate${entity}(${table.entityPath});
+        return Result.success();
+    }
+
+    @DeleteMapping("delete")
+    @SysLog("删除$!cfg[$tableMapKey].businessName数据")
+    public Result delete(@RequestParam(value = "id",required = false)Long id){
+        if(null == id || 0 == id){
+            return Result.idIsNullError();
+        }
+        ${entity} ${table.entityPath} = ${table.entityPath}Service.getById(id);
+        if(${table.entityPath} == null){
+            return Result.businessMsgError("$!cfg[$tableMapKey].businessName的ID值无效");
+        }
+        ${table.entityPath}.setDelFlag(true);
+        ${table.entityPath}Service.updateById(${table.entityPath});
+        return Result.success();
+    }
+
+}
+#end

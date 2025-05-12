@@ -1,0 +1,86 @@
+#set($tableMapKey="table_config_$!table.name")
+export interface ${entity}Record {
+    id: number // $!cfg[$tableMapKey].businessName的ID值
+    createDate: string | null // 创建日期
+    updateId: number | 0 // 更新者ID
+    updateDate: string | null // 更新日期
+    delFlag: boolean | false // 删除标志
+    remarks?: string | null // 备注
+    createId: number | 0 // 创建者ID
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isListVisible)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}: boolean | false // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}: string | null // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}: number | 0 // $!cfg[$fieldMapKey].businessName
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    sort: number | 0 // 排序
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    parentId: number | 0 // 父级ID
+#end
+}
+
+/**
+ * $!cfg[$tableMapKey].businessName列表查询参数
+ */
+export interface ${entity}ListParams {
+    page: number // 页码
+    limit: number // 每页条数
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}?: boolean | false // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}?: string | null // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}?: number | 0 // $!cfg[$fieldMapKey].businessName
+#end
+#end
+#end
+    sortByCreateDateAsc?: boolean // 创建日期升序
+}
+
+/**
+ * 新增$!cfg[$tableMapKey].businessName请求参数
+ */
+export type Add${entity}Params {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}?: boolean | false // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}?: string | null // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}?: number | 0 // $!cfg[$fieldMapKey].businessName
+#end
+#end
+#end
+}
+
+/**
+ * 编辑$!cfg[$tableMapKey].businessName请求参数
+ */
+export interface Edit${entity}Params {
+    id: number // 字典ID（必填）
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if(${field.frontType.equals("boolean")})
+    ${field.propertyName}?: boolean | false // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("string")})
+    ${field.propertyName}?: string | null // $!cfg[$fieldMapKey].businessName
+#elseif(${field.frontType.equals("number")})
+    ${field.propertyName}?: number | 0 // $!cfg[$fieldMapKey].businessName
+#end
+#end
+#end
+}

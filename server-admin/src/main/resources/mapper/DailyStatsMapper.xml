@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.DailyStatsDao" >
+    <!--根据日期查找统计数据-->
+    <select id="findByStatDate" resultType="com.mysiteforme.admin.entity.DailyStats">
+        select * from analytics_daily_stats where stat_date = #{statDate}
+    </select>
+    <!--查找指定日期范围内的统计数据-->
+    <select id="findByStatDateBetweenOrderByStatDate" resultType="com.mysiteforme.admin.entity.DailyStats">
+        select * from analytics_daily_stats where stat_date between #{startDate} and #{endDate} order by stat_date
+    </select>
+    <!--获取最近N天的统计数据-->
+    <select id="findRecentStats" resultType="com.mysiteforme.admin.entity.DailyStats">
+        select
+            stat_date as statDate ,
+            total_visits as totalVisits
+        from analytics_daily_stats
+        where
+            stat_date >= DATE_SUB(CURDATE(),INTERVAL #{days} DAY)
+        order by stat_date
+    </select>
+    <!--获取上周各项平均数据-->
+    <select id="findLastWeekAvgData" resultType="com.mysiteforme.admin.entity.response.LastWeekStatsResponse">
+        select
+        avg(total_visits) as avgTotalVisits,
+        avg(unique_visitors) as avgUniqueVisitors,
+        avg(new_users) as avgNewUsers,
+        avg(total_clicks) as avgTotalClicks
+        from analytics_daily_stats
+        where
+            stat_date
+        BETWEEN DATE_SUB( DATE(CURDATE()),INTERVAL WEEKDAY(CURDATE()) + 7 DAY)
+        AND DATE_SUB(DATE(CURDATE()),INTERVAL WEEKDAY(CURDATE()) + 1 DAY)
+    </select>
+    <!--获取各项数据总和-->
+    <select id="findTotalStats" resultType="com.mysiteforme.admin.entity.response.TotalStatsResponse">
+        select
+        sum(total_visits) as totalTotalVisits,
+        sum(unique_visitors) as totalUniqueVisitors,
+        sum(new_users) as totalNewUsers,
+        sum(total_clicks) as totalClicks
+        from analytics_daily_stats
+        <if test="lastWeek != null and lastWeek">
+            where stat_date &lt;= DATE_SUB(DATE(CURDATE()), INTERVAL WEEKDAY(CURDATE()) + 1 DAY)
+        </if>
+    </select>
+    <!--获取年度访问量数据集合-->
+    <select id="getYearTrendStatsData" resultType="com.mysiteforme.admin.entity.DTO.YearTrendStatsDTO">
+        SELECT
+            DATE_FORMAT(stat_date, '%Y-%m-01') AS statDate,
+            SUM(total_visits) AS monthlyTotalVisits
+        FROM
+            analytics_daily_stats
+        WHERE
+            YEAR(stat_date) = YEAR(CURDATE())
+          AND (del_flag = 0 OR del_flag IS NULL)
+        GROUP BY
+            DATE_FORMAT(stat_date, '%Y-%m-01')
+    </select>
+    <!--获取当月访问量总数-->
+    <select id="getCurrentMonthVisitData" resultType="java.lang.Integer">
+        SELECT
+            SUM(total_visits) AS monthlyTotalVisits
+        FROM
+            analytics_daily_stats
+        WHERE
+            YEAR(stat_date) = YEAR(CURDATE())
+          AND MONTH(stat_date) = MONTH(CURDATE())
+    </select>
+
+    <!--获取用户权限数量-->
+    <select id="getPerCounByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+             SELECT DISTINCT sup.permission_id
+             FROM sys_user_permission sup
+                      LEFT JOIN sys_permission p ON sup.permission_id = p.id AND p.del_flag = FALSE
+             WHERE
+                 sup.user_id = #{userId}
+             UNION
+             SELECT
+                 DISTINCT p.id
+             FROM
+                 sys_user_role ur
+                     -- 单独权限关联
+                     LEFT JOIN sys_role r ON ur.role_id = r.id AND r.del_flag = FALSE
+                     LEFT JOIN sys_role_permission rp ON r.id = rp.role_id
+                     LEFT JOIN sys_permission p ON rp.permission_id = p.id AND p.del_flag
+             WHERE
+                 ur.user_id = #{userId}
+               AND p.id IS NOT NULL
+         ) t
+    </select>
+
+    <!--获取用户菜单数量-->
+    <select id="getMenuCountByUserId" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT m.id) AS menuCount
+        FROM
+            sys_user_role ur
+                LEFT JOIN sys_role r ON ur.role_id = r.id AND r.del_flag = FALSE
+                LEFT JOIN sys_role_menu rm ON r.id = rm.role_id
+                LEFT JOIN sys_menu m ON rm.menu_id = m.id AND m.del_flag = FALSE
+        WHERE
+            ur.user_id = #{userId}
+    </select>
+
+    <!--获取用户角色数量-->
+    <select id="getRoleCountByUserId" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT r.id) AS roleCount
+        FROM
+            sys_user_role ur
+                LEFT JOIN sys_role r ON ur.role_id = r.id
+        WHERE
+            r.del_flag = FALSE
+            AND ur.user_id = #{userId}
+    </select>
+</mapper>

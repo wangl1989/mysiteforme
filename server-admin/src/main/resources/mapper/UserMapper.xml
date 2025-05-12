@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.UserDao" >
+    <!-- 这儿定义一个resultMap -->
+    <resultMap type="com.mysiteforme.admin.entity.User" id="UserMap">
+        <id property="id" column="id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="password"  column="password"/>
+        <result property="salt"  column="salt"/>
+        <result property="locked" column="locked"/>
+        <result property="location" column="location"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="icon" column="icon" />
+        <collection property="roles"  ofType="com.mysiteforme.admin.entity.Role">
+            <result property="id" column="role.id"/>
+            <result property="name" column="role.name"/>
+        </collection>
+        <collection property="menus"  ofType="com.mysiteforme.admin.entity.Menu">
+            <result property="id" column="menu.id"/>
+            <result property="name" column="menu.name"/>
+            <result property="href" column="menu.href"/>
+            <result property="permission" column="menu.permission"/>
+            <result property="bgColor" column="menu.bgColor"/>
+            <result property="icon" column="menu.icon"/>
+            <result property="sort" column="menu.sort"/>
+        </collection>
+    </resultMap>
+
+    <select id="saveUserRoles">
+        insert into sys_user_role(user_id,role_id)
+        values
+        <foreach collection="roleIds" item="item" index="index" separator="," >
+            (#{userId},#{item.id})
+        </foreach>
+    </select>
+
+    <select id="selectUserMenuCount" resultType="java.util.Map">
+        select
+        (select count(*) from sys_user where del_flag =false) as "sys:user:list",
+        (select count(*) from sys_role where del_flag =false) as "sys:role:list",
+        (select count(*) from sys_menu where del_flag =false) as "sys:menu:list",
+        (select count(*) from sys_rescource where del_flag = false) as "sys:rescource:list",
+        (select count(*) from sys_log where del_flag = false) as "sys:log:list",
+        24 as "sys:site:list",
+        (select count(*) from information_schema.tables where table_schema='mysiteforme') as "sys:table:list",
+        (select count(*) from sys_dict where del_flag = false) as "sys:dict:list",
+        (select count(*) from blog_comment where del_flag =false) as "blog:comment:list",
+        (select count(*) from blog_article where del_flag = false) as "blog:article:list",
+        (select count(*) from blog_channel where del_flag = false) as "blog:channel:list",
+        (select count(*) from blog_tags where del_flag = false) as "blog:tags:list",
+        (select count(*) from quartz_task where del_flag = false) as "quartz:task:list",
+        (select count(*) from quartz_task_log where del_flag = false) as "quartz:log:list"
+    </select>
+
+
+    <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
+        delete from sys_user_role where user_id = #{userId}
+    </delete>
+
+    <resultMap id="permissionsMap" type="com.mysiteforme.admin.entity.VO.PermissionVO">
+        <id property="id" column="permission_id"/>
+        <result property="permissionName" column="permission_name"/>
+        <result property="permissionCode" column="permission_code"/>
+        <result property="permissionType" column="permission_type"/>
+        <result property="icon" column="permission_icon"/>
+        <result property="color" column="permission_color"/>
+        <result property="sort" column="permission_sort"/>
+        <result property="remarks" column="permission_remarks"/>
+        <result property="createDate" column="permission_create_date"/>
+        <result property="updateDate" column="permission_update_date"/>
+        <!-- 菜单信息 -->
+        <association property="menu"  javaType="com.mysiteforme.admin.entity.VO.MenuVO">
+            <id property="id" column="menu_id"/>
+            <result property="name" column="menu_name"/>
+            <result property="parentId" column="menu_parent_id"/>
+            <result property="parentIds" column="menu_parent_ids"/>
+            <result property="level" column="menu_level"/>
+            <result property="sort" column="menu_sort"/>
+            <result property="remarks" column="menu_remarks"/>
+        </association>
+
+        <!-- 按钮权限 -->
+        <association property="button" javaType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
+            <id property="id" column="button_id"/>
+            <result property="buttonKey" column="button_key"/>
+            <result property="buttonName" column="button_name"/>
+        </association>
+
+        <!-- 页面权限 -->
+        <association property="page" javaType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
+            <id property="id" column="page_id"/>
+            <result property="pageUrl" column="page_url"/>
+        </association>
+
+        <!-- API权限 -->
+        <association property="api" javaType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
+            <id property="id" column="api_id"/>
+            <result property="apiUrl" column="api_url"/>
+            <result property="httpMethod" column="http_method"/>
+            <result property="common" column="common"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="UserDetailMap" type="com.mysiteforme.admin.entity.VO.UserVO">
+        <!-- 用户基本信息 -->
+        <id property="id" column="id"/>
+        <result property="loginName" column="login_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="icon" column="icon"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="password" column="password"/>
+        <result property="remarks" column="remarks"/>
+        <result property="locked" column="locked"/>
+        <result property="location" column="location"/>
+
+
+        <!-- 角色集合 -->
+        <collection property="roles" ofType="com.mysiteforme.admin.entity.VO.RoleVO">
+            <id property="id" column="role_id"/>
+            <result property="name" column="role_name"/>
+            <result property="isDefault" column="role_is_default"/>
+            <result property="remarks" column="role_remarks"/>
+        </collection>
+
+        <!-- 菜单+权限集合 -->
+        <collection property="permissions" resultMap="permissionsMap" />
+    </resultMap>
+
+
+    <resultMap id="pageListUserResponseMap" type="com.mysiteforme.admin.entity.response.PageListUserResponse">
+        <id property="id" column="u_id"/>
+        <result property="loginName" column="u_login_name"/>
+        <result property="nickName" column="u_nick_name"/>
+        <result property="icon" column="u_icon"/>
+        <result property="email" column="u_email"/>
+        <result property="tel" column="u_tel"/>
+        <result property="locked" column="u_locked"/>
+        <result property="location" column="u_location"/>
+        <result property="delFlag" column="u_del_flag"/>
+        <result property="remarks" column="u_remarks"/>
+        <result property="createUserNickName" column="create_user_nick_name"/>
+        <result property="createUserLoginName" column="create_user_login_name"/>
+        <result property="createId" column="u_create_by"/>
+        <result property="createDate" column="u_create_date"/>
+        <result property="updateUserNickName" column="update_user_nick_name"/>
+        <result property="updateUserLoginName" column="update_user_login_name"/>
+        <result property="updateId" column="u_update_by"/>
+        <result property="updateDate" column="u_update_date"/>
+        <collection property="roles" ofType="com.mysiteforme.admin.entity.response.BaseRoleResponse">
+            <id property="id" column="user_role_id"/>
+            <result property="name" column="user_role_name" />
+            <result property="isDefault" column="user_role_is_default"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectPageUser" resultMap="pageListUserResponseMap">
+        SELECT
+            u.id    AS u_id,
+            u.login_name AS u_login_name,
+            u.nick_name AS u_nick_name,
+            u.icon AS u_icon,
+            u.tel AS u_tel,
+            u.email AS u_email,
+            u.del_flag AS u_del_flag,
+            u.remarks AS u_remarks,
+            u.locked AS u_locked,
+            u.location AS u_location,
+            u.create_date AS u_create_date,
+            u.update_date AS u_update_date,
+            u.create_by AS u_create_by,
+            u.update_by AS u_update_by,
+            cu.nick_name AS create_user_nick_name,
+            cu.login_name AS create_user_login_name,
+            uu.nick_name AS update_user_nick_name,
+            uu.login_name AS update_user_login_name,
+            -- 角色信息
+            r.id AS user_role_id,
+            r.name AS user_role_name,
+            r.is_default AS user_role_is_default
+        FROM sys_user u
+        LEFT JOIN sys_user_role ur ON u.id = ur.user_id
+        LEFT JOIN sys_role r ON r.id = ur.role_id AND r.del_flag = false
+        LEFT JOIN sys_user cu ON cu.id = u.create_by
+        LEFT JOIN sys_user uu ON uu.id = u.update_by
+        WHERE TRUE
+
+            <if test="ids != null and ids.size() > 0">
+                AND
+                u.id
+                in
+                <foreach item="item" index="index" collection="ids" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+    </select>
+
+    <!-- findUserDetailById -->
+    <select id="findUserDetailById"  resultMap="UserDetailMap">
+        SELECT
+            u.id,
+            u.login_name,
+            u.nick_name,
+            u.icon,
+            u.tel,
+            u.email,
+            u.password,
+            u.locked,
+            u.location,
+            u.remarks,
+            u.del_flag,
+            -- 角色信息
+            r.id AS role_id,
+            r.name AS role_name,
+            r.is_default AS role_is_default,
+            r.remarks AS role_remarks,
+            -- 权限信息
+            p.id AS permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.permission_type,
+            p.icon AS permission_icon,
+            p.sort AS permission_sort,
+            p.color AS permission_color,
+            p.remarks AS permission_remarks,
+            p.update_date AS permission_update_date,
+            p.create_date AS permission_create_date,
+            -- 菜单信息
+            m.id AS menu_id,
+            m.name AS menu_name,
+            m.parent_id AS menu_parent_id,
+            m.parent_ids AS menu_parent_ids,
+            m.level AS menu_level,
+            m.sort AS menu_sort,
+            m.remarks AS menu_remarks,
+            m.update_date,
+            -- 按钮权限
+            pb.id AS button_id,
+            pb.button_key,
+            pb.button_name,
+            -- 页面权限
+            pp.id AS page_id,
+            pp.page_url,
+            -- API权限
+            pa.id AS api_id,
+            pa.api_url,
+            pa.http_method,
+            pa.common
+        FROM
+            sys_user u
+                -- 单独权限关联
+                LEFT JOIN sys_user_permission up ON u.id = up.user_id
+                -- 角色权限关联
+                LEFT JOIN sys_user_role sur ON sur.user_id = u.id
+                LEFT JOIN sys_role r ON r.id = sur.role_id AND r.del_flag = 0
+                LEFT JOIN sys_role_permission rp ON rp.role_id = r.id
+                -- 具体权限关联
+                LEFT JOIN sys_permission p ON (p.id = up.permission_id OR p.id = rp.permission_id) AND p.del_flag = 0
+                LEFT JOIN sys_menu m ON m.id = p.menu_id
+                -- 具体权限项关联
+                LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = 0
+                LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = 0
+                LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = 0
+        WHERE
+            u.del_flag = FALSE
+        AND u.id = #{id}
+        ORDER BY m.sort DESC, m.update_date DESC, p.sort DESC, p.update_date DESC
+    </select>
+
+    <sql id="userDetailSql">
+
+    </sql>
+</mapper>

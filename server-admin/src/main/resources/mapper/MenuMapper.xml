@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.MenuDao" >
+    <!-- 这儿定义一个resultMap -->
+
+    <resultMap type="com.mysiteforme.admin.entity.Menu" id="getSelf">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentId" column="parentId"/>
+        <result property="level" column="level"/>
+        <result property="parentIds" column="parentIds"/>
+        <result property="sort" column="sort"/>
+        <result property="href" column="href"/>
+        <result property="target" column="target"/>
+        <result property="icon" column="icon"/>
+        <result property="isShow" column="isShow"/>
+        <result property="bgColor" column="bgColor"/>
+        <result property="permission" column="permission"/>
+        <result property="createId" column="createId"/>
+        <result property="createDate" column="createDate"/>
+        <result property="updateId" column="updateId"/>
+        <result property="updateDate" column="updateDate"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="delFlag"/>
+        <collection property="children" select="getMenus"  column="{parentId = id,isShow = myIsShow}">
+        </collection>
+    </resultMap>
+
+    <select id="getMenus" resultMap="getSelf" parameterType="java.util.Map">
+    SELECT
+        id,
+        name,
+        parent_id as "parentId",
+        parent_ids as "parentIds",
+        level,
+        sort,
+        href,
+        target,
+        icon,
+        color,
+        is_show as "isShow",
+        bg_color as "bgColor",
+        permission,
+        create_by as "createId",
+        create_date as "createDate",
+        update_by as "updateId",
+        update_date as "updateDate",
+        remarks,
+        del_flag as "delFlag",
+        #{isShow} as "myIsShow"
+    FROM sys_menu
+    where
+        del_flag = false
+        <choose>
+            <when test="parentId != null and parentId!='' ">
+                and parent_id = #{parentId}
+            </when>
+            <otherwise>
+                and parent_id is NULL
+            </otherwise>
+        </choose>
+        <if test="isShow == true">
+            and is_show = #{isShow}
+        </if>
+    ORDER BY sort desc
+    </select>
+
+
+    <!-- getUserIdsByMenuId -->
+
+    <select id="getUserIdsByMenuId" resultType="java.lang.Long">
+    SELECT DISTINCT
+        sup.user_id
+    FROM
+        sys_user_permission sup
+    LEFT JOIN sys_permission p  on p.id = sup.permission_id
+    WHERE p.menu_id = #{menuId}
+    UNION
+    SELECT
+        sur.user_id
+    FROM
+        sys_user_role sur
+    LEFT JOIN sys_role r on r.id = sur.role_id
+    LEFT JOIN sys_role_menu srm on srm.role_id = r.id
+    WHERE
+        srm.menu_id = #{menuId}
+    </select>
+
+    <select id="getUserMenus" resultMap="getUserMenusMap">
+    SELECT
+        m.id,
+        m.name,
+        m.parent_id    AS "parentId",
+        m.parent_ids   AS "parentIds",
+        m.sort,
+        m.level,
+        m.remarks,
+        m.path,
+        m.component,
+        m.create_date   AS  "createDate",
+        m.update_date   AS "updateDate",
+        m.title AS "meta.title",
+        m.icon AS "meta.icon",
+        m.color AS "meta.color",
+        m.show_badge            AS "meta.showBadge",
+        m.show_text_badge       AS "meta.showTextBadge",
+        m.is_hide               AS "meta.isHide",
+        m.is_hide_tab           AS "meta.isHideTab",
+        m.link                  AS "meta.link",
+        m.is_iframe             AS "meta.isIframe",
+        m.keep_alive            AS "meta.keepAlive",
+        m.is_in_main_container  AS "meta.isInMainContainer"
+    FROM
+        sys_menu m
+    LEFT JOIN sys_role_menu srm on srm.menu_id = m.id
+    LEFT JOIN sys_user_role sur on sur.role_id = srm.role_id
+    LEFT JOIN sys_user su on su.id = sur.user_id and su.del_flag = false
+    WHERE
+        m.del_flag = false
+    <if test="userId != null and userId != ''">
+        AND su.id = #{userId}
+    </if>
+    ORDER BY m.sort desc
+    </select>
+
+    <resultMap id="getUserMenusMap" type="com.mysiteforme.admin.entity.VO.MenuTreeVO">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentId" column="parentId"/>
+        <result property="parentIds" column="parentIds"/>
+        <result property="sort" column="sort"/>
+        <result property="level" column="level"/>
+        <result property="remarks" column="remarks"/>
+        <result property="path" column="path"/>
+        <result property="component" column="component"/>
+        <result property="createDate" column="createDate"/>
+        <result property="updateDate" column="updateDate"/>
+        <association property="meta" javaType="com.mysiteforme.admin.entity.VO.MenuMetaVO">
+                <result property="title" column="meta.title"/>
+                <result property="icon" column="meta.icon"/>
+                <result property="color" column="meta.color"/>
+                <result property="showBadge" column="meta.showBadge"/>
+                <result property="showTextBadge" column="meta.showTextBadge"/>
+                <result property="isHide" column="meta.isHide"/>
+                <result property="isHideTab" column="meta.isHideTab"/>
+                <result property="link" column="meta.link"/>
+                <result property="isIframe" column="meta.isIframe"/>
+                <result property="keepAlive" column="meta.keepAlive"/>
+                <result property="isInMainContainer" column="meta.isInMainContainer"/>
+        </association>
+    </resultMap>
+</mapper>

@@ -1,0 +1,44 @@
+#set($tableMapKey="table_config_$!table.name")
+package ${package.Service};
+
+import ${package.Entity}.request.PageList${entity}Request;
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+/**
+ * <p>
+ * $!cfg[$tableMapKey].businessName 服务类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${kotlin})
+interface ${table.serviceName} : ${superServiceClass}<${entity}>
+#else
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+    /**
+     * 分页查询$!cfg[$tableMapKey].businessName
+     */
+    IPage<${entity}> selectPage${entity}(PageList${entity}Request request);
+
+    /**
+     * 新增或编辑$!cfg[$tableMapKey].businessName
+     */
+    void saveOrUpdate${entity}(${entity} ${table.entityPath});
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isUnique)
+    /**
+     * 检查$!cfg[$fieldMapKey].businessName唯一性
+     */
+    Long get${field.capitalName}Count(${field.propertyType} ${field.propertyName},Long id);
+
+#end
+#end
+}
+#end

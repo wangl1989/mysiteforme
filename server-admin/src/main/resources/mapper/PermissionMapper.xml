@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.PermissionDao" >
+
+    <select id="selectApiByUrl" resultMap="apiByUrl" >
+        SELECT
+            a.id,
+            a.api_url,
+            a.http_method,
+            a.common
+        FROM
+            sys_permission_api a
+        LEFT JOIN sys_permission p ON p.id = a.permission_id
+        WHERE
+            a.api_url = #{apiUrl}
+        AND a.http_method = #{method}
+        AND a.del_flag = false
+        AND p.del_flag = false
+    </select>
+
+    <resultMap type="com.mysiteforme.admin.entity.VO.PermissionApiVO" id="apiByUrl">
+        <id property="id" column="id"/>
+        <result property="apiUrl" column="api_url"/>
+        <result property="httpMethod" column="http_method"/>
+        <result property="common" column="common"/>
+    </resultMap>
+
+    <delete id="removeUserPermissionByUserId">
+        DELETE FROM sys_user_permission WHERE user_id = #{userId}
+    </delete>
+
+    <insert id="saveUserPermission" parameterType="com.mysiteforme.admin.entity.request.AssignUserPermissionRequest">
+        INSERT INTO sys_user_permission (user_id,permission_id) VALUES
+        <foreach collection="ass.permissionIds" item="permissionId" separator=",">
+            (#{ass.userId},#{permissionId})
+        </foreach>
+    </insert>
+
+    <!-- allPermission -->
+
+    <select id="allPermission" resultMap="allPermissionMap">
+        SELECT
+            p.id,
+            p.permission_name,
+            p.permission_code,
+            p.permission_type,
+            p.icon,
+            p.color,
+            p.sort,
+            p.remarks,
+            p.update_date,
+            p.create_date,
+            m.id AS menu_id,
+            m.name AS menu_name,
+            m.parent_id AS menu_parent_id,
+            m.parent_ids AS menu_parent_ids,
+            m.level AS menu_level,
+            m.sort AS menu_sort,
+            m.remarks AS menu_remarks,
+            pb.id AS button_id,
+            pb.button_key,
+            pb.button_name,
+            pp.id AS page_id,
+            pp.page_url,
+            pa.id AS api_id,
+            pa.api_url,
+            pa.http_method,
+            pa.common
+        FROM
+            sys_permission p
+        LEFT JOIN sys_menu m ON m.id = p.menu_id AND m.del_flag = false
+        LEFT JOIN sys_permission_button pb ON pb.permission_id = p.id AND pb.del_flag = false
+        LEFT JOIN sys_permission_page pp ON pp.permission_id = p.id AND pp.del_flag = false
+        LEFT JOIN sys_permission_api pa ON pa.permission_id = p.id AND pa.del_flag = false
+        WHERE
+            p.del_flag = false
+        ORDER BY
+            p.sort DESC,p.update_date DESC
+    </select>
+
+    <select id="getAssinUserPermission" resultType="java.lang.Long">
+        SELECT
+            up.permission_id
+        FROM
+            sys_user_permission up
+        WHERE
+            up.user_id = #{userId}
+    </select>
+
+    <select id="permissionMaxSort" resultType="java.lang.Integer">
+        SELECT
+            max(sort)
+        FROM
+            sys_permission
+        WHERE
+            del_flag =false
+          AND
+            menu_id =#{menuId}
+          AND
+            permission_type = #{menuType}
+    </select>
+
+    <!--获取API图标基础信息-->
+    <select id="getApiIconInfo" resultType="com.mysiteforme.admin.entity.DTO.ApiDTO">
+        SELECT
+            p.id,
+            p.icon,
+            a.api_url AS url,
+            a.http_method as method
+        FROM
+            sys_permission p
+        LEFT JOIN
+            sys_permission_api a on a.permission_id = p.id AND a.del_flag = FALSE
+        WHERE p.del_flag = FALSE
+        AND a.api_url is not null
+
+    </select>
+
+    <resultMap type="com.mysiteforme.admin.entity.VO.PermissionVO" id="allPermissionMap">
+        <id property="id" column="id"/>
+        <result property="permissionName" column="permission_name"/>
+        <result property="permissionCode" column="permission_code"/>
+        <result property="permissionType" column="permission_type"/>
+        <result property="icon" column="icon"/>
+        <result property="color" column="color"/>
+        <result property="sort" column="sort"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <!-- 权限分组信息 -->
+        <association property="menu" javaType="com.mysiteforme.admin.entity.VO.MenuVO">
+            <id property="id" column="menu_id"/>
+            <result property="name" column="menu_name"/>
+            <result property="parentId" column="menu_parent_id"/>
+            <result property="parentIds" column="menu_parent_ids"/>
+            <result property="level" column="menu_level"/>
+            <result property="sort" column="menu_sort"/>
+            <result property="remarks" column="menu_remarks"/>
+        </association>
+        
+        <!-- 按钮权限 -->
+        <association property="button" javaType="com.mysiteforme.admin.entity.VO.PermissionButtonVO">
+            <id property="id" column="button_id"/>
+            <result property="buttonKey" column="button_key"/>
+            <result property="buttonName" column="button_name"/>
+        </association>
+        
+        <!-- 页面权限 -->
+        <association property="page" javaType="com.mysiteforme.admin.entity.VO.PermissionPageVO">
+            <id property="id" column="page_id"/>
+            <result property="pageUrl" column="page_url"/>
+        </association>
+        
+        <!-- API权限 -->
+        <association property="api" javaType="com.mysiteforme.admin.entity.VO.PermissionApiVO">
+            <id property="id" column="api_id"/>
+            <result property="apiUrl" column="api_url"/>
+            <result property="httpMethod" column="http_method"/>
+            <result property="common" column="common"/>
+        </association>
+    </resultMap>
+</mapper>

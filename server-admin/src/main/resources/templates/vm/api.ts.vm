@@ -1,0 +1,42 @@
+#set($tableMapKey="table_config_$!table.name")
+import request from '@/utils/http'
+import { PageResult, BaseResult } from '@/types/axios'
+import {
+    ${entity}Record,
+    ${entity}ListParams,
+    Add${entity}Params,
+    Edit${entity}Params
+} from './model/${table.entityPath}Model'
+
+export class ${entity}Service {
+    // 获取$!cfg[$tableMapKey].businessName分页列表
+    static get${entity}List(params: ${entity}ListParams) {
+        return request.get<PageResult<${entity}Record>>({
+            url: '/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/list',
+            params
+        })
+    }
+
+    // 新增$!cfg[$tableMapKey].businessName
+    static add${entity}(params: Add${entity}Params) {
+        return request.post<BaseResult>({
+            url: '/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/add',
+            params
+        })
+    }
+
+    // 编辑$!cfg[$tableMapKey].businessName
+    static update${entity}(params: Edit${entity}Params) {
+        return request.put<BaseResult>({
+            url: '/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/edit',
+            params
+        })
+    }
+
+    // 删除$!cfg[$tableMapKey].businessName
+    static delete${entity}(id: number) {
+        return request.del<BaseResult>({
+            url: `/api#if($!cfg[$tableMapKey].isSysFile)/admin#end#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end/delete?id=${id}`
+        })
+    }
+}

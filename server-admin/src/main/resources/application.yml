@@ -1,0 +1,274 @@
+#公共配置
+server:
+    port: 80
+    tomcat:
+      uri-encoding: UTF-8
+    error:
+      whitelabel:
+        enabled: false
+spring:
+  application:
+    name: mysiteforme
+  #激活哪一个环境的配置文件
+  profiles:
+    active: dev # 默认使用开发环境
+  transaction:
+    default-timeout: 30s
+    rollback-on-commit-failure: true
+  mail:
+    host: smtp.163.com
+    port: 25
+    protocol: smtp
+    username: mysiteforme@163.com
+    password: DFbdcXzG9C3wueLP
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+    test-connection: true
+
+  #视图配置
+  mvc:
+    static-path-pattern: /static/**
+    pathmatch:
+      matching-strategy: PATH_PATTERN_PARSER
+    problemdetails:
+      enabled: true
+  web:
+    resources:
+      add-mappings: false
+  #连接池配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # 公共配置放在这里
+      initialSize: 10
+      maxActive: 100
+      minIdle: 10
+      max-wait: 60000
+      aopPatterns: com.mysiteforme.admin.service
+      minEvictableIdleTimeMillis: 1800000
+      maxEvictableIdleTimeMillis: 1800000
+      timeBetweenEvictionRunsMillis: 60000
+      keepAlive: true
+      filters: stat,slf4j
+      filter:
+        slf4j:
+          enabled: true
+        stat:
+          enabled: true
+          logSlowSql: true
+          slowSqlMillis: 2000
+  quartz:
+    job-store-type: JDBC
+    jdbc:
+      initialize-schema: NEVER
+
+  #缓存配置
+  cache:
+      type: redis
+      cache-names: mysiteforme
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+#mybatisPlus
+mybatis-plus:
+  mapper-locations: classpath:mapper/**.xml
+  #实体扫描，多个package用逗号或者分号隔离
+  type-aliases-package: com.mysiteforme.admin.entity
+
+  global-config:
+    #是否打印MyBatis-Plus 的 LOGO的banner
+    banner: false
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+      table-underline: true
+      #自定义填充策略接口实现
+      # meta-object-handler: com.mysiteforme.admin.config.SysMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    # 添加以下配置
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+jwt:
+  secret: B374A26A71490437AA024E4FADD5B497FDFF1A8EA6FF12F6FB65AF2720B59CCF
+  access-token-expiration: 1800000      # 30分钟 = 30 * 60 * 1000
+  refresh-token-expiration: 604800000  # 7天 = 7 * 24 * 60 * 1000
+#配置相关文件/文件夹路径
+user-path:
+  # windows代码生成路径
+  windows-generate-dic: D://temp/site
+  #  linux代码生成路径
+  linux-generate-dic: /tmp/site
+  #  windows源码压缩包路径(%s 是占位符，用当前用户登录名替换)
+  windows-source-code-dic: D://temp/%s/源码.zip
+  #  linux源码压缩包路径(%s 是占位符，用当前用户登录名替换)
+  linux-source-code-dic: /tmp/%s/源码.zip
+  # windows基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
+  windows-upload-dic: file:D:/upload/
+  #  linux基础上传目录（注意：重要！！！一定要以/结尾，且必须以file:开头）
+  linux-upload-dic: file:/user/upload/
+
+---
+#开发环境配置
+server:
+  #端口
+  port: 8080
+spring:
+  config:
+    activate:
+      on-profile: dev
+  #redis配置
+  data:
+    redis:
+      database: 1
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      lettuce:
+        pool:
+          enabled: true        # 需要添加此配置
+          max-active: 8
+          max-idle: 1000
+          max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/mysiteforme?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+#日志
+logging:
+  charset:
+    console: UTF-8
+  config: classpath:log/logback.xml
+  file:
+    path: D:\log\mysiteforme
+  level:
+    root: INFO
+    com.mysiteforme.admin.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security: TRACE
+    org.springframework.cache: DEBUG
+
+#搜索文件生成包的位置
+#本地路径
+lucence-dic: D://lucence
+
+---
+#测试环境配置
+server:
+  #端口
+  port: 8085
+spring:
+  config:
+    activate:
+      on-profile: test
+  #redis配置
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      lettuce:
+        pool:
+          enabled: true        # 需要添加此配置
+          max-idle: 1000
+          max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/mysiteforme?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+      
+
+#日志
+logging:
+  config: classpath:log/logback.xml
+  file:
+    path: /home/log/mysiteforme
+  level:
+    root: INFO
+    com.mysiteforme: DEBUG
+    org.springframework: INFO
+
+#搜索文件生成包的位置
+#本地路径
+lucence-dic: home/mysiteforme/lucence
+
+---
+#生产环境配置
+server:
+  #端口
+  port: 8080
+spring:
+  config:
+    activate:
+      on-profile: pro
+  #redis配置
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      password:      # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      lettuce:
+        pool:
+          enabled: true        # 需要添加此配置
+          max-idle: 1000
+          max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          min-idle: 5       # 连接池中的最小空闲连接
+  # 数据源配置
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/mysiteforme?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
+
+#日志
+logging:
+  config: classpath:log/logback.xml
+  file:
+    path: /home/log/mysiteforme
+  level:
+    root: INFO
+    com.mysiteforme: DEBUG
+    org.springframework: INFO
+#搜索文件生成包的位置
+#阿里云路径
+lucence-dic : /opt/lucence
+
+
+
+
+
+
+

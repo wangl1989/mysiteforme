@@ -1,0 +1,445 @@
+{
+  "topBar": {
+    "search": {
+      "title": "Search"
+    },
+    "user": {
+      "userCenter": "User center",
+      "docs": "Document",
+      "github": "Github",
+      "lockScreen": "Lock screen",
+      "logout": "Log out"
+    }
+  },
+  "common": {
+    "tips": "Prompt",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "logOutTips": "Do you want to log out?"
+  },
+  "search": {
+    "placeholder": "Search page",
+    "historyTitle": "Search history",
+    "switchKeydown": "Navigate",
+    "selectKeydown": "Select"
+  },
+  "setting": {
+    "menuType": {
+      "title": "Menu Layout",
+      "list": ["Vertical", "Horizontal", "Mixed", "Dual"]
+    },
+    "theme": {
+      "title": "Theme Style",
+      "list": ["Light", "Dark", "System"]
+    },
+    "menu": {
+      "title": "Menu Style"
+    },
+    "color": {
+      "title": "Theme Color"
+    },
+    "box": {
+      "title": "Box Style",
+      "list": ["Border", "Shadow"]
+    },
+    "container": {
+      "title": "Container Width",
+      "list": ["Full", "Boxed"]
+    },
+    "basics": {
+      "title": "Basic Config",
+      "list": [
+        "Sidebar opens accordion",
+        "Show sidebar button",
+        "Show reload page button",
+        "Show crumb navigation",
+        "Show work tab",
+        "Show multilingual selection",
+        "Show top progress bar",
+        "Color Weakness Mode",
+        "Auto close settings center",
+        "Global watermark",
+        "Menu width",
+        "Page animation",
+        "Custom radius",
+        "Tab style"
+      ]
+    },
+    "tabStyle": {
+      "default": "Default",
+      "card": "Card",
+      "google": "Chrome"
+    }
+  },
+  "notice": {
+    "title": "Notice",
+    "btnRead": "Mark as read",
+    "bar": ["Notice", "Message", "Todo"],
+    "text": ["No"],
+    "viewAll": "View all"
+  },
+  "worktab": {
+    "btn": ["Close left", "Close right", "Close outher", "Close All"]
+  },
+  "console": {
+    "card": [
+      "Total visits",
+      "Number of online visitors",
+      "Visits",
+      "Number of articles",
+      "Number of messages",
+      "To do task"
+    ],
+    "histogram": {
+      "title": "Visits"
+    },
+    "plan": {
+      "title": "Plan"
+    },
+    "lingChart": {
+      "title": "Traffic trend"
+    },
+    "todo": {
+      "title": "To do task"
+    },
+    "pieChart": {
+      "title": "Classified statistics"
+    }
+  },
+  "login": {
+    "leftView": {
+      "title": "An Admin template focused on user experience",
+      "subTitle": "A sleek and practical interface for a great user experience"
+    },
+    "title": "Welcome back",
+    "subTitle": "Please enter your account and password and captcha to login",
+    "placeholder": [
+      "Please enter your account",
+      "Please enter your password",
+      "Please enter the captcha",
+      "Please slide to verify"
+    ],
+    "sliderText": "Please slide to verify",
+    "sliderSuccessText": "Verification successful",
+    "rememberPwd": "Remember password",
+    "forgetPwd": "Forgot password",
+    "btnText": "Login",
+    "noAccount": "No account yet?",
+    "register": "Register",
+    "success": {
+      "title": "Login successful",
+      "message": "Welcome back"
+    }
+  },
+  "forgetPassword": {
+    "title": "Forgot password?",
+    "subTitle": "Enter your email to reset your password",
+    "placeholder": "Please enter your email",
+    "submitBtnText": "Submit",
+    "backBtnText": "Back",
+    "rule": [
+      "Please enter your email",
+      "Please enter a valid email address",
+      "The verification code has been sent, please check your email",
+      "Failed to send email, please try again later"
+    ]
+  },
+  "forgetCheckEmail": {
+    "title": "check your email",
+    "subTitle1": "code has send to",
+    "subTitle2": "pelease enter code in your email",
+    "resendBtnText": "resent",
+    "checkBtnText": "check",
+    "backBtnText": "back",
+    "rule": [
+      "Please enter your email",
+      "The verification code has been resent",
+      "Failed to send, please try again",
+      "pelease enter code in your email",
+      "Email verified successfully",
+      "Verification failed, please check if the verification code is correct"
+    ]
+  },
+  "register": {
+    "title": "Create account",
+    "subTitle": "Welcome to join us, please fill in the following information to complete the registration",
+    "placeholder": [
+      "Please enter your account",
+      "Please enter your password",
+      "Please enter your password again",
+      "Please enter your email"
+    ],
+    "rule": [
+      "Please enter your password again",
+      "The two passwords are inconsistent!",
+      "The length is 3 to 20 characters",
+      "The password length cannot be less than 6 digits",
+      "Please agree to the privacy policy",
+      "Username must start with a letter, can only contain letters, numbers, underscores, and be 3-10 characters long",
+      "Password must contain 8-20 characters, including at least one uppercase letter, one lowercase letter and one number",
+      "Please enter a valid email address"
+    ],
+    "agreeText": "I agree",
+    "privacyPolicy": "Privacy policy",
+    "submitBtnText": "Register",
+    "hasAccount": "Already have an account?",
+    "toLogin": "To login",
+    "success": "Registration successful",
+    "emailVerified": "Your email has been verified",
+    "registerfied": "Registration failed, please try again later"
+  },
+  "sendEmail": {
+    "title": "Send email verification code",
+    "subTitle": "Please enter your email address, we will send the verification code to your email",
+    "placeholder": "Please enter your email",
+    "submitBtnText": "Send verification code",
+    "hasAccount": "Already have an account?",
+    "toLogin": "To login",
+    "rule": [
+      "Please enter your email",
+      "Please enter a valid email address",
+      "The email has been verified, please register directly",
+      "The verification code has been sent, please check your email",
+      "Failed to send email, please try again later"
+    ]
+  },
+  "checkEmail": {
+    "title": "Verify your email",
+    "subTitle1": "The verification code has been sent to",
+    "subTitle2": "Please enter the 6-digit verification code in your email",
+    "resendBtnText": "Resend",
+    "checkBtnText": "Verify",
+    "backBtnText": "Back to login",
+    "rule": [
+      "Email parameter missing, please resend the verification code",
+      "The verification code has been resent",
+      "Failed to send, please try again",
+      "Email verified successfully",
+      "Verification failed, please check if the verification code is correct"
+    ]
+  },
+  "lockScreen": {
+    "pwdError": "Password error",
+    "lock": {
+      "inputPlaceholder": "Please input lock screen password",
+      "btnText": "Lock"
+    },
+    "unlock": {
+      "inputPlaceholder": "Please input unlock password",
+      "btnText": "Unlock",
+      "backBtnText": "Back to login"
+    }
+  },
+  "analysis": {
+    "todaySales": {
+      "title": "Today's Sales",
+      "subtitle": "Sales Summary",
+      "export": "Export",
+      "cards": {
+        "totalSales": {
+          "label": "Total Sales",
+          "change": "+15%"
+        },
+        "totalOrder": {
+          "label": "Total Order",
+          "change": "+5%"
+        },
+        "productSold": {
+          "label": "Product Sold",
+          "change": "+2%"
+        },
+        "newCustomers": {
+          "label": "New Customers",
+          "change": "+8%"
+        }
+      },
+      "fromYesterday": "from yesterday"
+    },
+    "visitorInsights": {
+      "title": "Visitor Insights",
+      "legend": {
+        "loyalCustomers": "Loyal Customers",
+        "newCustomers": "New Customers"
+      }
+    },
+    "totalRevenue": {
+      "title": "Total Revenue",
+      "legend": {
+        "onlineSales": "Online Sales",
+        "offlineSales": "Offline Sales"
+      }
+    },
+    "customerSatisfaction": {
+      "title": "Customer Satisfaction",
+      "legend": {
+        "lastMonth": "Last Month",
+        "thisMonth": "This Month"
+      }
+    },
+    "targetVsReality": {
+      "title": "Target vs Reality",
+      "realitySales": {
+        "label": "Reality Sales",
+        "sublabel": "Global"
+      },
+      "targetSales": {
+        "label": "Target Sales",
+        "sublabel": "Commercial"
+      }
+    },
+    "topProducts": {
+      "title": "Top Products",
+      "columns": {
+        "name": "Name",
+        "popularity": "Popularity",
+        "sales": "Sales"
+      },
+      "products": {
+        "homeDecor": {
+          "name": "Home Decor Range",
+          "sales": "10%"
+        },
+        "disneyBag": {
+          "name": "Disney Princess Pink Bag 18\"",
+          "sales": "29%"
+        },
+        "bathroom": {
+          "name": "Bathroom Essentials",
+          "sales": "65%"
+        },
+        "smartwatch": {
+          "name": "Apple Smartwatches",
+          "sales": "32%"
+        },
+        "fitness": {
+          "name": "Fitness Tracker",
+          "sales": "78%"
+        },
+        "earbuds": {
+          "name": "Wireless Earbuds",
+          "sales": "41%"
+        }
+      }
+    },
+    "salesMappingCountry": {
+      "title": "Sales Mapping by Country"
+    },
+    "volumeServiceLevel": {
+      "title": "Volume vs Service Level",
+      "legend": {
+        "volume": "Volume",
+        "services": "Services"
+      }
+    }
+  },
+  "greeting": {
+    "dawn": "Good morning!",
+    "morning": "Good morning!",
+    "afternoon": "Good afternoon!",
+    "evening": "Good evening!"
+  },
+  "menus": {
+    "login": {
+      "title": "Login"
+    },
+    "register": {
+      "title": "Register"
+    },
+    "forgetPassword": {
+      "title": "Forget Password"
+    },
+    "outside": {
+      "title": "Outside"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "console": "Console",
+      "analysis": "Analysis",
+      "ecommerce": "Ecommerce"
+    },
+    "widgets": {
+      "title": "Components",
+      "iconList": "Icon List",
+      "iconSelector": "Icon Selector",
+      "imageCrop": "Image Crop",
+      "excel": "Excel Import Export",
+      "video": "Video Player",
+      "countTo": "Count To",
+      "wangEditor": "Wang Editor",
+      "watermark": "Watermark",
+      "contextMenu": "Context Menu",
+      "qrcode": "QR Code",
+      "drag": "Drag",
+      "textScroll": "Text Scroll",
+      "fireworks": "Fireworks",
+      "elementUI": "Component Overview"
+    },
+    "template": {
+      "title": "Template Center",
+      "chat": "Chat",
+      "cards": "Cards",
+      "banners": "Banners",
+      "charts": "Charts",
+      "map": "Map",
+      "calendar": "Calendar",
+      "pricing": "Pricing"
+    },
+    "article": {
+      "title": "Article Management",
+      "articleList": "Article List",
+      "articleDetail": "Article Detail",
+      "comment": "Comment",
+      "articlePublish": "Article Publish"
+    },
+    "user": {
+      "title": "User Management",
+      "account": "Account",
+      "department": "Department",
+      "role": "Role",
+      "userCenter": "User Center",
+      "userDetail": "User Detail"
+    },
+    "menu": {
+      "title": "Menu Management",
+      "menu": "Menu",
+      "permission": "Permission",
+      "nested": "Nested Menu",
+      "menu1": "Menu 1",
+      "menu2": "Menu 2",
+      "menu21": "Menu 2-1",
+      "menu3": "Menu 3",
+      "menu31": "Menu 3-1",
+      "menu32": "Menu 3-2",
+      "menu321": "Menu 3-2-1"
+    },
+    "result": {
+      "title": "Result Page",
+      "success": "Success",
+      "fail": "Fail"
+    },
+    "exception": {
+      "title": "Exception",
+      "forbidden": "403",
+      "notFound": "404",
+      "serverError": "500"
+    },
+    "system": {
+      "title": "System Settings",
+      "setting": "Setting",
+      "api": "API",
+      "log": "Log"
+    },
+    "safeguard": {
+      "title": "Safeguard",
+      "server": "Server"
+    },
+    "plan": {
+      "title": "Version Plan",
+      "log": "Change Log"
+    },
+    "help": {
+      "title": "Help Center",
+      "document": "Document"
+    }
+  }
+}

@@ -1,0 +1,734 @@
+#set($tableMapKey="table_config_$!table.name")
+<template>
+  <ArtTableFullScreen>
+    <div class="${table.entityPath}-page" id="table-full-screen">
+      <!-- 搜索栏 -->
+      <ArtSearchBar
+          v-model:filter="formFilters"
+          :items="formItems"
+          @reset="handleReset"
+          @search="search"
+          :isExpand="true"
+      ></ArtSearchBar>
+
+      <ElCard shadow="never" class="art-table-card">
+        <!-- 表格头部 -->
+        <ArtTableHeader
+            :columnList="columnOptions"
+            v-model:columns="columnChecks"
+            @refresh="load${entity}List"
+        >
+          <template #left>
+            <el-button type="primary" @click="handleAdd"  v-ripple>新增$!cfg[$tableMapKey].businessName </el-button>
+          </template>
+        </ArtTableHeader>
+
+        <!-- 表格 -->
+        <ArtTable
+            :data="${table.entityPath}List"
+            v-loading="loading"
+            :currentPage="formFilters.page"
+            :pageSize="formFilters.limit"
+            :total="pagination.total"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+            :marginTop="10"
+            height="100%"
+        >
+          <template #default>
+            <ElTableColumn v-for="col in columns" :key="col.prop || col.type" v-bind="col" />
+          </template>
+        </ArtTable>
+
+        <!-- 添加 $!cfg[$tableMapKey].businessName 对话框 -->
+        <ElDialog
+            v-model="addDialogVisible"
+            :title="'新增$!cfg[$tableMapKey].businessName'"
+            width="500px"
+            destroy-on-close
+        >
+          <el-form
+              ref="add${entity}FormRef"
+              :model="addFormData"
+              :rules="addRules"
+              label-width="100px"
+              class="${table.entityPath}-form"
+          >
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+            <el-form-item label="$!cfg[$fieldMapKey].businessName" prop="${field.propertyName}">
+#if($!cfg[$fieldMapKey].formComponentType == 'INPUT')
+              <el-input v-model="addFormData.${field.propertyName}" placeholder="请输入$!cfg[$fieldMapKey].businessName"></el-input>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'TEXTAREA')
+              <el-input
+                      v-model="addFormData.${field.propertyName}"
+                      type="textarea"
+                      :rows="3"
+                      :placeholder="请输入$!cfg[$fieldMapKey].businessName"
+              />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'SELECT')
+              <el-select v-model="addFormData.${field.propertyName}" placeholder="请选择$!cfg[$fieldMapKey].businessName" clearable style="width: 120px">
+                <el-option
+                    v-for="item in ${field.propertyName}Options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+              </el-select>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'DATE_PICKER' || $!cfg[$fieldMapKey].formComponentType == 'TIME_PICKER' || $!cfg[$fieldMapKey].formComponentType == 'DATETIME_PICKER' )
+              <el-date-picker
+                      v-model="addFormData.${field.propertyName}"
+                      placeholder="请选择$!cfg[$fieldMapKey].businessName"
+                      style="width: 100%"
+              />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'INPUT_NUMBER')
+              <el-input-number v-model="addFormData.${field.propertyName}" :min="0" placeholder="请输入$!cfg[$fieldMapKey].businessName" style="width: 100%" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'SWITCH')
+              <el-switch v-model="addFormData.${field.propertyName}" active-text="是" inactive-text="否" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'RADIO')
+              <el-radio-group v-model="addFormData.${field.propertyName}" >
+                <el-radio-button v-for="item in ${field.propertyName}Options" :value="item.value" :label="item.label">{{ item.label }}</el-radio-button>
+              </el-radio-group>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'CHECKBOX')
+              <el-checkbox v-for="item in ${field.propertyName}Options" v-model="addFormData.${field.propertyName}" :value="item.value" :label="item.label" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'IMAGE_UPLOAD')
+              <upload-img v-model="addFormData.${field.propertyName}" :image-url="getImgUrl(addFormData.${field.propertyName})" width="100%" min-width="120px"/>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'RICH_TEXT')
+              <ArtWangEditor v-model="addFormData.${field.propertyName}" />
+#end
+#end
+#end
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button :title="'取消新增$!cfg[$tableMapKey].businessName'"  @click="addDialogVisible = false" >取消</el-button>
+              <el-button :title="'保存新增$!cfg[$tableMapKey].businessName'" type="primary" @click="addSubmitForm" :loading="submitLoading" >确定</el-button>
+            </div>
+          </template>
+        </ElDialog>
+        <!-- 编辑 $!cfg[$tableMapKey].businessName 对话框 -->
+        <ElDialog
+                v-model="editDialogVisible"
+                :title="'编辑$!cfg[$tableMapKey].businessName'"
+                width="500px"
+                destroy-on-close
+        >
+          <el-form
+                  ref="edit${entity}FormRef"
+                  :model="editFormData"
+                  :rules="editRules"
+                  label-width="100px"
+                  class="${table.entityPath}-form"
+          >
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+              <el-form-item label="$!cfg[$fieldMapKey].businessName" prop="${field.propertyName}">
+#if($!cfg[$fieldMapKey].formComponentType == 'INPUT')
+                  <el-input v-model="editFormData.${field.propertyName}" placeholder="请输入$!cfg[$fieldMapKey].businessName"></el-input>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'TEXTAREA')
+                  <el-input
+                          v-model="editFormData.${field.propertyName}"
+                          type="textarea"
+                          :rows="3"
+                          :placeholder="请输入$!cfg[$fieldMapKey].businessName"
+                  />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'SELECT')
+                  <el-select v-model="editFormData.${field.propertyName}" placeholder="请选择$!cfg[$fieldMapKey].businessName" clearable style="width: 120px">
+                    <el-option
+                            v-for="item in ${field.propertyName}Options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                    />
+                  </el-select>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'DATE_PICKER' || $!cfg[$fieldMapKey].formComponentType == 'TIME_PICKER' || $!cfg[$fieldMapKey].formComponentType == 'DATETIME_PICKER' )
+                  <el-date-picker
+                          v-model="editFormData.${field.propertyName}"
+                          placeholder="请选择$!cfg[$fieldMapKey].businessName"
+                          style="width: 100%"
+                  />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'INPUT_NUMBER')
+                  <el-input-number v-model="editFormData.${field.propertyName}" :min="0" placeholder="请输入$!cfg[$fieldMapKey].businessName" style="width: 100%" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'SWITCH')
+                  <el-switch v-model="editFormData.${field.propertyName}" active-text="是" inactive-text="否" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'RADIO')
+                  <el-radio-group v-model="editFormData.${field.propertyName}" >
+                    <el-radio-button v-for="item in ${field.propertyName}Options" :value="item.value" :label="item.label">{{ item.label }}</el-radio-button>
+                  </el-radio-group>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'CHECKBOX')
+                  <el-checkbox v-for="item in ${field.propertyName}Options" v-model="editFormData.${field.propertyName}" :value="item.value" :label="item.label" />
+#elseif($!cfg[$fieldMapKey].formComponentType == 'IMAGE_UPLOAD')
+                  <upload-img v-model="editFormData.${field.propertyName}" :image-url="getImgUrl(editFormData.${field.propertyName})" width="100%" min-width="120px"/>
+#elseif($!cfg[$fieldMapKey].formComponentType == 'RICH_TEXT')
+                  <ArtWangEditor v-model="editFormData.${field.propertyName}" />
+#end
+#end
+#end
+          </el-form-item>
+          </el-form>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button :title="'取消编辑$!cfg[$tableMapKey].businessName'"  @click="editDialogVisible = false" >取消</el-button>
+              <el-button :title="'保存编辑$!cfg[$tableMapKey].businessName'" type="primary" @click="submitForm" :loading="submitLoading" >确定</el-button>
+            </div>
+          </template>
+        </ElDialog>
+      </ElCard>
+    </div>
+  </ArtTableFullScreen>
+</template>
+
+<script setup lang="ts">
+  import { ref, reactive, onMounted, h } from 'vue'
+  import { ElMessage, ElMessageBox, FormInstance, FormRules, ElButton, ElSpace } from 'element-plus'
+  import { ${entity}Service } from '@/api/${table.entityPath}Api'
+  import { useCheckedColumns, type ColumnOption } from '@/composables/useCheckedColumns'
+  import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
+  import {
+    ${entity}Record,
+    ${entity}ListParams,
+    Add${entity}Params,
+    Edit${entity}Params
+  } from '@/api/model/${table.entityPath}Model'
+#if($!cfg[$tableMapKey].isDictList)
+  import { DictRecord } from '@/api/model/dictModel'
+  import { DictService } from '@/api/dictApi'
+#end
+  import { SearchFormItem } from '@/types/search-form'
+
+
+  // 加载状态
+  const loading = ref(false)
+#if($!cfg[$tableMapKey].isCheckImgUrl)
+  // 获取图片url
+  const getImgUrl = (url: string | undefined) => {
+    if (url && url.startsWith('upload')) {
+      return `${import.meta.env.VITE_API_URL}/` + url
+    }
+    return url
+  }
+#end
+
+  // $!cfg[$tableMapKey].businessName数据列表
+  const ${table.entityPath}List = ref<${entity}Record[]>([])
+
+  // 定义表单搜索初始值
+  const initialSearchState = {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+    ${field.propertyName}: false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+    ${field.propertyName}: '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+    page: 1,
+    limit: 10
+  }
+
+  // 统一搜索和分页状态
+  const formFilters = reactive({ ...initialSearchState })
+
+  // 搜索栏配置 (Aligned with Account.vue structure)
+  const formItems: SearchFormItem[] = [
+#set( $searchIndex = -1 )
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isQueryField)
+#set( $searchIndex = $searchIndex + 1 )
+#if( $searchIndex != 0)
+    ,
+#end
+    {
+      label: '$!cfg[$fieldMapKey].businessName',
+      prop: '${field.propertyName}',
+#if($!cfg[$fieldMapKey].formComponentType == 'INPUT' ||
+  $!cfg[$fieldMapKey].formComponentType == 'INPUT_NUMBER' ||
+  $!cfg[$fieldMapKey].formComponentType == 'TEXTAREA' ||
+  $!cfg[$fieldMapKey].formComponentType == 'CHECKBOX' ||
+  $!cfg[$fieldMapKey].formComponentType == 'RICH_TEXT')
+      type: 'input',
+      config: {
+        placeholder: '请输入$!cfg[$fieldMapKey].businessName 搜索',
+        clearable: true
+      }
+#elseif($!cfg[$fieldMapKey].formComponentType == 'SELECT')
+      type: 'select',
+      config: {
+        placeholder: '请选择$!cfg[$fieldMapKey].businessName 搜索',
+        clearable: true,
+        options: () => schemaNameList.value.map(name => ({ label: name, value: name }))
+      }
+#elseif($!cfg[$fieldMapKey].formComponentType == 'radio')
+#end
+    }
+#end
+#end
+  ]
+
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].associatedType == 1)
+  const ${field.propertyName}Options = ref<DictRecord[]>([])
+  const get${field.capitalName}Options = async (${field.propertyName}: string) => {
+    try {
+      const res = await DictService.getDictListByType({ type: ${field.propertyName} })
+      if (res.success && res.data) {
+          ${field.propertyName}Options.value = res.data
+      } else {
+        ElMessage.error(res.message || '获取字典[$!cfg[$fieldMapKey].businessName]列表失败')
+      }
+    } catch (error) {
+      console.error('获取字典[$!cfg[$fieldMapKey].businessName]列表失败:', error)
+      ElMessage.error('获取字典[$!cfg[$fieldMapKey].businessName]列表时发生错误')
+    }
+  }
+#end
+#end
+
+  // 列定义 (Moved definition outside, added formatter inline)
+  const columnOptions: ColumnOption[] = [
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+    { prop: '${field.propertyName}', label: '$!cfg[$fieldMapKey].businessName'#if($!cfg[$fieldMapKey].isListVisible != true) , checked: false #end },
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    { prop: 'sort', label: '排序', sortable: true, checked: false },
+#end
+    {
+      prop: 'actions',
+      label: '操作',
+      fixed: 'right',
+      width: 280,
+      formatter: (row: ${entity}Record) =>
+          h(ElSpace, null, () => [
+#if($!cfg[$tableMapKey].tableType == 2)
+            h(ArtButtonTable, {
+                title: '新增子$!cfg[$tableMapKey].businessName',
+                type: 'add',
+                onClick: () => handleAddSub(row)
+            }),
+#end
+            h(ArtButtonTable, {
+              title: '$!cfg[$tableMapKey].businessName编辑',
+              type: 'edit',
+              onClick: () => handleEdit(row)
+            }),
+            h(ArtButtonTable, {
+              title: '删除$!cfg[$tableMapKey].businessName',
+              type: 'delete',
+              onClick: () => handleDelete(row)
+            })
+          ])
+    }
+  ]
+
+  // 列定义与动态显隐 (Pass a function returning columnOptions)
+  const { columns, columnChecks } = useCheckedColumns(() => columnOptions)
+
+  // 分页信息
+  const pagination = reactive({
+    total: 0
+  })
+
+  // 对话框控制
+  const addDialogVisible = ref(false)
+  const editDialogVisible = ref(false)
+  const submitLoading = ref(false)
+  const add${entity}FormRef = ref<FormInstance>()
+  const edit${entity}FormRef = ref<FormInstance>()
+
+  // 新增表单数据
+  const addFormData = reactive<Add${entity}Params>({
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+    ${field.propertyName}: false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+    ${field.propertyName}: '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    parentId: 0,
+#end
+    remarks: ''
+  })
+
+  // 编辑表单数据
+  const editFormData = reactive<Edit${entity}Params>({
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+    ${field.propertyName}: false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+    ${field.propertyName}: '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+    ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    parentId: 0,
+#end
+    remarks: ''
+  })
+
+  // 表单验证规则
+  const addRules = reactive<FormRules>({
+#set( $addRuleIndex = -1 )
+#foreach($field in ${table.fields})
+#if($!cfg[$fieldMapKey].isAddVisible)
+#set($fieldMapKey="field_config_$!field.name")
+#if(!$!cfg[$fieldMapKey].isNullable)
+#set( $addRuleIndex = $addRuleIndex + 1 )
+#if( $addRuleIndex != 0)
+    ,
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }, { pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#else
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#else
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+#set( $addRuleIndex = $addRuleIndex + 1 )
+#if( $addRuleIndex != 0)
+    ,
+#end
+    ${field.propertyName}: [{ pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#end
+#end
+#end
+  })
+
+  const editRules = reactive<FormRules>({
+#set( $editRuleIndex = -1 )
+#foreach($field in ${table.fields})
+#if($!cfg[$fieldMapKey].isEditVisible)
+#set($fieldMapKey="field_config_$!field.name")
+#if(!$!cfg[$fieldMapKey].isNullable)
+#set( $editRuleIndex = $editRuleIndex + 1 )
+#if( $editRuleIndex != 0)
+    ,
+#end
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }, { pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#else
+    ${field.propertyName}: [{ required: true, message: '请输入$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#else
+#if(!$null.isNull($!cfg[$fieldMapKey].validationRules) && "$!cfg[$fieldMapKey].validationRules" != "")
+#set( $editRuleIndex = $editRuleIndex + 1 )
+#if( $editRuleIndex != 0)
+    ,
+#end
+    ${field.propertyName}: [{ pattern: '$!cfg[$fieldMapKey].validationRules', message: '请输入正确的$!cfg[$fieldMapKey].businessName', trigger: 'blur' }]
+#end
+#end
+#end
+#end
+  })
+
+  // 加载$!cfg[$tableMapKey].businessName列表数据
+  const load${entity}List = async () => {
+    loading.value = true
+    try {
+      const params: ${entity}ListParams = {
+        ...formFilters
+      }
+
+      const res = await ${entity}Service.get${entity}List(params)
+      if (res.success) {
+        ${table.entityPath}List.value = res.data.records
+        pagination.total = res.data.total
+      } else {
+        ElMessage.error(res.message || '获取$!cfg[$tableMapKey].businessName列表失败')
+      }
+    } catch (error) {
+      console.error('获取$!cfg[$tableMapKey].businessName列表失败:', error)
+      ElMessage.error('获取$!cfg[$tableMapKey].businessName列表时发生错误')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 搜索
+  const search = () => {
+    formFilters.page = 1
+    load${entity}List()
+  }
+
+  // 重置查询
+  const handleReset = () => {
+    Object.assign(formFilters, initialSearchState)
+    load${entity}List()
+  }
+
+  // 处理分页变化
+  const handleCurrentChange = (page: number) => {
+    formFilters.page = page
+    load${entity}List()
+  }
+
+  // 处理每页显示数量变化
+  const handleSizeChange = (size: number) => {
+    formFilters.limit = size
+    formFilters.page = 1
+    load${entity}List()
+  }
+
+  // 处理新增$!cfg[$tableMapKey].businessName
+  const handleAdd = () => {
+    addDialogVisible.value = true
+    editDialogVisible.value = false
+
+    Object.assign(addFormData, {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+        ${field.propertyName}: false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+        ${field.propertyName}: '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+        ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+        sort: 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+        parentId: 0,
+#end
+        remarks: ''
+    })
+    add${entity}FormRef.value?.resetFields()
+  }
+#if($!cfg[$tableMapKey].tableType == 2)
+    // 处理新增$!cfg[$tableMapKey].businessName子项目
+    const handleAddSub = (row: ${entity}Record) => {
+        addDialogVisible.value = true
+        editDialogVisible.value = false
+
+        // 清空表单数据
+        Object.assign(addFormData, {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+            ${field.propertyName}: false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+            ${field.propertyName}: '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+            ${field.propertyName}: 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+            sort: 0,
+#end
+            parentId: row.id || 0,
+            remarks: ''
+        })
+    }
+#end
+
+  // 处理编辑$!cfg[$tableMapKey].businessName
+  const handleEdit = (row: ${entity}Record) => {
+    addDialogVisible.value = false
+    editDialogVisible.value = true
+
+    Object.assign(formData, {
+      id: row.id,
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+      ${field.propertyName}: row.${field.propertyName} || false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+      ${field.propertyName}: row.${field.propertyName} || '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+      ${field.propertyName}: row.${field.propertyName} || 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+      sort: row.sort || 0,
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+      parentId: row.parentId || 0,
+#end
+      remarks: row.remarks || ''
+    })
+    edit${entity}FormRef.value?.resetFields()
+    editFormData.id = row.id
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+#if($!cfg[$fieldMapKey].frontType == "boolean")
+    editFormData.${field.propertyName} = row.${field.propertyName} || false,
+#elseif($!cfg[$fieldMapKey].frontType == "string")
+    editFormData.${field.propertyName} = row.${field.propertyName} || '',
+#elseif($!cfg[$fieldMapKey].frontType == "number")
+    editFormData.${field.propertyName} = row.${field.propertyName} || 0,
+#end
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+    editFormData.sort = row.sort || 0
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+    editFormData.parentId = row.parentId || 0
+#end
+    editFormData.remarks = row.remarks || ''
+  }
+
+  // 处理删除$!cfg[$tableMapKey].businessName
+  const handleDelete = (row: ${entity}Record) => {
+    ElMessageBox.confirm('确认删除该$!cfg[$tableMapKey].businessName吗？此操作不可恢复！', '删除确认', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+        .then(async () => {
+          try {
+            const res = await ${entity}Service.delete${entity}(row.id)
+            if (res.success) {
+              ElMessage.success('删除成功')
+              load${entity}List()
+            } else {
+              ElMessage.error(res.message || '删除失败')
+            }
+          } catch (error) {
+            console.error('删除$!cfg[$tableMapKey].businessName失败:', error)
+            ElMessage.error('删除$!cfg[$tableMapKey].businessName时发生错误')
+          }
+        })
+        .catch(() => {
+          ElMessage.info('已取消删除')
+        })
+  }
+
+  // 提交表单
+  const addSubmitForm = async () => {
+    if (!add${entity}FormRef.value) return
+
+    await add${entity}FormRef.value.validate(async (valid) => {
+      if (valid) {
+        submitLoading.value = true
+
+        try {
+          const params: Add${entity}Params = {
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isAddVisible)
+            ${field.propertyName}: addFormData.${field.propertyName},
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+            sort: addFormData.sort
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+            parentId: addFormData.parentId,
+#end
+            remarks: addFormData.remarks
+          }
+          const res = await ${entity}Service.add${entity}(params)
+
+          if (res.success) {
+            ElMessage.success('新增$!cfg[$tableMapKey].businessName成功')
+            addDialogVisible.value = false
+            editDialogVisible.value = false
+            load${entity}List()
+          } else {
+            ElMessage.error(res.message || '操作失败')
+          }
+        } catch (error) {
+          console.error('新增$!cfg[$tableMapKey].businessName失败:', error)
+          ElMessage.error('新增新增$!cfg[$tableMapKey].businessName时发生错误')
+        } finally {
+          submitLoading.value = false
+        }
+      }
+    })
+  }
+  const editSubmitForm = async () => {
+      if (!edit${entity}FormRef.value) return
+
+      await edit${entity}FormRef.value.validate(async (valid) => {
+          if (valid) {
+              submitLoading.value = true
+              try {
+                // 编辑$!cfg[$tableMapKey].businessName
+                const params: Edit${entity}Params = {
+                    id: editFormData.id,
+#foreach($field in ${table.fields})
+#set($fieldMapKey="field_config_$!field.name")
+#if($!cfg[$fieldMapKey].isEditVisible)
+                    ${field.propertyName}: editFormData.${field.propertyName},
+#end
+#end
+#if($!cfg[$tableMapKey].hasSortField)
+                    sort: editFormData.sort
+#end
+#if($!cfg[$tableMapKey].tableType == 2)
+                    parentId: editFormData.parentId,
+#end
+                    remarks: editFormData.remarks
+                  }
+
+                  const res = await ${entity}Service.edit${entity}(params)
+
+                  if (res.success) {
+                      ElMessage.success('编辑$!cfg[$tableMapKey].businessName成功')
+                      addDialogVisible.value = false
+                      editDialogVisible.value = false
+                      load${entity}List() // 重新加载数据
+                  } else {
+                      ElMessage.error(res.message || '操作失败')
+                  }
+              } catch (error) {
+                  console.error('编辑$!cfg[$tableMapKey].businessName失败:', error)
+                  ElMessage.error('编辑$!cfg[$tableMapKey].businessName时发生错误')
+              } finally {
+                  submitLoading.value = false
+              }
+          }
+      })
+  }
+
+  // 组件挂载时加载数据
+  onMounted(() => {
+    loadDictList()
+  })
+</script>
+
+<style lang="scss" scoped>
+  .dict-form {
+    .el-input-number {
+      width: 100%;
+    }
+  }
+</style>
