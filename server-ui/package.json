@@ -47,7 +47,7 @@
     "@vueuse/core": "^11.0.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "next",
-    "axios": "^1.7.5",
+    "axios": "^1.8.2",
     "crypto-js": "^4.2.0",
     "default-passive-events": "^2.0.0",
     "echarts": "^5.4.0",
