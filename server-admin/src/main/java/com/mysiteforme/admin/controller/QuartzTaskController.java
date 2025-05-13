@@ -8,9 +8,11 @@
 
 package com.mysiteforme.admin.controller;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.request.AddQuartzTaskRequest;
 import com.mysiteforme.admin.entity.request.PageListQuartzTaskRequest;
 import com.mysiteforme.admin.entity.request.UpdateQuartzTaskRequest;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import jakarta.validation.Valid;
@@ -23,9 +25,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/admin/quartzTask")
+@RateLimit(limit = 40, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class QuartzTaskController {
 
     private final QuartzTaskService quartzTaskService;

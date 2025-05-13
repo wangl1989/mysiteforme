@@ -1,8 +1,10 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.service.LogService;
 import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.Result;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import com.mysiteforme.admin.service.DailyStatsService;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -24,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/admin/dailyStats")
 @RequiredArgsConstructor
+@RateLimit(limit = 60, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class DailyStatsController {
 
     private final DailyStatsService dailyStatsService;

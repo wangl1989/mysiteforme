@@ -18,7 +18,10 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import com.mysiteforme.admin.annotation.RateLimit;
+import com.mysiteforme.admin.util.LimitType;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/admin/file")
 @RequiredArgsConstructor
+@RateLimit(limit = 20, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class FileController {
 
     private final UploadServiceFactory uploadServiceFactory;

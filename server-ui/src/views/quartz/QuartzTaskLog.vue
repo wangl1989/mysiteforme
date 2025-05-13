@@ -17,9 +17,14 @@
           @refresh="loadLogList"
         >
           <template #left>
-            <ElButton title="批量删除定时任务" type="danger" @click="handleBatchDelete" v-ripple
-              >批量删除</ElButton
+            <ElButton
+              :title="$t('quartzTaskLog.button.batchDelete')"
+              type="danger"
+              @click="handleBatchDelete"
+              v-ripple
             >
+              {{ $t('quartzTaskLog.button.batchDelete') }}
+            </ElButton>
           </template>
         </ArtTableHeader>
         <!-- 表格 -->
@@ -43,7 +48,11 @@
       </ElCard>
 
       <!-- 异常信息对话框 -->
-      <ElDialog v-model="errorDialogVisible" title="异常信息详情" width="60%">
+      <ElDialog
+        v-model="errorDialogVisible"
+        :title="$t('quartzTaskLog.dialog.errorTitle')"
+        width="60%"
+      >
         <div class="error-content">
           <pre>{{ currentError }}</pre>
         </div>
@@ -65,6 +74,9 @@
   import { useCheckedColumns, type ColumnOption } from '@/composables/useCheckedColumns'
   import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
   import type { SearchFormItem } from '@/types/search-form'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 加载状态
   const loading = ref(false)
@@ -104,12 +116,12 @@
   // 搜索表单配置
   const formItems: SearchFormItem[] = [
     {
-      label: '任务名称',
+      label: t('quartzTaskLog.form.name'),
       prop: 'name',
       type: 'input',
       elColSpan: 6,
       config: {
-        placeholder: '请输入任务名称搜索',
+        placeholder: t('quartzTaskLog.search.namePlaceholder'),
         clearable: true
       }
     }
@@ -117,16 +129,16 @@
 
   // 表格列配置
   const columnOptions: ColumnOption[] = [
-    { label: '勾选', type: 'selection' },
-    { prop: 'jobId', label: '任务ID', width: 100 },
-    { prop: 'name', label: '任务名称', minWidth: 150 },
-    { prop: 'cron', label: 'Cron表达式', minWidth: 150 },
-    { prop: 'targetBean', label: '目标Bean', minWidth: 180 },
-    { prop: 'trgetMethod', label: '目标方法', minWidth: 120 },
-    { prop: 'params', label: '参数', minWidth: 120 },
+    { label: t('quartzTaskLog.table.selection'), type: 'selection' },
+    { prop: 'jobId', label: t('quartzTaskLog.table.jobId'), width: 100 },
+    { prop: 'name', label: t('quartzTaskLog.table.name'), minWidth: 150 },
+    { prop: 'cron', label: t('quartzTaskLog.table.cron'), minWidth: 150 },
+    { prop: 'targetBean', label: t('quartzTaskLog.table.targetBean'), minWidth: 180 },
+    { prop: 'trgetMethod', label: t('quartzTaskLog.table.targetMethod'), minWidth: 120 },
+    { prop: 'params', label: t('quartzTaskLog.table.params'), minWidth: 120 },
     {
       prop: 'status',
-      label: '状态',
+      label: t('quartzTaskLog.table.status'),
       width: 100,
       formatter: (row) => {
         return h(
@@ -141,7 +153,7 @@
     },
     {
       prop: 'times',
-      label: '执行耗时',
+      label: t('quartzTaskLog.table.times'),
       minWidth: 120,
       formatter: (row) => {
         return `${row.times || 0}ms`
@@ -149,7 +161,7 @@
     },
     {
       prop: 'exception',
-      label: '异常信息',
+      label: t('quartzTaskLog.table.exception'),
       minWidth: 180,
       checked: false,
       formatter: (row) => {
@@ -160,22 +172,27 @@
               class: 'el-button el-button--danger el-button--small is-link',
               onClick: () => showErrorDialog(row.error)
             },
-            '查看异常'
+            t('quartzTaskLog.button.viewError')
           )
         } else {
           return h('span', '-')
         }
       }
     },
-    { prop: 'createDate', label: '创建时间', minWidth: 180, sortable: true },
+    {
+      prop: 'createDate',
+      label: t('quartzTaskLog.table.createDate'),
+      minWidth: 180,
+      sortable: true
+    },
     {
       prop: 'actions',
-      label: '操作',
+      label: t('quartzTaskLog.table.operation'),
       fixed: 'right',
       width: 100,
       formatter: (row) => {
         return h(ArtButtonTable, {
-          title: '删除定时任务日志',
+          title: t('quartzTaskLog.operation.delete'),
           type: 'delete',
           onClick: () => handleDelete(row)
         })
@@ -195,11 +212,11 @@
         logList.value = res.data.records
         pagination.total = res.data.total
       } else {
-        ElMessage.error(res.message || '获取定时任务日志列表失败')
+        ElMessage.error(res.message || t('quartzTaskLog.message.getListFailed'))
       }
     } catch (error) {
-      console.error('获取定时任务日志列表失败:', error)
-      ElMessage.error('获取定时任务日志列表时发生错误')
+      console.error(t('quartzTaskLog.message.getListError'), error)
+      ElMessage.error(t('quartzTaskLog.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -237,43 +254,51 @@
 
   // 处理单个删除
   const handleDelete = (row: QuartzTaskRecordModel) => {
-    ElMessageBox.confirm(`确定要删除任务日志吗？此操作不可恢复！`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTaskLog.dialog.confirmDelete'),
+      t('quartzTaskLog.dialog.confirmDeleteTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await QuartzTaskLogService.deleteQuartzTaskLog({ id: row.id })
           if (res.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('quartzTaskLog.message.deleteSuccess'))
             loadLogList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '删除失败')
+            ElMessage.error(res.message || t('quartzTaskLog.message.deleteFailed'))
           }
         } catch (error) {
-          console.error('删除任务日志失败:', error)
-          ElMessage.error('删除任务日志时发生错误')
+          console.error(t('quartzTaskLog.message.deleteError'), error)
+          ElMessage.error(t('quartzTaskLog.message.deleteError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消删除操作')
+        ElMessage.info(t('quartzTaskLog.message.cancelDelete'))
       })
   }
 
   // 处理批量删除
   const handleBatchDelete = () => {
     if (selectedLogs.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('quartzTaskLog.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要删除选中的任务日志吗？此操作不可恢复！', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTaskLog.dialog.confirmBatchDelete'),
+      t('quartzTaskLog.dialog.confirmDeleteTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           // 注意：当前API只支持单个删除，这里进行遍历删除
@@ -285,19 +310,19 @@
           const success = results.every((res) => res.success)
 
           if (success) {
-            ElMessage.success('批量删除成功')
+            ElMessage.success(t('quartzTaskLog.message.batchDeleteSuccess'))
             loadLogList() // 重新加载数据
           } else {
-            ElMessage.error('部分或全部删除失败，请重试')
+            ElMessage.error(t('quartzTaskLog.message.batchDeletePartial'))
           }
         } catch (error) {
-          console.error('批量删除任务日志失败:', error)
-          ElMessage.error('批量删除任务日志时发生错误')
+          console.error(t('quartzTaskLog.message.batchDeleteError'), error)
+          ElMessage.error(t('quartzTaskLog.message.batchDeleteError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消批量删除操作')
+        ElMessage.info(t('quartzTaskLog.message.cancelBatchDelete'))
       })
   }
 

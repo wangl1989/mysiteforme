@@ -1,16 +1,21 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.UserDevice;
 import com.mysiteforme.admin.entity.request.PageListUserDeviceRequest;
 import com.mysiteforme.admin.service.UserDeviceService;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/api/admin/userDevice")
 @RequiredArgsConstructor
+@RateLimit(limit = 40, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class UserDeviceController {
 
     private final UserDeviceService userDeviceService;

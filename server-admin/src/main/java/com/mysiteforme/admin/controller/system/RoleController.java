@@ -8,11 +8,13 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.request.AddRoleRequest;
 import com.mysiteforme.admin.entity.request.PageListRoleRequest;
 import com.mysiteforme.admin.entity.request.SaveRoleMenuPerRequest;
 import com.mysiteforme.admin.entity.request.UpdateRoleRequest;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -23,9 +25,12 @@ import com.mysiteforme.admin.service.RoleService;
 import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/api/admin/role")
 @RequiredArgsConstructor
+@RateLimit(limit = 30, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class RoleController {
 
     private final RoleService roleService;

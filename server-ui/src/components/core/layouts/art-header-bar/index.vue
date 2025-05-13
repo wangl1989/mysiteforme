@@ -151,7 +151,7 @@
                     style="float: left"
                   />
                   <div class="user-wrap">
-                    <span class="name">{{ userInfo.username }}</span>
+                    <span class="name">{{ getUserName }}</span>
                     <span class="email" v-if="userInfo.email">{{ userInfo.email }}</span>
                   </div>
                 </div>
@@ -293,6 +293,13 @@
 
     return url
   }
+
+  const getUserName = computed(() => {
+    if (userInfo.value.name) {
+      return userInfo.value.name
+    }
+    return userInfo.value.username
+  })
 
   const goPage = (path: string) => {
     // 检查 Popover 实例是否存在并尝试关闭

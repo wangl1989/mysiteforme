@@ -244,12 +244,11 @@
       if (userDetailRes.code === ApiStatus.success && userDetailRes.data) {
         // 保存用户详细信息
         const userData = userDetailRes.data
-        if (!userData.icon || userData.icon === '' || !userData.icon?.startsWith('http')) {
-          if (userData.icon?.startsWith('upload')) {
-            userData.icon = `${import.meta.env.VITE_API_URL}/` + userData.icon
-          } else {
-            userData.icon = `https://api.dicebear.com/9.x/adventurer/svg?seed=${userData.id}`
-          }
+        if (!userData.icon) {
+          userData.icon = `https://api.dicebear.com/9.x/adventurer/svg?seed=${userData.id}`
+        }
+        if (userData.icon.startsWith('upload')) {
+          userData.icon = `${import.meta.env.VITE_API_URL}/` + userData.icon
         }
         // 确保数据符合UserInfo类型或进行必要的适配
         userStore.setUserInfo({

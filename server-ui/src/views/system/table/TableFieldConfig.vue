@@ -2,7 +2,7 @@
   <div class="field-config-container">
     <el-dialog
       :model-value="visible"
-      :title="`字段列表【所属表：${tableConfig?.tableName || ''}】`"
+      :title="$t('tableFieldConfig.dialog.title', { tableName: tableConfig?.tableName || '' })"
       width="1500"
       :append-to-body="true"
       :destroy-on-close="false"
@@ -18,7 +18,7 @@
             :items="formItems"
             @reset="handleReset"
             @search="handleSearch"
-            :isExpand="true"
+            :isExpand="false"
           ></ArtSearchBar>
 
           <ElCard shadow="never" class="art-table-card">
@@ -35,14 +35,18 @@
                   @click="handleSyncFields"
                   v-auth="'tableconfig_sync_field'"
                   v-ripple
-                  >同步字段</ElButton
+                  >{{ $t('tableFieldConfig.button.syncFields') }}</ElButton
                 >
                 <ElButton
                   :type="sortMode ? 'danger' : 'info'"
                   @click="handleFieldSort"
                   v-auth="'tableconfig_field_sort'"
                   v-ripple
-                  >{{ sortMode ? '退出排序' : '字段排序' }}</ElButton
+                  >{{
+                    sortMode
+                      ? $t('tableFieldConfig.button.exitSort')
+                      : $t('tableFieldConfig.button.fieldSort')
+                  }}</ElButton
                 >
                 <template v-if="sortMode">
                   <ElButton
@@ -50,11 +54,11 @@
                     @click="handleSaveSortOrder"
                     v-auth="'tableconfig_field_sort'"
                     v-ripple
-                    >保存排序</ElButton
+                    >{{ $t('tableFieldConfig.button.saveSort') }}</ElButton
                   >
-                  <ElButton @click="handleCancelSort" v-auth="'tableconfig_field_sort'" v-ripple
-                    >取消排序</ElButton
-                  >
+                  <ElButton @click="handleCancelSort" v-auth="'tableconfig_field_sort'" v-ripple>{{
+                    $t('tableFieldConfig.button.cancelSort')
+                  }}</ElButton>
                 </template>
                 <ElButton
                   type="success"
@@ -62,7 +66,7 @@
                   @click="handlePreviewTable"
                   v-auth="'tableconfig_perview_form'"
                   v-ripple
-                  >预览表单</ElButton
+                  >{{ $t('tableFieldConfig.button.previewForm') }}</ElButton
                 >
               </template>
             </ArtTableHeader>
@@ -108,12 +112,12 @@
         <el-form ref="fieldFormRef" :model="fieldForm" label-width="100px" :rules="fieldFormRules">
           <el-row :gutter="12">
             <el-col :span="12">
-              <el-form-item label="字段名称" prop="columnName">
+              <el-form-item :label="$t('tableFieldConfig.form.fieldName')" prop="columnName">
                 <el-input v-model="fieldInfo.columnName" disabled />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="字段类型" prop="columnType">
+              <el-form-item :label="$t('tableFieldConfig.form.fieldType')" prop="columnType">
                 <el-input v-model="fieldInfo.columnType" disabled />
               </el-form-item>
             </el-col>
@@ -121,12 +125,12 @@
 
           <el-row :gutter="12">
             <el-col :span="12">
-              <el-form-item label="字段注释" prop="columnComment">
+              <el-form-item :label="$t('tableFieldConfig.form.fieldComment')" prop="columnComment">
                 <el-input v-model="fieldInfo.columnComment" disabled />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="业务名称" prop="businessName">
+              <el-form-item :label="$t('tableFieldConfig.form.businessName')" prop="businessName">
                 <el-input v-model="fieldForm.businessName" />
               </el-form-item>
             </el-col>
@@ -134,36 +138,75 @@
 
           <el-row :gutter="12">
             <el-col :span="12">
-              <el-form-item label="组件类型" prop="formComponentType">
+              <el-form-item
+                :label="$t('tableFieldConfig.form.componentType')"
+                prop="formComponentType"
+              >
                 <el-select
                   v-model="fieldForm.formComponentType"
-                  placeholder="请选择组件类型"
+                  :placeholder="$t('tableFieldConfig.form.inputComponentType')"
                   style="width: 100%"
                   clearable
                 >
-                  <el-option label="输入框" value="INPUT" />
-                  <el-option label="文本域" value="TEXTAREA" />
-                  <el-option label="下拉框" value="SELECT" />
-                  <el-option label="数字框" value="INPUT_NUMBER" />
-                  <el-option label="单选框" value="RADIO" />
-                  <el-option label="复选框" value="CHECKBOX" />
-                  <el-option label="颜色选择器" value="COLOR_PICKER" />
-                  <el-option label="图标选择器" value="ICON_PICKER" />
-                  <el-option label="日期选择器" value="DATE_PICKER" />
-                  <el-option label="时间选择器" value="TIME_PICKER" />
-                  <el-option label="日期时间选择器" value="DATETIME_PICKER" />
-                  <el-option label="开关" value="SWITCH" />
-                  <el-option label="图片上传" value="IMAGE_UPLOAD" />
-                  <el-option label="文件上传" value="FILE_UPLOAD" />
-                  <el-option label="富文本编辑器" value="RICH_TEXT" />
+                  <el-option :label="$t('tableFieldConfig.componentType.input')" value="INPUT" />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.textarea')"
+                    value="TEXTAREA"
+                  />
+                  <el-option :label="$t('tableFieldConfig.componentType.select')" value="SELECT" />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.inputNumber')"
+                    value="INPUT_NUMBER"
+                  />
+                  <el-option :label="$t('tableFieldConfig.componentType.radio')" value="RADIO" />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.checkbox')"
+                    value="CHECKBOX"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.colorPicker')"
+                    value="COLOR_PICKER"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.iconPicker')"
+                    value="ICON_PICKER"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.datePicker')"
+                    value="DATE_PICKER"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.timePicker')"
+                    value="TIME_PICKER"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.datetimePicker')"
+                    value="DATETIME_PICKER"
+                  />
+                  <el-option :label="$t('tableFieldConfig.componentType.switch')" value="SWITCH" />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.imageUpload')"
+                    value="IMAGE_UPLOAD"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.fileUpload')"
+                    value="FILE_UPLOAD"
+                  />
+                  <el-option
+                    :label="$t('tableFieldConfig.componentType.richText')"
+                    value="RICH_TEXT"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="校验规则" prop="validationRules">
+              <el-form-item
+                :label="$t('tableFieldConfig.form.validationRules')"
+                prop="validationRules"
+              >
                 <el-input
                   v-model="fieldForm.validationRules"
-                  placeholder="如：required|email|max:50"
+                  :placeholder="$t('tableFieldConfig.form.validationRulesPlaceholder')"
                 />
               </el-form-item>
             </el-col>
@@ -172,40 +215,45 @@
           <el-row :gutter="12">
             <el-col :span="12">
               <el-form-item
-                label="关联类型"
+                :label="$t('tableFieldConfig.form.associatedType')"
                 prop="associatedType"
                 :rules="[
                   {
                     required: isAssociatedTypeRequired,
-                    message: '请选择关联类型',
+                    message: $t('tableFieldConfig.validation.associatedTypeRequired'),
                     trigger: 'change'
                   }
                 ]"
               >
                 <el-select
                   v-model="fieldForm.associatedType"
-                  placeholder="请选择关联类型"
+                  :placeholder="$t('tableFieldConfig.form.selectAssociatedType')"
                   style="width: 100%"
                   @change="handleAssociatedTypeChange"
                   :required="isAssociatedTypeRequired"
                   clearable
                 >
-                  <el-option label="字典类型" :value="1" />
-                  <el-option label="关联表名" :value="2" />
+                  <el-option :label="$t('tableFieldConfig.associatedType.dictType')" :value="1" />
+                  <el-option
+                    :label="$t('tableFieldConfig.associatedType.associatedTable')"
+                    :value="2"
+                  />
                 </el-select>
                 <div
                   class="el-form-item-msg"
                   v-if="isAssociatedTypeRequired && !fieldForm.associatedType"
                 >
-                  <span class="warning-text">当前组件类型必须关联数据源</span>
+                  <span class="warning-text">{{
+                    $t('tableFieldConfig.warning.associatedTypeRequired')
+                  }}</span>
                 </div>
               </el-form-item>
             </el-col>
             <el-col :span="12" v-if="fieldForm.associatedType === 1">
-              <el-form-item label="字典类型" prop="associatedDictType">
+              <el-form-item :label="$t('tableFieldConfig.form.dictType')" prop="associatedDictType">
                 <el-select
                   v-model="fieldForm.associatedDictType"
-                  placeholder="请选择字典类型"
+                  :placeholder="$t('tableFieldConfig.form.selectDictType')"
                   style="width: 100%"
                   filterable
                   clearable
@@ -221,10 +269,13 @@
               </el-form-item>
             </el-col>
             <el-col :span="12" v-if="fieldForm.associatedType === 2">
-              <el-form-item label="关联表名" prop="associatedTable">
+              <el-form-item
+                :label="$t('tableFieldConfig.form.associatedTable')"
+                prop="associatedTable"
+              >
                 <el-select
                   v-model="fieldForm.associatedTable"
-                  placeholder="请选择关联表名"
+                  :placeholder="$t('tableFieldConfig.form.selectAssociatedTable')"
                   style="width: 100%"
                   filterable
                   clearable
@@ -243,10 +294,13 @@
 
           <el-row :gutter="12" v-if="fieldForm.associatedType === 2 && fieldForm.associatedTable">
             <el-col :span="12">
-              <el-form-item label="显示字段" prop="associatedTableField">
+              <el-form-item
+                :label="$t('tableFieldConfig.form.displayField')"
+                prop="associatedTableField"
+              >
                 <el-select
                   v-model="fieldForm.associatedTableField"
-                  placeholder="请选择显示字段"
+                  :placeholder="$t('tableFieldConfig.form.selectDisplayField')"
                   style="width: 100%"
                   filterable
                   clearable
@@ -264,8 +318,8 @@
 
           <el-row :gutter="12">
             <el-col :span="6">
-              <el-tooltip content="字段是否要求唯一值" placement="top">
-                <el-form-item label="是否唯一" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isUnique')" placement="top">
+                <el-form-item :label="$t('tableFieldConfig.form.isUnique')" label-width="80px">
                   <el-switch v-model="fieldForm.isUnique"></el-switch>
                 </el-form-item>
               </el-tooltip>
@@ -274,12 +328,12 @@
               <el-tooltip
                 :content="
                   originalFieldData && originalFieldData.isNullable === false
-                    ? '数据库必填字段不可修改'
-                    : '字段是否为必填项'
+                    ? $t('tableFieldConfig.tooltip.dbRequiredField')
+                    : $t('tableFieldConfig.tooltip.isRequired')
                 "
                 placement="top"
               >
-                <el-form-item label="是否必填" label-width="80px">
+                <el-form-item :label="$t('tableFieldConfig.form.isRequired')" label-width="80px">
                   <el-switch
                     v-model="fieldForm.isNullable"
                     :active-value="false"
@@ -292,15 +346,15 @@
               </el-tooltip>
             </el-col>
             <el-col :span="6">
-              <el-tooltip content="是否在列表页显示该字段" placement="top">
-                <el-form-item label="列表显示" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isListVisible')" placement="top">
+                <el-form-item :label="$t('tableFieldConfig.form.isListVisible')" label-width="80px">
                   <el-switch v-model="fieldForm.isListVisible"></el-switch>
                 </el-form-item>
               </el-tooltip>
             </el-col>
             <el-col :span="6">
-              <el-tooltip content="是否在新增表单中显示该字段" placement="top">
-                <el-form-item label="新增字段" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isAddVisible')" placement="top">
+                <el-form-item :label="$t('tableFieldConfig.form.isAddVisible')" label-width="80px">
                   <el-switch v-model="fieldForm.isAddVisible"></el-switch>
                 </el-form-item>
               </el-tooltip>
@@ -309,22 +363,25 @@
 
           <el-row :gutter="12">
             <el-col :span="6">
-              <el-tooltip content="是否在编辑表单中显示该字段" placement="top">
-                <el-form-item label="编辑字段" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isEditVisible')" placement="top">
+                <el-form-item :label="$t('tableFieldConfig.form.isEditVisible')" label-width="80px">
                   <el-switch v-model="fieldForm.isEditVisible"></el-switch>
                 </el-form-item>
               </el-tooltip>
             </el-col>
             <el-col :span="6">
-              <el-tooltip content="是否在详情页中显示该字段" placement="top">
-                <el-form-item label="详情显示" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isDetailVisible')" placement="top">
+                <el-form-item
+                  :label="$t('tableFieldConfig.form.isDetailVisible')"
+                  label-width="80px"
+                >
                   <el-switch v-model="fieldForm.isDetailVisible"></el-switch>
                 </el-form-item>
               </el-tooltip>
             </el-col>
             <el-col :span="6">
-              <el-tooltip content="是否作为查询条件" placement="top">
-                <el-form-item label="查询条件" label-width="80px">
+              <el-tooltip :content="$t('tableFieldConfig.tooltip.isQueryField')" placement="top">
+                <el-form-item :label="$t('tableFieldConfig.form.isQueryField')" label-width="80px">
                   <el-switch v-model="fieldForm.isQueryField"></el-switch>
                 </el-form-item>
               </el-tooltip>
@@ -332,7 +389,7 @@
           </el-row>
           <el-row :gutter="12">
             <el-col :span="12">
-              <el-form-item label="排序值" prop="sort">
+              <el-form-item :label="$t('tableFieldConfig.form.sortValue')" prop="sort">
                 <el-input-number
                   v-model="fieldForm.sort"
                   :min="0"
@@ -344,50 +401,56 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="查询方式" prop="queryType" v-if="fieldForm.isQueryField">
+          <el-form-item
+            :label="$t('tableFieldConfig.form.queryType')"
+            prop="queryType"
+            v-if="fieldForm.isQueryField"
+          >
             <el-select
               v-model="fieldForm.queryType"
-              placeholder="请选择查询方式"
+              :placeholder="$t('tableFieldConfig.form.inputComponentType')"
               style="width: 100%"
             >
-              <el-option label="等于(=)" value="eq" />
-              <el-option label="不等于(!=)" value="ne" />
-              <el-option label="大于(>)" value="gt" />
-              <el-option label="大于等于(>=)" value="ge" />
-              <el-option label="小于(<)" value="lt" />
-              <el-option label="小于等于(<=)" value="le" />
-              <el-option label="模糊查询(like)" value="like" />
-              <el-option label="左模糊(%like)" value="left_like" />
-              <el-option label="右模糊(like%)" value="right_like" />
-              <el-option label="范围查询(between)" value="between" />
-              <el-option label="包含(in)" value="in" />
-              <el-option label="不包含(not in)" value="not_in" />
-              <el-option label="不为空(is not null)" value="is_not_null" />
-              <el-option label="为空(is null)" value="is_null" />
+              <el-option :label="$t('tableFieldConfig.queryType.eq')" value="eq" />
+              <el-option :label="$t('tableFieldConfig.queryType.ne')" value="ne" />
+              <el-option :label="$t('tableFieldConfig.queryType.gt')" value="gt" />
+              <el-option :label="$t('tableFieldConfig.queryType.ge')" value="ge" />
+              <el-option :label="$t('tableFieldConfig.queryType.lt')" value="lt" />
+              <el-option :label="$t('tableFieldConfig.queryType.le')" value="le" />
+              <el-option :label="$t('tableFieldConfig.queryType.like')" value="like" />
+              <el-option :label="$t('tableFieldConfig.queryType.leftLike')" value="left_like" />
+              <el-option :label="$t('tableFieldConfig.queryType.rightLike')" value="right_like" />
+              <el-option :label="$t('tableFieldConfig.queryType.between')" value="between" />
+              <el-option :label="$t('tableFieldConfig.queryType.in')" value="in" />
+              <el-option :label="$t('tableFieldConfig.queryType.notIn')" value="not_in" />
+              <el-option :label="$t('tableFieldConfig.queryType.isNotNull')" value="is_not_null" />
+              <el-option :label="$t('tableFieldConfig.queryType.isNull')" value="is_null" />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="备注" prop="remarks">
+          <el-form-item :label="$t('tableFieldConfig.form.remarks')" prop="remarks">
             <el-input
               v-model="fieldForm.remarks"
               type="textarea"
               :rows="3"
-              placeholder="请输入备注信息"
+              :placeholder="$t('tableFieldConfig.form.inputRemarks')"
             />
           </el-form-item>
         </el-form>
         <template #footer>
-          <el-button @click="fieldDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitFieldForm" :loading="submitLoading"
-            >确定</el-button
-          >
+          <el-button @click="fieldDialogVisible = false">{{
+            $t('tableFieldConfig.button.cancel')
+          }}</el-button>
+          <el-button type="primary" @click="submitFieldForm" :loading="submitLoading">{{
+            $t('tableFieldConfig.button.confirm')
+          }}</el-button>
         </template>
       </el-dialog>
 
       <!-- 添加预览对话框 -->
       <el-dialog
         v-model="previewVisible"
-        :title="`预览表单【${tableConfig?.tableName || ''}】`"
+        :title="$t('tableFieldConfig.preview.title', { tableName: tableConfig?.tableName || '' })"
         width="90%"
         :append-to-body="true"
         :destroy-on-close="true"
@@ -418,8 +481,10 @@
   import { useCheckedColumns, ColumnOption } from '@/composables/useCheckedColumns'
   import type { SearchFormItem } from '@/types/search-form'
   import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
-  // 导入预览组件
   import TablePreview from './TablePreview.vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const props = defineProps<{
     visible: boolean
@@ -458,55 +523,55 @@
   // 搜索表单项
   const formItems: SearchFormItem[] = [
     {
-      label: '字段名称',
+      label: t('tableFieldConfig.search.fieldName'),
       prop: 'columnName',
       type: 'input',
       elColSpan: 5,
       config: {
-        placeholder: '请输入字段名称',
+        placeholder: t('tableFieldConfig.search.inputFieldName'),
         clearable: true
       }
     },
     {
-      label: '业务名称',
+      label: t('tableFieldConfig.search.businessName'),
       prop: 'businessName',
       type: 'input',
       elColSpan: 5,
       config: {
-        placeholder: '请输入业务名称',
+        placeholder: t('tableFieldConfig.search.inputBusinessName'),
         clearable: true
       }
     },
     {
-      label: '组件类型',
+      label: t('tableFieldConfig.search.componentType'),
       prop: 'formComponentType',
       type: 'select',
       elColSpan: 5,
       config: {
-        placeholder: '请选择组件类型',
+        placeholder: t('tableFieldConfig.search.selectComponentType'),
         clearable: true
       },
       options: () => [
-        { label: '输入框', value: 'INPUT' },
-        { label: '文本域', value: 'TEXTAREA' },
-        { label: '下拉框', value: 'SELECT' },
-        { label: '数字框', value: 'INPUT_NUMBER' },
-        { label: '单选框', value: 'RADIO' },
-        { label: '复选框', value: 'CHECKBOX' },
-        { label: '开关', value: 'SWITCH' }
+        { label: t('tableFieldConfig.componentType.input'), value: 'INPUT' },
+        { label: t('tableFieldConfig.componentType.textarea'), value: 'TEXTAREA' },
+        { label: t('tableFieldConfig.componentType.select'), value: 'SELECT' },
+        { label: t('tableFieldConfig.componentType.inputNumber'), value: 'INPUT_NUMBER' },
+        { label: t('tableFieldConfig.componentType.radio'), value: 'RADIO' },
+        { label: t('tableFieldConfig.componentType.checkbox'), value: 'CHECKBOX' },
+        { label: t('tableFieldConfig.componentType.switch'), value: 'SWITCH' }
       ]
     },
     {
-      label: '是否查询',
+      label: t('tableFieldConfig.search.isQuery'),
       prop: 'isQueryField',
       type: 'select',
       elColSpan: 5,
       options: () => [
-        { label: '是', value: '1' },
-        { label: '否', value: '0' }
+        { label: t('tableFieldConfig.search.yes'), value: '1' },
+        { label: t('tableFieldConfig.search.no'), value: '0' }
       ],
       config: {
-        placeholder: '请选择是否查询条件',
+        placeholder: t('tableFieldConfig.search.selectIsQuery'),
         clearable: true
       }
     }
@@ -515,7 +580,7 @@
   // 表格列配置
   const columnOptions: ColumnOption[] = [
     {
-      label: '排序',
+      label: t('tableFieldConfig.column.sort'),
       prop: 'sortable',
       fixed: 'left',
       checked: false,
@@ -523,7 +588,7 @@
         return h(
           'div',
           h(ArtButtonTable, {
-            title: '字段排序',
+            title: t('tableFieldConfig.column.sort'),
             icon: '&#xe840;',
             iconColor: '#88970e',
             extraClass: 'handle'
@@ -531,110 +596,116 @@
         )
       }
     },
-    { label: 'ID', prop: 'id', minWidth: 60, fixed: 'left' },
-    { label: '排序值', prop: 'sort', minWidth: 80 },
-    { label: '字段名称', prop: 'columnName', minWidth: 120 },
-    { label: '字段类型', prop: 'columnType', minWidth: 100 },
-    { label: '业务名称', prop: 'businessName', minWidth: 150 },
+    { label: t('tableFieldConfig.column.id'), prop: 'id', minWidth: 60, fixed: 'left' },
+    { label: t('tableFieldConfig.column.sortValue'), prop: 'sort', minWidth: 100 },
+    { label: t('tableFieldConfig.column.fieldName'), prop: 'columnName', minWidth: 120 },
+    { label: t('tableFieldConfig.column.fieldType'), prop: 'columnType', minWidth: 100 },
+    { label: t('tableFieldConfig.column.businessName'), prop: 'businessName', minWidth: 150 },
     {
-      label: '组件类型',
+      label: t('tableFieldConfig.column.componentType'),
       prop: 'formComponentType',
-      minWidth: 120,
+      minWidth: 140,
       formatter: (row) => componentTypeMap[row.formComponentType] || row.formComponentType
     },
     {
-      label: '是否唯一',
+      label: t('tableFieldConfig.column.isUnique'),
       prop: 'isUnique',
       minWidth: 100,
       formatter: (row) =>
-        h(ElTag, { type: row.isUnique ? 'danger' : 'info' }, () => (row.isUnique ? '是' : '否'))
-    },
-    {
-      label: '是否必填',
-      prop: 'isNullable',
-      minWidth: 100,
-      formatter: (row) =>
-        h(ElTag, { type: !row.isNullable ? 'danger' : 'info' }, () =>
-          !row.isNullable ? '是' : '否'
+        h(ElTag, { type: row.isUnique ? 'danger' : 'info' }, () =>
+          row.isUnique ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '是否查询字段',
+      label: t('tableFieldConfig.column.isRequired'),
+      prop: 'isNullable',
+      minWidth: 120,
+      formatter: (row) =>
+        h(ElTag, { type: !row.isNullable ? 'danger' : 'info' }, () =>
+          !row.isNullable ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
+        )
+    },
+    {
+      label: t('tableFieldConfig.column.isQueryField'),
       prop: 'isQueryField',
       minWidth: 120,
       formatter: (row) =>
         h(ElTag, { type: row.isQueryField ? 'success' : 'info' }, () =>
-          row.isQueryField ? '是' : '否'
+          row.isQueryField ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '是否列表显示',
+      label: t('tableFieldConfig.column.isListVisible'),
       prop: 'isListVisible',
       minWidth: 120,
       formatter: (row) =>
         h(ElTag, { type: row.isListVisible ? 'success' : 'info' }, () =>
-          row.isListVisible ? '是' : '否'
+          row.isListVisible ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '是否新增字段',
+      label: t('tableFieldConfig.column.isAddVisible'),
       prop: 'isAddVisible',
       minWidth: 120,
       formatter: (row) =>
         h(ElTag, { type: row.isAddVisible ? 'success' : 'info' }, () =>
-          row.isAddVisible ? '是' : '否'
+          row.isAddVisible ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '是否编辑字段',
+      label: t('tableFieldConfig.column.isEditVisible'),
       prop: 'isEditVisible',
       minWidth: 120,
       formatter: (row) =>
         h(ElTag, { type: row.isEditVisible ? 'success' : 'info' }, () =>
-          row.isEditVisible ? '是' : '否'
+          row.isEditVisible ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '是否详情显示',
+      label: t('tableFieldConfig.column.isDetailVisible'),
       prop: 'isDetailVisible',
       minWidth: 120,
       formatter: (row) =>
         h(ElTag, { type: row.isDetailVisible ? 'success' : 'info' }, () =>
-          row.isDetailVisible ? '是' : '否'
+          row.isDetailVisible ? t('tableFieldConfig.column.yes') : t('tableFieldConfig.column.no')
         )
     },
     {
-      label: '查询方式',
+      label: t('tableFieldConfig.column.queryType'),
       prop: 'queryType',
       minWidth: 100,
       formatter: (row) => queryTypeMap[row.queryType] || row.queryType
     },
     {
-      label: '关联类型',
+      label: t('tableFieldConfig.column.associatedType'),
       prop: 'associatedType',
       minWidth: 100,
       formatter: (row) => associatedTypeMap[row.associatedType] || row.associatedType
     },
-    { label: '字典类型', prop: 'associatedDictType', minWidth: 100 },
-    { label: '关联表名称', prop: 'associatedTable', minWidth: 100 },
-    { label: '关联表字段', prop: 'associatedTableField', minWidth: 100 },
-    { label: '校验规则', prop: 'validationRules', minWidth: 100 },
-    { label: '字段注释', prop: 'columnComment', minWidth: 150 },
+    { label: t('tableFieldConfig.column.dictType'), prop: 'associatedDictType', minWidth: 100 },
+    { label: t('tableFieldConfig.column.associatedTable'), prop: 'associatedTable', minWidth: 100 },
     {
-      label: '操作',
+      label: t('tableFieldConfig.column.associatedTableField'),
+      prop: 'associatedTableField',
+      minWidth: 100
+    },
+    { label: t('tableFieldConfig.column.validationRules'), prop: 'validationRules', minWidth: 100 },
+    { label: t('tableFieldConfig.column.fieldComment'), prop: 'columnComment', minWidth: 150 },
+    {
+      label: t('tableFieldConfig.column.actions'),
       prop: 'actions',
       fixed: 'right',
       width: 180,
       formatter: (row) => {
         return h('div', [
           h(ArtButtonTable, {
-            title: '编辑配置字段',
+            title: t('tableConfig.button.edit'),
             type: 'edit',
             auth: 'tableconfig_edit_field',
             onClick: () => handleEditField(row)
           }),
           h(ArtButtonTable, {
-            title: '删除配置字段',
+            title: t('tableConfig.button.delete'),
             type: 'delete',
             auth: 'tableconfig_field_delete',
             onClick: () => handleDeleteField(row)
@@ -650,7 +721,7 @@
   // 添加加载字段数据的方法
   const loadFieldData = async () => {
     if (!props.tableConfig?.id) {
-      ElMessage.warning('缺少表配置ID，无法加载字段列表')
+      ElMessage.warning(t('tableFieldConfig.warning.missingTableConfig'))
       return
     }
 
@@ -672,11 +743,11 @@
         internalFieldList.value = res.data.records
         pagination.total = res.data.total
       } else {
-        ElMessage.error(res.message || '加载字段列表失败')
+        ElMessage.error(res.message || t('tableFieldConfig.message.loadFieldsFailed'))
       }
     } catch (error) {
-      console.error('加载字段列表失败:', error)
-      ElMessage.error('加载字段列表时发生错误')
+      console.error(t('tableFieldConfig.message.loadFieldsFailed') + ':', error)
+      ElMessage.error(t('tableFieldConfig.message.loadFieldsError'))
     } finally {
       fieldListLoading.value = false
     }
@@ -779,23 +850,41 @@
 
   // 字段表单验证规则
   const fieldFormRules = reactive<FormRules>({
-    formComponentType: [{ required: false, message: '请选择组件类型', trigger: 'change' }],
-    associatedType: [{ required: false, message: '请选择关联类型', trigger: 'change' }],
+    formComponentType: [
+      {
+        required: false,
+        message: t('tableFieldConfig.validation.componentTypeRequired'),
+        trigger: 'change'
+      }
+    ],
+    associatedType: [
+      {
+        required: false,
+        message: t('tableFieldConfig.validation.associatedTypeRequired'),
+        trigger: 'change'
+      }
+    ],
     associatedDictType: [
       {
         required: false, // 初始设为false，在运行时动态检查
-        message: '请选择字典类型',
+        message: t('tableFieldConfig.validation.dictTypeRequired'),
         trigger: 'change'
       }
     ],
     associatedTable: [
       {
         required: false, // 初始设为false，在运行时动态检查
-        message: '请选择关联表名',
+        message: t('tableFieldConfig.validation.associatedTableRequired'),
         trigger: 'change'
       }
     ],
-    associatedTableField: [{ required: false, message: '请选择显示字段', trigger: 'change' }]
+    associatedTableField: [
+      {
+        required: false,
+        message: t('tableFieldConfig.validation.displayFieldRequired'),
+        trigger: 'change'
+      }
+    ]
   })
 
   // 获取字典类型列表
@@ -813,7 +902,7 @@
   // 获取关联表列表
   const loadAssociatedTableList = async (schemaName: string) => {
     if (!schemaName) {
-      ElMessage.warning('缺少数据库名称，无法获取关联表列表')
+      ElMessage.warning(t('tableFieldConfig.warning.missingDBName'))
       return
     }
 
@@ -823,7 +912,7 @@
         associatedTableList.value = res.data
       }
     } catch (error) {
-      console.error('获取关联表列表失败:', error)
+      console.error(t('tableFieldConfig.message.loadFieldsFailed') + ':', error)
     }
   }
 
@@ -927,7 +1016,7 @@
   // 同步字段
   const handleSyncFields = async () => {
     if (!props.tableConfig?.id) {
-      ElMessage.warning('缺少表配置ID')
+      ElMessage.warning(t('tableFieldConfig.warning.missingTableConfig'))
       return
     }
 
@@ -939,17 +1028,17 @@
       }
       const res = await TableService.syncFieldsByTableName(params)
       if (res.success) {
-        ElMessage.success('同步字段成功')
+        ElMessage.success(t('tableFieldConfig.message.syncSuccess'))
         // 刷新本组件字段列表
         await loadFieldData()
         // 刷新父组件数据
         emit('refresh')
       } else {
-        ElMessage.error(res.message || '同步字段失败')
+        ElMessage.error(res.message || t('tableFieldConfig.message.syncFailed'))
       }
     } catch (error) {
-      console.error('同步字段失败:', error)
-      ElMessage.error('同步字段时发生错误')
+      console.error(t('tableFieldConfig.message.syncError') + ':', error)
+      ElMessage.error(t('tableFieldConfig.message.syncError'))
     }
   }
 
@@ -962,7 +1051,7 @@
       columnChecks.value[0].checked = true
       // 进入排序模式，备份当前字段列表
       originalFieldListBackup.value = JSON.parse(JSON.stringify(internalFieldList.value))
-      ElMessage.info('已进入排序模式，请通过拖拽"移动"按钮对字段进行排序，完成后点击"保存排序"按钮')
+      ElMessage.info(t('tableFieldConfig.message.enterSortMode'))
     } else {
       columnChecks.value[0].checked = false
       // 如果是退出排序模式，恢复原始数据（取消排序）
@@ -976,7 +1065,7 @@
   // 保存排序方法
   const handleSaveSortOrder = async () => {
     if (!props.tableConfig?.id) {
-      ElMessage.warning('缺少表配置ID')
+      ElMessage.warning(t('tableFieldConfig.warning.missingTableConfig'))
       return
     }
 
@@ -987,7 +1076,7 @@
       // 调用排序API
       const res = await TableService.fieldSort({ ids: sortedIds })
       if (res.success) {
-        ElMessage.success('字段排序保存成功')
+        ElMessage.success(t('tableFieldConfig.message.sortSuccess'))
         sortMode.value = false
         columnChecks.value[0].checked = false
         // 刷新本组件字段列表
@@ -995,11 +1084,11 @@
         // 刷新父组件数据
         emit('refresh')
       } else {
-        ElMessage.error(res.message || '保存排序失败')
+        ElMessage.error(res.message || t('tableFieldConfig.message.sortFailed'))
       }
     } catch (error) {
-      console.error('保存字段排序失败:', error)
-      ElMessage.error('保存字段排序时发生错误')
+      console.error(t('tableFieldConfig.message.sortError') + ':', error)
+      ElMessage.error(t('tableFieldConfig.message.sortError'))
     }
   }
 
@@ -1009,7 +1098,7 @@
     if (sortMode.value) {
       columnChecks.value[0].checked = false
       internalFieldList.value = [...originalFieldListBackup.value]
-      ElMessage.info('已取消排序')
+      ElMessage.info(t('tableFieldConfig.message.cancelSort'))
       sortMode.value = false
       // 刷新字段列表数据
       loadFieldData()
@@ -1020,7 +1109,9 @@
 
   // 编辑字段
   const handleEditField = (field: TableFieldConfigModel) => {
-    fieldDialogTitle.value = `编辑字段【${field.columnName}】`
+    fieldDialogTitle.value = t('tableFieldConfig.dialog.editFieldTitle', {
+      fieldName: field.columnName
+    })
 
     // 保存原始字段数据，用于【是否必填】字段的校验
     originalFieldData.value = { ...field }
@@ -1080,7 +1171,7 @@
 
     // 在表单验证前进行额外验证
     if (isAssociatedTypeRequired.value && !fieldForm.associatedType) {
-      ElMessage.error('当前组件类型必须设置关联类型')
+      ElMessage.error(t('tableFieldConfig.warning.associatedTypeRequired'))
       return
     }
 
@@ -1090,7 +1181,7 @@
       fieldForm.associatedType === 1 &&
       !fieldForm.associatedDictType
     ) {
-      ElMessage.error('请选择字典类型')
+      ElMessage.error(t('tableFieldConfig.warning.selectDictType'))
       return
     }
 
@@ -1099,7 +1190,7 @@
       fieldForm.associatedType === 2 &&
       !fieldForm.associatedTable
     ) {
-      ElMessage.error('请选择关联表名')
+      ElMessage.error(t('tableFieldConfig.warning.selectAssociatedTable'))
       return
     }
 
@@ -1122,7 +1213,7 @@
 
           const res = await TableService.editTableFieldConfig(params)
           if (res.success) {
-            ElMessage.success('保存成功')
+            ElMessage.success(t('tableFieldConfig.message.saveSuccess'))
             fieldDialogVisible.value = false
 
             // 刷新本组件字段列表
@@ -1130,11 +1221,11 @@
             // 刷新父组件数据
             emit('refresh')
           } else {
-            ElMessage.error(res.message || '保存失败')
+            ElMessage.error(res.message || t('tableFieldConfig.message.saveFailed'))
           }
         } catch (error) {
-          console.error('保存字段配置失败:', error)
-          ElMessage.error('保存字段配置时发生错误')
+          console.error(t('tableFieldConfig.message.saveError') + ':', error)
+          ElMessage.error(t('tableFieldConfig.message.saveError'))
         } finally {
           submitLoading.value = false
         }
@@ -1168,7 +1259,7 @@
   // 预览整个表单
   const handlePreviewTable = () => {
     if (!props.tableConfig) {
-      ElMessage.warning('缺少表配置信息')
+      ElMessage.warning(t('tableFieldConfig.warning.missingTableConfigInfo'))
       return
     }
 
@@ -1181,21 +1272,25 @@
 
   // 删除字段
   const handleDeleteField = (field: TableFieldConfigModel) => {
-    ElMessageBox.confirm(`确定要删除字段 "${field.columnName}" 吗？`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('tableFieldConfig.message.deleteConfirm', { fieldName: field.columnName }),
+      t('common.warning'),
+      {
+        confirmButtonText: t('tableFieldConfig.button.confirm'),
+        cancelButtonText: t('tableFieldConfig.button.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         const res = await TableService.deleteTableFieldConfig({ id: field.id })
         if (res.success) {
-          ElMessage.success('字段配置删除成功')
+          ElMessage.success(t('tableFieldConfig.message.deleteSuccess'))
           // 删除成功后刷新本组件字段列表
           await loadFieldData()
           // 刷新父组件数据
           emit('refresh')
         } else {
-          ElMessage.error(res.message || '字段配置删除失败')
+          ElMessage.error(res.message || t('tableFieldConfig.message.deleteFailed'))
         }
       })
       .catch(() => {
@@ -1204,7 +1299,6 @@
   }
 
   // 添加对formComponentType的监听
-  // 在script部分增加watch
   // 监听组件类型变化，当选择特定组件时关联类型为必填
   watch(
     () => fieldForm.formComponentType,
@@ -1212,7 +1306,7 @@
       if (['SELECT', 'RADIO', 'CHECKBOX'].includes(newVal)) {
         // 如果切换到需要关联类型的组件，但当前未设置关联类型，给出提示
         if (!fieldForm.associatedType) {
-          ElMessage.warning('当前组件类型需要设置关联类型')
+          ElMessage.warning(t('tableFieldConfig.warning.componentTypeRequireAssociated'))
         }
       }
     }
@@ -1220,45 +1314,45 @@
 
   // 组件类型映射
   const componentTypeMap: Record<string, string> = {
-    INPUT: '输入框',
-    TEXTAREA: '文本域',
-    SELECT: '下拉框',
-    INPUT_NUMBER: '数字框',
-    RADIO: '单选框',
-    CHECKBOX: '复选框',
-    COLOR_PICKER: '颜色选择器',
-    ICON_PICKER: '图标选择器',
-    DATE_PICKER: '日期选择器',
-    TIME_PICKER: '时间选择器',
-    DATETIME_PICKER: '日期时间选择器',
-    SWITCH: '开关',
-    IMAGE_UPLOAD: '图片上传',
-    FILE_UPLOAD: '文件上传',
-    RICH_TEXT: '富文本编辑器'
+    INPUT: t('tableFieldConfig.componentType.input'),
+    TEXTAREA: t('tableFieldConfig.componentType.textarea'),
+    SELECT: t('tableFieldConfig.componentType.select'),
+    INPUT_NUMBER: t('tableFieldConfig.componentType.inputNumber'),
+    RADIO: t('tableFieldConfig.componentType.radio'),
+    CHECKBOX: t('tableFieldConfig.componentType.checkbox'),
+    COLOR_PICKER: t('tableFieldConfig.componentType.colorPicker'),
+    ICON_PICKER: t('tableFieldConfig.componentType.iconPicker'),
+    DATE_PICKER: t('tableFieldConfig.componentType.datePicker'),
+    TIME_PICKER: t('tableFieldConfig.componentType.timePicker'),
+    DATETIME_PICKER: t('tableFieldConfig.componentType.datetimePicker'),
+    SWITCH: t('tableFieldConfig.componentType.switch'),
+    IMAGE_UPLOAD: t('tableFieldConfig.componentType.imageUpload'),
+    FILE_UPLOAD: t('tableFieldConfig.componentType.fileUpload'),
+    RICH_TEXT: t('tableFieldConfig.componentType.richText')
   }
 
   // 查询方式映射
   const queryTypeMap: Record<string, string> = {
-    eq: '等于(=)',
-    ne: '不等于(!=)',
-    gt: '大于(>)',
-    ge: '大于等于(>=)',
-    lt: '小于(<)',
-    le: '小于等于(<=)',
-    like: '模糊查询(like)',
-    left_like: '左模糊(%like)',
-    right_like: '右模糊(like%)',
-    between: '范围查询(between)',
-    in: '包含(in)',
-    not_in: '不包含(not in)',
-    is_not_null: '不为空(is not null)',
-    is_null: '为空(is null)'
+    eq: t('tableFieldConfig.queryType.eq'),
+    ne: t('tableFieldConfig.queryType.ne'),
+    gt: t('tableFieldConfig.queryType.gt'),
+    ge: t('tableFieldConfig.queryType.ge'),
+    lt: t('tableFieldConfig.queryType.lt'),
+    le: t('tableFieldConfig.queryType.le'),
+    like: t('tableFieldConfig.queryType.like'),
+    left_like: t('tableFieldConfig.queryType.leftLike'),
+    right_like: t('tableFieldConfig.queryType.rightLike'),
+    between: t('tableFieldConfig.queryType.between'),
+    in: t('tableFieldConfig.queryType.in'),
+    not_in: t('tableFieldConfig.queryType.notIn'),
+    is_not_null: t('tableFieldConfig.queryType.isNotNull'),
+    is_null: t('tableFieldConfig.queryType.isNull')
   }
 
   // 关联类型映射
   const associatedTypeMap: Record<number, string> = {
-    1: '字典类型',
-    2: '关联表名'
+    1: t('tableFieldConfig.associatedType.dictType'),
+    2: t('tableFieldConfig.associatedType.associatedTable')
   }
 </script>
 

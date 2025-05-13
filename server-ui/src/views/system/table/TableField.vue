@@ -13,15 +13,15 @@
       <div class="header-info-card">
         <div class="header-info">
           <div class="info-item">
-            <span class="info-label">表名称:</span>
+            <span class="info-label">{{ $t('tableField.headerInfo.tableName') }}:</span>
             <span class="info-value">{{ tableInfo.tableName }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">数据库名称:</span>
+            <span class="info-label">{{ $t('tableField.headerInfo.dbName') }}:</span>
             <span class="info-value">{{ tableInfo.schemaName }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">表类型:</span>
+            <span class="info-label">{{ $t('tableField.headerInfo.tableType') }}:</span>
             <span class="info-value">
               <el-tag size="small">{{ getTableTypeText(tableInfo.tableType) }}</el-tag>
             </span>
@@ -47,23 +47,23 @@
         >
           <template #left>
             <ElButton
-              title="新增表格字段"
+              :title="$t('tableField.button.add')"
               type="primary"
               @click="handleAdd"
               v-auth="'field_add'"
               v-ripple
             >
-              新增字段
+              {{ $t('tableField.button.add') }}
             </ElButton>
             <ElButton
-              title="批量删除表格字段"
+              :title="$t('tableField.button.batchDelete')"
               type="danger"
               @click="handleBatchDelete"
               :disabled="selectedFields.length === 0"
               v-auth="'field_batch_delete'"
               v-ripple
             >
-              批量删除
+              {{ $t('tableField.button.batchDelete') }}
             </ElButton>
           </template>
         </ArtTableHeader>
@@ -91,7 +91,7 @@
       <!-- 添加/编辑字段对话框 (保持内部结构不变) -->
       <el-dialog
         v-model="fieldDialogVisible"
-        :title="dialogType === 'add' ? '新增字段' : '编辑字段'"
+        :title="dialogType === 'add' ? $t('tableField.addTitle') : $t('tableField.editTitle')"
         width="600px"
         :close-on-click-modal="false"
         :destroy-on-close="true"
@@ -104,15 +104,19 @@
           label-width="100px"
           label-position="right"
         >
-          <el-form-item label="字段名称" prop="columnName">
+          <el-form-item :label="$t('tableField.form.fieldName')" prop="columnName">
             <el-input
               v-model="formData.columnName"
-              placeholder="请输入字段名称"
+              :placeholder="$t('tableField.form.inputFieldName')"
               :disabled="dialogType === 'edit'"
             />
           </el-form-item>
-          <el-form-item label="字段类型" prop="type">
-            <el-select v-model="formData.type" placeholder="请选择字段类型" style="width: 100%">
+          <el-form-item :label="$t('tableField.form.fieldType')" prop="type">
+            <el-select
+              v-model="formData.type"
+              :placeholder="$t('tableField.form.selectFieldType')"
+              style="width: 100%"
+            >
               <el-option label="varchar" value="varchar" />
               <el-option label="int" value="int" />
               <el-option label="bigint" value="bigint" />
@@ -127,45 +131,44 @@
               <el-option label="blob" value="blob" />
             </el-select>
           </el-form-item>
-          <el-form-item label="字段长度" prop="length">
+          <el-form-item :label="$t('tableField.form.fieldLength')" prop="length">
             <el-input-number
               v-model="formData.length"
-              placeholder="请输入长度"
+              :placeholder="$t('tableField.form.inputFieldLength')"
               style="width: 100%"
               :min="0"
               :disabled="!needLength(formData.type)"
               controls-position="right"
             />
           </el-form-item>
-          <el-form-item label="不是 null" prop="isNullable">
+          <el-form-item :label="$t('tableField.form.isNotNull')" prop="isNullable">
             <el-switch
               v-model="formData.isNullable"
               :active-value="true"
               :inactive-value="false"
             ></el-switch>
           </el-form-item>
-          <el-form-item label="字段注释" prop="comment">
+          <el-form-item :label="$t('tableField.form.comment')" prop="comment">
             <el-input
               v-model="formData.comment"
               type="textarea"
               :rows="3"
-              placeholder="请输入字段注释"
+              :placeholder="$t('tableField.form.inputComment')"
             />
           </el-form-item>
         </el-form>
         <template #footer>
+          <el-button :title="$t('tableField.button.cancel')" @click="fieldDialogVisible = false">
+            {{ $t('tableField.button.cancel') }}
+          </el-button>
           <el-button
-            :title="dialogType === 'add' ? '取消新增字段' : '取消编辑字段'"
-            @click="fieldDialogVisible = false"
-            >取消</el-button
-          >
-          <el-button
-            :title="dialogType === 'add' ? '保存新增字段' : '保存编辑字段'"
+            :title="$t('tableField.button.confirm')"
             type="primary"
             @click="submitForm"
             :loading="submitLoading"
-            >确定</el-button
           >
+            {{ $t('tableField.button.confirm') }}
+          </el-button>
         </template>
       </el-dialog>
     </div>
@@ -198,9 +201,12 @@
     EditTableFieldParam
   } from '@/api/model/tableModel'
   import type { FormInstance, FormRules } from 'element-plus'
-  import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue' // 需要导入
+  import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
   import { useCheckedColumns, ColumnOption } from '@/composables/useCheckedColumns'
-  import type { SearchFormItem } from '@/types/search-form' // 确认路径
+  import type { SearchFormItem } from '@/types/search-form'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 定义属性
   const props = defineProps({
@@ -268,11 +274,11 @@
   // 搜索栏配置
   const formItems: SearchFormItem[] = [
     {
-      label: '字段名称',
+      label: t('tableField.search.fieldName'),
       prop: 'columnName',
       type: 'input',
       config: {
-        placeholder: '请输入字段名称搜索',
+        placeholder: t('tableField.search.inputFieldName'),
         clearable: true
       }
     }
@@ -280,37 +286,37 @@
 
   // 表格列配置
   const columnOptions: ColumnOption[] = [
-    { label: '勾选', type: 'selection', width: 55 },
-    { prop: 'columnName', label: '字段名称', minWidth: 150 },
-    { prop: 'length', label: '字段长度', minWidth: 100 },
-    { prop: 'type', label: '字段类型', minWidth: 120 },
+    { label: t('tableField.column.selection'), type: 'selection', width: 55 },
+    { prop: 'columnName', label: t('tableField.column.fieldName'), minWidth: 150 },
+    { prop: 'length', label: t('tableField.column.fieldLength'), minWidth: 100 },
+    { prop: 'type', label: t('tableField.column.fieldType'), minWidth: 120 },
     {
       prop: 'isNullable',
-      label: '不是 null', // 注意：规则是 isNullable，显示文本反过来
+      label: t('tableField.column.isNotNull'), // 注意：规则是 isNullable，显示文本反过来
       minWidth: 120,
       formatter: (row) =>
         h(
           ElTag,
           { type: !row.isNullable ? 'success' : 'danger' }, // API 返回 true 表示允许为空，false 表示不允许
-          () => (!row.isNullable ? '否' : '是')
+          () => (!row.isNullable ? t('tableField.column.no') : t('tableField.column.yes'))
         )
     },
-    { prop: 'comment', label: '字段注释', minWidth: 180 },
+    { prop: 'comment', label: t('tableField.column.comment'), minWidth: 180 },
     {
       prop: 'actions',
-      label: '操作',
+      label: t('tableField.column.actions'),
       fixed: 'right',
       width: 180,
       formatter: (row) =>
         h(ElSpace, null, () => [
           h(ArtButtonTable, {
-            title: '编辑字段',
+            title: t('tableField.button.edit'),
             type: 'edit',
             auth: 'field_edit',
             onClick: () => handleEdit(row)
           }),
           h(ArtButtonTable, {
-            title: '删除字段',
+            title: t('tableField.button.delete'),
             type: 'delete',
             auth: 'field_batch_delete', // 注意：权限标识可能需要区分单行删除和批量删除
             onClick: () => handleDelete(row)
@@ -365,12 +371,12 @@
         fieldList.value = res.data.records
         pagination.total = res.data.total
       } else {
-        ElMessage.error(res.message || '获取字段列表失败')
+        ElMessage.error(res.message || t('tableField.message.getListFailed'))
         console.error('字段列表加载失败:', res.message)
       }
     } catch (error) {
       console.error('获取字段列表失败:', error)
-      ElMessage.error('获取字段列表时发生错误')
+      ElMessage.error(t('tableField.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -430,15 +436,17 @@
   // 内层表单验证规则
   const formRules = reactive<FormRules>({
     columnName: [
-      { required: true, message: '请输入字段名称', trigger: 'blur' },
-      { max: 64, message: '长度不能超过64个字符', trigger: 'blur' }
+      { required: true, message: t('tableField.validation.fieldNameRequired'), trigger: 'blur' },
+      { max: 64, message: t('tableField.validation.fieldNameLength'), trigger: 'blur' }
     ],
-    type: [{ required: true, message: '请选择字段类型', trigger: 'change' }],
+    type: [
+      { required: true, message: t('tableField.validation.fieldTypeRequired'), trigger: 'change' }
+    ],
     length: [
       {
         validator: (rule, value, callback) => {
           if (needLength(formData.type) && (value === null || value === undefined || value < 0)) {
-            callback(new Error('请输入有效的字段长度'))
+            callback(new Error(t('tableField.validation.fieldLengthRequired')))
           } else {
             callback()
           }
@@ -566,15 +574,28 @@
           }
 
           if (res.success) {
-            ElMessage.success(dialogType.value === 'add' ? '添加成功' : '编辑成功')
+            ElMessage.success(
+              dialogType.value === 'add'
+                ? t('tableField.message.addSuccess')
+                : t('tableField.message.editSuccess')
+            )
             fieldDialogVisible.value = false
             loadFieldList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || (dialogType.value === 'add' ? '添加失败' : '编辑失败'))
+            ElMessage.error(
+              res.message ||
+                (dialogType.value === 'add'
+                  ? t('tableField.message.addFailed')
+                  : t('tableField.message.editFailed'))
+            )
           }
         } catch (error) {
           console.error(dialogType.value === 'add' ? '添加字段失败:' : '编辑字段失败:', error)
-          ElMessage.error(dialogType.value === 'add' ? '添加字段时发生错误' : '编辑字段时发生错误')
+          ElMessage.error(
+            dialogType.value === 'add'
+              ? t('tableField.message.addError')
+              : t('tableField.message.editError')
+          )
         } finally {
           submitLoading.value = false
         }
@@ -585,13 +606,13 @@
   // 处理批量删除
   const handleBatchDelete = () => {
     if (selectedFields.value.length === 0) {
-      ElMessage.warning('请至少选择一个字段')
+      ElMessage.warning(t('tableField.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要删除选中的字段吗？此操作不可恢复！', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('tableField.message.batchDeleteConfirm'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -611,32 +632,39 @@
           ).length
 
           if (failedCount === 0) {
-            ElMessage.success('批量删除成功')
+            ElMessage.success(t('tableField.message.batchDeleteSuccess'))
           } else {
             ElMessage.warning(
-              `批量删除完成，${selectedFields.value.length - failedCount} 个成功，${failedCount} 个失败。`
+              t('tableField.message.batchDeletePartial', {
+                success: selectedFields.value.length - failedCount,
+                failed: failedCount
+              })
             )
           }
           loadFieldList() // 重新加载数据
         } catch (error) {
           console.error('批量删除字段过程中发生错误:', error)
-          ElMessage.error('批量删除字段时发生未知错误')
+          ElMessage.error(t('tableField.message.batchDeleteError'))
         } finally {
           loading.value = false // 结束 loading
         }
       })
       .catch(() => {
-        ElMessage.info('取消了批量删除操作') // 添加 .catch 处理
+        ElMessage.info(t('tableField.message.cancelBatchDelete'))
       })
   }
 
   // 处理单个删除
   const handleDelete = (row: TableFieldRecordModel) => {
-    ElMessageBox.confirm(`确定要删除字段 "${row.columnName}" 吗？此操作不可恢复！`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('tableField.message.deleteConfirm', { name: row.columnName }),
+      t('common.tips'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await TableService.deleteField({
@@ -645,29 +673,29 @@
             // 根据API定义，不需要schemaName参数
           })
           if (res.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('tableField.message.deleteSuccess'))
             loadFieldList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '删除失败')
+            ElMessage.error(res.message || t('tableField.message.deleteFailed'))
           }
         } catch (error) {
           console.error('删除字段失败:', error)
-          ElMessage.error('删除字段时发生错误')
+          ElMessage.error(t('tableField.message.deleteError'))
         }
       })
       .catch(() => {
-        ElMessage.info('取消了删除操作') // 添加 .catch 处理
+        ElMessage.info(t('tableField.message.cancelDelete'))
       })
   }
 
   // 获取表格类型对应的文本
   const getTableTypeText = (typeCode: number): string => {
     const map: Record<number, string> = {
-      1: '基本类型',
-      2: '树结构类型',
-      3: '关联类型'
+      1: t('tableField.headerInfo.basicType'),
+      2: t('tableField.headerInfo.treeType'),
+      3: t('tableField.headerInfo.relationType')
     }
-    return map[typeCode] || `未知类型(${typeCode})`
+    return map[typeCode] || t('tableField.headerInfo.unknownType', { typeCode })
   }
 
   // 对话框关闭处理函数

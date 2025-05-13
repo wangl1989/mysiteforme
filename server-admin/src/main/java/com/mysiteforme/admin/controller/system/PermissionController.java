@@ -8,9 +8,11 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.request.AddPermissionRequest;
 import com.mysiteforme.admin.entity.request.PageListPermissionRequest;
 import com.mysiteforme.admin.entity.request.UpdatePermissionRequest;
+import com.mysiteforme.admin.util.LimitType;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +27,13 @@ import com.mysiteforme.admin.util.ResultCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/permission")
 @RequiredArgsConstructor
+@RateLimit(limit = 30, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class PermissionController{
 
     private final PermissionService permissionService;

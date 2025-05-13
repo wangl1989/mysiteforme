@@ -7,11 +7,11 @@
         <el-icon class="arrow-icon" :class="{ 'is-expanded': groupVisible['1'] }">
           <arrow-right />
         </el-icon>
-        <span>路由权限</span>
+        <span>{{ $t('menu.permissionList.groupTitle.route') }}</span>
       </div>
       <div v-show="groupVisible['1']">
         <el-table :data="getPermissionsByType('1')" style="width: 100%">
-          <el-table-column prop="permissionName" label="权限名称" min-width="180">
+          <el-table-column prop="permissionName" :label="$t('menu.permissionList.table.permissionName')" min-width="180">
             <template #default="scope">
               <div class="permission-name-cell">
                 <i
@@ -26,26 +26,26 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="page.pageUrl" label="路由地址" min-width="180" />
-          <el-table-column prop="sort" label="排序值" width="80" align="center" />
-          <el-table-column prop="updateDate" label="更新时间" width="160">
+          <el-table-column prop="page.pageUrl" :label="$t('menu.permissionList.table.routeAddress')" min-width="180" />
+          <el-table-column prop="sort" :label="$t('menu.permissionList.table.sortValue')" width="80" align="center" />
+          <el-table-column prop="updateDate" :label="$t('menu.permissionList.table.updateTime')" width="160">
             <template #default="scope">
               {{ formatDate(scope.row.updateDate) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120" align="right">
+          <el-table-column :label="$t('menu.permissionList.table.operation')" width="120" align="right">
             <template #default="scope">
               <span
                 class="action-btn edit-btn"
                 v-auth="'permission_edit'"
                 @click="handleEdit(scope.row)"
-                >编辑</span
+                >{{ $t('menu.permissionList.operation.edit') }}</span
               >
               <span
                 class="action-btn delete-btn"
                 v-auth="'permission_delete'"
                 @click="handleDelete(scope.row)"
-                >删除</span
+                >{{ $t('menu.permissionList.operation.delete') }}</span
               >
             </template>
           </el-table-column>
@@ -59,11 +59,11 @@
         <el-icon class="arrow-icon" :class="{ 'is-expanded': groupVisible['2'] }">
           <arrow-right />
         </el-icon>
-        <span>按钮权限</span>
+        <span>{{ $t('menu.permissionList.groupTitle.button') }}</span>
       </div>
       <div v-show="groupVisible['2']">
         <el-table :data="getPermissionsByType('2')" style="width: 100%">
-          <el-table-column prop="permissionName" label="权限名称" min-width="150">
+          <el-table-column prop="permissionName" :label="$t('menu.permissionList.table.permissionName')" min-width="150">
             <template #default="scope">
               <div class="permission-name-cell">
                 <i
@@ -78,26 +78,26 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="button.buttonKey" label="按钮关键词" min-width="150" />
-          <el-table-column prop="sort" label="排序值" width="80" align="center" />
-          <el-table-column prop="updateDate" label="更新时间" width="160">
+          <el-table-column prop="button.buttonKey" :label="$t('menu.permissionList.table.buttonKey')" min-width="150" />
+          <el-table-column prop="sort" :label="$t('menu.permissionList.table.sortValue')" width="80" align="center" />
+          <el-table-column prop="updateDate" :label="$t('menu.permissionList.table.updateTime')" width="160">
             <template #default="scope">
               {{ formatDate(scope.row.updateDate) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120" align="right">
+          <el-table-column :label="$t('menu.permissionList.table.operation')" width="120" align="right">
             <template #default="scope">
               <span
                 class="action-btn edit-btn"
                 v-auth="'permission_edit'"
                 @click="handleEdit(scope.row)"
-                >编辑</span
+                >{{ $t('menu.permissionList.operation.edit') }}</span
               >
               <span
                 class="action-btn delete-btn"
                 v-auth="'permission_delete'"
                 @click="handleDelete(scope.row)"
-                >删除</span
+                >{{ $t('menu.permissionList.operation.delete') }}</span
               >
             </template>
           </el-table-column>
@@ -111,11 +111,11 @@
         <el-icon class="arrow-icon" :class="{ 'is-expanded': groupVisible['3'] }">
           <arrow-right />
         </el-icon>
-        <span>API权限</span>
+        <span>{{ $t('menu.permissionList.groupTitle.api') }}</span>
       </div>
       <div v-show="groupVisible['3']">
         <el-table :data="getPermissionsByType('3')" style="width: 100%">
-          <el-table-column prop="permissionName" label="权限名称" min-width="120">
+          <el-table-column prop="permissionName" :label="$t('menu.permissionList.table.permissionName')" min-width="120">
             <template #default="scope">
               <div class="permission-name-cell">
                 <i
@@ -130,31 +130,31 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="api.apiUrl" label="API地址" min-width="150" />
-          <el-table-column prop="api.httpMethod" label="请求方法" width="100" align="center">
+          <el-table-column prop="api.apiUrl" :label="$t('menu.permissionList.table.apiAddress')" min-width="150" />
+          <el-table-column prop="api.httpMethod" :label="$t('menu.permissionList.table.requestMethod')" width="100" align="center">
             <template #default="scope">
               <el-tag :type="getMethodTagType(scope.row.api?.httpMethod)" size="small">
                 {{ scope.row.api?.httpMethod || '-' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="api.common" label="公共接口" width="100" align="center">
+          <el-table-column prop="api.common" :label="$t('menu.permissionList.table.isPublic')" width="100" align="center">
             <template #default="scope">
               <el-tag :type="scope.row.api?.common ? 'success' : 'info'" size="small">
-                {{ scope.row.api?.common ? '是' : '否' }}
+                {{ scope.row.api?.common ? $t('menu.permissionList.tag.yes') : $t('menu.permissionList.tag.no') }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="sort" label="排序值" width="80" align="center" />
-          <el-table-column prop="updateDate" label="更新时间" width="160">
+          <el-table-column prop="sort" :label="$t('menu.permissionList.table.sortValue')" width="80" align="center" />
+          <el-table-column prop="updateDate" :label="$t('menu.permissionList.table.updateTime')" width="160">
             <template #default="scope">
               {{ formatDate(scope.row.updateDate) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120" align="right">
+          <el-table-column :label="$t('menu.permissionList.table.operation')" width="120" align="right">
             <template #default="scope">
-              <span class="action-btn edit-btn" @click="handleEdit(scope.row)">编辑</span>
-              <span class="action-btn delete-btn" @click="handleDelete(scope.row)">删除</span>
+              <span class="action-btn edit-btn" @click="handleEdit(scope.row)">{{ $t('menu.permissionList.operation.edit') }}</span>
+              <span class="action-btn delete-btn" @click="handleDelete(scope.row)">{{ $t('menu.permissionList.operation.delete') }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -162,7 +162,7 @@
     </div>
 
     <!-- 当没有任何权限数据时显示提示 -->
-    <div class="no-permission-tip" v-if="!hasAnyPermissions">该菜单下暂无权限数据</div>
+    <div class="no-permission-tip" v-if="!hasAnyPermissions">{{ $t('menu.permissionList.noData') }}</div>
   </div>
 </template>
 

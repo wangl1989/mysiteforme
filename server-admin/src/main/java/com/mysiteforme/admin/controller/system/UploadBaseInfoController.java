@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.UploadBaseInfo;
 import com.mysiteforme.admin.entity.request.AddUploadBaseInfoRequest;
 import com.mysiteforme.admin.entity.request.PageListUploadBaseInfoRequest;
@@ -18,10 +19,12 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/admin/uploadBaseInfo")
 @RequiredArgsConstructor
+@RateLimit(limit = 30, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class UploadBaseInfoController {
 
     private final UploadBaseInfoService uploadBaseInfoService;

@@ -19,16 +19,16 @@
         >
           <template #left>
             <ElButton type="primary" @click="handleAdd" v-auth="'tableconfig_add'" v-ripple>
-              新增表格配置
+              {{ $t('tableConfig.button.add') }}
             </ElButton>
             <ElButton
-              title="批量删除表格配置"
+              :title="$t('tableConfig.button.batchDelete')"
               type="danger"
               @click="handleBatchDelete"
               v-auth="'tableconfig_batch_delete'"
               v-ripple
             >
-              批量删除
+              {{ $t('tableConfig.button.batchDelete') }}
             </ElButton>
             <ElButton
               type="success"
@@ -36,7 +36,7 @@
               v-auth="'tableconfig_download'"
               v-ripple
             >
-              下载源码
+              {{ $t('tableConfig.button.downloadCode') }}
             </ElButton>
           </template>
         </ArtTableHeader>
@@ -64,7 +64,7 @@
       <!-- 添加/编辑对话框 -->
       <ElDialog
         v-model="dialogVisible"
-        :title="dialogType === 'add' ? '新增表格配置' : '编辑表格配置'"
+        :title="dialogType === 'add' ? $t('tableConfig.addTitle') : $t('tableConfig.editTitle')"
         width="580px"
         :close-on-click-modal="false"
       >
@@ -75,10 +75,10 @@
           label-width="100px"
           label-position="right"
         >
-          <el-form-item label="数据库名称" prop="schemaName">
+          <el-form-item :label="$t('tableConfig.form.dbName')" prop="schemaName">
             <el-select
               v-model="formData.schemaName"
-              placeholder="请选择数据库名称"
+              :placeholder="$t('tableConfig.form.selectDbName')"
               filterable
               clearable
               @change="handleSchemaChange"
@@ -87,10 +87,10 @@
               <el-option v-for="item in schemaNameList" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
-          <el-form-item label="表格名称" prop="tableName">
+          <el-form-item :label="$t('tableConfig.form.tableName')" prop="tableName">
             <el-select
               v-model="formData.tableName"
-              placeholder="请选择表格名称"
+              :placeholder="$t('tableConfig.form.selectTableName')"
               filterable
               clearable
               style="width: 100%"
@@ -99,53 +99,76 @@
               <el-option v-for="item in tableNameList" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
-          <el-form-item label="表格前缀" prop="tablePrefix">
-            <el-input v-model="formData.tablePrefix" placeholder="请输入表格前缀" />
+          <el-form-item :label="$t('tableConfig.form.tablePrefix')" prop="tablePrefix">
+            <el-input
+              v-model="formData.tablePrefix"
+              :placeholder="$t('tableConfig.form.inputTablePrefix')"
+            />
           </el-form-item>
-          <el-form-item label="业务名称" prop="businessName">
-            <el-input v-model="formData.businessName" placeholder="请输入业务名称" />
+          <el-form-item :label="$t('tableConfig.form.businessName')" prop="businessName">
+            <el-input
+              v-model="formData.businessName"
+              :placeholder="$t('tableConfig.form.inputBusinessName')"
+            />
           </el-form-item>
-          <el-form-item label="模块名称" prop="moduleName">
-            <el-input v-model="formData.moduleName" placeholder="请输入模块名称" />
+          <el-form-item :label="$t('tableConfig.form.moduleName')" prop="moduleName">
+            <el-input
+              v-model="formData.moduleName"
+              :placeholder="$t('tableConfig.form.inputModuleName')"
+            />
           </el-form-item>
-          <el-form-item label="包名称" prop="packageName">
-            <el-input v-model="formData.packageName" placeholder="请输入包名称" />
+          <el-form-item :label="$t('tableConfig.form.packageName')" prop="packageName">
+            <el-input
+              v-model="formData.packageName"
+              :placeholder="$t('tableConfig.form.inputPackageName')"
+            />
           </el-form-item>
-          <el-form-item label="作者" prop="author">
-            <el-input v-model="formData.author" placeholder="请输入作者" />
+          <el-form-item :label="$t('tableConfig.form.author')" prop="author">
+            <el-input v-model="formData.author" :placeholder="$t('tableConfig.form.inputAuthor')" />
           </el-form-item>
-          <el-form-item label="生成路径" prop="generatePath">
-            <el-input v-model="formData.generatePath" placeholder="请输入生成路径" />
+          <el-form-item :label="$t('tableConfig.form.generatePath')" prop="generatePath">
+            <el-input
+              v-model="formData.generatePath"
+              :placeholder="$t('tableConfig.form.inputGeneratePath')"
+            />
           </el-form-item>
-          <el-form-item label="选项" prop="options">
+          <el-form-item :label="$t('tableConfig.form.options')" prop="options">
             <el-input
               v-model="formData.options"
               type="textarea"
               :rows="3"
-              placeholder="请输入选项，如JSON格式配置"
+              :placeholder="$t('tableConfig.form.inputOptions')"
             />
           </el-form-item>
-          <el-form-item label="备注" prop="remarks">
+          <el-form-item :label="$t('tableConfig.form.remarks')" prop="remarks">
             <el-input
               v-model="formData.remarks"
               type="textarea"
               :rows="3"
-              placeholder="请输入备注信息"
+              :placeholder="$t('tableConfig.form.inputRemarks')"
             />
           </el-form-item>
         </el-form>
         <template #footer>
           <el-button
-            :title="dialogType === 'add' ? '取消新增表格配置' : '取消编辑表格配置'"
+            :title="
+              dialogType === 'add'
+                ? $t('tableConfig.button.cancel')
+                : $t('tableConfig.button.cancel')
+            "
             @click="dialogVisible = false"
-            >取消</el-button
+            >{{ $t('tableConfig.button.cancel') }}</el-button
           >
           <el-button
-            :title="dialogType === 'add' ? '保存新增表格配置' : '保存编辑表格配置'"
+            :title="
+              dialogType === 'add'
+                ? $t('tableConfig.button.confirm')
+                : $t('tableConfig.button.confirm')
+            "
             type="primary"
             @click="submitForm"
             :loading="submitLoading"
-            >确定</el-button
+            >{{ $t('tableConfig.button.confirm') }}</el-button
           >
         </template>
       </ElDialog>
@@ -192,6 +215,9 @@
   import { useCheckedColumns, ColumnOption } from '@/composables/useCheckedColumns'
   import type { SearchFormItem } from '@/types/search-form'
   import FileSaver from 'file-saver'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 加载状态
   const loading = ref(false)
@@ -237,50 +263,50 @@
   // 搜索栏配置
   const formItems: SearchFormItem[] = [
     {
-      label: '表格名称',
+      label: t('tableConfig.search.tableName'),
       prop: 'tableName',
       type: 'input',
       elColSpan: 5,
       config: {
-        placeholder: '请输入表格名称',
+        placeholder: t('tableConfig.search.inputTableName'),
         clearable: true
       }
     },
     {
-      label: '数据库名称',
+      label: t('tableConfig.search.dbName'),
       labelWidth: '100px',
       prop: 'schemaName',
       type: 'select',
       elColSpan: 5,
       options: () => schemaNameList.value.map((name) => ({ label: name, value: name })),
       config: {
-        placeholder: '请选择数据库名称',
+        placeholder: t('tableConfig.search.selectDbName'),
         clearable: true
       }
     },
     {
-      label: '业务名称',
+      label: t('tableConfig.search.businessName'),
       labelWidth: '100px',
       prop: 'businessName',
       type: 'input',
       elColSpan: 6,
       config: {
-        placeholder: '请输入业务名称',
+        placeholder: t('tableConfig.search.inputBusinessName'),
         clearable: true
       }
     },
     {
-      label: '配置状态',
+      label: t('tableConfig.search.status'),
       labelWidth: '100px',
       prop: 'delFlag',
       type: 'select',
       elColSpan: 5,
       options: () => [
-        { label: '正常', value: '0' },
-        { label: '已删除', value: '1' }
+        { label: t('tableConfig.search.normal'), value: '0' },
+        { label: t('tableConfig.search.deleted'), value: '1' }
       ],
       config: {
-        placeholder: '请选择配置状态',
+        placeholder: t('tableConfig.search.selectStatus'),
         clearable: true
       }
     }
@@ -288,62 +314,82 @@
 
   // 表格列配置
   const columnOptions: ColumnOption[] = [
-    { label: '勾选', type: 'selection' },
+    { label: t('tableConfig.column.selection'), type: 'selection' },
     {
       prop: 'tableType',
-      label: '表格类型',
+      label: t('tableConfig.column.tableType'),
       minWidth: 120,
       formatter: (row) => h(ElTag, null, () => getTableTypeText(row.tableType))
     },
-    { prop: 'tableName', label: '表格名称', minWidth: 180 },
-    { prop: 'tablePrefix', label: '表格前缀', minWidth: 120, checked: false },
-    { prop: 'schemaName', label: '数据库名称', minWidth: 150 },
-    { prop: 'businessName', label: '业务名称', minWidth: 150 },
-    { prop: 'moduleName', label: '模块名称', minWidth: 150, checked: false },
-    { prop: 'packageName', label: '包名称', minWidth: 150, checked: false },
-    { prop: 'author', label: '作者', minWidth: 120 },
-    { prop: 'generatePath', label: '生成路径', minWidth: 200, checked: false },
+    { prop: 'tableName', label: t('tableConfig.column.tableName'), minWidth: 180 },
+    {
+      prop: 'tablePrefix',
+      label: t('tableConfig.column.tablePrefix'),
+      minWidth: 120,
+      checked: false
+    },
+    { prop: 'schemaName', label: t('tableConfig.column.dbName'), minWidth: 150 },
+    { prop: 'businessName', label: t('tableConfig.column.businessName'), minWidth: 150 },
+    {
+      prop: 'moduleName',
+      label: t('tableConfig.column.moduleName'),
+      minWidth: 150,
+      checked: false
+    },
+    {
+      prop: 'packageName',
+      label: t('tableConfig.column.packageName'),
+      minWidth: 150,
+      checked: false
+    },
+    { prop: 'author', label: t('tableConfig.column.author'), minWidth: 120 },
+    {
+      prop: 'generatePath',
+      label: t('tableConfig.column.generatePath'),
+      minWidth: 200,
+      checked: false
+    },
     {
       prop: 'fieldCount',
-      label: '可配置字段',
+      label: t('tableConfig.column.fieldCount'),
       minWidth: 120,
       formatter: (row) => {
         if (row.fieldCount > 0) {
           return h(
             ElButton,
             {
-              title: '可配置字段列表',
+              title: t('tableConfig.column.fieldCount'),
               type: 'primary',
               link: true,
               onClick: () => openFieldConfig(row)
             },
-            () => `共 ${row.fieldCount} 个字段`
+            () => t('tableConfig.column.fieldCountText', { count: row.fieldCount })
           )
         } else {
           return h('span', '-')
         }
       }
     },
-    { prop: 'remarks', label: '备注', minWidth: 150 },
+    { prop: 'remarks', label: t('tableConfig.column.remarks'), minWidth: 150 },
     {
       prop: 'updateDate',
-      label: '更新时间',
+      label: t('tableConfig.column.updateTime'),
       minWidth: 170,
       formatter: (row) => (row.updateDate ? formatDate(row.updateDate) : '-')
     },
     {
       prop: 'delFlag',
-      label: '状态',
+      label: t('tableConfig.column.status'),
       minWidth: 100,
       checked: false,
       formatter: (row) =>
         h(ElTag, { type: row.delFlag ? 'danger' : 'success' }, () =>
-          row.delFlag ? '已删除' : '正常'
+          row.delFlag ? t('tableConfig.column.statusDeleted') : t('tableConfig.column.statusNormal')
         )
     },
     {
       prop: 'actions',
-      label: '操作',
+      label: t('tableConfig.column.actions'),
       fixed: 'right',
       width: 220,
       formatter: (row) =>
@@ -353,19 +399,19 @@
           if (!row.delFlag) {
             buttons.push(
               h(ArtButtonTable, {
-                title: '编辑表格配置',
+                title: t('tableConfig.button.edit'),
                 type: 'edit',
                 auth: 'tableconfig_edit',
                 onClick: () => handleEdit(row)
               }),
               h(ArtButtonTable, {
-                title: '同步表格字段配置',
-                text: '同步字段',
+                title: t('tableConfig.button.syncFields'),
+                text: t('tableConfig.button.syncFields'),
                 auth: 'tableconfig_sync_field',
                 onClick: () => handleSyncFields(row)
               }),
               h(ArtButtonTable, {
-                title: '删除表格配置',
+                title: t('tableConfig.button.delete'),
                 type: 'delete',
                 auth: 'tableconfig_delete',
                 onClick: () => handleDelete(row)
@@ -374,14 +420,14 @@
           } else {
             buttons.push(
               h(ArtButtonTable, {
-                title: '恢复表格配置',
+                title: t('tableConfig.button.recover'),
                 icon: '&#xe64b',
                 iconColor: '#67c23a',
                 auth: 'tableconfig_recover',
                 onClick: () => handleRecover(row)
               }),
               h(ArtButtonTable, {
-                title: '彻底删除表格配置',
+                title: t('tableConfig.button.completeDelete'),
                 type: 'delete',
                 auth: 'tableconfig_complete_delete',
                 onClick: () => handleCompletelyDelete(row)
@@ -419,17 +465,23 @@
   // 表单验证规则
   const formRules = reactive<FormRules>({
     tableName: [
-      { required: true, message: '请输入表格名称', trigger: 'blur' },
-      { max: 100, message: '长度不能超过100个字符', trigger: 'blur' }
+      { required: true, message: t('tableConfig.validation.tableNameRequired'), trigger: 'blur' },
+      { max: 100, message: t('tableConfig.validation.tableNameLength'), trigger: 'blur' }
     ],
-    tablePrefix: [{ max: 30, message: '长度不能超过30个字符', trigger: 'blur' }],
+    tablePrefix: [
+      { max: 30, message: t('tableConfig.validation.tablePrefixLength'), trigger: 'blur' }
+    ],
     schemaName: [
-      { required: true, message: '请输入数据库名称', trigger: 'blur' },
-      { max: 100, message: '长度不能超过100个字符', trigger: 'blur' }
+      { required: true, message: t('tableConfig.validation.dbNameRequired'), trigger: 'blur' },
+      { max: 100, message: t('tableConfig.validation.dbNameLength'), trigger: 'blur' }
     ],
     businessName: [
-      { required: true, message: '请输入业务名称', trigger: 'blur' },
-      { max: 100, message: '长度不能超过100个字符', trigger: 'blur' }
+      {
+        required: true,
+        message: t('tableConfig.validation.businessNameRequired'),
+        trigger: 'blur'
+      },
+      { max: 100, message: t('tableConfig.validation.businessNameLength'), trigger: 'blur' }
     ]
   })
 
@@ -446,11 +498,11 @@
         tableConfigList.value = res.data.records
         pagination.total = res.data.total
       } else {
-        ElMessage.error(res.message || '获取表格配置列表失败')
+        ElMessage.error(res.message || t('tableConfig.message.getListFailed'))
       }
     } catch (error) {
       console.error('获取表格配置列表失败:', error)
-      ElMessage.error('获取表格配置列表时发生错误')
+      ElMessage.error(t('tableConfig.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -489,7 +541,7 @@
   // 处理批量删除
   const handleBatchDelete = () => {
     if (selectedConfigs.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('tableConfig.message.selectAtLeastOne'))
       return
     }
 
@@ -497,13 +549,13 @@
     const validConfigs = selectedConfigs.value.filter((config) => !config.delFlag)
 
     if (validConfigs.length === 0) {
-      ElMessage.warning('所选记录均已被删除，请重新选择')
+      ElMessage.warning(t('tableConfig.message.allDeleted'))
       return
     }
 
-    ElMessageBox.confirm('确定要删除选中的表格配置吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('tableConfig.message.batchDeleteConfirm'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -516,55 +568,59 @@
           const success = results.every((res) => res.success)
 
           if (success) {
-            ElMessage.success('批量删除成功')
+            ElMessage.success(t('tableConfig.message.batchDeleteSuccess'))
             loadTableConfigList() // 重新加载数据
           } else {
-            ElMessage.error('部分或全部删除失败，请重试')
+            ElMessage.error(t('tableConfig.message.batchDeleteFailed'))
           }
         } catch (error) {
           console.error('批量删除表格配置失败:', error)
-          ElMessage.error('批量删除表格配置时发生错误')
+          ElMessage.error(t('tableConfig.message.batchDeleteError'))
         }
       })
       .catch(() => {
-        ElMessage.info('取消了批量删除操作')
+        ElMessage.info(t('tableConfig.message.cancelBatchDelete'))
       })
   }
 
   // 处理单个删除
   const handleDelete = (row: TableConfigModel) => {
-    ElMessageBox.confirm(`确定要删除表格配置 "${row.tableName}" 吗？`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('tableConfig.message.deleteConfirm', { name: row.tableName }),
+      t('common.tips'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await TableService.deleteTableConfig(row.id)
           if (res.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('tableConfig.message.deleteSuccess'))
             loadTableConfigList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '删除失败')
+            ElMessage.error(res.message || t('tableConfig.message.deleteFailed'))
           }
         } catch (error) {
           console.error('删除表格配置失败:', error)
-          ElMessage.error('删除表格配置时发生错误')
+          ElMessage.error(t('tableConfig.message.deleteError'))
         }
       })
       .catch(() => {
-        ElMessage.info('取消了删除操作')
+        ElMessage.info(t('tableConfig.message.cancelDelete'))
       })
   }
 
   // 处理彻底删除
   const handleCompletelyDelete = (row: TableConfigModel) => {
     ElMessageBox.confirm(
-      `确定要彻底删除表格配置 "${row.tableName}" 吗？这会把所有配置字段一并删除,且不能恢复！！！`,
-      '警告',
+      t('tableConfig.message.completeDeleteConfirm', { name: row.tableName }),
+      t('common.tips'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     )
@@ -572,44 +628,48 @@
         try {
           const res = await TableService.completelyDeleteTableConfig(row.id)
           if (res.success) {
-            ElMessage.success('彻底删除成功')
+            ElMessage.success(t('tableConfig.message.completeDeleteSuccess'))
             loadTableConfigList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '彻底删除失败')
+            ElMessage.error(res.message || t('tableConfig.message.completeDeleteFailed'))
           }
         } catch (error) {
           console.error('彻底删除表格配置失败:', error)
-          ElMessage.error('彻底删除表格配置时发生错误')
+          ElMessage.error(t('tableConfig.message.completeDeleteError'))
         }
       })
       .catch(() => {
-        ElMessage.info('取消了彻底删除操作')
+        ElMessage.info(t('tableConfig.message.cancelDelete'))
       })
   }
 
   // 处理恢复
   const handleRecover = (row: TableConfigModel) => {
-    ElMessageBox.confirm(`确定要恢复表格配置 "${row.tableName}" 吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'info'
-    })
+    ElMessageBox.confirm(
+      t('tableConfig.message.recoverConfirm', { name: row.tableName }),
+      t('common.tips'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'info'
+      }
+    )
       .then(async () => {
         try {
           const res = await TableService.recoverTableConfig(row.id)
           if (res.success) {
-            ElMessage.success('恢复成功')
+            ElMessage.success(t('tableConfig.message.recoverSuccess'))
             loadTableConfigList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '恢复失败')
+            ElMessage.error(res.message || t('tableConfig.message.recoverFailed'))
           }
         } catch (error) {
           console.error('恢复表格配置失败:', error)
-          ElMessage.error('恢复表格配置时发生错误')
+          ElMessage.error(t('tableConfig.message.recoverError'))
         }
       })
       .catch(() => {
-        ElMessage.info('取消了恢复操作')
+        ElMessage.info(t('tableConfig.message.cancelRecover'))
       })
   }
 
@@ -623,14 +683,14 @@
       }
       const res = await TableService.syncFieldsByTableName(params)
       if (res.success) {
-        ElMessage.success('同步字段列表成功')
+        ElMessage.success(t('tableConfig.message.syncFieldsSuccess'))
         loadTableConfigList() // 重新加载数据
       } else {
-        ElMessage.error(res.message || '同步字段列表失败')
+        ElMessage.error(res.message || t('tableConfig.message.syncFieldsFailed'))
       }
     } catch (error) {
       console.error('同步字段列表失败:', error)
-      ElMessage.error('同步字段列表时发生错误')
+      ElMessage.error(t('tableConfig.message.syncFieldsError'))
     }
   }
 
@@ -692,11 +752,20 @@
           }
 
           if (res.success) {
-            ElMessage.success(dialogType.value === 'add' ? '添加成功' : '编辑成功')
+            ElMessage.success(
+              dialogType.value === 'add'
+                ? t('tableConfig.message.addSuccess')
+                : t('tableConfig.message.editSuccess')
+            )
             dialogVisible.value = false
             loadTableConfigList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || (dialogType.value === 'add' ? '添加失败' : '编辑失败'))
+            ElMessage.error(
+              res.message ||
+                (dialogType.value === 'add'
+                  ? t('tableConfig.message.addFailed')
+                  : t('tableConfig.message.editFailed'))
+            )
           }
         } catch (error) {
           console.error(
@@ -704,7 +773,9 @@
             error
           )
           ElMessage.error(
-            dialogType.value === 'add' ? '添加表格配置时发生错误' : '编辑表格配置时发生错误'
+            dialogType.value === 'add'
+              ? t('tableConfig.message.addError')
+              : t('tableConfig.message.editError')
           )
         } finally {
           submitLoading.value = false
@@ -733,11 +804,11 @@
       if (res.success && res.data) {
         schemaNameList.value = res.data
       } else {
-        ElMessage.error(res.message || '获取数据库名称列表失败')
+        ElMessage.error(res.message || t('tableConfig.message.getDbListFailed'))
       }
     } catch (error) {
       console.error('获取数据库名称列表失败:', error)
-      ElMessage.error('获取数据库名称列表时发生错误')
+      ElMessage.error(t('tableConfig.message.getDbListError'))
     }
   }
 
@@ -748,11 +819,11 @@
       if (res.success && res.data) {
         tableNameList.value = res.data
       } else {
-        ElMessage.error(res.message || '获取表名列表失败')
+        ElMessage.error(res.message || t('tableConfig.message.getTableListFailed'))
       }
     } catch (error) {
       console.error('获取表名列表失败:', error)
-      ElMessage.error('获取表名列表时发生错误')
+      ElMessage.error(t('tableConfig.message.getTableListError'))
     }
   }
 
@@ -790,7 +861,7 @@
   // 下载源码
   const handleDownloadCode = () => {
     if (selectedConfigs.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('tableConfig.message.selectAtLeastOne'))
       return
     }
 
@@ -798,13 +869,13 @@
     const validConfigs = selectedConfigs.value.filter((config) => !config.delFlag)
 
     if (validConfigs.length === 0) {
-      ElMessage.warning('所选记录均已被删除，请重新选择')
+      ElMessage.warning(t('tableConfig.message.allDeleted'))
       return
     }
 
-    ElMessageBox.confirm('确定要下载选中的表格配置源码吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('tableConfig.message.downloadConfirm'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'info'
     })
       .then(async () => {
@@ -819,16 +890,16 @@
           // 使用FileSaver进行下载，直接处理blob数据
           FileSaver.saveAs(res as Blob, '源码.zip')
 
-          ElMessage.success('源码下载成功')
+          ElMessage.success(t('tableConfig.message.downloadSuccess'))
         } catch (error) {
           console.error('下载源码失败:', error)
-          ElMessage.error('下载源码时发生错误')
+          ElMessage.error(t('tableConfig.message.downloadError'))
         } finally {
           loading.value = false
         }
       })
       .catch(() => {
-        ElMessage.info('取消了下载操作')
+        ElMessage.info(t('tableConfig.message.cancelDownload'))
       })
   }
 

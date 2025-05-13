@@ -3,30 +3,40 @@
     <el-row :gutter="15" class="mb-4">
       <el-col :xs="19" :sm="12" :lg="6">
         <el-input
-          title="搜索系统资源文件"
+          :title="$t('resources.search.title')"
           v-model="queryParams.fileName"
-          placeholder="请输入文件名搜索"
+          :placeholder="$t('resources.search.fileNamePlaceholder')"
         ></el-input>
       </el-col>
       <el-col :xs="4" :sm="6" :lg="3">
-        <el-select v-model="queryParams.source" placeholder="资源来源" clearable>
-          <el-option label="本地存储" value="local"></el-option>
-          <el-option label="阿里云OSS" value="oss"></el-option>
-          <el-option label="七牛云" value="qiniu"></el-option>
+        <el-select
+          v-model="queryParams.source"
+          :placeholder="$t('resources.search.source')"
+          clearable
+        >
+          <el-option :label="$t('resources.sourceType.local')" value="local"></el-option>
+          <el-option :label="$t('resources.sourceType.oss')" value="oss"></el-option>
+          <el-option :label="$t('resources.sourceType.qiniu')" value="qiniu"></el-option>
         </el-select>
       </el-col>
       <el-col :xs="4" :sm="6" :lg="3">
-        <el-select v-model="queryParams.fileType" placeholder="文件类型" clearable>
-          <el-option label="图片" value="image"></el-option>
-          <el-option label="文档" value="document"></el-option>
-          <el-option label="视频" value="video"></el-option>
-          <el-option label="音频" value="audio"></el-option>
-          <el-option label="其他" value="other"></el-option>
+        <el-select
+          v-model="queryParams.fileType"
+          :placeholder="$t('resources.search.fileType')"
+          clearable
+        >
+          <el-option :label="$t('resources.fileType.image')" value="image"></el-option>
+          <el-option :label="$t('resources.fileType.document')" value="document"></el-option>
+          <el-option :label="$t('resources.fileType.video')" value="video"></el-option>
+          <el-option :label="$t('resources.fileType.audio')" value="audio"></el-option>
+          <el-option :label="$t('resources.fileType.other')" value="other"></el-option>
         </el-select>
       </el-col>
       <el-col :xs="4" :sm="12" :lg="4">
-        <el-button type="primary" v-ripple @click="handleQuery">搜索</el-button>
-        <el-button v-ripple @click="resetQuery">重置</el-button>
+        <el-button type="primary" v-ripple @click="handleQuery">
+          {{ $t('resources.search.search') }}
+        </el-button>
+        <el-button v-ripple @click="resetQuery">{{ $t('resources.search.reset') }}</el-button>
       </el-col>
     </el-row>
 
@@ -40,29 +50,35 @@
       @current-change="handleCurrentChange"
       @size-change="handleSizeChange"
     >
-      <el-table-column label="文件名" prop="fileName" />
-      <el-table-column label="存储来源" prop="source">
+      <el-table-column :label="$t('resources.table.fileName')" prop="fileName" />
+      <el-table-column :label="$t('resources.table.source')" prop="source">
         <template #default="scope">
-          <el-tag v-if="scope.row.source === 'local'">本地存储</el-tag>
-          <el-tag v-else-if="scope.row.source === 'oss'" type="success">阿里云OSS</el-tag>
-          <el-tag v-else-if="scope.row.source === 'qiniu'" type="warning">七牛云</el-tag>
+          <el-tag v-if="scope.row.source === 'local'">
+            {{ $t('resources.sourceType.local') }}
+          </el-tag>
+          <el-tag v-else-if="scope.row.source === 'oss'" type="success">
+            {{ $t('resources.sourceType.oss') }}
+          </el-tag>
+          <el-tag v-else-if="scope.row.source === 'qiniu'" type="warning">
+            {{ $t('resources.sourceType.qiniu') }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="文件类型" prop="fileType" />
-      <el-table-column label="文件大小" prop="fileSize" />
-      <el-table-column label="上传时间" prop="createDate" />
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column :label="$t('resources.table.fileType')" prop="fileType" />
+      <el-table-column :label="$t('resources.table.fileSize')" prop="fileSize" />
+      <el-table-column :label="$t('resources.table.createDate')" prop="createDate" />
+      <el-table-column :label="$t('resources.table.operation')" width="220" fixed="right">
         <template #default="scope">
           <ArtButtonTable
-            title="预览系统文件"
-            text="预览"
+            :title="$t('resources.button.previewTitle')"
+            :text="$t('resources.button.preview')"
             icon="&#xe700;"
             iconColor="#67C23A"
             @click="previewResource(scope.row)"
           />
           <ArtButtonTable
-            title="复制文件链接"
-            text="复制链接"
+            :title="$t('resources.button.copyUrlTitle')"
+            :text="$t('resources.button.copyUrl')"
             icon="&#xe63a;"
             iconColor="#125232"
             @click="copyUrl(scope.row.webUrl)"
@@ -73,12 +89,12 @@
     </art-table>
 
     <!-- 预览弹窗 -->
-    <el-dialog v-model="previewVisible" title="资源预览" width="60%">
+    <el-dialog v-model="previewVisible" :title="$t('resources.preview.title')" width="60%">
       <div class="preview-container">
         <img
           v-if="isImageFile"
           :src="getImgUrl(currentResource.webUrl)"
-          alt="预览图片"
+          :alt="$t('resources.preview.imageAlt')"
           class="preview-image"
         />
         <video
@@ -95,10 +111,14 @@
         ></audio>
         <div v-else class="preview-other">
           <el-icon><Document /></el-icon>
-          <p>此文件类型不支持直接预览，请下载后查看</p>
-          <el-button title="下载资源文件" type="primary" @click="downloadResource"
-            >下载文件</el-button
+          <p>{{ $t('resources.preview.unsupportedType') }}</p>
+          <el-button
+            :title="$t('resources.button.downloadTitle')"
+            type="primary"
+            @click="downloadResource"
           >
+            {{ $t('resources.button.download') }}
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -110,6 +130,9 @@
   import { ElMessage } from 'element-plus'
   import { ResourcesService } from '@/api/resourcesApi'
   import type { ResourcesRecord, ResourcesListParams } from '@/api/model/resourcesModel'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 查询参数
   const queryParams = reactive({
@@ -170,10 +193,10 @@
         pagination.size = res.data.size
         pagination.pages = res.data.pages
       } else {
-        ElMessage.error(res.message || '获取资源列表失败')
+        ElMessage.error(res.message || t('resources.message.getListFailed'))
       }
     } catch (error) {
-      ElMessage.error('获取资源列表失败：' + error)
+      ElMessage.error(t('resources.message.getListError') + error)
     } finally {
       loading.value = false
     }
@@ -219,10 +242,10 @@
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        ElMessage.success('链接已复制到剪贴板')
+        ElMessage.success(t('resources.message.copySuccess'))
       })
       .catch(() => {
-        ElMessage.error('复制失败，请手动复制')
+        ElMessage.error(t('resources.message.copyFailed'))
       })
   }
 

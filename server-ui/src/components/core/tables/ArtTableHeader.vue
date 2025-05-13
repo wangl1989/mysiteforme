@@ -45,7 +45,7 @@
                 <i class="iconfont-sys">&#xe648;</i>
               </div>
               <ElCheckbox v-model="item.checked" :disabled="item.disabled">{{
-                item.label || (item.type === 'selection' ? '选择' : '')
+                item.label || (item.type === 'selection' ? $t('tableCommon.selection') : '')
               }}</ElCheckbox>
             </div>
           </VueDraggable>

@@ -17,6 +17,16 @@
     "confirm": "确定",
     "logOutTips": "您是否要退出登录?"
   },
+  "tableCommon": {
+    "tableName": "表格名称",
+    "reset": "重置",
+    "select": "查询",
+    "expand": "展开",
+    "collapse": "收起",
+    "check": "勾选",
+    "index": "序号",
+    "selection": "选择"
+  },
   "search": {
     "placeholder": "搜索页面",
     "historyTitle": "搜索历史",
@@ -423,6 +433,1507 @@
     "help": {
       "title": "帮助中心",
       "document": "官方文档"
+    }
+  },
+  "user": {
+    "account": {
+      "search": "搜索",
+      "reset": "重置",
+      "add": "添加用户",
+      "edit": "编辑用户",
+      "refresh": "刷新",
+      "addTitle": "添加用户",
+      "editTitle": "编辑用户",
+      "defaultPassword": "注意：新增的用户默认密码是：123456",
+      "userName": "用户名",
+      "loginName": "登录账号",
+      "loginNameRule": "登录名规则: 必须以英文字母开头，只能包含字母、数字、下划线，最小3个字符，最大10个字符",
+      "phone": "手机号",
+      "email": "邮箱",
+      "role": "角色",
+      "remarks": "备注",
+      "cancel": "取消",
+      "submit": "提交",
+      "cancelAdd": "取消添加用户",
+      "cancelEdit": "取消编辑用户",
+      "saveAdd": "保存添加用户",
+      "saveEdit": "保存编辑用户",
+      "formItems": {
+        "loginName": "登录账号",
+        "loginNamePlaceholder": "请输入登录账号",
+        "phone": "手机号",
+        "phonePlaceholder": "请输入电话号码",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱",
+        "location": "位置",
+        "locationPlaceholder": "请输入位置"
+      },
+      "table": {
+        "selection": "勾选",
+        "userName": "用户名",
+        "phone": "手机号",
+        "loginName": "登录账号",
+        "role": "角色",
+        "status": "状态",
+        "location": "位置",
+        "updateDate": "更新日期",
+        "operation": "操作"
+      },
+      "status": {
+        "online": "在线",
+        "offline": "离线",
+        "normal": "正常",
+        "deviceLocked": "设备锁定",
+        "accountLocked": "账号锁定",
+        "cancelled": "注销",
+        "unknown": "未知"
+      },
+      "operation": {
+        "edit": "编辑用户信息",
+        "delete": "删除用户",
+        "assign": "给用户分配额外权限"
+      },
+      "dialog": {
+        "confirmDelete": "确定要注销该用户吗？",
+        "confirmDeleteTitle": "注销用户",
+        "deleteSuccess": "注销成功",
+        "deleteFailed": "注销失败",
+        "deleteError": "注销用户失败，请重试",
+        "cancelDelete": "取消注销用户操作",
+        "addSuccess": "添加成功",
+        "editSuccess": "更新成功",
+        "operationFailed": "操作失败",
+        "saveError": "保存用户信息时发生错误"
+      },
+      "rules": {
+        "nickName": {
+          "required": "请输入用户名",
+          "length": "长度在 2 到 20 个字符"
+        },
+        "loginName": {
+          "required": "请输入登录账号",
+          "length": "长度在 3 到 10 个字符",
+          "pattern": "必须以英文字母开头，只能包含字母、数字、下划线"
+        },
+        "tel": {
+          "pattern": "请输入正确的手机号格式"
+        },
+        "email": {
+          "pattern": "请输入正确的邮箱格式"
+        }
+      }
+    },
+    "detail": {
+      "title": {
+        "basicSettings": "基本设置",
+        "changePassword": "更改密码"
+      },
+      "form": {
+        "loginName": "登录账号",
+        "role": "角色",
+        "nickName": "昵称",
+        "email": "邮箱",
+        "phone": "手机",
+        "location": "地址",
+        "description": "个人介绍",
+        "currentPassword": "当前密码",
+        "newPassword": "新密码",
+        "confirmPassword": "确认新密码",
+        "noRole": "未分配角色"
+      },
+      "device": {
+        "deviceList": "设备列表",
+        "deviceId": "设备ID",
+        "online": "是否在线",
+        "onlineStatus": "在线",
+        "offlineStatus": "离线",
+        "currentDevice": "当前设备",
+        "isCurrentDevice": "是",
+        "notCurrentDevice": "否"
+      },
+      "button": {
+        "cancel": "取消",
+        "save": "保存",
+        "edit": "编辑",
+        "uploadAvatar": "上传用户头像",
+        "getLocation": "获取当前位置",
+        "cancelEdit": "取消编辑用户详情",
+        "saveEdit": "保存用户字段",
+        "editDetail": "编辑用户字段",
+        "cancelResetPassword": "取消重置密码",
+        "saveResetPassword": "保存重置密码",
+        "editResetPassword": "编辑重置密码",
+        "logoutNow": "立即退出"
+      },
+      "rules": {
+        "nickName": {
+          "required": "请输入昵称",
+          "length": "长度在 2 到 50 个字符"
+        },
+        "password": {
+          "required": "请输入当前密码"
+        },
+        "newPassword": {
+          "required": "请输入新密码",
+          "format": "密码必须包含8-20个字符，至少包含一个大写字母、一个小写字母和一个数字"
+        },
+        "confirmPassword": {
+          "required": "请确认新密码",
+          "match": "两次输入的密码不一致"
+        }
+      },
+      "message": {
+        "gettingLocation": "正在获取位置...",
+        "locationSuccess": "位置获取成功",
+        "locationFailed": "获取位置失败",
+        "onlyUploadImage": "只能上传图片文件!",
+        "imageSizeLimit": "图片大小不能超过 2MB!",
+        "avatarUploadSuccess": "头像上传成功",
+        "avatarUploadFailed": "头像上传失败",
+        "updateSuccess": "更新成功",
+        "updateFailed": "更新失败",
+        "noUserId": "无法获取用户ID，请刷新页面后重试",
+        "passwordChangeSuccess": "密码修改成功",
+        "passwordChanged": "密码已修改",
+        "passwordChangeFailed": "密码修改失败",
+        "logoutCountdown": "密码已成功修改！{0}秒后将退出系统，请使用新密码重新登录。",
+        "getUserInfoFailed": "获取用户信息失败",
+        "getUserDetailFailed": "获取用户详情失败",
+        "getUserDetailedInfoFailed": "获取用户详细信息失败"
+      }
+    }
+  },
+  "dict": {
+    "title": "字典管理",
+    "add": "新增字典",
+    "edit": "编辑字典",
+    "editType": "编辑字典类型",
+    "form": {
+      "type": "字典类型",
+      "label": "标签名",
+      "value": "数据值",
+      "description": "描述",
+      "sort": "排序",
+      "oldType": "原字典类型",
+      "newType": "新字典类型",
+      "typePlaceholder": "请输入字典类型",
+      "labelPlaceholder": "请输入标签名",
+      "valuePlaceholder": "请输入数据值",
+      "descriptionPlaceholder": "请输入描述",
+      "newTypePlaceholder": "请输入新的字典类型"
+    },
+    "table": {
+      "type": "字典类型",
+      "label": "标签名",
+      "value": "数据值",
+      "description": "描述",
+      "sort": "排序",
+      "createDate": "创建时间",
+      "updateDate": "更新时间",
+      "operation": "操作"
+    },
+    "search": {
+      "typePlaceholder": "请输入字典类型搜索",
+      "labelPlaceholder": "请输入标签名搜索",
+      "valuePlaceholder": "请输入数据值搜索"
+    },
+    "operation": {
+      "edit": "字典编辑",
+      "addByType": "根据类型增加字典",
+      "editType": "编辑字典类型",
+      "delete": "删除字典"
+    },
+    "button": {
+      "confirm": "确定",
+      "cancel": "取消",
+      "search": "搜索",
+      "reset": "重置"
+    },
+    "dialog": {
+      "confirmDelete": "确认删除该字典吗？此操作不可恢复！",
+      "confirmDeleteTitle": "删除确认",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除字典时发生错误",
+      "cancelDelete": "已取消删除",
+      "typeUpdateSuccess": "字典类型更新成功",
+      "typeUpdateFailed": "更新字典类型失败",
+      "typeUpdateError": "更新字典类型时发生错误",
+      "editSuccess": "编辑成功",
+      "addSuccess": "新增成功",
+      "operationFailed": "操作失败",
+      "editError": "编辑时发生错误",
+      "addError": "新增时发生错误"
+    },
+    "rules": {
+      "type": {
+        "required": "请输入字典类型"
+      },
+      "label": {
+        "required": "请输入标签名"
+      },
+      "value": {
+        "required": "请输入数据值"
+      },
+      "newType": {
+        "required": "请输入新的字典类型"
+      }
+    },
+    "messages": {
+      "getListFailed": "获取字典列表失败",
+      "getListError": "获取字典列表时发生错误"
+    }
+  },
+  "log": {
+    "title": "系统日志",
+    "batchDelete": "批量删除",
+    "form": {
+      "username": "操作用户",
+      "title": "操作标题",
+      "httpMethod": "请求类型",
+      "usernamePlaceholder": "请输入用户名搜索",
+      "titlePlaceholder": "请输入日志标题搜索",
+      "methodPlaceholder": "请选择请求类型"
+    },
+    "table": {
+      "selection": "勾选",
+      "username": "操作用户",
+      "title": "操作标题",
+      "remoteAddr": "IP地址",
+      "requestUri": "请求URI",
+      "httpMethod": "请求方法",
+      "browser": "浏览器",
+      "location": "位置",
+      "params": "请求参数",
+      "response": "返回数据",
+      "useTime": "请求耗时",
+      "exception": "异常信息",
+      "createDate": "创建时间"
+    },
+    "button": {
+      "viewParams": "查看请求参数",
+      "viewResponse": "查看返回数据",
+      "viewException": "查看异常"
+    },
+    "dialog": {
+      "params": "请求参数",
+      "response": "返回数据",
+      "exception": "异常信息",
+      "confirmDelete": "确定要删除选中的日志记录吗？此操作不可恢复！",
+      "confirmDeleteTitle": "警告",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除日志记录时发生错误",
+      "cancelDelete": "已取消删除",
+      "selectRecord": "请至少选择一条记录"
+    },
+    "message": {
+      "getListFailed": "获取日志列表失败",
+      "getListError": "获取日志列表时发生错误"
+    },
+    "json": {
+      "content": "内容",
+      "emptyData": "空数据",
+      "parseError": "无法解析的数据"
+    }
+  },
+  "menu": {
+    "addMainMenu": "新增主菜单",
+    "table": {
+      "name": "菜单名称",
+      "route": "路由",
+      "permission": "可操作权限",
+      "permissionCount": "共 {0} 个权限",
+      "sort": "排序值",
+      "updateTime": "编辑时间",
+      "operation": "操作",
+      "permissionList": "权限列表【所属菜单：{0}】"
+    },
+    "operation": {
+      "addMenu": "新增菜单或权限",
+      "editMenu": "编辑菜单",
+      "deleteMenu": "删除菜单或权限"
+    },
+    "dialog": {
+      "editMenu": "编辑菜单【{0}】",
+      "editPermission": "编辑权限【{0}】",
+      "newSubMenu": "新建子菜单【父级菜单：{0}】",
+      "newPermission": "新建权限【所属菜单：{0}】",
+      "newMenu": "新建菜单",
+      "newPermissionGeneral": "新建权限",
+      "menuType": "菜单类型",
+      "menu": "菜单",
+      "permission": "权限",
+      "permissionType": "权限类型",
+      "route": "路由",
+      "button": "按钮",
+      "api": "API",
+      "menuTitle": "菜单标题",
+      "routePath": "路由地址",
+      "menuName": "菜单名称",
+      "icon": "图标",
+      "componentPath": "组件路径",
+      "componentPathPlaceholder": "例如: /system/user/index",
+      "color": "颜色",
+      "externalLink": "外部链接",
+      "externalLinkPlaceholder": "外部链接/内嵌地址(https://www.baidu.com)",
+      "textBadge": "文本徽章",
+      "textBadgePlaceholder": "留空则不显示",
+      "menuSort": "菜单排序",
+      "hideMenu": "隐藏菜单",
+      "hideMenuTip": "菜单是否在侧边栏隐藏",
+      "pageCache": "页面缓存",
+      "pageCacheTip": "页面是否使用 keep-alive 缓存",
+      "isIframe": "是否内嵌",
+      "isIframeTip": "是否为内嵌外部链接 (iframe)",
+      "hideTab": "隐藏Tab",
+      "hideTabTip": "是否在标签页栏隐藏",
+      "showBadge": "显示徽标",
+      "showBadgeTip": "是否在顶部和侧边栏显示徽标",
+      "inMainContainer": "主布局内",
+      "inMainContainerTip": "当前路由是否在主布局内显示 (通常为 false)",
+      "remarks": "备注",
+      "remarksPlaceholder": "请输入备注信息",
+      "permissionName": "权限名称",
+      "permissionCode": "权限标识",
+      "permissionSort": "权限排序",
+      "routePermission": "路由权限信息",
+      "pageUrl": "页面地址",
+      "pageUrlPlaceholder": "页面请求的地址",
+      "buttonPermission": "按钮权限信息",
+      "buttonName": "按钮名称",
+      "buttonNamePlaceholder": "按钮的功能名称",
+      "buttonKey": "按钮标识",
+      "buttonKeyPlaceholder": "按钮标识，如：user_add",
+      "apiPermission": "API权限信息",
+      "apiUrl": "API地址",
+      "apiUrlPlaceholder": "API的请求地址",
+      "requestMethod": "请求方法",
+      "isPublic": "是否公共",
+      "isPublicTip": "公共API无需权限即可访问",
+      "cancel": "取 消",
+      "confirm": "确 定"
+    },
+    "form": {
+      "rules": {
+        "title": {
+          "required": "请输入菜单标题",
+          "length": "长度在 2 到 20 个字符"
+        },
+        "path": {
+          "required": "请输入路由地址"
+        },
+        "name": {
+          "required": "请输入菜单名称",
+          "length": "长度在 2 到 20 个字符"
+        },
+        "permissionName": {
+          "required": "请输入权限名称"
+        },
+        "permissionCode": {
+          "required": "请输入权限标识"
+        },
+        "apiUrl": {
+          "required": "请输入API地址"
+        },
+        "httpMethod": {
+          "required": "请选择请求方法"
+        },
+        "pageUrl": {
+          "required": "请输入页面地址"
+        },
+        "buttonName": {
+          "required": "请输入按钮名称"
+        },
+        "buttonKey": {
+          "required": "请输入按钮标识"
+        }
+      }
+    },
+    "message": {
+      "confirmDelete": "确定要删除该菜单吗？删除后无法恢复",
+      "confirmDeleteTitle": "提示",
+      "confirmDeleteAuth": "确定要删除该权限吗？删除后无法恢复",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "editSuccess": "编辑成功",
+      "addSuccess": "新增成功",
+      "operationFailed": "操作失败",
+      "getMenuFailed": "获取菜单数据失败"
+    },
+    "permissionList": {
+      "groupTitle": {
+        "route": "路由权限",
+        "button": "按钮权限",
+        "api": "API权限"
+      },
+      "table": {
+        "permissionName": "权限名称",
+        "routeAddress": "路由地址",
+        "buttonKey": "按钮关键词",
+        "apiAddress": "API地址",
+        "requestMethod": "请求方法",
+        "isPublic": "公共接口",
+        "sortValue": "排序值",
+        "updateTime": "更新时间",
+        "operation": "操作"
+      },
+      "operation": {
+        "edit": "编辑",
+        "delete": "删除"
+      },
+      "tag": {
+        "yes": "是",
+        "no": "否"
+      },
+      "noData": "该菜单下暂无权限数据"
+    },
+    "menuPermission": {
+      "title": {
+        "menuTree": "菜单树",
+        "permissionDetail": "权限详情",
+        "currentMenu": "当前选中菜单",
+        "userPrefix": "用户",
+        "rolePrefix": "角色"
+      },
+      "button": {
+        "saveUserPermission": "保存用户权限",
+        "saveRolePermission": "保存角色权限",
+        "clear": "清空"
+      },
+      "empty": {
+        "selectMenu": "请在左侧选择一个菜单以查看权限详情"
+      },
+      "permission": {
+        "selected": "已选权限",
+        "apiPermission": "API权限",
+        "buttonPermission": "按钮权限",
+        "routePermission": "路由权限",
+        "noApiPermission": "暂无API权限",
+        "noButtonPermission": "暂无按钮权限",
+        "noRoutePermission": "暂无路由权限",
+        "publicApi": "公共API"
+      },
+      "dialog": {
+        "confirmClear": "确定要清空当前菜单下所有已选择的权限吗?",
+        "tip": "提示",
+        "confirm": "确定",
+        "cancel": "取消",
+        "cleared": "已清空当前菜单下所有已选择的权限",
+        "selectUser": "请先选择一个用户",
+        "confirmClearUser": "您当前正在清空用户单独权限，是否确认？",
+        "clearConfirmTitle": "清空确认",
+        "confirmBtn": "确认",
+        "userPermissionSaved": "用户权限设置保存成功",
+        "saveFailed": "保存失败",
+        "saveUserPermissionFailed": "保存用户权限失败，请重试",
+        "selectRole": "请先选择一个角色",
+        "rolePermissionSaved": "角色权限设置保存成功",
+        "saveRolePermissionFailed": "保存角色权限失败，请重试"
+      },
+      "message": {
+        "getUserPermissionFailed": "获取用户权限失败",
+        "getRolePermissionFailed": "获取角色权限失败",
+        "getMenuDataFailed": "获取菜单数据失败",
+        "noUserId": "未提供用户ID，无法加载权限数据",
+        "noRoleId": "未提供角色ID，无法加载权限数据",
+        "loadPermissionFailed": "加载权限数据失败"
+      }
+    }
+  },
+  "upload": {
+    "baseInfo": {
+      "title": "上传方式配置",
+      "subtitle": "可自由配置本地或云存储方式",
+      "addButton": "新增上传方式",
+      "types": {
+        "local": "本地上传",
+        "qiniu": "七牛云存储",
+        "oss": "阿里云OSS",
+        "cos": "腾讯云COS",
+        "bitiful": "缤纷云存储",
+        "unknown": "未知上传方式"
+      },
+      "card": {
+        "edit": "编辑上传方式",
+        "enabled": "已启用",
+        "storageAddress": "存储地址",
+        "storageSpace": "存储空间",
+        "status": "状态",
+        "enabled_status": "已启用",
+        "disabled_status": "已禁用",
+        "testStatus": "测试状态",
+        "connectionNormal": "连接正常",
+        "connectionError": "连接异常",
+        "testImage": "测试图片",
+        "viewTestImage": "点我查看",
+        "storageDir": "存储目录",
+        "endpoint": "地域节点",
+        "region": "区域",
+        "tempDisable": "暂时禁用",
+        "enable": "立即启用"
+      },
+      "dialog": {
+        "addTitle": "新增上传方式",
+        "editTitle": "编辑上传方式",
+        "uploadType": "上传类型",
+        "statusLabel": "启用状态",
+        "enableText": "启用",
+        "disableText": "禁用", 
+        "httpPrefix": "HTTP前缀",
+        "httpPrefixPlaceholder": "例如：http://example.com 或 https://example.com",
+        "httpPrefixTip": "公开访问的URL前缀，包括http://或https://",
+        "storageDir": "存储目录",
+        "storageDirPlaceholder": "例如：images/ 或 uploads/",
+        "storageDirTip": "存储目录，不可以为空",
+        "bucketName": "Bucket名称",
+        "bucketNamePlaceholder": "存储空间名称",
+        "accessKey": "AccessKey",
+        "accessKeyPlaceholder": "云存储访问密钥ID",
+        "secretKey": "SecretKey",
+        "secretKeyPlaceholder": "云存储访问密钥密码",
+        "secretKeyTip": "如不修改，请留空",
+        "endpoint": "地域节点",
+        "endpointPlaceholder": {
+          "oss": "例如：oss-cn-beijing.aliyuncs.com",
+          "bitiful": "例如：endpoint.example.com"
+        },
+        "region": "区域",
+        "regionPlaceholder": {
+          "cos": "例如：ap-guangzhou",
+          "bitiful": "区域代码"
+        },
+        "remarks": "备注",
+        "remarksPlaceholder": "请输入备注信息",
+        "cancel": "取消",
+        "confirm": "确定"
+      },
+      "imagePreview": {
+        "title": "图片预览",
+        "noImage": "暂无图片",
+        "uploadButton": "上传测试图片",
+        "selectImage": "选择图片",
+        "uploadImage": "上传图片",
+        "close": "关闭"
+      },
+      "message": {
+        "getListFailed": "获取上传方式列表失败",
+        "getListError": "获取上传方式列表时发生错误",
+        "configNotFound": "找不到对应的上传配置",
+        "onlyImage": "只能上传图片文件!",
+        "imageSizeLimit": "图片大小不能超过 2MB!",
+        "selectImage": "请先选择图片",
+        "uploadSuccess": "上传成功",
+        "uploadFailed": "上传失败",
+        "uploadError": "上传图片时发生错误",
+        "toggleSuccess": "禁用成功",
+        "toggleEnableSuccess": "启用成功",
+        "toggleFailed": "操作失败",
+        "toggleError": "切换状态时发生错误",
+        "addSuccess": "新增成功",
+        "editSuccess": "编辑成功",
+        "operationFailed": "操作失败",
+        "addError": "新增时发生错误",
+        "editError": "编辑时发生错误"
+      },
+      "rules": {
+        "type": {
+          "required": "请选择上传类型"
+        },
+        "basePath": {
+          "required": "请输入HTTP前缀",
+          "pattern": "请输入正确的HTTP前缀，以http://或https://开头"
+        },
+        "dir": {
+          "required": "请输入上传目录",
+          "pattern": "目录名称只能包含字母、斜杠(/),且首字母不能是斜杠,必须是斜杠(/)结尾"
+        },
+        "bucketName": {
+          "required": "请输入Bucket名称"
+        },
+        "accessKey": {
+          "required": "请输入AccessKey"
+        },
+        "secretKey": {
+          "required": "请输入SecretKey"
+        },
+        "endpoint": {
+          "required": "请输入地域节点"
+        },
+        "region": {
+          "required": "请输入区域"
+        }
+      }
+    }
+  },
+  "redis": {
+    "title": "Redis管理",
+    "table": {
+      "key": "键名",
+      "type": "类型",
+      "ttl": "TTL",
+      "value": "值",
+      "operation": "操作"
+    },
+    "button": {
+      "batchDelete": "批量删除",
+      "viewValue": "查看值",
+      "viewValueTitle": "查看Redis值",
+      "deleteRedis": "删除Redis数据"
+    },
+    "sort": {
+      "label": "排序:",
+      "expireAsc": "过期时间升序",
+      "expireDesc": "过期时间降序"
+    },
+    "form": {
+      "key": "键",
+      "keyPlaceholder": "请输入key搜索"
+    },
+    "dialog": {
+      "valueData": "键值数据",
+      "dataSizeWarning": "数据较大 ({0} KB)，可能影响浏览器性能",
+      "showFullData": "显示完整数据",
+      "showPartialData": "显示部分数据",
+      "confirmDelete": "确定要删除选中的Redis键吗？此操作不可恢复！",
+      "confirmDeleteKey": "确定要删除Redis键 \"{0}\" 吗？此操作不可恢复！",
+      "warning": "警告",
+      "confirm": "确定",
+      "cancel": "取消"
+    },
+    "message": {
+      "selectAtLeastOne": "请至少选择一条记录",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeleteFailed": "部分或全部删除失败，请重试",
+      "batchDeleteError": "批量删除Redis记录时发生错误",
+      "cancelBatchDelete": "已取消批量删除",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除Redis记录时发生错误",
+      "cancelDelete": "已取消删除",
+      "getListFailed": "获取Redis列表失败",
+      "getListError": "获取Redis列表时发生错误"
+    },
+    "ttl": {
+      "never": "永不过期",
+      "expired": "已过期",
+      "seconds": "{0}秒",
+      "minutes": "{0}分钟{1}秒",
+      "hours": "{0}小时{1}分钟",
+      "days": "{0}天{1}小时"
+    },
+    "content": {
+      "emptyData": "空数据",
+      "unparseableData": "无法解析的数据",
+      "dataTruncated": "...(数据已截断)"
+    }
+  },
+  "resources": {
+    "title": "系统资源管理",
+    "search": {
+      "title": "搜索系统资源文件",
+      "fileNamePlaceholder": "请输入文件名搜索",
+      "source": "资源来源",
+      "fileType": "文件类型",
+      "search": "搜索",
+      "reset": "重置"
+    },
+    "sourceType": {
+      "local": "本地存储",
+      "oss": "阿里云OSS",
+      "qiniu": "七牛云"
+    },
+    "fileType": {
+      "image": "图片",
+      "document": "文档",
+      "video": "视频",
+      "audio": "音频",
+      "other": "其他"
+    },
+    "table": {
+      "fileName": "文件名",
+      "source": "存储来源",
+      "fileType": "文件类型",
+      "fileSize": "文件大小",
+      "createDate": "上传时间",
+      "operation": "操作"
+    },
+    "button": {
+      "preview": "预览",
+      "previewTitle": "预览系统文件",
+      "copyUrl": "复制链接",
+      "copyUrlTitle": "复制文件链接",
+      "download": "下载文件",
+      "downloadTitle": "下载资源文件"
+    },
+    "preview": {
+      "title": "资源预览",
+      "imageAlt": "预览图片",
+      "unsupportedType": "此文件类型不支持直接预览，请下载后查看"
+    },
+    "message": {
+      "getListFailed": "获取资源列表失败",
+      "getListError": "获取资源列表失败：",
+      "copySuccess": "链接已复制到剪贴板",
+      "copyFailed": "复制失败，请手动复制"
+    }
+  },
+  "site": {
+    "title": "系统设置",
+    "button": {
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "tabs": {
+      "basic": "基础设置",
+      "comment": "留言设置",
+      "contact": "联系方式",
+      "seo": "SEO设置",
+      "server": "服务器信息",
+      "profile": "个人简介设置"
+    },
+    "form": {
+      "websiteName": "网站名称",
+      "websiteUrl": "网站网址",
+      "version": "系统版本",
+      "author": "系统作者",
+      "webServiceKey": "WebServiceKey",
+      "uploadType": "文件上传方式",
+      "uploadLimit": "文件上传限制",
+      "logo": "LOGO",
+      "authorAvatar": "作者头像",
+      "enableComment": "开启留言",
+      "anonymousComment": "匿名留言",
+      "email": "邮箱",
+      "qq": "QQ",
+      "github": "Github",
+      "gitee": "Gitee",
+      "weibo": "微博",
+      "phone": "手机号",
+      "address": "地址",
+      "recordNumber": "网站备案号",
+      "defaultKeywords": "默认关键字",
+      "description": "网站描述",
+      "copyright": "版权信息",
+      "serverEnvironment": "服务器环境",
+      "databaseVersion": "数据库版本",
+      "unit": {
+        "mb": "MB"
+      },
+      "serverTypes": {
+        "windows": "Windows",
+        "linux": "Linux",
+        "macos": "macOS"
+      }
+    },
+    "message": {
+      "getUploadTypesFailed": "获取上传类型列表失败",
+      "getSystemDataFailed": "获取系统设置失败",
+      "saveSuccess": "保存成功",
+      "saveFailed": "保存失败"
+    }
+  },
+  "table": {
+    "title": "新增表格",
+    "editTitle": "编辑表格",
+    "search": {
+      "tableNameLabel": "表格名称",
+      "dbName": "请选择数据库名称",
+      "tableName": "请输入表格名称搜索",
+      "reset": "重置",
+      "search": "搜索"
+    },
+    "button": {
+      "add": "新增表格",
+      "batchDelete": "批量删除",
+      "cancel": "取消",
+      "confirm": "确定",
+      "edit": "编辑表格",
+      "manageFields": "管理字段列表",
+      "delete": "删除表格",
+      "addField": "添加字段"
+    },
+    "column": {
+      "selection": "勾选",
+      "name": "表格名称",
+      "comment": "表格注释",
+      "tableType": "表格类型",
+      "dbName": "数据库名称",
+      "dataCount": "数据量",
+      "createTime": "创建时间",
+      "updateTime": "更新时间",
+      "actions": "操作"
+    },
+    "form": {
+      "dbName": "数据库名称",
+      "tableName": "表格名称",
+      "comment": "表格注释",
+      "tableType": "表格类型",
+      "fieldSettings": "字段设置",
+      "inputDbName": "请选择数据库名称",
+      "inputTableName": "请输入表格名称",
+      "inputComment": "请输入表格注释",
+      "selectTableType": "请选择表格类型"
+    },
+    "field": {
+      "name": "字段名称",
+      "type": "字段类型",
+      "length": "字段长度",
+      "notNull": "不是 null",
+      "comment": "字段注释",
+      "actions": "操作",
+      "inputName": "请输入字段名称",
+      "selectType": "请选择字段类型",
+      "inputLength": "请输入字段长度",
+      "inputComment": "请输入字段注释"
+    },
+    "tableType": {
+      "basic": "基本类型",
+      "tree": "树结构类型",
+      "relation": "关联类型",
+      "unknown": "未知类型"
+    },
+    "message": {
+      "addSuccess": "添加成功",
+      "editSuccess": "编辑成功",
+      "deleteSuccess": "删除成功",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeletePartial": "批量删除完成，{success} 个成功，{failed} 个失败。",
+      "addFailed": "添加失败",
+      "editFailed": "编辑失败",
+      "deleteFailed": "删除失败",
+      "batchDeleteFailed": "批量删除表格时发生未知错误",
+      "cancelBatchDelete": "取消了批量删除操作",
+      "cancelDelete": "取消了删除操作",
+      "getTableListFailed": "获取表格列表失败",
+      "getDbListFailed": "获取数据库名称列表失败",
+      "selectAtLeastOne": "请至少选择一条记录",
+      "addAtLeastOneField": "请至少添加并配置一个字段",
+      "deleteConfirm": "确定要删除表格 \"{name}\" 吗？此操作会删除表及其所有数据，且不可恢复！",
+      "batchDeleteConfirm": "确定要删除选中的表格吗？此操作会删除表及其所有数据，且不可恢复！"
+    },
+    "validation": {
+      "dbNameRequired": "请选择数据库名称",
+      "tableNameRequired": "请输入表格名称",
+      "tableNameMaxLength": "长度不能超过64个字符",
+      "tableTypeRequired": "请选择表格类型",
+      "fieldNameRequired": "请输入字段名称",
+      "fieldNameMaxLength": "长度不能超过64个字符",
+      "fieldTypeRequired": "请选择字段类型",
+      "fieldLengthRequired": "请输入字段长度",
+      "fieldLengthNumber": "长度必须为数字"
+    }
+  },
+  "tableConfig": {
+    "title": "表格配置",
+    "addTitle": "新增表格配置",
+    "editTitle": "编辑表格配置",
+    "search": {
+      "tableName": "表格名称",
+      "dbName": "数据库名称",
+      "businessName": "业务名称",
+      "status": "配置状态",
+      "inputTableName": "请输入表格名称",
+      "selectDbName": "请选择数据库名称",
+      "inputBusinessName": "请输入业务名称",
+      "selectStatus": "请选择配置状态",
+      "normal": "正常",
+      "deleted": "已删除",
+      "search": "搜索",
+      "reset": "重置"
+    },
+    "button": {
+      "add": "新增表格配置",
+      "batchDelete": "批量删除",
+      "downloadCode": "下载源码",
+      "cancel": "取消",
+      "confirm": "确定",
+      "edit": "编辑表格配置",
+      "syncFields": "同步字段",
+      "delete": "删除表格配置",
+      "recover": "恢复表格配置",
+      "completeDelete": "彻底删除表格配置"
+    },
+    "column": {
+      "selection": "勾选",
+      "tableType": "表格类型",
+      "tableName": "表格名称",
+      "tablePrefix": "表格前缀",
+      "dbName": "数据库名称",
+      "businessName": "业务名称",
+      "moduleName": "模块名称",
+      "packageName": "包名称",
+      "author": "作者",
+      "generatePath": "生成路径",
+      "fieldCount": "可配置字段",
+      "fieldCountText": "共 {count} 个字段",
+      "remarks": "备注",
+      "updateTime": "更新时间",
+      "status": "状态",
+      "statusNormal": "正常",
+      "statusDeleted": "已删除",
+      "actions": "操作"
+    },
+    "form": {
+      "dbName": "数据库名称",
+      "tableName": "表格名称",
+      "tablePrefix": "表格前缀",
+      "businessName": "业务名称",
+      "moduleName": "模块名称",
+      "packageName": "包名称",
+      "author": "作者",
+      "generatePath": "生成路径",
+      "options": "选项",
+      "remarks": "备注",
+      "selectDbName": "请选择数据库名称",
+      "selectTableName": "请选择表格名称",
+      "inputTablePrefix": "请输入表格前缀",
+      "inputBusinessName": "请输入业务名称",
+      "inputModuleName": "请输入模块名称",
+      "inputPackageName": "请输入包名称",
+      "inputAuthor": "请输入作者",
+      "inputGeneratePath": "请输入生成路径",
+      "inputOptions": "请输入选项，如JSON格式配置",
+      "inputRemarks": "请输入备注信息"
+    },
+    "message": {
+      "getListFailed": "获取表格配置列表失败",
+      "getListError": "获取表格配置列表时发生错误",
+      "getDbListFailed": "获取数据库名称列表失败",
+      "getDbListError": "获取数据库名称列表时发生错误",
+      "getTableListFailed": "获取表名列表失败",
+      "getTableListError": "获取表名列表时发生错误",
+      "selectAtLeastOne": "请至少选择一条记录",
+      "allDeleted": "所选记录均已被删除，请重新选择",
+      "batchDeleteConfirm": "确定要删除选中的表格配置吗？",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeleteFailed": "部分或全部删除失败，请重试",
+      "batchDeleteError": "批量删除表格配置时发生错误",
+      "cancelBatchDelete": "取消了批量删除操作",
+      "deleteConfirm": "确定要删除表格配置 \"{name}\" 吗？",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除表格配置时发生错误",
+      "cancelDelete": "取消了删除操作",
+      "completeDeleteConfirm": "确定要彻底删除表格配置 \"{name}\" 吗？这会把所有配置字段一并删除,且不能恢复！！！",
+      "completeDeleteSuccess": "彻底删除成功",
+      "completeDeleteFailed": "彻底删除失败",
+      "completeDeleteError": "彻底删除表格配置时发生错误",
+      "recoverConfirm": "确定要恢复表格配置 \"{name}\" 吗？",
+      "recoverSuccess": "恢复成功",
+      "recoverFailed": "恢复失败",
+      "recoverError": "恢复表格配置时发生错误",
+      "cancelRecover": "取消了恢复操作",
+      "syncFieldsSuccess": "同步字段列表成功",
+      "syncFieldsFailed": "同步字段列表失败",
+      "syncFieldsError": "同步字段列表时发生错误",
+      "addSuccess": "添加成功",
+      "editSuccess": "编辑成功",
+      "addFailed": "添加失败",
+      "editFailed": "编辑失败",
+      "addError": "添加表格配置时发生错误",
+      "editError": "编辑表格配置时发生错误",
+      "downloadConfirm": "确定要下载选中的表格配置源码吗？",
+      "downloadSuccess": "源码下载成功",
+      "downloadFailed": "下载源码失败",
+      "downloadError": "下载源码时发生错误",
+      "cancelDownload": "取消了下载操作"
+    },
+    "validation": {
+      "tableNameRequired": "请输入表格名称",
+      "tableNameLength": "长度不能超过100个字符",
+      "tablePrefixLength": "长度不能超过30个字符",
+      "dbNameRequired": "请输入数据库名称",
+      "dbNameLength": "长度不能超过100个字符",
+      "businessNameRequired": "请输入业务名称",
+      "businessNameLength": "长度不能超过100个字符"
+    }
+  },
+  "tableField": {
+    "title": "表格字段管理",
+    "addTitle": "新增字段",
+    "editTitle": "编辑字段",
+    "headerInfo": {
+      "tableName": "表名称",
+      "dbName": "数据库名称",
+      "tableType": "表类型",
+      "basicType": "基本类型",
+      "treeType": "树结构类型",
+      "relationType": "关联类型",
+      "unknownType": "未知类型"
+    },
+    "search": {
+      "fieldName": "字段名称",
+      "inputFieldName": "请输入字段名称搜索",
+      "reset": "重置",
+      "search": "搜索"
+    },
+    "button": {
+      "add": "新增字段",
+      "batchDelete": "批量删除",
+      "cancel": "取消",
+      "confirm": "确定",
+      "edit": "编辑字段",
+      "delete": "删除字段"
+    },
+    "column": {
+      "selection": "勾选",
+      "fieldName": "字段名称",
+      "fieldLength": "字段长度",
+      "fieldType": "字段类型",
+      "isNotNull": "不是 null",
+      "yes": "是",
+      "no": "否",
+      "comment": "字段注释",
+      "actions": "操作"
+    },
+    "form": {
+      "fieldName": "字段名称",
+      "fieldType": "字段类型",
+      "fieldLength": "字段长度",
+      "isNotNull": "不是 null",
+      "comment": "字段注释",
+      "inputFieldName": "请输入字段名称",
+      "selectFieldType": "请选择字段类型",
+      "inputFieldLength": "请输入长度",
+      "inputComment": "请输入字段注释"
+    },
+    "message": {
+      "getListFailed": "获取字段列表失败",
+      "getListError": "获取字段列表时发生错误",
+      "selectAtLeastOne": "请至少选择一个字段",
+      "batchDeleteConfirm": "确定要删除选中的字段吗？此操作不可恢复！",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeletePartial": "批量删除完成，{success} 个成功，{failed} 个失败。",
+      "batchDeleteError": "批量删除字段时发生未知错误",
+      "cancelBatchDelete": "取消了批量删除操作",
+      "deleteConfirm": "确定要删除字段 \"{name}\" 吗？此操作不可恢复！",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除字段时发生错误",
+      "cancelDelete": "取消了删除操作",
+      "addSuccess": "添加成功",
+      "editSuccess": "编辑成功",
+      "addFailed": "添加失败",
+      "editFailed": "编辑失败",
+      "addError": "添加字段时发生错误",
+      "editError": "编辑字段时发生错误"
+    },
+    "validation": {
+      "fieldNameRequired": "请输入字段名称",
+      "fieldNameLength": "长度不能超过64个字符",
+      "fieldTypeRequired": "请选择字段类型",
+      "fieldLengthRequired": "请输入有效的字段长度"
+    }
+  },
+  "tableFieldConfig": {
+    "title": "字段列表",
+    "dialog": {
+      "title": "字段列表【所属表：{tableName}】",
+      "editFieldTitle": "编辑字段【{fieldName}】"
+    },
+    "search": {
+      "fieldName": "字段名称",
+      "businessName": "业务名称",
+      "componentType": "组件类型",
+      "isQuery": "是否查询",
+      "yes": "是",
+      "no": "否",
+      "inputFieldName": "请输入字段名称",
+      "inputBusinessName": "请输入业务名称",
+      "selectComponentType": "请选择组件类型",
+      "selectIsQuery": "请选择是否查询条件",
+      "reset": "重置",
+      "search": "搜索"
+    },
+    "button": {
+      "syncFields": "同步字段",
+      "fieldSort": "字段排序",
+      "exitSort": "退出排序",
+      "saveSort": "保存排序",
+      "cancelSort": "取消排序",
+      "previewForm": "预览表单",
+      "cancel": "取消",
+      "confirm": "确定"
+    },
+    "column": {
+      "sort": "排序",
+      "id": "ID",
+      "sortValue": "排序值",
+      "fieldName": "字段名称",
+      "fieldType": "字段类型",
+      "businessName": "业务名称",
+      "componentType": "组件类型",
+      "isUnique": "是否唯一",
+      "isRequired": "是否必填",
+      "isQueryField": "是否查询字段",
+      "isListVisible": "是否列表显示",
+      "isAddVisible": "是否新增字段",
+      "isEditVisible": "是否编辑字段",
+      "isDetailVisible": "是否详情显示",
+      "queryType": "查询方式",
+      "associatedType": "关联类型",
+      "dictType": "字典类型",
+      "associatedTable": "关联表名称",
+      "associatedTableField": "关联表字段",
+      "validationRules": "校验规则",
+      "fieldComment": "字段注释",
+      "actions": "操作",
+      "yes": "是",
+      "no": "否"
+    },
+    "form": {
+      "fieldName": "字段名称",
+      "fieldType": "字段类型",
+      "fieldComment": "字段注释",
+      "businessName": "业务名称",
+      "componentType": "组件类型",
+      "validationRules": "校验规则",
+      "associatedType": "关联类型",
+      "dictType": "字典类型",
+      "associatedTable": "关联表名",
+      "displayField": "显示字段",
+      "isUnique": "是否唯一",
+      "isRequired": "是否必填",
+      "isListVisible": "列表显示",
+      "isAddVisible": "新增字段",
+      "isEditVisible": "编辑字段",
+      "isDetailVisible": "详情显示",
+      "isQueryField": "查询条件",
+      "sortValue": "排序值",
+      "queryType": "查询方式",
+      "remarks": "备注",
+      "inputComponentType": "请选择组件类型",
+      "validationRulesPlaceholder": "如：required|email|max:50",
+      "selectAssociatedType": "请选择关联类型",
+      "selectDictType": "请选择字典类型",
+      "selectAssociatedTable": "请选择关联表名",
+      "selectDisplayField": "请选择显示字段",
+      "inputRemarks": "请输入备注信息"
+    },
+    "componentType": {
+      "input": "输入框",
+      "textarea": "文本域",
+      "select": "下拉框",
+      "inputNumber": "数字框",
+      "radio": "单选框",
+      "checkbox": "复选框",
+      "colorPicker": "颜色选择器",
+      "iconPicker": "图标选择器",
+      "datePicker": "日期选择器",
+      "timePicker": "时间选择器",
+      "datetimePicker": "日期时间选择器",
+      "switch": "开关",
+      "imageUpload": "图片上传",
+      "fileUpload": "文件上传",
+      "richText": "富文本编辑器"
+    },
+    "queryType": {
+      "eq": "等于(=)",
+      "ne": "不等于(!=)",
+      "gt": "大于(>)",
+      "ge": "大于等于(>=)",
+      "lt": "小于(<)",
+      "le": "小于等于(<=)",
+      "like": "模糊查询(like)",
+      "leftLike": "左模糊(%like)",
+      "rightLike": "右模糊(like%)",
+      "between": "范围查询(between)",
+      "in": "包含(in)",
+      "notIn": "不包含(not in)",
+      "isNotNull": "不为空(is not null)",
+      "isNull": "为空(is null)"
+    },
+    "associatedType": {
+      "dictType": "字典类型",
+      "associatedTable": "关联表名"
+    },
+    "tooltip": {
+      "isUnique": "字段是否要求唯一值",
+      "isRequired": "字段是否为必填项",
+      "dbRequiredField": "数据库必填字段不可修改",
+      "isListVisible": "是否在列表页显示该字段",
+      "isAddVisible": "是否在新增表单中显示该字段",
+      "isEditVisible": "是否在编辑表单中显示该字段",
+      "isDetailVisible": "是否在详情页中显示该字段",
+      "isQueryField": "是否作为查询条件"
+    },
+    "warning": {
+      "associatedTypeRequired": "当前组件类型必须关联数据源",
+      "missingTableConfig": "缺少表配置ID，无法加载字段列表",
+      "selectDictType": "请选择字典类型",
+      "selectAssociatedTable": "请选择关联表名",
+      "missingDBName": "缺少数据库名称，无法获取关联表列表",
+      "missingTableConfigInfo": "缺少表配置信息",
+      "componentTypeRequireAssociated": "当前组件类型需要设置关联类型"
+    },
+    "message": {
+      "loadFieldsFailed": "加载字段列表失败",
+      "loadFieldsError": "加载字段列表时发生错误",
+      "enterSortMode": "已进入排序模式，请通过拖拽【移动】按钮对字段进行排序，完成后点击【保存排序】按钮",
+      "saveSuccess": "保存成功",
+      "saveFailed": "保存失败",
+      "saveError": "保存字段配置时发生错误",
+      "syncSuccess": "同步字段成功",
+      "syncFailed": "同步字段失败",
+      "syncError": "同步字段时发生错误",
+      "sortSuccess": "字段排序保存成功",
+      "sortFailed": "保存排序失败",
+      "sortError": "保存字段排序时发生错误",
+      "cancelSort": "已取消排序",
+      "deleteSuccess": "字段配置删除成功",
+      "deleteFailed": "字段配置删除失败",
+      "deleteConfirm": "确定要删除字段 \"{fieldName}\" 吗？"
+    },
+    "validation": {
+      "componentTypeRequired": "请选择组件类型",
+      "associatedTypeRequired": "请选择关联类型",
+      "dictTypeRequired": "请选择字典类型",
+      "associatedTableRequired": "请选择关联表名",
+      "displayFieldRequired": "请选择显示字段"
+    },
+    "preview": {
+      "title": "预览表单【{tableName}】"
+    }
+  },
+  "role": {
+    "title": "角色管理",
+    "search": {
+      "roleName": "角色名称",
+      "inputRoleName": "请输入角色名称",
+      "search": "搜索",
+      "add": "新增角色"
+    },
+    "table": {
+      "roleName": "角色名称",
+      "description": "描述",
+      "isDefault": "是否默认",
+      "status": "状态",
+      "updateTime": "更新时间",
+      "operations": "操作",
+      "yes": "是",
+      "no": "否",
+      "enabled": "启用",
+      "disabled": "禁用"
+    },
+    "button": {
+      "search": "搜索角色",
+      "add": "新增角色",
+      "edit": "编辑角色",
+      "delete": "删除角色",
+      "assignPermission": "给角色分配菜单权限",
+      "cancel": "取消",
+      "submit": "提交",
+      "confirm": "确定"
+    },
+    "dialog": {
+      "addTitle": "新增角色",
+      "editTitle": "编辑角色",
+      "roleName": "角色名称",
+      "description": "描述",
+      "isDefault": "是否默认",
+      "status": "状态",
+      "cancelAdd": "取消新增角色",
+      "cancelEdit": "取消编辑角色",
+      "submitAdd": "保存新增角色",
+      "submitEdit": "保存编辑角色"
+    },
+    "message": {
+      "confirmDelete": "确定删除该角色吗？",
+      "confirmDeleteTitle": "删除确认",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除角色失败，请重试",
+      "cancelDelete": "用户取消删除角色操作",
+      "addSuccess": "新增成功",
+      "addFailed": "新增失败",
+      "editSuccess": "修改成功",
+      "editFailed": "修改失败",
+      "operationFailed": "操作失败，请重试",
+      "getRoleListFailed": "获取角色列表失败",
+      "getRoleListError": "获取角色列表时发生错误"
+    },
+    "validation": {
+      "roleNameRequired": "请输入角色名称",
+      "roleNameLength": "长度在 2 到 20 个字符",
+      "descriptionRequired": "请输入角色描述"
+    }
+  },
+  "quartzTask": {
+    "title": "定时任务管理",
+    "button": {
+      "add": "新增任务",
+      "batchDelete": "批量删除",
+      "batchPause": "批量暂停",
+      "batchResume": "批量恢复",
+      "batchRun": "立即执行"
+    },
+    "dialog": {
+      "addTitle": "新增定时任务",
+      "editTitle": "编辑定时任务",
+      "cancelAdd": "取消新增定时任务",
+      "cancelEdit": "取消编辑定时任务",
+      "submitAdd": "保存新增定时任务",
+      "submitEdit": "保存编辑定时任务",
+      "confirmDelete": "确定要删除任务 \"{name}\" 吗？此操作不可恢复！",
+      "confirmDeleteTitle": "警告",
+      "confirmBatchDelete": "确定要删除选中的任务吗？此操作不可恢复！",
+      "confirmPause": "确定要暂停任务 \"{name}\" 吗？",
+      "confirmBatchPause": "确定要暂停选中的任务吗？",
+      "confirmResume": "确定要恢复任务 \"{name}\" 吗？",
+      "confirmBatchResume": "确定要恢复选中的任务吗？",
+      "confirmRun": "确定要立即执行任务 \"{name}\" 吗？",
+      "confirmBatchRun": "确定要立即执行选中的任务吗？"
+    },
+    "form": {
+      "groupName": "任务组名",
+      "name": "任务名称",
+      "cron": "Cron表达式",
+      "targetBean": "目标Bean",
+      "targetMethod": "目标方法",
+      "params": "执行参数",
+      "status": "任务状态",
+      "remarks": "备注",
+      "groupNamePlaceholder": "请输入任务组名",
+      "namePlaceholder": "请输入任务名称",
+      "cronPlaceholder": "请输入Cron表达式",
+      "targetBeanPlaceholder": "请输入目标Bean名称",
+      "targetMethodPlaceholder": "请输入目标方法名称",
+      "paramsPlaceholder": "请输入执行参数",
+      "remarksPlaceholder": "请输入备注信息"
+    },
+    "search": {
+      "namePlaceholder": "请输入任务名称搜索",
+      "statusPlaceholder": "请选择状态"
+    },
+    "table": {
+      "groupName": "任务组名",
+      "name": "任务名称",
+      "cron": "Cron表达式",
+      "targetBean": "目标Bean",
+      "targetMethod": "目标方法",
+      "params": "参数",
+      "status": "状态",
+      "updateDate": "更新时间",
+      "operation": "操作"
+    },
+    "status": {
+      "normal": "正常",
+      "pause": "暂停"
+    },
+    "operation": {
+      "edit": "编辑定时任务",
+      "delete": "删除定时任务",
+      "pause": "暂停定时任务",
+      "resume": "恢复定时任务",
+      "run": "立即执行任务"
+    },
+    "rules": {
+      "name": {
+        "required": "请输入任务名称",
+        "length": "长度不能超过100个字符"
+      },
+      "cron": {
+        "required": "请输入Cron表达式"
+      },
+      "targetBean": {
+        "required": "请输入目标Bean"
+      },
+      "targetMethod": {
+        "required": "请输入目标方法"
+      },
+      "status": {
+        "required": "请选择任务状态"
+      }
+    },
+    "message": {
+      "getListFailed": "获取定时任务列表失败",
+      "getListError": "获取定时任务列表时发生错误",
+      "selectAtLeastOne": "请至少选择一条记录",
+      "addSuccess": "添加成功",
+      "addFailed": "添加失败",
+      "addError": "添加任务时发生错误",
+      "editSuccess": "编辑成功",
+      "editFailed": "编辑失败",
+      "editError": "编辑任务时发生错误",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除任务时发生错误",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeleteFailed": "批量删除失败",
+      "batchDeleteError": "批量删除任务时发生错误",
+      "pauseSuccess": "暂停成功",
+      "pauseFailed": "暂停失败",
+      "pauseError": "暂停任务时发生错误",
+      "batchPauseSuccess": "批量暂停成功",
+      "batchPauseFailed": "批量暂停失败",
+      "batchPauseError": "批量暂停任务时发生错误",
+      "resumeSuccess": "恢复成功",
+      "resumeFailed": "恢复失败",
+      "resumeError": "恢复任务时发生错误",
+      "batchResumeSuccess": "批量恢复成功",
+      "batchResumeFailed": "批量恢复失败",
+      "batchResumeError": "批量恢复任务时发生错误",
+      "runSuccess": "执行成功",
+      "runFailed": "执行失败",
+      "runError": "执行任务时发生错误",
+      "batchRunSuccess": "批量执行成功",
+      "batchRunFailed": "批量执行失败",
+      "batchRunError": "批量执行任务时发生错误",
+      "cancelResume": "用户取消恢复任务",
+      "cancelBatchResume": "用户取消批量恢复任务",
+      "cancelRun": "用户取消执行任务",
+      "cancelBatchRun": "用户取消立即执行选中的任务"
+    }
+  },
+  "quartzTaskLog": {
+    "title": "定时任务日志管理",
+    "button": {
+      "batchDelete": "批量删除",
+      "viewError": "查看异常"
+    },
+    "dialog": {
+      "errorTitle": "异常信息详情",
+      "confirmDelete": "确定要删除任务日志吗？此操作不可恢复！",
+      "confirmDeleteTitle": "警告",
+      "confirmBatchDelete": "确定要删除选中的任务日志吗？此操作不可恢复！"
+    },
+    "form": {
+      "name": "任务名称"
+    },
+    "search": {
+      "namePlaceholder": "请输入任务名称搜索"
+    },
+    "table": {
+      "selection": "勾选",
+      "jobId": "任务ID",
+      "name": "任务名称",
+      "cron": "Cron表达式",
+      "targetBean": "目标Bean",
+      "targetMethod": "目标方法",
+      "params": "参数",
+      "status": "状态",
+      "times": "执行耗时",
+      "exception": "异常信息",
+      "createDate": "创建时间",
+      "operation": "操作"
+    },
+    "operation": {
+      "delete": "删除定时任务日志"
+    },
+    "message": {
+      "getListFailed": "获取定时任务日志列表失败",
+      "getListError": "获取定时任务日志列表时发生错误",
+      "selectAtLeastOne": "请至少选择一条记录",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "deleteError": "删除任务日志时发生错误",
+      "batchDeleteSuccess": "批量删除成功",
+      "batchDeletePartial": "部分或全部删除失败，请重试",
+      "batchDeleteError": "批量删除任务日志时发生错误",
+      "cancelDelete": "用户取消删除操作",
+      "cancelBatchDelete": "用户取消批量删除操作"
     }
   }
 }

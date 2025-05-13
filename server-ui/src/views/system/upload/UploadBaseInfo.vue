@@ -4,8 +4,8 @@
     <div class="upload-header-card">
       <div class="upload-header">
         <div class="header-content">
-          <h1 class="title">上传方式配置</h1>
-          <h2 class="subtitle">可自由配置本地或云存储方式</h2>
+          <h1 class="title">{{ $t('upload.baseInfo.title') }}</h1>
+          <h2 class="subtitle">{{ $t('upload.baseInfo.subtitle') }}</h2>
         </div>
         <div class="header-action">
           <el-button
@@ -16,7 +16,7 @@
             @click="handleAddUpload"
             v-ripple
           >
-            <el-icon class="el-icon--left"><Plus /></el-icon>新增上传方式
+            <el-icon class="el-icon--left"><Plus /></el-icon>{{ $t('upload.baseInfo.addButton') }}
           </el-button>
         </div>
       </div>
@@ -29,7 +29,7 @@
             <div class="card-header">
               <div class="header-actions">
                 <span
-                  title="编辑上传方式"
+                  :title="$t('upload.baseInfo.card.edit')"
                   class="edit-icon"
                   v-auth="'uploadtype_edit'"
                   @click="handleEditUpload(item)"
@@ -40,17 +40,17 @@
               <h3>
                 {{ getUploadTitle(item.type) }}
                 <el-tag v-if="item.enable" type="success" size="small" class="status-tag">
-                  已启用
+                  {{ $t('upload.baseInfo.card.enabled') }}
                 </el-tag>
               </h3>
               <p class="description">{{ item.remarks }}</p>
               <div class="upload-info">
                 <div class="info-item">
-                  <span class="label">存储地址：</span>
+                  <span class="label">{{ $t('upload.baseInfo.card.storageAddress') }}：</span>
                   <span class="value">{{ item.basePath }}</span>
                 </div>
                 <div v-if="item.bucketName" class="info-item">
-                  <span class="label">存储空间：</span>
+                  <span class="label">{{ $t('upload.baseInfo.card.storageSpace') }}：</span>
                   <span class="value">{{ item.bucketName }}</span>
                 </div>
               </div>
@@ -61,27 +61,27 @@
                 <el-icon class="available">
                   <Check />
                 </el-icon>
-                <span>状态：{{ item.enable ? '已启用' : '已禁用' }}</span>
+                <span>{{ $t('upload.baseInfo.card.status') }}：{{ item.enable ? $t('upload.baseInfo.card.enabled_status') : $t('upload.baseInfo.card.disabled_status') }}</span>
               </div>
               <div class="feature-item">
                 <el-icon class="available">
                   <Check />
                 </el-icon>
-                <span>测试状态：{{ item.testAccess ? '连接正常' : '连接异常' }}</span>
+                <span>{{ $t('upload.baseInfo.card.testStatus') }}：{{ item.testAccess ? $t('upload.baseInfo.card.connectionNormal') : $t('upload.baseInfo.card.connectionError') }}</span>
               </div>
               <div v-if="item.enable && item.testAccess" class="feature-item">
                 <el-icon class="available">
                   <Check />
                 </el-icon>
                 <span>
-                  测试图片：
+                  {{ $t('upload.baseInfo.card.testImage') }}：
                   <el-button
-                    title="查看测试图片"
+                    :title="$t('upload.baseInfo.card.viewTestImage')"
                     type="primary"
                     link
                     v-auth="'uploadtype_show_test'"
                     @click="showImg(item.id)"
-                    >点我查看</el-button
+                    >{{ $t('upload.baseInfo.card.viewTestImage') }}</el-button
                   >
                 </span>
               </div>
@@ -89,19 +89,19 @@
                 <el-icon class="available">
                   <Check />
                 </el-icon>
-                <span>存储目录：{{ item.dir || '-' }}</span>
+                <span>{{ $t('upload.baseInfo.card.storageDir') }}：{{ item.dir || '-' }}</span>
               </div>
               <div v-if="item.endpoint" class="feature-item">
                 <el-icon class="available">
                   <Check />
                 </el-icon>
-                <span>地域节点：{{ item.endpoint }}</span>
+                <span>{{ $t('upload.baseInfo.card.endpoint') }}：{{ item.endpoint }}</span>
               </div>
               <div v-if="item.region" class="feature-item">
                 <el-icon class="available">
                   <Check />
                 </el-icon>
-                <span>区域：{{ item.region }}</span>
+                <span>{{ $t('upload.baseInfo.card.region') }}：{{ item.region }}</span>
               </div>
             </div>
 
@@ -113,7 +113,7 @@
                 @click="handleToggleStatus(item)"
                 v-ripple
               >
-                {{ item.enable ? '暂时禁用' : '立即启用' }}
+                {{ item.enable ? $t('upload.baseInfo.card.tempDisable') : $t('upload.baseInfo.card.enable') }}
               </el-button>
             </div>
           </el-card>
@@ -124,7 +124,7 @@
     <!-- 添加/编辑上传方式对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="isEdit ? '编辑上传方式' : '新增上传方式'"
+      :title="isEdit ? $t('upload.baseInfo.dialog.editTitle') : $t('upload.baseInfo.dialog.addTitle')"
       width="600px"
       destroy-on-close
     >
@@ -136,88 +136,88 @@
         class="upload-form"
       >
         <!-- 类型选择 - 仅新增时可选 -->
-        <el-form-item label="上传类型" prop="type">
+        <el-form-item :label="$t('upload.baseInfo.dialog.uploadType')" prop="type">
           <el-radio-group v-model="formData.type" :disabled="isEdit">
-            <el-radio :value="UploadTypeEnum.LOCAL">本地上传</el-radio>
-            <el-radio :value="UploadTypeEnum.QINIU">七牛云</el-radio>
-            <el-radio :value="UploadTypeEnum.OSS">阿里云OSS</el-radio>
-            <el-radio :value="UploadTypeEnum.COS">腾讯云COS</el-radio>
-            <el-radio :value="UploadTypeEnum.BITIFUL">缤纷云</el-radio>
+            <el-radio :value="UploadTypeEnum.LOCAL">{{ $t('upload.baseInfo.types.local') }}</el-radio>
+            <el-radio :value="UploadTypeEnum.QINIU">{{ $t('upload.baseInfo.types.qiniu') }}</el-radio>
+            <el-radio :value="UploadTypeEnum.OSS">{{ $t('upload.baseInfo.types.oss') }}</el-radio>
+            <el-radio :value="UploadTypeEnum.COS">{{ $t('upload.baseInfo.types.cos') }}</el-radio>
+            <el-radio :value="UploadTypeEnum.BITIFUL">{{ $t('upload.baseInfo.types.bitiful') }}</el-radio>
           </el-radio-group>
         </el-form-item>
 
         <!-- 基础字段 - 所有类型都有 -->
-        <el-form-item label="启用状态" prop="enable" v-if="formData.type !== UploadTypeEnum.LOCAL">
+        <el-form-item :label="$t('upload.baseInfo.dialog.statusLabel')" prop="enable" v-if="formData.type !== UploadTypeEnum.LOCAL">
           <el-switch
             v-model="formData.enable"
-            :active-text="formData.enable ? '启用' : '禁用'"
-            :inactive-text="formData.enable ? '启用' : '禁用'"
+            :active-text="formData.enable ? $t('upload.baseInfo.dialog.enableText') : $t('upload.baseInfo.dialog.disableText')"
+            :inactive-text="formData.enable ? $t('upload.baseInfo.dialog.enableText') : $t('upload.baseInfo.dialog.disableText')"
           />
         </el-form-item>
 
-        <el-form-item label="HTTP前缀" prop="basePath">
+        <el-form-item :label="$t('upload.baseInfo.dialog.httpPrefix')" prop="basePath">
           <el-input
             v-model="formData.basePath"
-            placeholder="例如：http://example.com 或 https://example.com"
+            :placeholder="$t('upload.baseInfo.dialog.httpPrefixPlaceholder')"
           />
-          <div class="form-tip">公开访问的URL前缀，包括http://或https://</div>
+          <div class="form-tip">{{ $t('upload.baseInfo.dialog.httpPrefixTip') }}</div>
         </el-form-item>
 
-        <el-form-item label="存储目录" prop="dir">
-          <el-input v-model="formData.dir" placeholder="例如：images/ 或 uploads/" />
-          <div class="form-tip">存储目录，不可以为空</div>
+        <el-form-item :label="$t('upload.baseInfo.dialog.storageDir')" prop="dir">
+          <el-input v-model="formData.dir" :placeholder="$t('upload.baseInfo.dialog.storageDirPlaceholder')" />
+          <div class="form-tip">{{ $t('upload.baseInfo.dialog.storageDirTip') }}</div>
         </el-form-item>
 
         <!-- 云存储共有字段 -->
         <template v-if="formData.type !== UploadTypeEnum.LOCAL">
-          <el-form-item label="Bucket名称" prop="bucketName">
-            <el-input v-model="formData.bucketName" placeholder="存储空间名称" />
+          <el-form-item :label="$t('upload.baseInfo.dialog.bucketName')" prop="bucketName">
+            <el-input v-model="formData.bucketName" :placeholder="$t('upload.baseInfo.dialog.bucketNamePlaceholder')" />
           </el-form-item>
 
-          <el-form-item label="AccessKey" prop="accessKey">
+          <el-form-item :label="$t('upload.baseInfo.dialog.accessKey')" prop="accessKey">
             <el-input
               v-model="formData.accessKey"
-              placeholder="云存储访问密钥ID"
+              :placeholder="$t('upload.baseInfo.dialog.accessKeyPlaceholder')"
               :show-password="isEdit"
             />
           </el-form-item>
 
-          <el-form-item label="SecretKey" prop="secretKey">
-            <el-input v-model="formData.secretKey" placeholder="云存储访问密钥密码" show-password />
-            <div v-if="isEdit" class="form-tip">如不修改，请留空</div>
+          <el-form-item :label="$t('upload.baseInfo.dialog.secretKey')" prop="secretKey">
+            <el-input v-model="formData.secretKey" :placeholder="$t('upload.baseInfo.dialog.secretKeyPlaceholder')" show-password />
+            <div v-if="isEdit" class="form-tip">{{ $t('upload.baseInfo.dialog.secretKeyTip') }}</div>
           </el-form-item>
         </template>
 
         <!-- 阿里云OSS特有字段 -->
         <template v-if="formData.type === UploadTypeEnum.OSS">
-          <el-form-item label="地域节点" prop="endpoint">
-            <el-input v-model="formData.endpoint" placeholder="例如：oss-cn-beijing.aliyuncs.com" />
+          <el-form-item :label="$t('upload.baseInfo.dialog.endpoint')" prop="endpoint">
+            <el-input v-model="formData.endpoint" :placeholder="$t('upload.baseInfo.dialog.endpointPlaceholder.oss')" />
           </el-form-item>
         </template>
 
         <!-- 腾讯云COS特有字段 -->
         <template v-if="formData.type === UploadTypeEnum.COS">
-          <el-form-item label="地域" prop="region">
-            <el-input v-model="formData.region" placeholder="例如：ap-guangzhou" />
+          <el-form-item :label="$t('upload.baseInfo.dialog.region')" prop="region">
+            <el-input v-model="formData.region" :placeholder="$t('upload.baseInfo.dialog.regionPlaceholder.cos')" />
           </el-form-item>
         </template>
 
         <!-- 缤纷云特有字段 -->
         <template v-if="formData.type === UploadTypeEnum.BITIFUL">
-          <el-form-item label="地域节点" prop="endpoint">
-            <el-input v-model="formData.endpoint" placeholder="例如：endpoint.example.com" />
+          <el-form-item :label="$t('upload.baseInfo.dialog.endpoint')" prop="endpoint">
+            <el-input v-model="formData.endpoint" :placeholder="$t('upload.baseInfo.dialog.endpointPlaceholder.bitiful')" />
           </el-form-item>
 
-          <el-form-item label="区域" prop="region">
-            <el-input v-model="formData.region" placeholder="区域代码" />
+          <el-form-item :label="$t('upload.baseInfo.dialog.region')" prop="region">
+            <el-input v-model="formData.region" :placeholder="$t('upload.baseInfo.dialog.regionPlaceholder.bitiful')" />
           </el-form-item>
         </template>
 
-        <el-form-item label="备注" prop="remarks">
+        <el-form-item :label="$t('upload.baseInfo.dialog.remarks')" prop="remarks">
           <el-input
             type="textarea"
             v-model="formData.remarks"
-            placeholder="请输入备注信息"
+            :placeholder="$t('upload.baseInfo.dialog.remarksPlaceholder')"
             :rows="3"
           ></el-input>
         </el-form-item>
@@ -225,21 +225,21 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitForm" :loading="submitLoading">确定</el-button>
+          <el-button @click="dialogVisible = false">{{ $t('upload.baseInfo.dialog.cancel') }}</el-button>
+          <el-button type="primary" @click="submitForm" :loading="submitLoading">{{ $t('upload.baseInfo.dialog.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 图片预览对话框 -->
-    <el-dialog v-model="imgDialogVisible" title="图片预览" width="500px" destroy-on-close>
+    <el-dialog v-model="imgDialogVisible" :title="$t('upload.baseInfo.imagePreview.title')" width="500px" destroy-on-close>
       <div class="img-preview">
-        <img v-if="currentImgUrl" :src="currentImgUrl" alt="图片预览" class="preview-img" />
-        <div v-else class="no-image">暂无图片</div>
+        <img v-if="currentImgUrl" :src="currentImgUrl" :alt="$t('upload.baseInfo.imagePreview.title')" class="preview-img" />
+        <div v-else class="no-image">{{ $t('upload.baseInfo.imagePreview.noImage') }}</div>
 
         <div class="upload-container">
           <el-upload
-            title="上传测试图片"
+            :title="$t('upload.baseInfo.imagePreview.uploadButton')"
             class="upload-demo"
             :action="''"
             :auto-upload="false"
@@ -248,7 +248,7 @@
             :before-upload="beforeUpload"
             accept="image/*"
           >
-            <el-button type="primary" :loading="imgUploadLoading">选择图片</el-button>
+            <el-button type="primary" :loading="imgUploadLoading">{{ $t('upload.baseInfo.imagePreview.selectImage') }}</el-button>
           </el-upload>
           <el-button
             type="success"
@@ -257,14 +257,14 @@
             @click="handleUploadFile"
             style="margin-left: 10px"
           >
-            上传图片
+            {{ $t('upload.baseInfo.imagePreview.uploadImage') }}
           </el-button>
         </div>
       </div>
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="imgDialogVisible = false">关闭</el-button>
+          <el-button @click="imgDialogVisible = false">{{ $t('upload.baseInfo.imagePreview.close') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -283,6 +283,9 @@
     AddUploadBaseInfoParam,
     EditUploadBaseInfoParam
   } from '@/api/model/uploadModel'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 上传方式列表数据
   const uploadList = ref<UploadRecord[]>([])
@@ -327,20 +330,22 @@
 
   // 表单验证规则
   const rules = reactive<FormRules>({
-    type: [{ required: true, message: '请选择上传类型', trigger: 'change' }],
+    type: [
+      { required: true, message: t('upload.baseInfo.rules.type.required'), trigger: 'change' }
+    ],
     basePath: [
-      { required: true, message: '请输入HTTP前缀', trigger: 'blur' },
+      { required: true, message: t('upload.baseInfo.rules.basePath.required'), trigger: 'blur' },
       {
         pattern: /^https?:\/\//,
-        message: '请输入正确的HTTP前缀，以http://或https://开头',
+        message: t('upload.baseInfo.rules.basePath.pattern'),
         trigger: 'blur'
       }
     ],
     dir: [
-      { required: true, message: '请输入上传目录', trigger: 'blur' },
+      { required: true, message: t('upload.baseInfo.rules.dir.required'), trigger: 'blur' },
       {
         pattern: /^[a-zA-Z][a-zA-Z/]*\/$/,
-        message: '目录名称只能包含字母、斜杠(/),且首字母不能是斜杠,必须是斜杠(/)结尾',
+        message: t('upload.baseInfo.rules.dir.pattern'),
         trigger: 'blur'
       }
     ],
@@ -348,7 +353,7 @@
       {
         validator: (rule, value, callback) => {
           if (formData.type !== UploadTypeEnum.LOCAL && !value) {
-            callback(new Error('请输入Bucket名称'))
+            callback(new Error(t('upload.baseInfo.rules.bucketName.required')))
           } else {
             callback()
           }
@@ -360,7 +365,7 @@
       {
         validator: (rule, value, callback) => {
           if (formData.type !== UploadTypeEnum.LOCAL && !isEdit.value && !value) {
-            callback(new Error('请输入AccessKey'))
+            callback(new Error(t('upload.baseInfo.rules.accessKey.required')))
           } else {
             callback()
           }
@@ -372,7 +377,7 @@
       {
         validator: (rule, value, callback) => {
           if (formData.type !== UploadTypeEnum.LOCAL && !isEdit.value && !value) {
-            callback(new Error('请输入SecretKey'))
+            callback(new Error(t('upload.baseInfo.rules.secretKey.required')))
           } else {
             callback()
           }
@@ -384,7 +389,7 @@
       {
         validator: (rule, value, callback) => {
           if ([UploadTypeEnum.OSS, UploadTypeEnum.BITIFUL].includes(formData.type) && !value) {
-            callback(new Error('请输入地域节点'))
+            callback(new Error(t('upload.baseInfo.rules.endpoint.required')))
           } else {
             callback()
           }
@@ -396,7 +401,7 @@
       {
         validator: (rule, value, callback) => {
           if ([UploadTypeEnum.COS, UploadTypeEnum.BITIFUL].includes(formData.type) && !value) {
-            callback(new Error('请输入区域'))
+            callback(new Error(t('upload.baseInfo.rules.region.required')))
           } else {
             callback()
           }
@@ -418,26 +423,16 @@
   // 获取上传方式标题
   const getUploadTitle = (type: string | null) => {
     const titleMap: Record<string, string> = {
-      [UploadTypeEnum.LOCAL]: '本地上传',
-      [UploadTypeEnum.QINIU]: '七牛云存储',
-      [UploadTypeEnum.OSS]: '阿里云OSS',
-      [UploadTypeEnum.COS]: '腾讯云COS',
-      [UploadTypeEnum.BITIFUL]: '缤纷云存储'
+      [UploadTypeEnum.LOCAL]: t('upload.baseInfo.types.local'),
+      [UploadTypeEnum.QINIU]: t('upload.baseInfo.types.qiniu'),
+      [UploadTypeEnum.OSS]: t('upload.baseInfo.types.oss'),
+      [UploadTypeEnum.COS]: t('upload.baseInfo.types.cos'),
+      [UploadTypeEnum.BITIFUL]: t('upload.baseInfo.types.bitiful')
     }
-    return type ? titleMap[type] || '未知上传方式' : '未知上传方式'
+    return type
+      ? titleMap[type] || t('upload.baseInfo.types.unknown')
+      : t('upload.baseInfo.types.unknown')
   }
-
-  // 获取上传方式描述
-  // const getUploadDescription = (type: string | null) => {
-  //   const descMap: Record<string, string> = {
-  //     [UploadTypeEnum.LOCAL]: '使用服务器本地存储，无需额外配置，适合小型应用',
-  //     [UploadTypeEnum.QINIU]: '七牛云对象存储服务，提供高效稳定的云存储服务',
-  //     [UploadTypeEnum.OSS]: '阿里云对象存储服务，提供海量、安全、低成本的云存储服务',
-  //     [UploadTypeEnum.COS]: '腾讯云对象存储服务，稳定、安全、高效',
-  //     [UploadTypeEnum.BITIFUL]: '缤纷云提供的云存储服务'
-  //   }
-  //   return type ? descMap[type] || '未知上传方式' : '未知上传方式'
-  // }
 
   // 加载上传方式列表数据
   const loadUploadList = async () => {
@@ -448,11 +443,11 @@
         uploadList.value = res.data.records
         totalCount.value = res.data.total
       } else {
-        ElMessage.error(res.message || '获取上传方式列表失败')
+        ElMessage.error(res.message || t('upload.baseInfo.message.getListFailed'))
       }
     } catch (error) {
       console.error('获取上传方式列表失败:', error)
-      ElMessage.error('获取上传方式列表时发生错误')
+      ElMessage.error(t('upload.baseInfo.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -462,7 +457,7 @@
     // 查找当前ID对应的上传配置
     const currentItem = uploadList.value.find((item) => item.id === id)
     if (!currentItem) {
-      ElMessage.error('找不到对应的上传配置')
+      ElMessage.error(t('upload.baseInfo.message.configNotFound'))
       return
     }
 
@@ -484,11 +479,11 @@
     const isLt2M = file.size / 1024 / 1024 < 2
 
     if (!isImage) {
-      ElMessage.error('只能上传图片文件!')
+      ElMessage.error(t('upload.baseInfo.message.onlyImage'))
       return false
     }
     if (!isLt2M) {
-      ElMessage.error('图片大小不能超过 2MB!')
+      ElMessage.error(t('upload.baseInfo.message.imageSizeLimit'))
       return false
     }
     return true
@@ -507,7 +502,7 @@
   // 处理图片上传
   const handleUploadFile = async () => {
     if (!selectedFile.value) {
-      ElMessage.warning('请先选择图片')
+      ElMessage.warning(t('upload.baseInfo.message.selectImage'))
       return
     }
 
@@ -524,7 +519,7 @@
       const res = await UploadService.upload(uploadFormData)
 
       if (res.success) {
-        ElMessage.success('上传成功')
+        ElMessage.success(t('upload.baseInfo.message.uploadSuccess'))
 
         // 更新图片地址
         if (currentItem && res.data) {
@@ -560,11 +555,11 @@
           loadUploadList() // 重新加载数据
         }
       } else {
-        ElMessage.error(res.message || '上传失败')
+        ElMessage.error(res.message || t('upload.baseInfo.message.uploadFailed'))
       }
     } catch (error) {
       console.error('上传图片失败:', error)
-      ElMessage.error('上传图片时发生错误')
+      ElMessage.error(t('upload.baseInfo.message.uploadError'))
     } finally {
       imgUploadLoading.value = false
       selectedFile.value = null
@@ -593,14 +588,18 @@
 
       const res = await UploadService.updateUploadBaseInfo(params)
       if (res.success) {
-        ElMessage.success(`${item.enable ? '禁用' : '启用'}成功`)
+        ElMessage.success(
+          item.enable
+            ? t('upload.baseInfo.message.toggleSuccess')
+            : t('upload.baseInfo.message.toggleEnableSuccess')
+        )
         loadUploadList() // 重新加载数据
       } else {
-        ElMessage.error(res.message || '操作失败')
+        ElMessage.error(res.message || t('upload.baseInfo.message.toggleFailed'))
       }
     } catch (error) {
       console.error('切换状态失败:', error)
-      ElMessage.error('切换状态时发生错误')
+      ElMessage.error(t('upload.baseInfo.message.toggleError'))
     }
   }
 
@@ -703,15 +702,23 @@
           }
 
           if (res.success) {
-            ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
+            ElMessage.success(
+              isEdit.value
+                ? t('upload.baseInfo.message.editSuccess')
+                : t('upload.baseInfo.message.addSuccess')
+            )
             dialogVisible.value = false
             loadUploadList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '操作失败')
+            ElMessage.error(res.message || t('upload.baseInfo.message.operationFailed'))
           }
         } catch (error) {
           console.error(isEdit.value ? '编辑失败:' : '新增失败:', error)
-          ElMessage.error(isEdit.value ? '编辑时发生错误' : '新增时发生错误')
+          ElMessage.error(
+            isEdit.value
+              ? t('upload.baseInfo.message.editError')
+              : t('upload.baseInfo.message.addError')
+          )
         } finally {
           submitLoading.value = false
         }

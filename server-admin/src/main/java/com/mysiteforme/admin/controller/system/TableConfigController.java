@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.exception.MyException;
@@ -18,6 +19,8 @@ import com.mysiteforme.admin.service.TableConfigService;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * <p>
@@ -31,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/admin/tableConfig")
 @RequiredArgsConstructor
+@RateLimit(limit = 20, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class TableConfigController {
 
     private final TableConfigService tableConfigService;

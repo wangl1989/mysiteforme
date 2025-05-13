@@ -8,10 +8,12 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.Menu;
 import com.mysiteforme.admin.entity.request.AddMenuRequest;
 import com.mysiteforme.admin.entity.request.UpdateMenuRequest;
+import com.mysiteforme.admin.util.LimitType;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,11 +33,14 @@ import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/menu")
 @RequiredArgsConstructor
+@RateLimit(limit = 30, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class MenuController{
 
     private final MenuService menuService;

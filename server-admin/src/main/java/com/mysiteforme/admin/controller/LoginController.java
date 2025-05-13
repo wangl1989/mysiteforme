@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,13 +30,6 @@ import com.mysiteforme.admin.redis.RedisConstants;
 import com.mysiteforme.admin.redis.RedisUtils;
 import com.mysiteforme.admin.redis.TokenStorageService;
 import com.mysiteforme.admin.security.MyUserDetails;
-import com.mysiteforme.admin.util.Constants;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
-import com.mysiteforme.admin.util.ResultCode;
-import com.mysiteforme.admin.util.TokenErrorType;
-import com.mysiteforme.admin.util.ToolUtil;
-import com.mysiteforme.admin.util.VerifyCodeUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +56,7 @@ public class LoginController {
 	 * 生成验证码
 	 * @param request request对象
 	 */
+	@RateLimit(limit = 60, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
 	@GetMapping("/genCaptcha")
 	public Result genCaptcha(HttpServletRequest request) throws IOException {
 		String deviceId = request.getHeader(Constants.DEVICE_ID);
@@ -82,7 +78,7 @@ public class LoginController {
 		return Result.error(ResultCode.INTERNAL_ERROR, MessageConstants.System.SYSTEM_ERROR);
 	}
 
-
+	@RateLimit(limit = 60, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
 	@PostMapping("/api/auth/refresh")
 	public Result refreshToken(@RequestBody RefreshTokenRequest request,
 										  HttpServletRequest httpRequest) {
@@ -141,6 +137,7 @@ public class LoginController {
 	 * 校验token是否有效
 	 * @return Result对象
 	 */
+	@RateLimit(limit = 60, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
 	@GetMapping("/api/auth/validate")
 	public Result tokenValidate(HttpServletRequest request){
 		String deviceId = request.getHeader(Constants.DEVICE_ID);

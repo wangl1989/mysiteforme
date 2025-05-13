@@ -8,9 +8,11 @@
 
 package com.mysiteforme.admin.controller;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.QuartzTaskLog;
 import com.mysiteforme.admin.entity.request.PageListQuartzTaskLogRequest;
 import com.mysiteforme.admin.service.QuartzTaskLogService;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import com.mysiteforme.admin.annotation.SysLog;
@@ -18,8 +20,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/api/admin/quartzTaskLog")
+@RateLimit(limit = 40, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class QuartzTaskLogController {
 
     private final QuartzTaskLogService quartzTaskLogService;
