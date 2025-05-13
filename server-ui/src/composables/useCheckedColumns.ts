@@ -1,6 +1,7 @@
 // 动态列配置
 
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // 定义列配置接口
 export interface ColumnOption {
@@ -32,24 +33,24 @@ const INDEX_KEY = '__index__'
 // 工具函数：根据列配置生成列选择状态
 const getColumnChecks = (columns: ColumnOption[]): ColumnCheck[] => {
   const checks: ColumnCheck[] = []
-
+  const { t } = useI18n()
   columns.forEach((column) => {
     if (column.type === 'selection') {
       checks.push({
         prop: SELECTION_KEY,
-        label: '勾选',
+        label: t('tableCommon.check'),
         checked: true
       })
     } else if (column.type === 'expand') {
       checks.push({
         prop: EXPAND_KEY,
-        label: '展开',
+        label: t('tableCommon.expand'),
         checked: true
       })
     } else if (column.type === 'index') {
       checks.push({
         prop: INDEX_KEY,
-        label: '序号',
+        label: t('tableCommon.index'),
         checked: true
       })
     } else {

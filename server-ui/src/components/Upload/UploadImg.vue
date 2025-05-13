@@ -1,5 +1,5 @@
 <template>
-  <div class="upload-img-container" :style="{ width }">
+  <div class="upload-img-container" :style="{ width, minWidth }">
     <el-upload
       class="avatar-uploader"
       action="#"
@@ -9,7 +9,7 @@
       :http-request="customUpload"
       :on-preview="handlePictureCardPreview"
     >
-      <div class="image-container" v-if="previewUrl">
+      <div class="image-container" v-if="previewUrl" :style="{ minWidth, minHeight }">
         <img :src="previewUrl" class="avatar" />
         <div class="image-mask">
           <div class="image-actions">
@@ -27,7 +27,10 @@
           </div>
         </div>
       </div>
-      <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+      <div v-else class="empty-upload-area">
+        <el-icon class="avatar-uploader-icon"><Plus /></el-icon>
+        <span class="upload-text">点击上传</span>
+      </div>
     </el-upload>
     <el-dialog v-model="dialogVisible">
       <img w-full :src="dialogImageUrl" alt="Preview Image" class="preview-image" />
@@ -41,6 +44,9 @@
   import { ElMessage } from 'element-plus'
   import { UploadService } from '@/api/uploadApi'
   import type { UploadProps } from 'element-plus'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const props = defineProps({
     modelValue: {
@@ -54,6 +60,14 @@
     width: {
       type: String,
       default: '100px'
+    },
+    minWidth: {
+      type: String,
+      default: '120px'
+    },
+    minHeight: {
+      type: String,
+      default: '120px'
     },
     disabled: {
       type: Boolean,
@@ -97,14 +111,14 @@
     // 检查文件类型
     const isImage = file.type.startsWith('image/')
     if (!isImage) {
-      ElMessage.error('请上传图片文件')
+      ElMessage.error(t('upload.baseInfo.message.onlyImage'))
       return false
     }
 
     // 检查文件大小
     const isLtMax = file.size / 1024 / 1024 < props.maxSize
     if (!isLtMax) {
-      ElMessage.error(`图片大小不能超过${props.maxSize}MB`)
+      ElMessage.error(t('upload.baseInfo.message.imageSizeLimit'))
       return false
     }
 
@@ -127,16 +141,16 @@
         previewUrl.value = url
         emit('update:modelValue', url)
         options.onSuccess(result.data)
-        ElMessage.success('上传成功')
+        ElMessage.success(t('upload.baseInfo.message.uploadSuccess'))
       } else {
         // 上传失败处理
-        options.onError(new Error(result.message || '上传失败'))
-        ElMessage.error(result.message || '上传失败')
+        options.onError(new Error(result.message || t('upload.baseInfo.message.uploadFailed')))
+        ElMessage.error(result.message || t('upload.baseInfo.message.uploadFailed'))
       }
     } catch (error) {
-      console.error('上传错误:', error)
+      console.error(t('upload.baseInfo.message.uploadError'), error)
       options.onError(error)
-      ElMessage.error('上传过程中发生错误')
+      ElMessage.error(t('upload.baseInfo.message.uploadError'))
     }
   }
 
@@ -199,6 +213,24 @@
           }
         }
       }
+
+      .empty-upload-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-width: 120px;
+        min-height: 120px;
+        padding: 20px;
+        cursor: pointer;
+
+        .upload-text {
+          margin-top: 8px;
+          font-size: 14px;
+          color: #8c939d;
+        }
+      }
     }
 
     :deep(.el-dialog) {
@@ -231,11 +263,6 @@
   }
 
   :deep(.el-icon.avatar-uploader-icon) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 120px;
-    height: 120px;
     font-size: 28px;
     color: #8c939d;
     text-align: center;

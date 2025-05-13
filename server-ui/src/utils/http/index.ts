@@ -45,6 +45,7 @@ let refreshingTokenPromise: Promise<any> | null = null
 // 请求刷新 token 的函数 - 修改函数名避免与参数名冲突
 async function doRefreshToken(refreshTokenStr: string) {
   try {
+    const userStore = useUserStore()
     // 替换为直接使用axios的原始请求
     const deviceId = localStorage.getItem('deviceId') || ''
     const baseURL = import.meta.env.VITE_API_URL // 获取API基础URL
@@ -55,13 +56,13 @@ async function doRefreshToken(refreshTokenStr: string) {
       data: { refreshToken: refreshTokenStr },
       headers: {
         'Content-Type': 'application/json',
-        'Device-Id': deviceId
+        'Device-Id': deviceId,
+        'Accept-Language': userStore.language
       }
     })
     const result = response.data
     if (result.code === 200 && result.data) {
       // 更新 token
-      const userStore = useUserStore()
       userStore.setAccessToken(result.data.accessToken, result.data.refreshToken)
       return result.data.accessToken
     } else {
@@ -77,6 +78,9 @@ async function doRefreshToken(refreshTokenStr: string) {
 // 处理请求拦截
 axiosInstance.interceptors.request.use(
   async (request: InternalAxiosRequestConfig) => {
+    // 设置语言
+    const userStore = useUserStore()
+    request.headers.set('Accept-Language', userStore.language)
     // 设置 Device-Id
     const deviceId = getDeviceIdSync() || ''
     if (deviceId) {

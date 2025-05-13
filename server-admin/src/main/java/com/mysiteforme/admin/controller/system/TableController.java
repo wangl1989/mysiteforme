@@ -8,6 +8,7 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.annotation.SqlInjectionCheck;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.*;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.mysiteforme.admin.util.GenCodeConstants.*;
 
@@ -30,6 +32,7 @@ import static com.mysiteforme.admin.util.GenCodeConstants.*;
 @RequestMapping("/api/admin/table")
 @RequiredArgsConstructor
 @SqlInjectionCheck
+@RateLimit(limit = 20, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class TableController {
 
     private final TableService tableService;

@@ -20,12 +20,12 @@
         >
           <template #left>
             <el-button
-              title="批量删除系统操作日志"
+              :title="$t('log.batchDelete')"
               type="danger"
               @click="handleDelete"
               v-auth="'log_delete'"
               v-ripple
-              >批量删除</el-button
+              >{{ $t('log.batchDelete') }}</el-button
             >
           </template>
         </ArtTableHeader>
@@ -67,6 +67,9 @@
   import { LogRecord, LogListParams } from '@/api/model/logModel'
   import { useCheckedColumns } from '@/composables/useCheckedColumns'
   import { SearchFormItem, SearchChangeParams } from '@/types/search-form'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 加载状态
   const loading = ref(false)
@@ -85,31 +88,31 @@
   // 表单配置项 for ArtSearchBar
   const formItems: SearchFormItem[] = [
     {
-      label: '操作用户',
+      label: t('log.form.username'),
       prop: 'username',
       type: 'input',
       config: {
-        placeholder: '请输入用户名搜索',
+        placeholder: t('log.form.usernamePlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
     },
     {
-      label: '操作标题',
+      label: t('log.form.title'),
       prop: 'title',
       type: 'input',
       config: {
-        placeholder: '请输入日志标题搜索',
+        placeholder: t('log.form.titlePlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
     },
     {
-      label: '请求类型',
+      label: t('log.form.httpMethod'),
       prop: 'httpMethod',
       type: 'select',
       config: {
-        placeholder: '请选择请求类型',
+        placeholder: t('log.form.methodPlaceholder'),
         clearable: true
       },
       options: () => [
@@ -190,12 +193,12 @@
       if (jsonString) {
         jsonRawData.value = jsonString
       } else {
-        jsonRawData.value = { 内容: '空数据' }
+        jsonRawData.value = { [t('log.json.content')]: t('log.json.emptyData') }
       }
       jsonDialogVisible.value = true
     } catch (error) {
       console.error('解析JSON数据失败:', error)
-      jsonRawData.value = { 内容: jsonString || '无法解析的数据' }
+      jsonRawData.value = { [t('log.json.content')]: jsonString || t('log.json.parseError') }
       jsonDialogVisible.value = true
     }
   }
@@ -216,31 +219,31 @@
 
   // 列配置 for ArtTableHeader
   const columnOptions = [
-    { label: '勾选', type: 'selection' },
-    { label: '操作用户', prop: 'username' },
-    { label: '操作标题', prop: 'title' },
-    { label: 'IP地址', prop: 'remoteAddr' },
-    { label: '请求URI', prop: 'requestUri' },
-    { label: '请求方法', prop: 'httpMethod' },
-    { label: '浏览器', prop: 'browser' },
-    { label: '位置', prop: 'area' },
-    { label: '请求参数', prop: 'params' },
-    { label: '返回数据', prop: 'response' },
-    { label: '请求耗时', prop: 'useTime' },
-    { label: '异常信息', prop: 'exception' },
-    { label: '创建时间', prop: 'createDate' }
+    { label: t('log.table.selection'), type: 'selection' },
+    { label: t('log.table.username'), prop: 'username' },
+    { label: t('log.table.title'), prop: 'title' },
+    { label: t('log.table.remoteAddr'), prop: 'remoteAddr' },
+    { label: t('log.table.requestUri'), prop: 'requestUri' },
+    { label: t('log.table.httpMethod'), prop: 'httpMethod' },
+    { label: t('log.table.browser'), prop: 'browser' },
+    { label: t('log.table.location'), prop: 'area' },
+    { label: t('log.table.params'), prop: 'params' },
+    { label: t('log.table.response'), prop: 'response' },
+    { label: t('log.table.useTime'), prop: 'useTime' },
+    { label: t('log.table.exception'), prop: 'exception' },
+    { label: t('log.table.createDate'), prop: 'createDate' }
   ]
 
   // 动态列配置 for ArtTable using useCheckedColumns
   const { columnChecks, columns } = useCheckedColumns(() => [
     { type: 'selection' },
-    { prop: 'username', label: '操作用户' },
-    { prop: 'title', label: '操作标题' },
-    { prop: 'remoteAddr', label: 'IP地址' },
-    { prop: 'requestUri', label: '请求URI' },
+    { prop: 'username', label: t('log.table.username') },
+    { prop: 'title', label: t('log.table.title') },
+    { prop: 'remoteAddr', label: t('log.table.remoteAddr') },
+    { prop: 'requestUri', label: t('log.table.requestUri') },
     {
       prop: 'httpMethod',
-      label: '请求方法',
+      label: t('log.table.httpMethod'),
       formatter: (row) => {
         return h(
           ElTag,
@@ -249,48 +252,48 @@
         )
       }
     },
-    { prop: 'browser', label: '浏览器' },
+    { prop: 'browser', label: t('log.table.browser') },
     {
       prop: 'area',
-      label: '位置',
+      label: t('log.table.location'),
       formatter: (row) => `${row.province || ''}${row.city ? ' - ' + row.city : ''}`
     },
     {
       prop: 'params',
-      label: '请求参数',
+      label: t('log.table.params'),
       formatter: (row) => {
         return h(
           'button',
           {
             class: 'el-button el-button--primary el-button--small is-link',
-            onClick: () => showJsonDialog(row.params, '请求参数')
+            onClick: () => showJsonDialog(row.params, t('log.dialog.params'))
           },
-          '查看请求参数'
+          t('log.button.viewParams')
         )
       }
     },
     {
       prop: 'response',
-      label: '返回数据',
+      label: t('log.table.response'),
       formatter: (row) => {
         return h(
           'button',
           {
             class: 'el-button el-button--primary el-button--small is-link',
-            onClick: () => showJsonDialog(row.response, '返回数据')
+            onClick: () => showJsonDialog(row.response, t('log.dialog.response'))
           },
-          '查看返回数据'
+          t('log.button.viewResponse')
         )
       }
     },
     {
       prop: 'useTime',
-      label: '请求耗时',
+      label: t('log.table.useTime'),
       formatter: (row) => `${row.useTime}ms`
     },
     {
       prop: 'exception',
-      label: '异常信息',
+      label: t('log.table.exception'),
       checked: false,
       formatter: (row) => {
         if (row.exception) {
@@ -298,16 +301,16 @@
             'button',
             {
               class: 'el-button el-button--danger el-button--small is-link',
-              onClick: () => showJsonDialog(row.exception, '异常信息')
+              onClick: () => showJsonDialog(row.exception, t('log.dialog.exception'))
             },
-            '查看异常'
+            t('log.button.viewException')
           )
         } else {
           return h('span', '-')
         }
       }
     },
-    { prop: 'createDate', label: '创建时间', sortable: true }
+    { prop: 'createDate', label: t('log.table.createDate'), sortable: true }
   ])
 
   // 加载日志列表数据
@@ -323,11 +326,11 @@
         pagination.size = res.data.size
         pagination.pages = res.data.pages
       } else {
-        ElMessage.error(res.message || '获取日志列表失败')
+        ElMessage.error(res.message || t('log.message.getListFailed'))
       }
     } catch (error) {
       console.error('获取日志列表失败:', error)
-      ElMessage.error('获取日志列表时发生错误')
+      ElMessage.error(t('log.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -353,13 +356,13 @@
   // 处理批量删除
   const handleDelete = () => {
     if (selectedLogs.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('log.dialog.selectRecord'))
       return
     }
 
-    ElMessageBox.confirm('确定要删除选中的日志记录吗？此操作不可恢复！', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('log.dialog.confirmDelete'), t('log.dialog.confirmDeleteTitle'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -367,19 +370,19 @@
           const logIds = selectedLogs.value.map((log) => parseInt(log.id))
           const res = await LogService.deleteLog(logIds)
           if (res.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('log.dialog.deleteSuccess'))
             loadLogList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '删除失败')
+            ElMessage.error(res.message || t('log.dialog.deleteFailed'))
           }
         } catch (error) {
           console.error('删除日志记录失败:', error)
-          ElMessage.error('删除日志记录时发生错误')
+          ElMessage.error(t('log.dialog.deleteError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('已取消删除')
+        ElMessage.info(t('log.dialog.cancelDelete'))
       })
   }
 

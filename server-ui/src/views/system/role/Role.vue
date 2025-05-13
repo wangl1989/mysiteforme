@@ -2,14 +2,24 @@
   <div class="page-content">
     <el-row>
       <el-col :xs="24" :sm="12" :lg="6">
-        <el-input v-model="searchForm.name" placeholder="请输入角色名称"></el-input>
+        <el-input
+          v-model="searchForm.name"
+          :placeholder="$t('role.search.inputRoleName')"
+        ></el-input>
       </el-col>
       <div style="width: 12px"></div>
       <el-col :xs="24" :sm="12" :lg="6" class="el-col2">
-        <el-button title="搜索角色" v-ripple @click="loadRoleData" v-auth="'role_search'"
-          >搜索</el-button
+        <el-button
+          :title="$t('role.button.search')"
+          v-ripple
+          @click="loadRoleData"
+          v-auth="'role_search'"
         >
-        <el-button @click="showDialog('add')" v-auth="'role_add'" v-ripple>新增角色</el-button>
+          {{ $t('role.button.search') }}
+        </el-button>
+        <el-button @click="showDialog('add')" v-auth="'role_add'" v-ripple>
+          {{ $t('role.button.add') }}
+        </el-button>
       </el-col>
     </el-row>
 
@@ -23,24 +33,24 @@
       v-loading="loading"
     >
       <template #default>
-        <el-table-column label="角色名称" prop="name" />
-        <el-table-column label="描述" prop="remarks" />
-        <el-table-column label="是否默认" prop="isDefault">
+        <el-table-column :label="$t('role.table.roleName')" prop="name" />
+        <el-table-column :label="$t('role.table.description')" prop="remarks" />
+        <el-table-column :label="$t('role.table.isDefault')" prop="isDefault">
           <template #default="scope">
             <el-tag :type="scope.row.isDefault ? 'danger' : 'warning'">
-              {{ scope.row.isDefault ? '是' : '否' }}
+              {{ scope.row.isDefault ? $t('role.table.yes') : $t('role.table.no') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" prop="delFlag">
+        <el-table-column :label="$t('role.table.status')" prop="delFlag">
           <template #default="scope">
             <el-tag :type="scope.row.delFlag ? 'primary' : 'info'">
-              {{ scope.row.delFlag ? '禁用' : '启用' }}
+              {{ scope.row.delFlag ? $t('role.table.disabled') : $t('role.table.enabled') }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          label="更新时间"
+          :label="$t('role.table.updateTime')"
           prop="updateDate"
           sortable
           @sort-change="handleSortChange"
@@ -49,22 +59,22 @@
             {{ formatDate(scope.row.updateDate) }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="250px">
+        <el-table-column fixed="right" :label="$t('role.table.operations')" width="250px">
           <template #default="scope">
             <ArtButtonTable
-              title="编辑角色"
+              :title="$t('role.button.edit')"
               type="edit"
               auth="role_edit"
               @click="showDialog('edit', scope.row)"
             />
             <ArtButtonTable
-              title="删除角色"
+              :title="$t('role.button.delete')"
               type="delete"
               auth="role_delete"
               @click="deleteRole(scope.row)"
             />
             <ArtButtonTable
-              title="给角色分配菜单权限"
+              :title="$t('role.button.assignPermission')"
               type="more"
               auth="role_assign"
               @click="navigateToPermissions(scope.row)"
@@ -76,17 +86,17 @@
 
     <el-dialog
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '新增角色' : '编辑角色'"
+      :title="dialogType === 'add' ? $t('role.dialog.addTitle') : $t('role.dialog.editTitle')"
       width="30%"
     >
       <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
-        <el-form-item label="角色名称" prop="name">
+        <el-form-item :label="$t('role.dialog.roleName')" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="描述" prop="remarks">
+        <el-form-item :label="$t('role.dialog.description')" prop="remarks">
           <el-input v-model="form.remarks" type="textarea" :rows="3" />
         </el-form-item>
-        <el-form-item label="是否默认" prop="isDefault">
+        <el-form-item :label="$t('role.dialog.isDefault')" prop="isDefault">
           <el-switch v-model="form.isDefault" />
         </el-form-item>
         <!-- <el-form-item label="状态">
@@ -96,16 +106,22 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button
-            :title="dialogType === 'add' ? '取消新增角色' : '取消编辑角色'"
+            :title="
+              dialogType === 'add' ? $t('role.dialog.cancelAdd') : $t('role.dialog.cancelEdit')
+            "
             @click="dialogVisible = false"
-            >取消</el-button
           >
+            {{ $t('common.cancel') }}
+          </el-button>
           <el-button
-            :title="dialogType === 'add' ? '保存新增角色' : '保存编辑角色'"
+            :title="
+              dialogType === 'add' ? $t('role.dialog.submitAdd') : $t('role.dialog.submitEdit')
+            "
             type="primary"
             @click="handleSubmit(formRef)"
-            >提交</el-button
           >
+            {{ $t('common.confirm') }}
+          </el-button>
         </div>
       </template>
     </el-dialog>
@@ -120,6 +136,9 @@
   import { formatDate } from '@/utils/date'
   import { onMounted } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const dialogVisible = ref(false)
   const loading = ref(false)
@@ -156,11 +175,11 @@
         pagination.size = response.data.size
         pagination.pages = response.data.pages
       } else {
-        ElMessage.error(response.message || '获取角色列表失败')
+        ElMessage.error(response.message || t('role.message.getRoleListFailed'))
       }
     } catch (error) {
-      console.error('获取角色列表失败:', error)
-      ElMessage.error('获取角色列表时发生错误')
+      console.error(t('role.message.getRoleListError'), error)
+      ElMessage.error(t('role.message.operationFailed'))
     } finally {
       loading.value = false
     }
@@ -222,10 +241,12 @@
 
   const rules = reactive<FormRules>({
     name: [
-      { required: true, message: '请输入角色名称', trigger: 'blur' },
-      { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+      { required: true, message: t('role.validation.roleNameRequired'), trigger: 'blur' },
+      { min: 2, max: 20, message: t('role.validation.roleNameLength'), trigger: 'blur' }
     ],
-    remarks: [{ required: true, message: '请输入角色描述', trigger: 'blur' }]
+    remarks: [
+      { required: true, message: t('role.validation.descriptionRequired'), trigger: 'blur' }
+    ]
   })
 
   const form = reactive({
@@ -236,28 +257,28 @@
   })
 
   const deleteRole = (row: RoleRecord) => {
-    ElMessageBox.confirm('确定删除该角色吗？', '删除确认', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('role.message.confirmDelete'), t('role.message.confirmDeleteTitle'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'error'
     })
       .then(async () => {
         try {
           const response = await RoleService.deleteRole(row.id)
           if (response.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('role.message.deleteSuccess'))
             loadRoleData() // 重新加载数据
           } else {
-            ElMessage.error(response.message || '删除失败')
+            ElMessage.error(response.message || t('role.message.deleteFailed'))
           }
         } catch (error) {
-          console.error('删除角色失败:', error)
-          ElMessage.error('删除角色失败，请重试')
+          console.error(t('role.message.deleteError'), error)
+          ElMessage.error(t('role.message.operationFailed'))
         }
       })
       .catch(() => {
         // 用户取消删除操作
-        ElMessage.info('用户取消删除角色操作')
+        ElMessage.info(t('role.message.cancelDelete'))
       })
   }
 
@@ -275,12 +296,12 @@
               isDefault: form.isDefault
             })
             if (response.success) {
-              ElMessage.success('新增成功')
+              ElMessage.success(t('role.message.addSuccess'))
               dialogVisible.value = false
               formEl.resetFields()
               loadRoleData() // 重新加载数据
             } else {
-              ElMessage.error(response.message || '新增失败')
+              ElMessage.error(response.message || t('role.message.addFailed'))
             }
           } else {
             // 调用更新角色API
@@ -291,17 +312,17 @@
               isDefault: form.isDefault
             })
             if (response.success) {
-              ElMessage.success('修改成功')
+              ElMessage.success(t('role.message.editSuccess'))
               dialogVisible.value = false
               formEl.resetFields()
               loadRoleData() // 重新加载数据
             } else {
-              ElMessage.error(response.message || '修改失败')
+              ElMessage.error(response.message || t('role.message.editFailed'))
             }
           }
         } catch (error) {
-          console.error('提交角色数据失败:', error)
-          ElMessage.error('操作失败，请重试')
+          console.error(t('role.message.operationFailed'), error)
+          ElMessage.error(t('role.message.operationFailed'))
         }
       }
     })

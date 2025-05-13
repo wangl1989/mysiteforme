@@ -32,14 +32,16 @@
           class="action-column"
         >
           <div class="action-buttons-wrapper">
-            <div class="form-buttons" v-auth="auth">
-              <el-button class="reset-button" @click="$emit('reset')" v-ripple>重置</el-button>
-              <el-button type="primary" class="search-button" @click="$emit('search')" v-ripple
-                >查询</el-button
-              >
+            <div class="form-buttons" :v-auth="auth">
+              <el-button class="reset-button" @click="$emit('reset')" v-ripple>{{
+                $t('tableCommon.reset')
+              }}</el-button>
+              <el-button type="primary" class="search-button" @click="$emit('search')" v-ripple>{{
+                $t('tableCommon.select')
+              }}</el-button>
             </div>
             <div v-if="!isExpand" class="filter-toggle" @click="isShow = !isShow">
-              <span>{{ isShow ? '收起' : '展开' }}</span>
+              <span>{{ isShow ? $t('tableCommon.collapse') : $t('tableCommon.expand') }}</span>
               <div class="icon-wrapper">
                 <el-icon>
                   <ArrowUpBold v-if="isShow" />

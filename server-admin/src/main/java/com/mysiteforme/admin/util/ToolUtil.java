@@ -13,12 +13,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,11 +30,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.HtmlUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
 import com.mysiteforme.admin.exception.MyException;
-import cn.hutool.http.HttpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -149,6 +143,10 @@ public class ToolUtil {
 			ip = request.getRemoteAddr();
 		}
 		log.debug(" ip --> {}" , ip);
+		// 对于通过多个代理的情况，X-Forwarded-For可能包含多个IP，取第一个非unknown的
+		if (ip != null && ip.contains(",")) {
+			ip = ip.split(",")[0];
+		}
 		return ip;
 	}
 
@@ -289,51 +287,6 @@ public class ToolUtil {
 	}
 
 	/**
-     */
-	@SuppressWarnings("unchecked")
-	public static Map<String,String> getAddressByIP(String ip) {
-		String area;
-		String province;
-		String city;
-		String isp = "";
-		Map<String,String> finalMap = Maps.newHashMap();
-		try{
-			String getUrl;
-			if("0:0:0:0:0:0:0:1".equals(ip) ||
-				"127.0.0.1".equals(ip)){
-				getUrl = "http://whois.pconline.com.cn/ipJson.jsp?json=true";
-			}else{
-				getUrl = "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip;
-			}
-            String result= HttpUtil.get(getUrl, Charset.forName("GBK"));
-			Map<String,String> resultMap = JSON.parseObject(result,Map.class);
-			String status = resultMap.get("err");
-
-			province = resultMap.get("pro");
-			city = resultMap.get("city");
-			if("noprovince".equalsIgnoreCase(status)){
-				area = resultMap.get("addr");
-			}else{
-				area = "中国";
-				String addr = resultMap.get("addr");
-				if(StringUtils.isNotBlank(addr)){
-					isp = addr.split(" ")[1];
-				}
-			}
-		}catch (Exception e){
-			log.error("获取地理位置异常",e);
-			throw MyException.builder().code(MyException.SERVER_ERROR).msg("获取地理位置异常").throwable(e).build();
-		}
-
-
-		finalMap.put("area",area);
-		finalMap.put("province",province);
-		finalMap.put("city",city);
-		finalMap.put("isp",isp);
-		return finalMap;
-	}
-
-	/**
 	 * 获取操作系统类型
 	 * @return 操作系统类型
 	 */
@@ -428,10 +381,5 @@ public class ToolUtil {
 			log.error("路径验证失败: {} - {}", path, e.getMessage());
 			return true;
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		Map<String,String> maps = getAddressByIP("117.82.187.111");
-		System.out.println(JSONObject.toJSONString(maps));
 	}
 }

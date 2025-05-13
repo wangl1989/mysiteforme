@@ -10,6 +10,8 @@ package com.mysiteforme.admin.controller.system;
 
 
 import cn.hutool.core.util.DesensitizedUtil;
+import com.mysiteforme.admin.annotation.RateLimit;
+import com.mysiteforme.admin.util.LimitType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,9 +31,12 @@ import com.mysiteforme.admin.util.Result;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/api/admin/site")
 @RequiredArgsConstructor
+@RateLimit(limit = 10, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class SiteController{
 
     private final SiteService siteService;

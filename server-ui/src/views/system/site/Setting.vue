@@ -1,6 +1,6 @@
 <template>
   <div class="main-content">
-    <PageWrapper title="系统设置">
+    <PageWrapper :title="$t('site.title')">
       <div class="system-form-wrapper">
         <div class="action-buttons">
           <el-button
@@ -8,13 +8,15 @@
             type="primary"
             v-auth="'site_edit'"
             @click="handleAction('edit')"
-            >编辑</el-button
+            >{{ $t('site.button.edit') }}</el-button
           >
           <template v-else>
-            <el-button type="success" v-auth="'site_save'" @click="handleAction('save')"
-              >保存</el-button
-            >
-            <el-button v-auth="'site_cancle'" @click="handleAction('cancel')">取消</el-button>
+            <el-button type="success" v-auth="'site_save'" @click="handleAction('save')">{{
+              $t('site.button.save')
+            }}</el-button>
+            <el-button v-auth="'site_cancle'" @click="handleAction('cancel')">{{
+              $t('site.button.cancel')
+            }}</el-button>
           </template>
         </div>
 
@@ -23,23 +25,23 @@
           <div class="tabs-container">
             <el-tabs>
               <!-- 基础设置 -->
-              <el-tab-pane label="基础设置">
-                <el-form-item label="网站名称">
+              <el-tab-pane :label="$t('site.tabs.basic')">
+                <el-form-item :label="$t('site.form.websiteName')">
                   <el-input v-model="systemData.name" />
                 </el-form-item>
-                <el-form-item label="网站网址">
+                <el-form-item :label="$t('site.form.websiteUrl')">
                   <el-input v-model="systemData.url" />
                 </el-form-item>
-                <el-form-item label="系统版本">
+                <el-form-item :label="$t('site.form.version')">
                   <el-input v-model="systemData.version" />
                 </el-form-item>
-                <el-form-item label="系统作者">
+                <el-form-item :label="$t('site.form.author')">
                   <el-input v-model="systemData.author" />
                 </el-form-item>
-                <el-form-item label="WebServiceKey">
+                <el-form-item :label="$t('site.form.webServiceKey')">
                   <el-input v-model="systemData.webServicekey" />
                 </el-form-item>
-                <el-form-item label="文件上传方式">
+                <el-form-item :label="$t('site.form.uploadType')">
                   <el-radio-group v-model="systemData.fileUploadType" size="large">
                     <el-tooltip
                       placement="top"
@@ -53,11 +55,11 @@
                     </el-tooltip>
                   </el-radio-group>
                 </el-form-item>
-                <el-form-item label="文件上传限制">
+                <el-form-item :label="$t('site.form.uploadLimit')">
                   <el-input-number v-model="systemData.maxUpload" :min="1" :max="100" />
-                  <span class="unit-text">MB</span>
+                  <span class="unit-text">{{ $t('site.form.unit.mb') }}</span>
                 </el-form-item>
-                <el-form-item label="LOGO">
+                <el-form-item :label="$t('site.form.logo')">
                   <upload-img
                     v-model="systemData.logo"
                     :disabled="!isEdit"
@@ -67,7 +69,7 @@
                     min-width="120px"
                   />
                 </el-form-item>
-                <el-form-item label="作者头像">
+                <el-form-item :label="$t('site.form.authorAvatar')">
                   <upload-img
                     v-model="systemData.authorIcon"
                     :disabled="!isEdit"
@@ -80,66 +82,72 @@
               </el-tab-pane>
 
               <!-- 留言设置 -->
-              <el-tab-pane label="留言设置">
-                <el-form-item label="开启留言">
+              <el-tab-pane :label="$t('site.tabs.comment')">
+                <el-form-item :label="$t('site.form.enableComment')">
                   <el-switch v-model="systemData.openMessage" />
                 </el-form-item>
-                <el-form-item label="匿名留言">
+                <el-form-item :label="$t('site.form.anonymousComment')">
                   <el-switch v-model="systemData.isNoName" />
                 </el-form-item>
               </el-tab-pane>
 
               <!-- 联系方式 -->
-              <el-tab-pane label="联系方式">
-                <el-form-item label="邮箱">
+              <el-tab-pane :label="$t('site.tabs.contact')">
+                <el-form-item :label="$t('site.form.email')">
                   <el-input v-model="systemData.email" />
                 </el-form-item>
-                <el-form-item label="QQ">
+                <el-form-item :label="$t('site.form.qq')">
                   <el-input v-model="systemData.qq" />
                 </el-form-item>
-                <el-form-item label="Github">
+                <el-form-item :label="$t('site.form.github')">
                   <el-input v-model="systemData.github" />
                 </el-form-item>
-                <el-form-item label="Gitee">
+                <el-form-item :label="$t('site.form.gitee')">
                   <el-input v-model="systemData.git" />
                 </el-form-item>
-                <el-form-item label="微博">
+                <el-form-item :label="$t('site.form.weibo')">
                   <el-input v-model="systemData.weibo" />
                 </el-form-item>
-                <el-form-item label="手机号">
+                <el-form-item :label="$t('site.form.phone')">
                   <el-input v-model="systemData.phone" />
                 </el-form-item>
-                <el-form-item label="地址">
+                <el-form-item :label="$t('site.form.address')">
                   <el-input v-model="systemData.address" />
                 </el-form-item>
-                <el-form-item label="网站备案号">
+                <el-form-item :label="$t('site.form.recordNumber')">
                   <el-input v-model="systemData.record" />
                 </el-form-item>
               </el-tab-pane>
 
               <!-- SEO设置 -->
-              <el-tab-pane label="SEO设置">
-                <el-form-item label="默认关键字">
+              <el-tab-pane :label="$t('site.tabs.seo')">
+                <el-form-item :label="$t('site.form.defaultKeywords')">
                   <el-input v-model="systemData.keywords" type="textarea" :rows="4" />
                 </el-form-item>
-                <el-form-item label="网站描述">
+                <el-form-item :label="$t('site.form.description')">
                   <el-input v-model="systemData.description" type="textarea" :rows="4" />
                 </el-form-item>
-                <el-form-item label="版权信息">
+                <el-form-item :label="$t('site.form.copyright')">
                   <el-input v-model="systemData.powerby" />
                 </el-form-item>
               </el-tab-pane>
 
               <!-- 服务器信息 -->
-              <el-tab-pane label="服务器信息">
-                <el-form-item label="服务器环境">
+              <el-tab-pane :label="$t('site.tabs.server')">
+                <el-form-item :label="$t('site.form.serverEnvironment')">
                   <el-radio-group v-model="systemData.server" size="large">
-                    <el-radio-button :value="'Windows'">Windows</el-radio-button>
-                    <el-radio-button :value="'Linux'">Linux</el-radio-button>
-                    <el-radio-button :value="'macOS'">macOS</el-radio-button>
+                    <el-radio-button :value="'Windows'">{{
+                      $t('site.form.serverTypes.windows')
+                    }}</el-radio-button>
+                    <el-radio-button :value="'Linux'">{{
+                      $t('site.form.serverTypes.linux')
+                    }}</el-radio-button>
+                    <el-radio-button :value="'macOS'">{{
+                      $t('site.form.serverTypes.macos')
+                    }}</el-radio-button>
                   </el-radio-group>
                 </el-form-item>
-                <el-form-item label="数据库版本">
+                <el-form-item :label="$t('site.form.databaseVersion')">
                   <el-input v-model="systemData.myDatabase" />
                 </el-form-item>
               </el-tab-pane>
@@ -148,7 +156,7 @@
 
           <!-- 分隔线 -->
           <div class="divider">
-            <span>个人简介设置</span>
+            <span>{{ $t('site.tabs.profile') }}</span>
           </div>
 
           <!-- 将个人简介移出el-tabs，避免警告 -->
@@ -166,6 +174,9 @@
   import { SystemRecord, SiteUploadTypeResponse } from '@/api/model/systemModel'
   import PageWrapper from '@/components/Page/PageWrapper.vue'
   import UploadImg from '@/components/Upload/UploadImg.vue'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 表单编辑状态
   const isEdit = ref(false)
@@ -214,8 +225,8 @@
         uploadTypes.value = Array.isArray(data) ? data : [data]
       }
     } catch (error) {
-      console.error('获取上传类型列表失败', error)
-      ElMessage.error('获取上传类型列表失败')
+      console.error(t('site.message.getUploadTypesFailed'), error)
+      ElMessage.error(t('site.message.getUploadTypesFailed'))
     }
   }
 
@@ -229,8 +240,8 @@
         originalData = JSON.parse(JSON.stringify(data))
       }
     } catch (error) {
-      console.error('获取系统设置失败', error)
-      ElMessage.error('获取系统设置失败')
+      console.error(t('site.message.getSystemDataFailed'), error)
+      ElMessage.error(t('site.message.getSystemDataFailed'))
     }
   }
 
@@ -252,15 +263,15 @@
         try {
           const result = await SystemService.editSystem(systemData)
           if (result.success) {
-            ElMessage.success('保存成功')
+            ElMessage.success(t('site.message.saveSuccess'))
             isEdit.value = false
             getSystemData() // 重新获取最新数据
           } else {
-            ElMessage.error(result.message)
+            ElMessage.error(result.message || t('site.message.saveFailed'))
           }
         } catch (error) {
-          console.error('保存失败', error)
-          ElMessage.error('保存失败')
+          console.error(t('site.message.saveFailed'), error)
+          ElMessage.error(t('site.message.saveFailed'))
         }
         break
       case 'cancel':

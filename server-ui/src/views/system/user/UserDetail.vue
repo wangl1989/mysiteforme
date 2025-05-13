@@ -11,7 +11,7 @@
             />
             <div class="avatar-upload-btn" v-if="isEdit">
               <el-upload
-                title="上传用户头像"
+                :title="$t('user.detail.button.uploadAvatar')"
                 class="upload-demo"
                 :action="''"
                 :auto-upload="false"
@@ -48,7 +48,7 @@
                   </el-tag>
                 </template>
                 <template v-else>
-                  <span>未分配角色</span>
+                  <span>{{ $t('user.detail.form.noRole') }}</span>
                 </template>
               </div>
             </div>
@@ -72,21 +72,33 @@
           </div> -->
 
           <div class="device-table">
-            <h3>设备列表</h3>
+            <h3>{{ $t('user.detail.device.deviceList') }}</h3>
             <art-table :data="deviceList" :pagination="false">
               <template #default>
-                <el-table-column label="设备ID" prop="deviceId" width="150" />
-                <el-table-column label="是否在线">
+                <el-table-column
+                  :label="$t('user.detail.device.deviceId')"
+                  prop="deviceId"
+                  width="150"
+                />
+                <el-table-column :label="$t('user.detail.device.online')">
                   <template #default="scope">
                     <el-tag :type="scope.row.online ? 'success' : 'info'">
-                      {{ scope.row.online ? '在线' : '离线' }}
+                      {{
+                        scope.row.online
+                          ? $t('user.detail.device.onlineStatus')
+                          : $t('user.detail.device.offlineStatus')
+                      }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column label="当前设备">
+                <el-table-column :label="$t('user.detail.device.currentDevice')">
                   <template #default="scope">
                     <el-tag :type="scope.row.currentDevice ? 'primary' : 'info'">
-                      {{ scope.row.currentDevice ? '是' : '否' }}
+                      {{
+                        scope.row.currentDevice
+                          ? $t('user.detail.device.isCurrentDevice')
+                          : $t('user.detail.device.notCurrentDevice')
+                      }}
                     </el-tag>
                   </template>
                 </el-table-column>
@@ -106,7 +118,7 @@
       </div>
       <div class="right-wrap">
         <div class="info box-style">
-          <h1 class="title">基本设置</h1>
+          <h1 class="title">{{ $t('user.detail.title.basicSettings') }}</h1>
 
           <el-form
             :model="form"
@@ -117,10 +129,10 @@
             label-position="top"
           >
             <el-row>
-              <el-form-item label="登录账号" prop="loginName">
+              <el-form-item :label="$t('user.detail.form.loginName')" prop="loginName">
                 <el-input v-model="form.loginName" disabled />
               </el-form-item>
-              <el-form-item label="角色" class="right-input">
+              <el-form-item :label="$t('user.detail.form.role')" class="right-input">
                 <div class="role-tags">
                   <el-tag
                     v-for="role in userDetail.roles"
@@ -135,26 +147,30 @@
             </el-row>
 
             <el-row>
-              <el-form-item label="昵称" prop="nickName">
+              <el-form-item :label="$t('user.detail.form.nickName')" prop="nickName">
                 <el-input v-model="form.nickName" :disabled="!isEdit" />
               </el-form-item>
-              <el-form-item label="邮箱" prop="email" class="right-input">
+              <el-form-item :label="$t('user.detail.form.email')" prop="email" class="right-input">
                 <el-input v-model="form.email" :disabled="!isEdit" />
               </el-form-item>
             </el-row>
 
             <el-row>
-              <el-form-item label="手机" prop="tel">
+              <el-form-item :label="$t('user.detail.form.phone')" prop="tel">
                 <el-input v-model="form.tel" :disabled="!isEdit" />
               </el-form-item>
-              <el-form-item label="地址" prop="location" class="right-input">
+              <el-form-item
+                :label="$t('user.detail.form.location')"
+                prop="location"
+                class="right-input"
+              >
                 <el-input v-model="form.location" :disabled="!isEdit">
                   <template #suffix>
                     <i
                       class="iconfont-sys location-icon"
                       v-if="isEdit"
                       @click="getLocation"
-                      title="获取当前位置"
+                      :title="$t('user.detail.button.getLocation')"
                       >&#xe736;</i
                     >
                   </template>
@@ -162,36 +178,42 @@
               </el-form-item>
             </el-row>
 
-            <el-form-item label="个人介绍" prop="des" :style="{ height: '130px' }">
+            <el-form-item
+              :label="$t('user.detail.form.description')"
+              prop="des"
+              :style="{ height: '130px' }"
+            >
               <el-input type="textarea" :rows="4" v-model="form.des" :disabled="!isEdit" />
             </el-form-item>
 
             <div class="el-form-item-right">
               <el-button
-                title="取消编辑用户详情"
+                :title="$t('user.detail.button.cancelEdit')"
                 v-if="isEdit"
                 type="default"
                 style="width: 90px; margin-right: 10px"
                 v-ripple
                 @click="cancelEdit"
               >
-                取消
+                {{ $t('user.detail.button.cancel') }}
               </el-button>
               <el-button
-                :title="isEdit ? '保存用户字段' : '编辑用户字段'"
+                :title="
+                  isEdit ? $t('user.detail.button.saveEdit') : $t('user.detail.button.editDetail')
+                "
                 type="primary"
                 style="width: 90px"
                 v-ripple
                 @click="edit"
               >
-                {{ isEdit ? '保存' : '编辑' }}
+                {{ isEdit ? $t('user.detail.button.save') : $t('user.detail.button.edit') }}
               </el-button>
             </div>
           </el-form>
         </div>
 
         <div class="info box-style" style="margin-top: 20px">
-          <h1 class="title">更改密码</h1>
+          <h1 class="title">{{ $t('user.detail.title.changePassword') }}</h1>
 
           <el-form
             :model="pwdForm"
@@ -201,7 +223,7 @@
             ref="pwdFormRef"
             :rules="pwdRules"
           >
-            <el-form-item label="当前密码" prop="password">
+            <el-form-item :label="$t('user.detail.form.currentPassword')" prop="password">
               <el-input
                 v-model="pwdForm.password"
                 :type="passwordVisible.current ? 'text' : 'password'"
@@ -220,7 +242,7 @@
               </el-input>
             </el-form-item>
 
-            <el-form-item label="新密码" prop="newPassword">
+            <el-form-item :label="$t('user.detail.form.newPassword')" prop="newPassword">
               <el-input
                 v-model="pwdForm.newPassword"
                 :type="passwordVisible.new ? 'text' : 'password'"
@@ -239,7 +261,7 @@
               </el-input>
             </el-form-item>
 
-            <el-form-item label="确认新密码" prop="confirmPassword">
+            <el-form-item :label="$t('user.detail.form.confirmPassword')" prop="confirmPassword">
               <el-input
                 v-model="pwdForm.confirmPassword"
                 :type="passwordVisible.confirm ? 'text' : 'password'"
@@ -260,23 +282,27 @@
 
             <div class="el-form-item-right">
               <el-button
-                title="取消重置密码"
+                :title="$t('user.detail.button.cancelResetPassword')"
                 v-if="isEditPwd"
                 type="default"
                 style="width: 90px; margin-right: 10px"
                 v-ripple
                 @click="cancelEditPwd"
               >
-                取消
+                {{ $t('user.detail.button.cancel') }}
               </el-button>
               <el-button
-                :title="isEditPwd ? '保存重置密码' : '编辑重置密码'"
+                :title="
+                  isEditPwd
+                    ? $t('user.detail.button.saveResetPassword')
+                    : $t('user.detail.button.editResetPassword')
+                "
                 type="primary"
                 style="width: 90px"
                 v-ripple
                 @click="editPwd"
               >
-                {{ isEditPwd ? '保存' : '编辑' }}
+                {{ isEditPwd ? $t('user.detail.button.save') : $t('user.detail.button.edit') }}
               </el-button>
             </div>
           </el-form>
@@ -294,7 +320,9 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { View as ElIconView, Hide as ElIconHide, Upload } from '@element-plus/icons-vue'
   import { UploadService } from '@/api/uploadApi'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const userStore = useUserStore()
   const userInfo = computed(() => userStore.getUserInfo)
   const userDetail = ref<UserDetailResponse & { originalIcon?: string }>({} as UserDetailResponse)
@@ -333,8 +361,8 @@
   const rules = reactive<FormRules>({
     loginName: [],
     nickName: [
-      { required: true, message: '请输入昵称', trigger: 'blur' },
-      { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+      { required: true, message: t('user.detail.rules.nickName.required'), trigger: 'blur' },
+      { min: 2, max: 50, message: t('user.detail.rules.nickName.length'), trigger: 'blur' }
     ],
     email: [],
     tel: [],
@@ -344,13 +372,15 @@
 
   // 密码表单校验规则
   const pwdRules = reactive<FormRules>({
-    password: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+    password: [
+      { required: true, message: t('user.detail.rules.password.required'), trigger: 'blur' }
+    ],
     newPassword: [
-      { required: true, message: '请输入新密码', trigger: 'blur' },
+      { required: true, message: t('user.detail.rules.newPassword.required'), trigger: 'blur' },
       {
         validator: (rule, value, callback) => {
           if (!value) {
-            callback(new Error('请输入新密码'))
+            callback(new Error(t('user.detail.rules.newPassword.required')))
             return
           }
 
@@ -359,9 +389,7 @@
           console.log('密码验证结果:', value, isValid)
 
           if (!isValid) {
-            callback(
-              new Error('密码必须包含8-20个字符，至少包含一个大写字母、一个小写字母和一个数字')
-            )
+            callback(new Error(t('user.detail.rules.newPassword.format')))
             return
           }
 
@@ -371,16 +399,16 @@
       }
     ],
     confirmPassword: [
-      { required: true, message: '请确认新密码', trigger: 'blur' },
+      { required: true, message: t('user.detail.rules.confirmPassword.required'), trigger: 'blur' },
       {
         validator: (rule, value, callback) => {
           if (!value) {
-            callback(new Error('请确认新密码'))
+            callback(new Error(t('user.detail.rules.confirmPassword.required')))
             return
           }
 
           if (value !== pwdForm.newPassword) {
-            callback(new Error('两次输入的密码不一致'))
+            callback(new Error(t('user.detail.rules.confirmPassword.match')))
             return
           }
 
@@ -429,11 +457,11 @@
         form.des = res.data.remarks || ''
         form.location = res.data.location || ''
       } else {
-        ElMessage.error(res.message || '获取用户信息失败')
+        ElMessage.error(res.message || t('user.detail.message.getUserInfoFailed'))
       }
     } catch (error) {
       console.error('获取用户详情失败:', error)
-      ElMessage.error('获取用户详情失败')
+      ElMessage.error(t('user.detail.message.getUserDetailFailed'))
     } finally {
       loading.value = false
     }
@@ -457,11 +485,11 @@
 
         isEdit.value = true
       } else {
-        ElMessage.error(res.message || '获取用户详细信息失败')
+        ElMessage.error(res.message || t('user.detail.message.getUserDetailedInfoFailed'))
       }
     } catch (error) {
       console.error('获取用户详细信息失败:', error)
-      ElMessage.error('获取用户详细信息失败')
+      ElMessage.error(t('user.detail.message.getUserDetailedInfoFailed'))
     } finally {
       loading.value = false
     }
@@ -507,7 +535,7 @@
     if (!isEdit.value) return
 
     try {
-      ElMessage.info('正在获取位置...')
+      ElMessage.info(t('user.detail.message.gettingLocation'))
       const res = await UserService.getUserLocation()
       if (res.success) {
         const locationData = res.data
@@ -523,13 +551,13 @@
         // 更新location字段
         form.location = fullAddress
 
-        ElMessage.success('位置获取成功')
+        ElMessage.success(t('user.detail.message.locationSuccess'))
       } else {
-        ElMessage.error(res.message || '获取位置失败')
+        ElMessage.error(res.message || t('user.detail.message.locationFailed'))
       }
     } catch (error) {
       console.error('获取位置失败:', error)
-      ElMessage.error('获取位置失败')
+      ElMessage.error(t('user.detail.message.locationFailed'))
     }
   }
 
@@ -541,11 +569,11 @@
       const isLt2M = file.raw.size / 1024 / 1024 < 2
 
       if (!isImage) {
-        ElMessage.error('只能上传图片文件!')
+        ElMessage.error(t('user.detail.message.onlyUploadImage'))
         return
       }
       if (!isLt2M) {
-        ElMessage.error('图片大小不能超过 2MB!')
+        ElMessage.error(t('user.detail.message.imageSizeLimit'))
         return
       }
 
@@ -620,14 +648,16 @@
                   if (uploadRes.success) {
                     // 上传成功，将返回的URL添加到用户更新参数中
                     params.icon = uploadRes.data.url
-                    ElMessage.success('头像上传成功')
+                    ElMessage.success(t('user.detail.message.avatarUploadSuccess'))
                   } else {
-                    ElMessage.error(uploadRes.message || '头像上传失败')
+                    ElMessage.error(
+                      uploadRes.message || t('user.detail.message.avatarUploadFailed')
+                    )
                     return
                   }
                 } catch (error) {
                   console.error('头像上传失败:', error)
-                  ElMessage.error('头像上传失败')
+                  ElMessage.error(t('user.detail.message.avatarUploadFailed'))
                   return
                 }
               }
@@ -635,16 +665,30 @@
               // 更新用户信息
               const res = await UserService.updateCurrentUserInfo(params)
               if (res.success) {
-                ElMessage.success('更新成功')
+                ElMessage.success(t('user.detail.message.updateSuccess'))
+                // 更新用户缓存
+                userStore.setUserInfo({
+                  id: userStore.info.id || 0,
+                  name: params.nickName,
+                  username: params.loginName,
+                  avatar: params.icon,
+                  email: params.email,
+                  tel: params.tel,
+                  location: params.location || '',
+                  token: userStore.info.accessToken || '',
+                  accessToken: userStore.info.accessToken || '',
+                  refreshToken: userStore.info.refreshToken || ''
+                })
+                userStore.saveUserData()
                 await fetchUserDetail() // 重新获取用户信息
                 isEdit.value = false
                 selectedAvatar.value = null
               } else {
-                ElMessage.error(res.message || '更新失败')
+                ElMessage.error(res.message || t('user.detail.message.updateFailed'))
               }
             } catch (error) {
               console.error('更新用户信息失败:', error)
-              ElMessage.error('更新用户信息失败')
+              ElMessage.error(t('user.detail.message.updateFailed'))
             }
           }
         })
@@ -659,7 +703,7 @@
 
         await fetchDetailForEdit(userDetail.value.id)
       } else {
-        ElMessage.error('无法获取用户ID，请刷新页面后重试')
+        ElMessage.error(t('user.detail.message.noUserId'))
       }
     }
   }
@@ -690,16 +734,16 @@
 
               const res = await UserService.changePassword(params)
               if (res.success) {
-                ElMessage.success('密码修改成功')
+                ElMessage.success(t('user.detail.message.passwordChangeSuccess'))
                 isEditPwd.value = false
                 resetPwdForm()
 
                 // 密码修改成功后倒计时登出
                 let countdown = 5
-                const messageContent = `密码已成功修改！${countdown}秒后将退出系统，请使用新密码重新登录。`
+                const messageContent = t('user.detail.message.logoutCountdown', [countdown])
 
-                ElMessageBox.alert(messageContent, '密码已修改', {
-                  confirmButtonText: '立即退出',
+                ElMessageBox.alert(messageContent, t('user.detail.message.passwordChanged'), {
+                  confirmButtonText: t('user.detail.button.logoutNow'),
                   showClose: false,
                   beforeClose: (action, instance, done) => {
                     // 用户点击了立即退出按钮
@@ -718,16 +762,16 @@
                     // 更新消息框内容
                     const messageEl = document.querySelector('.el-message-box__message p')
                     if (messageEl) {
-                      messageEl.textContent = `密码已成功修改！${countdown}秒后将退出系统，请使用新密码重新登录。`
+                      messageEl.textContent = t('user.detail.message.logoutCountdown', [countdown])
                     }
                   }
                 }, 1000)
               } else {
-                ElMessage.error(res.message || '密码修改失败')
+                ElMessage.error(res.message || t('user.detail.message.passwordChangeFailed'))
               }
             } catch (error) {
               console.error('密码修改失败:', error)
-              ElMessage.error('密码修改失败')
+              ElMessage.error(t('user.detail.message.passwordChangeFailed'))
             }
           }
         })

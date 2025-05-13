@@ -9,9 +9,12 @@
 package com.mysiteforme.admin.controller.system;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.PageListSystemLogRequest;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/admin/log")
 @RequiredArgsConstructor
+@RateLimit(limit = 60, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class LogController{
 
     private final LogService logService;
@@ -43,11 +47,5 @@ public class LogController{
         }
         logService.removeByIds(ids);
         return Result.success();
-    }
-
-    @GetMapping("pvs")
-    public Result getPV(){
-        List<Integer> pvs = logService.selectSelfMonthData();
-        return Result.success(pvs);
     }
 }

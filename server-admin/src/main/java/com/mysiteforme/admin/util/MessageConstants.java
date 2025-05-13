@@ -10,7 +10,6 @@ package com.mysiteforme.admin.util;
 
 public class MessageConstants {
     public static final String SUCCESS = "message.success";
-    public static final String FAILED = "message.failed";
     public static final String OBJECT_NOT_NULL = "message.object.not.null";
 
     public static class SysLog{
@@ -21,9 +20,7 @@ public class MessageConstants {
         public static final String USER_ADD = "message.log.user.add";
         public static final String USER_EDIT = "message.log.user.edit";
         public static final String USER_DELETE = "message.log.user.delete";
-        public static final String USER_RESET_PASSWORD = "message.log.user.reset.password";
         public static final String USER_CHANGE_PASSWORD = "message.log.user.change.password";
-        public static final String USER_UPDATE_USERINFO = "message.log.user.update.userinfo";
 
         // 角色相关
         public static final String ROLE_ADD = "message.log.role.add";
@@ -35,7 +32,6 @@ public class MessageConstants {
         public static final String FILE_UPLOAD_BASE64 = "message.log.file.upload.base64";
         public static final String FILE_UPLOAD_WANG = "message.log.file.upload.wang";
         public static final String FILE_UPLOAD_DO_CONTENT = "message.log.file.upload.do.content";
-        public static final String FILE_DOWN_CHECK = "message.log.file.down.check";
         public static final String FILE_DOWNLOAD = "message.log.file.download";
 
         // 字典相关
@@ -51,7 +47,6 @@ public class MessageConstants {
         public static final String MENU_DELETE = "message.log.menu.delete";
         public static final String MENU_ADD = "message.log.menu.add";
         public static final String MENU_UPDATE = "message.log.menu.update";
-        public static final String MENU_UPDATE_STATUS = "message.log.menu.update.status";
 
         // 权限相关
         public static final String PERMISSION_DELETE = "message.log.permission.delete";
@@ -59,11 +54,6 @@ public class MessageConstants {
         public static final String PERMISSION_UPDATE = "message.log.permission.update";
         public static final String PERMISSION_ASSIGN_USER = "message.log.permission.assign.user";
         public static final String PERMISSION_ASSIGN_ROLE = "message.log.permission.assign.role";
-
-        // 权限组相关
-        public static final String GROUP_ADD = "message.log.group.add";
-        public static final String GROUP_UPDATE = "message.log.group.update";
-        public static final String GROUP_DELETE = "message.log.group.delete";
 
         // 上传基础信息相关
         public static final String UPLOAD_BASE_INFO_ADD = "message.log.upload.base.info.add";
@@ -174,7 +164,6 @@ public class MessageConstants {
         public static final String JWT_TOKEN_INVALID = "message.jwt.token.invalid";
         public static final String JWT_REFRESH_TOKEN_NULL = "message.jwt.refresh.token.null";
         public static final String JWT_REFRESH_TOKEN_INVALID = "message.jwt.refresh.token.invalid";
-        public static final String JWT_DEVICE_ID_NULL = "message.jwt.devicd.id.null";
         public static final String JWT_DEVICE_ID_INVALID = "message.jwt.devicd.id.invalid";
         public static final String JWT_REFRESH_TOKEN_REVOKED = "message.jwt.refresh.token.revoked";
         public static final String JWT_REFRESH_TOKEN_FAILED = "message.jwt.refresh.token.failed";
@@ -226,7 +215,6 @@ public class MessageConstants {
     public static class Validate {
         public static final String VALIDATE_ID_ERROR = "message.validate.id.error";
         public static final String VALIDATE_HEADER_AUTH_ERROR = "message.validate.header.auth.error";
-        public static final String VALIDATE_SORT_ERROR = "message.validate.sort.error";
     }
 
     public static class Permission {
@@ -236,18 +224,13 @@ public class MessageConstants {
         public static final String TYPE_NOT_NULL = "message.permission.type.not.null";
         public static final String TYPE_CAN_NOT_CHANGE = "message.permission.type.can.not.change";
         public static final String DATA_INVALID = "message.permission.data.invalid";
-        public static final String TYPE_INVALID = "message.permission.type.invalid";
         public static final String MENU_ID_NOT_NULL = "message.permission.menu.id.not.null";
         public static final String MENU_NOT_FOUND = "message.permission.menu.not.found";
-        public static final String CAN_NOT_DELETE_BY_USER = "message.can.not.delete.by.user";
-        public static final String CAN_NOT_DELETE_BY_ROLE = "message.can.not.delete.by.role";
         public static final String NOT_EXISTS = "message.permission.not.exists";
-        public static final String HAS_RELATED_DATA = "message.permission.has.related.data";
         public static final String API_URL_EMPTY = "message.permission.api.url.empty";
         public static final String API_METHOD_EMPTY = "message.permission.api.method.empty";
         public static final String API_URL_EXISTS = "message.permission.api.url.exists";
         public static final String API_NOT_REGISTERED = "message.permission.api.not.registered";
-        public static final String PAGE_NOT_REGISTERED = "message.permission.page.not.registered";
         public static final String PAGE_URL_EMPTY = "message.permission.page.url.empty";
         public static final String PAGE_URL_EXISTS = "message.permission.page.url.exists";
         public static final String BUTTON_KEY_EMPTY = "message.permission.button.key.empty";
@@ -256,8 +239,6 @@ public class MessageConstants {
         public static final String ASSIGN_PERMISSION_USER_NOT_FOUND = "message.permission.assign.user.not.found";
         public static final String ASSIGN_PERMISSION_USER_MORE = "message.permission.assign.user.more";
         public static final String ASSIGN_PERMISSION_ROLE_MORE = "message.permission.assign.role.more";
-        public static final String ASSIGN_USER_PERMISSION_EMPTY = "message.permission.assign.user.permission.empty";
-        public static final String ASSIGN_ROLE_PERMISSION_EMPTY = "message.permission.assign.role.permission.empty";
         public static final String API_DATA_INVALID = "message.permission.api.data.invalid";
         public static final String PAGE_DATA_INVALID = "message.permission.page.data.invalid";
         public static final String BUTTON_DATA_INVALID = "message.permission.button.data.invalid";
@@ -308,7 +289,6 @@ public class MessageConstants {
         public static final String COPY_CONTENT_EMPTY = "message.file.copy.content.empty";
         public static final String DOWNLOAD_URL_EMPTY = "message.file.download.url.empty";
         public static final String DOWNLOAD_NAME_EMPTY = "message.file.download.name.empty";
-        public static final String IMAGE_FORMAT_ERROR = "message.file.image.format.error";
         public static final String IO_EXCEPTION = "message.file.io.exception";
         public static final String QINIU_UPLOAD_BASE64_EXCEPTION = "message.qiniu.upload.base64.exception";
         public static final String ILLEGAL_STATE_EXCEPTION = "message.file.illegal.state.exception";
@@ -328,12 +308,8 @@ public class MessageConstants {
         public static final String MENU_NAME_EXISTS = "message.menu.name.exists";
         public static final String MENU_HAS_PERMISSIONS = "message.menu.has_permissions";
         public static final String MENU_HAS_SUBMENU = "message.menu.has_submenu";
-        public static final String MENU_PARENT_ID_EMPTY = "message.menu.parent.id.empty";
         public static final String MENU_PARENT_ID_INVALID = "message.menu.parent.id.invalid";
-        public static final String MENU_PERMISSION_EXISTS = "message.menu.permission.exists";
         public static final String MENU_SORT_EMPTY = "message.menu.sort.empty";
-        public static final String MENU_STATUS_EMPTY = "message.menu.status.empty";
-        public static final String MENU_STATUS_INVALID = "message.menu.status.invalid";
         public static final String MENU_NOT_FOUND = "message.menu.not.found";
     }
 
@@ -349,10 +325,8 @@ public class MessageConstants {
 
     public static class UploadBaseInfo {
         public static final String QUERY_PARAMS_NULL = "message.upload.base.info.query.params.null";
-        public static final String UPLOAD_BASE_INFO_NULL = "message.upload.base.info.null";
         public static final String TYPE_EMPTY = "message.upload.base.info.type.empty";
         public static final String TYPE_INVALID = "message.upload.base.info.type.invalid";
-        public static final String LOCAL_DIR_EMPTY = "message.upload.base.info.local.dir.empty";
         public static final String BASE_PATH_EMPTY = "message.upload.base.info.base.path.empty";
         public static final String BUCKET_NAME_EMPTY = "message.upload.base.info.bucket.name.empty";
         public static final String DIR_EMPTY = "message.upload.base.info.dir.empty";
@@ -370,7 +344,6 @@ public class MessageConstants {
         public static final String UPLOAD_ENABLE_CAN_NOT_DELETE = "message.upload.enable.can.not.delete";
         public static final String LOCAL_UPLOAD_CAN_NOT_DELETE = "message.upload.local.can.not.delete";
         public static final String LOCAL_UPLOAD_CAN_NOT_DISABLE = "message.upload.local.can.not.disable";
-        public static final String NOT_LOCAL_UPLOAD = "message.upload.not.local.upload";
     }
 
     public static class Sql {
@@ -460,7 +433,6 @@ public class MessageConstants {
         public static final String TASK_GROUP_NAME_NOT_MATCH = "message.quartz.task.group.name.not.match";
         public static final String TASK_NAME_EXISTS = "message.quartz.task.name.exists";
         public static final String TASK_CRON_NOT_EMPTY = "message.quartz.task.cron.not.empty";
-        public static final String TASK_CRON_INVALID = "message.quartz.task.cron.invalid";
         public static final String TASK_TARGET_BEAN_NOT_EMPTY = "message.quartz.task.target.bean.not.empty";
         public static final String TASK_TRGET_METHOD_NOT_EMPTY = "message.quartz.task.trget.method.not.empty";
         public static final String TASK_PARAMS_NOT_EMPTY = "message.quartz.task.params.not.empty";

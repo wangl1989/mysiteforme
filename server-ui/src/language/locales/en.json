@@ -17,6 +17,16 @@
     "confirm": "Confirm",
     "logOutTips": "Do you want to log out?"
   },
+  "tableCommon": {
+    "tableName": "Table Name",
+    "reset": "Reset",
+    "select": "Search",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "check": "Check",
+    "index": "Index",
+    "selection": "Selection"
+  },
   "search": {
     "placeholder": "Search page",
     "historyTitle": "Search history",
@@ -440,6 +450,1507 @@
     "help": {
       "title": "Help Center",
       "document": "Document"
+    }
+  },
+  "user": {
+    "account": {
+      "search": "Search",
+      "reset": "Reset",
+      "add": "Add User",
+      "edit": "Edit User",
+      "refresh": "Refresh",
+      "addTitle": "Add User",
+      "editTitle": "Edit User",
+      "defaultPassword": "Note: The default password for new users is: 123456",
+      "userName": "Username",
+      "loginName": "Account",
+      "loginNameRule": "Login name rules: Must start with a letter, can only contain letters, numbers, underscores, minimum 3 characters, maximum 10 characters",
+      "phone": "Phone",
+      "email": "Email",
+      "role": "Role",
+      "remarks": "Remarks",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "cancelAdd": "Cancel Adding User",
+      "cancelEdit": "Cancel Editing User",
+      "saveAdd": "Save New User",
+      "saveEdit": "Save User Changes",
+      "formItems": {
+        "loginName": "Account",
+        "loginNamePlaceholder": "Please enter login account",
+        "phone": "Phone",
+        "phonePlaceholder": "Please enter phone number",
+        "email": "Email",
+        "emailPlaceholder": "Please enter email",
+        "location": "Location",
+        "locationPlaceholder": "Please enter location"
+      },
+      "table": {
+        "selection": "Select",
+        "userName": "Username",
+        "phone": "Phone",
+        "loginName": "Account",
+        "role": "Role",
+        "status": "Status",
+        "location": "Location",
+        "updateDate": "Update Date",
+        "operation": "Operation"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "normal": "Normal",
+        "deviceLocked": "Device Locked",
+        "accountLocked": "Account Locked",
+        "cancelled": "Cancelled",
+        "unknown": "Unknown"
+      },
+      "operation": {
+        "edit": "Edit User Information",
+        "delete": "Delete User",
+        "assign": "Assign Additional Permissions"
+      },
+      "dialog": {
+        "confirmDelete": "Are you sure you want to cancel this user?",
+        "confirmDeleteTitle": "Cancel User",
+        "deleteSuccess": "Successfully cancelled",
+        "deleteFailed": "Cancellation failed",
+        "deleteError": "Failed to cancel user, please try again",
+        "cancelDelete": "Cancelled the user cancellation operation",
+        "addSuccess": "Successfully added",
+        "editSuccess": "Successfully updated",
+        "operationFailed": "Operation failed",
+        "saveError": "An error occurred while saving user information"
+      },
+      "rules": {
+        "nickName": {
+          "required": "Please enter username",
+          "length": "Length should be between 2 and 20 characters"
+        },
+        "loginName": {
+          "required": "Please enter account",
+          "length": "Length should be between 3 and 10 characters",
+          "pattern": "Must start with a letter and can only contain letters, numbers, and underscores"
+        },
+        "tel": {
+          "pattern": "Please enter a valid phone number format"
+        },
+        "email": {
+          "pattern": "Please enter a valid email format"
+        }
+      }
+    },
+    "detail": {
+      "title": {
+        "basicSettings": "Basic Settings",
+        "changePassword": "Change Password"
+      },
+      "form": {
+        "loginName": "Account",
+        "role": "Role",
+        "nickName": "Nickname",
+        "email": "Email",
+        "phone": "Phone",
+        "location": "Location",
+        "description": "Personal Introduction",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+        "noRole": "No roles assigned"
+      },
+      "device": {
+        "deviceList": "Device List",
+        "deviceId": "Device ID",
+        "online": "Online Status",
+        "onlineStatus": "Online",
+        "offlineStatus": "Offline",
+        "currentDevice": "Current Device",
+        "isCurrentDevice": "Yes",
+        "notCurrentDevice": "No"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "edit": "Edit",
+        "uploadAvatar": "Upload Avatar",
+        "getLocation": "Get Current Location",
+        "cancelEdit": "Cancel Editing",
+        "saveEdit": "Save Changes",
+        "editDetail": "Edit User Details",
+        "cancelResetPassword": "Cancel Password Reset",
+        "saveResetPassword": "Save New Password",
+        "editResetPassword": "Reset Password",
+        "logoutNow": "Logout Now"
+      },
+      "rules": {
+        "nickName": {
+          "required": "Please enter nickname",
+          "length": "Length should be between 2 and 50 characters"
+        },
+        "password": {
+          "required": "Please enter current password"
+        },
+        "newPassword": {
+          "required": "Please enter new password",
+          "format": "Password must contain 8-20 characters, including at least one uppercase letter, one lowercase letter and one number"
+        },
+        "confirmPassword": {
+          "required": "Please confirm new password",
+          "match": "The two passwords do not match"
+        }
+      },
+      "message": {
+        "gettingLocation": "Getting location...",
+        "locationSuccess": "Location retrieved successfully",
+        "locationFailed": "Failed to get location",
+        "onlyUploadImage": "Only image files can be uploaded!",
+        "imageSizeLimit": "Image size cannot exceed 2MB!",
+        "avatarUploadSuccess": "Avatar uploaded successfully",
+        "avatarUploadFailed": "Avatar upload failed",
+        "updateSuccess": "Updated successfully",
+        "updateFailed": "Update failed",
+        "noUserId": "Unable to get user ID, please refresh the page and try again",
+        "passwordChangeSuccess": "Password changed successfully",
+        "passwordChanged": "Password Changed",
+        "passwordChangeFailed": "Password change failed",
+        "logoutCountdown": "Password has been successfully changed! You will be logged out in {0} seconds. Please login again with your new password.",
+        "getUserInfoFailed": "Failed to get user information",
+        "getUserDetailFailed": "Failed to get user details",
+        "getUserDetailedInfoFailed": "Failed to get detailed user information"
+      }
+    }
+  },
+  "dict": {
+    "title": "Dictionary Management",
+    "add": "Add Dictionary",
+    "edit": "Edit Dictionary",
+    "editType": "Edit Dictionary Type",
+    "form": {
+      "type": "Type",
+      "label": "Label",
+      "value": "Value",
+      "description": "Description",
+      "sort": "Sort",
+      "oldType": "Original Type",
+      "newType": "New Type",
+      "typePlaceholder": "Please enter dictionary type",
+      "labelPlaceholder": "Please enter label",
+      "valuePlaceholder": "Please enter value",
+      "descriptionPlaceholder": "Please enter description",
+      "newTypePlaceholder": "Please enter new dictionary type"
+    },
+    "table": {
+      "type": "Dictionary Type",
+      "label": "Label",
+      "value": "Value",
+      "description": "Description",
+      "sort": "Sort",
+      "createDate": "Create Time",
+      "updateDate": "Update Time",
+      "operation": "Operation"
+    },
+    "search": {
+      "typePlaceholder": "Search by dictionary type",
+      "labelPlaceholder": "Search by label",
+      "valuePlaceholder": "Search by value"
+    },
+    "operation": {
+      "edit": "Edit Dictionary",
+      "addByType": "Add Dictionary by Type",
+      "editType": "Edit Dictionary Type",
+      "delete": "Delete Dictionary"
+    },
+    "button": {
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "search": "Search",
+      "reset": "Reset"
+    },
+    "dialog": {
+      "confirmDelete": "Are you sure you want to delete this dictionary? This operation cannot be undone!",
+      "confirmDeleteTitle": "Delete Confirmation",
+      "deleteSuccess": "Deleted successfully",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred while deleting the dictionary",
+      "cancelDelete": "Delete operation cancelled",
+      "typeUpdateSuccess": "Dictionary type updated successfully",
+      "typeUpdateFailed": "Failed to update dictionary type",
+      "typeUpdateError": "An error occurred while updating dictionary type",
+      "editSuccess": "Edited successfully",
+      "addSuccess": "Added successfully",
+      "operationFailed": "Operation failed",
+      "editError": "An error occurred during editing",
+      "addError": "An error occurred during addition"
+    },
+    "rules": {
+      "type": {
+        "required": "Please enter dictionary type"
+      },
+      "label": {
+        "required": "Please enter label"
+      },
+      "value": {
+        "required": "Please enter value"
+      },
+      "newType": {
+        "required": "Please enter new dictionary type"
+      }
+    },
+    "messages": {
+      "getListFailed": "Failed to get dictionary list",
+      "getListError": "An error occurred while getting dictionary list"
+    }
+  },
+  "log": {
+    "title": "System Logs",
+    "batchDelete": "Batch Delete",
+    "form": {
+      "username": "Username",
+      "title": "Operation Title",
+      "httpMethod": "Request Method",
+      "usernamePlaceholder": "Search by username",
+      "titlePlaceholder": "Search by log title",
+      "methodPlaceholder": "Select request method"
+    },
+    "table": {
+      "selection": "Select",
+      "username": "Username",
+      "title": "Operation Title",
+      "remoteAddr": "IP Address",
+      "requestUri": "Request URI",
+      "httpMethod": "HTTP Method",
+      "browser": "Browser",
+      "location": "Location",
+      "params": "Request Parameters",
+      "response": "Response Data",
+      "useTime": "Duration",
+      "exception": "Exception",
+      "createDate": "Create Time"
+    },
+    "button": {
+      "viewParams": "View Parameters",
+      "viewResponse": "View Response",
+      "viewException": "View Exception"
+    },
+    "dialog": {
+      "params": "Request Parameters",
+      "response": "Response Data",
+      "exception": "Exception Info",
+      "confirmDelete": "Are you sure you want to delete the selected log records? This operation cannot be undone!",
+      "confirmDeleteTitle": "Warning",
+      "deleteSuccess": "Successfully deleted",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred while deleting log records",
+      "cancelDelete": "Delete operation cancelled",
+      "selectRecord": "Please select at least one record"
+    },
+    "message": {
+      "getListFailed": "Failed to get log list",
+      "getListError": "An error occurred while getting log list"
+    },
+    "json": {
+      "content": "Content",
+      "emptyData": "Empty data",
+      "parseError": "Unparseable data"
+    }
+  },
+  "menu": {
+    "addMainMenu": "Add Main Menu",
+    "table": {
+      "name": "Menu Name",
+      "route": "Route",
+      "permission": "Available Permissions",
+      "permissionCount": "{0} Permissions",
+      "sort": "Sort Value",
+      "updateTime": "Update Time",
+      "operation": "Operations",
+      "permissionList": "Permission List【Menu: {0}】"
+    },
+    "operation": {
+      "addMenu": "Add Menu or Permission",
+      "editMenu": "Edit Menu",
+      "deleteMenu": "Delete Menu or Permission"
+    },
+    "dialog": {
+      "editMenu": "Edit Menu【{0}】",
+      "editPermission": "Edit Permission【{0}】",
+      "newSubMenu": "New Submenu【Parent: {0}】",
+      "newPermission": "New Permission【Menu: {0}】",
+      "newMenu": "New Menu",
+      "newPermissionGeneral": "New Permission",
+      "menuType": "Menu Type",
+      "menu": "Menu",
+      "permission": "Permission",
+      "permissionType": "Per Type",
+      "route": "Route",
+      "button": "Button",
+      "api": "API",
+      "menuTitle": "Title",
+      "routePath": "Path",
+      "menuName": "Name",
+      "icon": "Icon",
+      "componentPath": "Component",
+      "componentPathPlaceholder": "e.g.: /system/user/index",
+      "color": "Color",
+      "externalLink": "LinkAddress",
+      "externalLinkPlaceholder": "External link/iframe URL (https://www.example.com)",
+      "textBadge": "Text Badge",
+      "textBadgePlaceholder": "Leave empty to not display",
+      "menuSort": "Sort",
+      "hideMenu": "Hide Menu",
+      "hideMenuTip": "Whether to hide the menu in the sidebar",
+      "pageCache": "Cache",
+      "pageCacheTip": "Whether to use keep-alive cache for the page",
+      "isIframe": "Use Iframe",
+      "isIframeTip": "Whether it's an embedded external link (iframe)",
+      "hideTab": "Hide Tab",
+      "hideTabTip": "Whether to hide in the tab bar",
+      "showBadge": "ShowBadge",
+      "showBadgeTip": "Whether to show badge in the top and sidebar",
+      "inMainContainer": "IsInMain",
+      "inMainContainerTip": "Whether the current route is displayed in the main layout (usually false)",
+      "remarks": "Remarks",
+      "remarksPlaceholder": "Please enter remarks",
+      "permissionName": "Name",
+      "permissionCode": "Code",
+      "permissionSort": "Sort",
+      "routePermission": "Route Permission Info",
+      "pageUrl": "Page URL",
+      "pageUrlPlaceholder": "Page request URL",
+      "buttonPermission": "Button Permission Info",
+      "buttonName": "Button Name",
+      "buttonNamePlaceholder": "Button function name",
+      "buttonKey": "Button Key",
+      "buttonKeyPlaceholder": "Button identifier, e.g.: user_add",
+      "apiPermission": "API Permission Info",
+      "apiUrl": "API URL",
+      "apiUrlPlaceholder": "API request URL",
+      "requestMethod": "Method",
+      "isPublic": "Is Public",
+      "isPublicTip": "Public APIs can be accessed without permission",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "form": {
+      "rules": {
+        "title": {
+          "required": "Please enter menu title",
+          "length": "Length should be between 2 and 20 characters"
+        },
+        "path": {
+          "required": "Please enter route path"
+        },
+        "name": {
+          "required": "Please enter menu name",
+          "length": "Length should be between 2 and 20 characters"
+        },
+        "permissionName": {
+          "required": "Please enter permission name"
+        },
+        "permissionCode": {
+          "required": "Please enter permission code"
+        },
+        "apiUrl": {
+          "required": "Please enter API URL"
+        },
+        "httpMethod": {
+          "required": "Please select request method"
+        },
+        "pageUrl": {
+          "required": "Please enter page URL"
+        },
+        "buttonName": {
+          "required": "Please enter button name"
+        },
+        "buttonKey": {
+          "required": "Please enter button key"
+        }
+      }
+    },
+    "message": {
+      "confirmDelete": "Are you sure you want to delete this menu? This cannot be undone.",
+      "confirmDeleteTitle": "Prompt",
+      "confirmDeleteAuth": "Are you sure you want to delete this permission? This cannot be undone.",
+      "deleteSuccess": "Successfully deleted",
+      "deleteFailed": "Delete failed",
+      "editSuccess": "Successfully edited",
+      "addSuccess": "Successfully added",
+      "operationFailed": "Operation failed",
+      "getMenuFailed": "Failed to get menu data"
+    },
+    "permissionList": {
+      "groupTitle": {
+        "route": "Route Permission",
+        "button": "Button Permission",
+        "api": "API Permission"
+      },
+      "table": {
+        "permissionName": "Permission Name",
+        "routeAddress": "Route Path",
+        "buttonKey": "Button Key",
+        "apiAddress": "API Address",
+        "requestMethod": "Method",
+        "isPublic": "Is Public",
+        "sortValue": "Sort",
+        "updateTime": "Update",
+        "operation": "Operation"
+      },
+      "operation": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "tag": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "noData": "No permission data under this menu"
+    },
+    "menuPermission": {
+      "title": {
+        "menuTree": "Menu Tree",
+        "permissionDetail": "Permission Details",
+        "currentMenu": "Current Menu",
+        "userPrefix": "User",
+        "rolePrefix": "Role"
+      },
+      "button": {
+        "saveUserPermission": "Save User Permissions",
+        "saveRolePermission": "Save Role Permissions",
+        "clear": "Clear"
+      },
+      "empty": {
+        "selectMenu": "Please select a menu from the left to view permission details"
+      },
+      "permission": {
+        "selected": "Selected Permissions",
+        "apiPermission": "API Permissions",
+        "buttonPermission": "Button Permissions",
+        "routePermission": "Route Permissions",
+        "noApiPermission": "No API permissions",
+        "noButtonPermission": "No button permissions",
+        "noRoutePermission": "No route permissions",
+        "publicApi": "Public API"
+      },
+      "dialog": {
+        "confirmClear": "Are you sure you want to clear all selected permissions under the current menu?",
+        "tip": "Tip",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "cleared": "All selected permissions under the current menu have been cleared",
+        "selectUser": "Please select a user first",
+        "confirmClearUser": "You are about to clear all individual user permissions, confirm?",
+        "clearConfirmTitle": "Clear Confirmation",
+        "confirmBtn": "Confirm",
+        "userPermissionSaved": "User permissions saved successfully",
+        "saveFailed": "Save failed",
+        "saveUserPermissionFailed": "Failed to save user permissions, please try again",
+        "selectRole": "Please select a role first",
+        "rolePermissionSaved": "Role permissions saved successfully",
+        "saveRolePermissionFailed": "Failed to save role permissions, please try again"
+      },
+      "message": {
+        "getUserPermissionFailed": "Failed to get user permissions",
+        "getRolePermissionFailed": "Failed to get role permissions",
+        "getMenuDataFailed": "Failed to get menu data",
+        "noUserId": "No user ID provided, cannot load permission data",
+        "noRoleId": "No role ID provided, cannot load permission data",
+        "loadPermissionFailed": "Failed to load permission data"
+      }
+    }
+  },
+  "upload": {
+    "baseInfo": {
+      "title": "Upload Configuration",
+      "subtitle": "Configure local or cloud storage methods",
+      "addButton": "Add Upload Method",
+      "types": {
+        "local": "Local Storage",
+        "qiniu": "Qiniu Cloud",
+        "oss": "Alibaba OSS",
+        "cos": "Tencent COS",
+        "bitiful": "Bitiful Cloud",
+        "unknown": "Unknown Method"
+      },
+      "card": {
+        "edit": "Edit Upload Method",
+        "enabled": "Enabled",
+        "storageAddress": "Storage Address",
+        "storageSpace": "Storage Space",
+        "status": "Status",
+        "enabled_status": "Enabled",
+        "disabled_status": "Disabled",
+        "testStatus": "Test Status",
+        "connectionNormal": "Connection Normal",
+        "connectionError": "Connection Error",
+        "testImage": "Test Image",
+        "viewTestImage": "View Image",
+        "storageDir": "Storage Directory",
+        "endpoint": "Endpoint",
+        "region": "Region",
+        "tempDisable": "Disable",
+        "enable": "Enable Now"
+      },
+      "dialog": {
+        "addTitle": "Add Upload Method",
+        "editTitle": "Edit Upload Method",
+        "uploadType": "Upload Type",
+        "statusLabel": "Status",
+        "enableText": "Enable",
+        "disableText": "Disable", 
+        "httpPrefix": "HTTP Prefix",
+        "httpPrefixPlaceholder": "e.g. http://example.com or https://example.com",
+        "httpPrefixTip": "Public URL prefix, including http:// or https://",
+        "storageDir": "Storage Directory",
+        "storageDirPlaceholder": "e.g. images/ or uploads/",
+        "storageDirTip": "Storage directory, cannot be empty",
+        "bucketName": "Bucket Name",
+        "bucketNamePlaceholder": "Storage space name",
+        "accessKey": "AccessKey",
+        "accessKeyPlaceholder": "Cloud storage access key ID",
+        "secretKey": "SecretKey",
+        "secretKeyPlaceholder": "Cloud storage secret key",
+        "secretKeyTip": "Leave empty if not changing",
+        "endpoint": "Endpoint",
+        "endpointPlaceholder": {
+          "oss": "e.g. oss-cn-beijing.aliyuncs.com",
+          "bitiful": "e.g. endpoint.example.com"
+        },
+        "region": "Region",
+        "regionPlaceholder": {
+          "cos": "e.g. ap-guangzhou",
+          "bitiful": "Region code"
+        },
+        "remarks": "Remarks",
+        "remarksPlaceholder": "Please enter remarks",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      },
+      "imagePreview": {
+        "title": "Image Preview",
+        "noImage": "No image",
+        "uploadButton": "Upload Test Image",
+        "selectImage": "Select Image",
+        "uploadImage": "Upload Image",
+        "close": "Close"
+      },
+      "message": {
+        "getListFailed": "Failed to get upload method list",
+        "getListError": "An error occurred while getting upload method list",
+        "configNotFound": "Upload configuration not found",
+        "onlyImage": "Only image files can be uploaded!",
+        "imageSizeLimit": "Image size cannot exceed 2MB!",
+        "selectImage": "Please select an image first",
+        "uploadSuccess": "Upload successful",
+        "uploadFailed": "Upload failed",
+        "uploadError": "An error occurred during image upload",
+        "toggleSuccess": "Disabled successfully",
+        "toggleEnableSuccess": "Enabled successfully",
+        "toggleFailed": "Operation failed",
+        "toggleError": "An error occurred while toggling status",
+        "addSuccess": "Added successfully",
+        "editSuccess": "Updated successfully",
+        "operationFailed": "Operation failed",
+        "addError": "An error occurred while adding",
+        "editError": "An error occurred while editing"
+      },
+      "rules": {
+        "type": {
+          "required": "Please select upload type"
+        },
+        "basePath": {
+          "required": "Please enter HTTP prefix",
+          "pattern": "Please enter a valid HTTP prefix, starting with http:// or https://"
+        },
+        "dir": {
+          "required": "Please enter storage directory",
+          "pattern": "Directory name can only contain letters, slashes (/), must not start with slash, and must end with slash (/)"
+        },
+        "bucketName": {
+          "required": "Please enter Bucket name"
+        },
+        "accessKey": {
+          "required": "Please enter AccessKey"
+        },
+        "secretKey": {
+          "required": "Please enter SecretKey"
+        },
+        "endpoint": {
+          "required": "Please enter endpoint"
+        },
+        "region": {
+          "required": "Please enter region"
+        }
+      }
+    }
+  },
+  "redis": {
+    "title": "Redis Management",
+    "table": {
+      "key": "Key",
+      "type": "Type",
+      "ttl": "TTL",
+      "value": "Value",
+      "operation": "Operation"
+    },
+    "button": {
+      "batchDelete": "Batch Delete",
+      "viewValue": "View Value",
+      "viewValueTitle": "View Redis Value",
+      "deleteRedis": "Delete Redis Data"
+    },
+    "sort": {
+      "label": "Sort:",
+      "expireAsc": "Expire Time Asc",
+      "expireDesc": "Expire Time Desc"
+    },
+    "form": {
+      "key": "Key",
+      "keyPlaceholder": "Search by key"
+    },
+    "dialog": {
+      "valueData": "Key Value Data",
+      "dataSizeWarning": "Large data ({0} KB), may affect browser performance",
+      "showFullData": "Show Full Data",
+      "showPartialData": "Show Partial Data",
+      "confirmDelete": "Are you sure you want to delete the selected Redis keys? This operation cannot be undone!",
+      "confirmDeleteKey": "Are you sure you want to delete Redis key \"{0}\"? This operation cannot be undone!",
+      "warning": "Warning",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "message": {
+      "selectAtLeastOne": "Please select at least one record",
+      "batchDeleteSuccess": "Batch delete successful",
+      "batchDeleteFailed": "Some or all deletes failed, please try again",
+      "batchDeleteError": "An error occurred while batch deleting Redis records",
+      "cancelBatchDelete": "Batch delete canceled",
+      "deleteSuccess": "Delete successful",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred while deleting Redis record",
+      "cancelDelete": "Delete canceled",
+      "getListFailed": "Failed to get Redis list",
+      "getListError": "An error occurred while getting Redis list"
+    },
+    "ttl": {
+      "never": "Never Expires",
+      "expired": "Expired",
+      "seconds": "{0} seconds",
+      "minutes": "{0} minutes {1} seconds",
+      "hours": "{0} hours {1} minutes",
+      "days": "{0} days {1} hours"
+    },
+    "content": {
+      "emptyData": "Empty Data",
+      "unparseableData": "Unparseable Data",
+      "dataTruncated": "...(Data truncated)"
+    }
+  },
+  "resources": {
+    "title": "System Resources",
+    "search": {
+      "title": "Search System Resources",
+      "fileNamePlaceholder": "Search by filename",
+      "source": "Resource Source",
+      "fileType": "File Type",
+      "search": "Search",
+      "reset": "Reset"
+    },
+    "sourceType": {
+      "local": "Local Storage",
+      "oss": "Alibaba OSS",
+      "qiniu": "Qiniu Cloud"
+    },
+    "fileType": {
+      "image": "Image",
+      "document": "Document",
+      "video": "Video",
+      "audio": "Audio",
+      "other": "Other"
+    },
+    "table": {
+      "fileName": "Filename",
+      "source": "Storage Source",
+      "fileType": "File Type",
+      "fileSize": "File Size",
+      "createDate": "Upload Time",
+      "operation": "Operations"
+    },
+    "button": {
+      "preview": "Preview",
+      "previewTitle": "Preview System File",
+      "copyUrl": "CopyLink",
+      "copyUrlTitle": "Copy File URL",
+      "download": "Download",
+      "downloadTitle": "Download Resource File" 
+    },
+    "preview": {
+      "title": "Resource Preview",
+      "imageAlt": "Preview Image",
+      "unsupportedType": "This file type cannot be previewed directly. Please download to view."
+    },
+    "message": {
+      "getListFailed": "Failed to get resources list",
+      "getListError": "Failed to get resources list: ",
+      "copySuccess": "URL copied to clipboard",
+      "copyFailed": "Copy failed, please copy manually"
+    }
+  },
+  "site": {
+    "title": "System Settings",
+    "button": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "tabs": {
+      "basic": "Basic Settings",
+      "comment": "Comment Settings",
+      "contact": "Contact Info",
+      "seo": "SEO Settings",
+      "server": "Server Info",
+      "profile": "Profile Settings"
+    },
+    "form": {
+      "websiteName": "Website Name",
+      "websiteUrl": "Website URL",
+      "version": "System Version",
+      "author": "System Author",
+      "webServiceKey": "WebServiceKey",
+      "uploadType": "Upload Type",
+      "uploadLimit": "Size Limit",
+      "logo": "LOGO",
+      "authorAvatar": "Author Avatar",
+      "enableComment": "EnableComments",
+      "anonymousComment": "Anonymous",
+      "email": "Email",
+      "qq": "QQ",
+      "github": "Github",
+      "gitee": "Gitee",
+      "weibo": "Weibo",
+      "phone": "Phone",
+      "address": "Address",
+      "recordNumber": "Record Number",
+      "defaultKeywords": "Keywords",
+      "description": "Description",
+      "copyright": "Copyright",
+      "serverEnvironment": "Environment",
+      "databaseVersion": "Database",
+      "unit": {
+        "mb": "MB"
+      },
+      "serverTypes": {
+        "windows": "Windows",
+        "linux": "Linux", 
+        "macos": "macOS"
+      }
+    },
+    "message": {
+      "getUploadTypesFailed": "Failed to get upload types list",
+      "getSystemDataFailed": "Failed to get system settings",
+      "saveSuccess": "Saved successfully",
+      "saveFailed": "Save failed"
+    }
+  },
+  "table": {
+    "title": "Add Table",
+    "editTitle": "Edit Table",
+    "search": {
+      "tableNameLabel": "Name",
+      "dbName": "Please select database name",
+      "tableName": "Please enter table name to search",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "button": {
+      "add": "Add Table",
+      "batchDelete": "Batch Delete",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "edit": "Edit Table",
+      "manageFields": "Manage Fields",
+      "delete": "Delete Table",
+      "addField": "Add Field"
+    },
+    "column": {
+      "selection": "Select",
+      "name": "Table Name",
+      "comment": "Table Comment",
+      "tableType": "Table Type",
+      "dbName": "Database Name",
+      "dataCount": "Data Count",
+      "createTime": "Create Time",
+      "updateTime": "Update Time",
+      "actions": "Actions"
+    },
+    "form": {
+      "dbName": "Database",
+      "tableName": "Table Name",
+      "comment": "Comment",
+      "tableType": "Table Type",
+      "fieldSettings": "Field Settings",
+      "inputDbName": "Please select database name",
+      "inputTableName": "Please enter table name",
+      "inputComment": "Please enter table comment",
+      "selectTableType": "Please select table type"
+    },
+    "field": {
+      "name": "Field Name",
+      "type": "Field Type",
+      "length": "Field Length",
+      "notNull": "Not Null",
+      "comment": "Field Comment",
+      "actions": "Actions",
+      "inputName": "Please enter field name",
+      "selectType": "Please select field type",
+      "inputLength": "Please enter field length",
+      "inputComment": "Please enter field comment"
+    },
+    "tableType": {
+      "basic": "Basic Type",
+      "tree": "Tree Structure",
+      "relation": "Relation Type",
+      "unknown": "Unknown Type"
+    },
+    "message": {
+      "addSuccess": "Added successfully",
+      "editSuccess": "Edited successfully",
+      "deleteSuccess": "Deleted successfully",
+      "batchDeleteSuccess": "Batch deleted successfully",
+      "batchDeletePartial": "Batch delete completed, {success} succeeded, {failed} failed.",
+      "addFailed": "Add failed",
+      "editFailed": "Edit failed",
+      "deleteFailed": "Delete failed",
+      "batchDeleteFailed": "Unknown error occurred during batch deletion",
+      "cancelBatchDelete": "Batch delete operation canceled",
+      "cancelDelete": "Delete operation canceled",
+      "getTableListFailed": "Failed to get table list",
+      "getDbListFailed": "Failed to get database name list",
+      "selectAtLeastOne": "Please select at least one record",
+      "addAtLeastOneField": "Please add and configure at least one field",
+      "deleteConfirm": "Are you sure you want to delete table \"{name}\"? This operation will delete the table and all its data, and cannot be recovered!",
+      "batchDeleteConfirm": "Are you sure you want to delete the selected tables? This operation will delete tables and all their data, and cannot be recovered!"
+    },
+    "validation": {
+      "dbNameRequired": "Please select database name",
+      "tableNameRequired": "Please enter table name",
+      "tableNameMaxLength": "Length cannot exceed 64 characters",
+      "tableTypeRequired": "Please select table type",
+      "fieldNameRequired": "Please enter field name",
+      "fieldNameMaxLength": "Length cannot exceed 64 characters",
+      "fieldTypeRequired": "Please select field type",
+      "fieldLengthRequired": "Please enter field length",
+      "fieldLengthNumber": "Length must be a number"
+    }
+  },
+  "tableConfig": {
+    "title": "Table Configuration",
+    "addTitle": "Add Table Configuration",
+    "editTitle": "Edit Table Configuration",
+    "search": {
+      "tableName": "Table",
+      "dbName": "Database",
+      "businessName": "Business",
+      "status": "Status",
+      "inputTableName": "Please enter table name",
+      "selectDbName": "Please select database name",
+      "inputBusinessName": "Please enter business name",
+      "selectStatus": "Please select configuration status",
+      "normal": "Normal",
+      "deleted": "Deleted",
+      "search": "Search",
+      "reset": "Reset"
+    },
+    "button": {
+      "add": "Add Config",
+      "batchDelete": "Batch Delete",
+      "downloadCode": "Download Code",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "edit": "Edit Config",
+      "syncFields": "Sync",
+      "delete": "Delete Config",
+      "recover": "Recover Config",
+      "completeDelete": "Permanently Delete"
+    },
+    "column": {
+      "selection": "Select",
+      "tableType": "Table Type",
+      "tableName": "Table Name",
+      "tablePrefix": "Table Prefix",
+      "dbName": "Database Name",
+      "businessName": "Business",
+      "moduleName": "Module",
+      "packageName": "Package",
+      "author": "Author",
+      "generatePath": "Generate Path",
+      "fieldCount": "Fields",
+      "fieldCountText": "Total {count} fields",
+      "remarks": "Remarks",
+      "updateTime": "Update Time",
+      "status": "Status",
+      "statusNormal": "Normal",
+      "statusDeleted": "Deleted",
+      "actions": "Actions"
+    },
+    "form": {
+      "dbName": "Database",
+      "tableName": "Table Name",
+      "tablePrefix": "Table Prefix",
+      "businessName": "Business",
+      "moduleName": "Module",
+      "packageName": "Package",
+      "author": "Author",
+      "generatePath": "Path",
+      "options": "Options",
+      "remarks": "Remarks",
+      "selectDbName": "Please select database name",
+      "selectTableName": "Please select table name",
+      "inputTablePrefix": "Please enter table prefix",
+      "inputBusinessName": "Please enter business name",
+      "inputModuleName": "Please enter module name",
+      "inputPackageName": "Please enter package name",
+      "inputAuthor": "Please enter author",
+      "inputGeneratePath": "Please enter generate path",
+      "inputOptions": "Please enter options, such as JSON configuration",
+      "inputRemarks": "Please enter remarks"
+    },
+    "message": {
+      "getListFailed": "Failed to get configuration list",
+      "getListError": "An error occurred while getting configuration list",
+      "getDbListFailed": "Failed to get database list",
+      "getDbListError": "An error occurred while getting database list",
+      "getTableListFailed": "Failed to get table list",
+      "getTableListError": "An error occurred while getting table list",
+      "selectAtLeastOne": "Please select at least one record",
+      "allDeleted": "All selected records are already deleted, please select again",
+      "batchDeleteConfirm": "Are you sure you want to delete the selected configurations?",
+      "batchDeleteSuccess": "Batch delete successful",
+      "batchDeleteFailed": "Some or all deletions failed, please try again",
+      "batchDeleteError": "An error occurred during batch deletion",
+      "cancelBatchDelete": "Batch delete operation canceled",
+      "deleteConfirm": "Are you sure you want to delete configuration \"{name}\"?",
+      "deleteSuccess": "Delete successful",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred during deletion",
+      "cancelDelete": "Delete operation canceled",
+      "completeDeleteConfirm": "Are you sure you want to permanently delete configuration \"{name}\"? This will also delete all field configurations and cannot be recovered!!!",
+      "completeDeleteSuccess": "Permanent deletion successful",
+      "completeDeleteFailed": "Permanent deletion failed",
+      "completeDeleteError": "An error occurred during permanent deletion",
+      "recoverConfirm": "Are you sure you want to recover configuration \"{name}\"?",
+      "recoverSuccess": "Recovery successful",
+      "recoverFailed": "Recovery failed",
+      "recoverError": "An error occurred during recovery",
+      "cancelRecover": "Recovery operation canceled",
+      "syncFieldsSuccess": "Field list synchronized successfully",
+      "syncFieldsFailed": "Field list synchronization failed",
+      "syncFieldsError": "An error occurred during field synchronization",
+      "addSuccess": "Added successfully",
+      "editSuccess": "Edited successfully",
+      "addFailed": "Add failed",
+      "editFailed": "Edit failed",
+      "addError": "An error occurred while adding configuration",
+      "editError": "An error occurred while editing configuration",
+      "downloadConfirm": "Are you sure you want to download the source code for selected configurations?",
+      "downloadSuccess": "Source code downloaded successfully",
+      "downloadFailed": "Download failed",
+      "downloadError": "An error occurred during download",
+      "cancelDownload": "Download operation canceled"
+    },
+    "validation": {
+      "tableNameRequired": "Please enter table name",
+      "tableNameLength": "Length cannot exceed 100 characters",
+      "tablePrefixLength": "Length cannot exceed 30 characters",
+      "dbNameRequired": "Please enter database name",
+      "dbNameLength": "Length cannot exceed 100 characters",
+      "businessNameRequired": "Please enter business name",
+      "businessNameLength": "Length cannot exceed 100 characters"
+    }
+  },
+  "tableField": {
+    "title": "Table Fields Management",
+    "addTitle": "Add Field",
+    "editTitle": "Edit Field",
+    "headerInfo": {
+      "tableName": "Table Name",
+      "dbName": "Database Name",
+      "tableType": "Table Type",
+      "basicType": "Basic Type",
+      "treeType": "Tree Structure",
+      "relationType": "Relation Type",
+      "unknownType": "Unknown Type"
+    },
+    "search": {
+      "fieldName": "Field Name",
+      "inputFieldName": "Please enter field name to search",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "button": {
+      "add": "Add Field",
+      "batchDelete": "Batch Delete",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "edit": "Edit Field",
+      "delete": "Delete Field"
+    },
+    "column": {
+      "selection": "Select",
+      "fieldName": "Field Name",
+      "fieldLength": "Length",
+      "fieldType": "Type",
+      "isNotNull": "Not Null",
+      "yes": "Yes",
+      "no": "No",
+      "comment": "Comment",
+      "actions": "Actions"
+    },
+    "form": {
+      "fieldName": "Field Name",
+      "fieldType": "Field Type",
+      "fieldLength": "Field Length",
+      "isNotNull": "Not Null",
+      "comment": "Comment",
+      "inputFieldName": "Please enter field name",
+      "selectFieldType": "Please select field type",
+      "inputFieldLength": "Please enter length",
+      "inputComment": "Please enter field comment"
+    },
+    "message": {
+      "getListFailed": "Failed to get field list",
+      "getListError": "An error occurred while getting field list",
+      "selectAtLeastOne": "Please select at least one field",
+      "batchDeleteConfirm": "Are you sure you want to delete the selected fields? This operation cannot be undone!",
+      "batchDeleteSuccess": "Batch delete successful",
+      "batchDeletePartial": "Batch delete completed, {success} succeeded, {failed} failed.",
+      "batchDeleteError": "An unknown error occurred during batch deletion",
+      "cancelBatchDelete": "Batch delete operation canceled",
+      "deleteConfirm": "Are you sure you want to delete field \"{name}\"? This operation cannot be undone!",
+      "deleteSuccess": "Delete successful",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred during deletion",
+      "cancelDelete": "Delete operation canceled",
+      "addSuccess": "Added successfully",
+      "editSuccess": "Edited successfully",
+      "addFailed": "Add failed",
+      "editFailed": "Edit failed",
+      "addError": "An error occurred while adding field",
+      "editError": "An error occurred while editing field"
+    },
+    "validation": {
+      "fieldNameRequired": "Please enter field name",
+      "fieldNameLength": "Length cannot exceed 64 characters",
+      "fieldTypeRequired": "Please select field type",
+      "fieldLengthRequired": "Please enter a valid field length"
+    }
+  },
+  "tableFieldConfig": {
+    "title": "Field List",
+    "dialog": {
+      "title": "Fields List【Table: {tableName}】",
+      "editFieldTitle": "Edit Field【{fieldName}】"
+    },
+    "search": {
+      "fieldName": "Field Name",
+      "businessName": "Business Name",
+      "componentType": "Component Type",
+      "isQuery": "Is Query",
+      "yes": "Yes",
+      "no": "No",
+      "inputFieldName": "Please enter field name",
+      "inputBusinessName": "Please enter business name",
+      "selectComponentType": "Please select component type",
+      "selectIsQuery": "Please select query status",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "button": {
+      "syncFields": "Sync Fields",
+      "fieldSort": "Field Sort",
+      "exitSort": "Exit Sort",
+      "saveSort": "Save Sort",
+      "cancelSort": "Cancel Sort",
+      "previewForm": "Preview Form",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "column": {
+      "sort": "Sort",
+      "id": "ID",
+      "sortValue": "Sort Value",
+      "fieldName": "Field Name",
+      "fieldType": "Field Type",
+      "businessName": "Business Name",
+      "componentType": "Component Type",
+      "isUnique": "Is Unique",
+      "isRequired": "Is Required",
+      "isQueryField": "Is Query Field",
+      "isListVisible": "Show in List",
+      "isAddVisible": "Show in Add",
+      "isEditVisible": "Show in Edit",
+      "isDetailVisible": "Show in Detail",
+      "queryType": "Query Type",
+      "associatedType": "Associated Type",
+      "dictType": "Dict Type",
+      "associatedTable": "Associated Table",
+      "associatedTableField": "Associated Field",
+      "validationRules": "Validation Rules",
+      "fieldComment": "Field Comment",
+      "actions": "Actions",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "form": {
+      "fieldName": "Field Name",
+      "fieldType": "Field Type",
+      "fieldComment": "Field Comment",
+      "businessName": "Business Name",
+      "componentType": "Component Type",
+      "validationRules": "Validation Rules",
+      "associatedType": "Associated Type",
+      "dictType": "Dict Type",
+      "associatedTable": "Associated Table",
+      "displayField": "Display Field",
+      "isUnique": "Is Unique",
+      "isRequired": "Is Required",
+      "isListVisible": "Show in List",
+      "isAddVisible": "Show in Add",
+      "isEditVisible": "Show in Edit",
+      "isDetailVisible": "Show in Detail",
+      "isQueryField": "Is Query Field",
+      "sortValue": "Sort Value",
+      "queryType": "Query Type",
+      "remarks": "Remarks",
+      "inputComponentType": "Please select component type",
+      "validationRulesPlaceholder": "E.g.: required|email|max:50",
+      "selectAssociatedType": "Please select associated type",
+      "selectDictType": "Please select dictionary type",
+      "selectAssociatedTable": "Please select associated table",
+      "selectDisplayField": "Please select display field",
+      "inputRemarks": "Please enter remarks"
+    },
+    "componentType": {
+      "input": "Input",
+      "textarea": "Textarea",
+      "select": "Select",
+      "inputNumber": "Number",
+      "radio": "Radio",
+      "checkbox": "Checkbox",
+      "colorPicker": "Color Picker",
+      "iconPicker": "Icon Picker",
+      "datePicker": "Date Picker",
+      "timePicker": "Time Picker",
+      "datetimePicker": "Datetime Picker",
+      "switch": "Switch",
+      "imageUpload": "Image Upload",
+      "fileUpload": "File Upload",
+      "richText": "Rich Text"
+    },
+    "queryType": {
+      "eq": "Equal(=)",
+      "ne": "Not Equal(!=)",
+      "gt": "Greater Than(>)",
+      "ge": "Greater Equal(>=)",
+      "lt": "Less Than(<)",
+      "le": "Less Equal(<=)",
+      "like": "Like",
+      "leftLike": "Left Like(%like)",
+      "rightLike": "Right Like(like%)",
+      "between": "Between",
+      "in": "In",
+      "notIn": "Not In",
+      "isNotNull": "Is Not Null",
+      "isNull": "Is Null"
+    },
+    "associatedType": {
+      "dictType": "Dictionary Type",
+      "associatedTable": "Associated Table"
+    },
+    "tooltip": {
+      "isUnique": "Whether field requires unique value",
+      "isRequired": "Whether field is required",
+      "dbRequiredField": "Database required field cannot be modified",
+      "isListVisible": "Whether to show in list page",
+      "isAddVisible": "Whether to show in add form",
+      "isEditVisible": "Whether to show in edit form",
+      "isDetailVisible": "Whether to show in detail page",
+      "isQueryField": "Whether used as query condition"
+    },
+    "warning": {
+      "associatedTypeRequired": "Current component type must have associated data source",
+      "missingTableConfig": "Missing table config ID, cannot load field list",
+      "selectDictType": "Please select dictionary type",
+      "selectAssociatedTable": "Please select associated table",
+      "missingDBName": "Missing database name, cannot get associated tables",
+      "missingTableConfigInfo": "Missing table configuration info",
+      "componentTypeRequireAssociated": "Current component type requires associated type"
+    },
+    "message": {
+      "loadFieldsFailed": "Failed to load field list",
+      "loadFieldsError": "An error occurred while loading field list",
+      "enterSortMode": "Entered sort mode, please drag the 'move' button to sort fields, then click 'Save Sort'",
+      "saveSuccess": "Saved successfully",
+      "saveFailed": "Save failed",
+      "saveError": "An error occurred while saving field configuration",
+      "syncSuccess": "Fields synchronized successfully",
+      "syncFailed": "Field synchronization failed",
+      "syncError": "An error occurred during field synchronization",
+      "sortSuccess": "Field sort saved successfully",
+      "sortFailed": "Failed to save sort",
+      "sortError": "An error occurred while saving field sort",
+      "cancelSort": "Sort canceled",
+      "deleteSuccess": "Field configuration deleted successfully",
+      "deleteFailed": "Field configuration deletion failed",
+      "deleteConfirm": "Are you sure you want to delete field \"{fieldName}\"?"
+    },
+    "validation": {
+      "componentTypeRequired": "Please select component type",
+      "associatedTypeRequired": "Please select associated type",
+      "dictTypeRequired": "Please select dictionary type",
+      "associatedTableRequired": "Please select associated table",
+      "displayFieldRequired": "Please select display field"
+    },
+    "preview": {
+      "title": "Preview Form【{tableName}】"
+    }
+  },
+  "role": {
+    "title": "Role Management",
+    "search": {
+      "roleName": "Role Name",
+      "inputRoleName": "Please enter role name",
+      "search": "Search",
+      "add": "Add Role"
+    },
+    "table": {
+      "roleName": "Role Name",
+      "description": "Description",
+      "isDefault": "Is Default",
+      "status": "Status",
+      "updateTime": "Update Time",
+      "operations": "Operations",
+      "yes": "Yes",
+      "no": "No",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "button": {
+      "search": "Search Role",
+      "add": "Add Role",
+      "edit": "Edit Role",
+      "delete": "Delete Role",
+      "assignPermission": "Assign Menu Permissions",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "confirm": "Confirm"
+    },
+    "dialog": {
+      "addTitle": "Add Role",
+      "editTitle": "Edit Role",
+      "roleName": "Role Name",
+      "description": "Description",
+      "isDefault": "Is Default",
+      "status": "Status",
+      "cancelAdd": "Cancel Adding Role",
+      "cancelEdit": "Cancel Editing Role",
+      "submitAdd": "Save New Role",
+      "submitEdit": "Save Role Changes"
+    },
+    "message": {
+      "confirmDelete": "Are you sure you want to delete this role?",
+      "confirmDeleteTitle": "Delete Confirmation",
+      "deleteSuccess": "Successfully deleted",
+      "deleteFailed": "Delete failed",
+      "deleteError": "Failed to delete role, please try again",
+      "cancelDelete": "Role deletion canceled",
+      "addSuccess": "Successfully added",
+      "addFailed": "Add failed",
+      "editSuccess": "Successfully updated",
+      "editFailed": "Edit failed",
+      "operationFailed": "Operation failed, please try again",
+      "getRoleListFailed": "Failed to get role list",
+      "getRoleListError": "An error occurred while getting role list"
+    },
+    "validation": {
+      "roleNameRequired": "Please enter role name",
+      "roleNameLength": "Length should be between 2 and 20 characters",
+      "descriptionRequired": "Please enter role description"
+    }
+  },
+  "quartzTask": {
+    "title": "Scheduled Task Management",
+    "button": {
+      "add": "Add Task",
+      "batchDelete": "Batch Delete",
+      "batchPause": "Batch Pause",
+      "batchResume": "Batch Resume",
+      "batchRun": "Execute Now"
+    },
+    "dialog": {
+      "addTitle": "Add Scheduled Task",
+      "editTitle": "Edit Scheduled Task",
+      "cancelAdd": "Cancel Adding Task",
+      "cancelEdit": "Cancel Editing Task",
+      "submitAdd": "Save New Task",
+      "submitEdit": "Save Task Changes",
+      "confirmDelete": "Are you sure you want to delete task \"{name}\"? This operation cannot be undone!",
+      "confirmDeleteTitle": "Warning",
+      "confirmBatchDelete": "Are you sure you want to delete the selected tasks? This operation cannot be undone!",
+      "confirmPause": "Are you sure you want to pause task \"{name}\"?",
+      "confirmBatchPause": "Are you sure you want to pause the selected tasks?",
+      "confirmResume": "Are you sure you want to resume task \"{name}\"?",
+      "confirmBatchResume": "Are you sure you want to resume the selected tasks?",
+      "confirmRun": "Are you sure you want to execute task \"{name}\" now?",
+      "confirmBatchRun": "Are you sure you want to execute the selected tasks now?"
+    },
+    "form": {
+      "groupName": "Task Group",
+      "name": "Task Name",
+      "cron": "Cron",
+      "targetBean": "Bean",
+      "targetMethod": "Method",
+      "params": "Parameters",
+      "status": "Task Status",
+      "remarks": "Remarks",
+      "groupNamePlaceholder": "Please enter task group name",
+      "namePlaceholder": "Please enter task name",
+      "cronPlaceholder": "Please enter cron expression",
+      "targetBeanPlaceholder": "Please enter target bean name",
+      "targetMethodPlaceholder": "Please enter target method name",
+      "paramsPlaceholder": "Please enter execution parameters",
+      "remarksPlaceholder": "Please enter remarks"
+    },
+    "search": {
+      "namePlaceholder": "Search by task name",
+      "statusPlaceholder": "Please select status"
+    },
+    "table": {
+      "groupName": "Task Group",
+      "name": "Task Name",
+      "cron": "Cron Expression",
+      "targetBean": "Target Bean",
+      "targetMethod": "Target Method",
+      "params": "Parameters",
+      "status": "Status",
+      "updateDate": "Update Time",
+      "operation": "Operations"
+    },
+    "status": {
+      "normal": "Normal",
+      "pause": "Paused"
+    },
+    "operation": {
+      "edit": "Edit Task",
+      "delete": "Delete Task",
+      "pause": "Pause Task",
+      "resume": "Resume Task",
+      "run": "Execute Now"
+    },
+    "rules": {
+      "name": {
+        "required": "Please enter task name",
+        "length": "Length cannot exceed 100 characters"
+      },
+      "cron": {
+        "required": "Please enter cron expression"
+      },
+      "targetBean": {
+        "required": "Please enter target bean"
+      },
+      "targetMethod": {
+        "required": "Please enter target method"
+      },
+      "status": {
+        "required": "Please select task status"
+      }
+    },
+    "message": {
+      "getListFailed": "Failed to get task list",
+      "getListError": "An error occurred while getting task list",
+      "selectAtLeastOne": "Please select at least one record",
+      "addSuccess": "Added successfully",
+      "addFailed": "Add failed",
+      "addError": "An error occurred while adding task",
+      "editSuccess": "Edited successfully",
+      "editFailed": "Edit failed",
+      "editError": "An error occurred while editing task",
+      "deleteSuccess": "Deleted successfully",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred while deleting task",
+      "batchDeleteSuccess": "Batch delete successful",
+      "batchDeleteFailed": "Batch delete failed",
+      "batchDeleteError": "An error occurred during batch deletion",
+      "pauseSuccess": "Paused successfully",
+      "pauseFailed": "Pause failed",
+      "pauseError": "An error occurred while pausing task",
+      "batchPauseSuccess": "Batch pause successful",
+      "batchPauseFailed": "Batch pause failed",
+      "batchPauseError": "An error occurred during batch pause",
+      "resumeSuccess": "Resumed successfully",
+      "resumeFailed": "Resume failed",
+      "resumeError": "An error occurred while resuming task",
+      "batchResumeSuccess": "Batch resume successful",
+      "batchResumeFailed": "Batch resume failed",
+      "batchResumeError": "An error occurred during batch resume",
+      "runSuccess": "Execution successful",
+      "runFailed": "Execution failed",
+      "runError": "An error occurred during task execution",
+      "batchRunSuccess": "Batch execution successful",
+      "batchRunFailed": "Batch execution failed",
+      "batchRunError": "An error occurred during batch execution",
+      "cancelResume": "Resume operation canceled",
+      "cancelBatchResume": "Batch resume operation canceled",
+      "cancelRun": "Execution operation canceled",
+      "cancelBatchRun": "Batch execution operation canceled"
+    }
+  },
+  "quartzTaskLog": {
+    "title": "Task Log Management",
+    "button": {
+      "batchDelete": "Batch Delete",
+      "viewError": "View Error"
+    },
+    "dialog": {
+      "errorTitle": "Error Details",
+      "confirmDelete": "Are you sure you want to delete this task log? This operation cannot be undone!",
+      "confirmDeleteTitle": "Warning",
+      "confirmBatchDelete": "Are you sure you want to delete the selected task logs? This operation cannot be undone!"
+    },
+    "form": {
+      "name": "Task Name"
+    },
+    "search": {
+      "namePlaceholder": "Search by task name"
+    },
+    "table": {
+      "selection": "Select",
+      "jobId": "Task ID",
+      "name": "Task Name",
+      "cron": "Cron",
+      "targetBean": "Bean",
+      "targetMethod": "Method",
+      "params": "Parameters",
+      "status": "Status",
+      "times": "Execution Time",
+      "exception": "Exception",
+      "createDate": "Create Time",
+      "operation": "Operations"
+    },
+    "operation": {
+      "delete": "Delete Task Log"
+    },
+    "message": {
+      "getListFailed": "Failed to get task log list",
+      "getListError": "An error occurred while getting task log list",
+      "selectAtLeastOne": "Please select at least one record",
+      "deleteSuccess": "Deleted successfully",
+      "deleteFailed": "Delete failed",
+      "deleteError": "An error occurred while deleting task log",
+      "batchDeleteSuccess": "Batch delete successful",
+      "batchDeletePartial": "Some or all deletions failed, please try again",
+      "batchDeleteError": "An error occurred during batch deletion",
+      "cancelDelete": "Delete operation canceled",
+      "cancelBatchDelete": "Batch delete operation canceled"
     }
   }
 }

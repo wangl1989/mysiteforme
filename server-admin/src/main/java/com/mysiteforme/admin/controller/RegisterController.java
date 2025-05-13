@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/register")
+@RateLimit(limit = 20, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
 public class RegisterController {
 
     private final RedisUtils redisUtils;
@@ -47,6 +49,7 @@ public class RegisterController {
      * @param request 邮件参数对象
      * @return 返回结果
      */
+    @RateLimit(limit = 1, period = 30, timeUnit = TimeUnit.SECONDS, limitType = LimitType.IP)
     @PostMapping("sendEmail")
     public Result sendEmail(@RequestBody @Valid SendEmailRequest request) {
         // 检测这个邮箱是否被注册过
@@ -131,6 +134,7 @@ public class RegisterController {
      * @param request 参数对象
      * @return result返回结果
      */
+    @RateLimit(limit = 1, period = 30, timeUnit = TimeUnit.SECONDS, limitType = LimitType.IP)
     @PostMapping("forgetPassword")
     public Result forgetPassword(@RequestBody @Valid ForgetPasswordRequest request){
         User user = userService.getUserByEmail(request.getEmail());

@@ -18,7 +18,9 @@
           @refresh="loadUserData"
         >
           <template #left>
-            <ElButton @click="showDialog('add')" v-auth="'user_add'" v-ripple>添加用户</ElButton>
+            <ElButton @click="showDialog('add')" v-auth="'user_add'" v-ripple>
+              {{ $t('user.account.add') }}
+            </ElButton>
           </template>
         </ArtTableHeader>
 
@@ -42,7 +44,7 @@
         </ArtTable>
         <ElDialog
           v-model="dialogVisible"
-          :title="dialogType === 'add' ? '添加用户' : '编辑用户'"
+          :title="dialogType === 'add' ? $t('user.account.addTitle') : $t('user.account.editTitle')"
           width="30%"
           destroy-on-close
         >
@@ -51,35 +53,34 @@
               <i class="iconfont-sys" v-html="'&#xe71d;'"></i>
             </div>
             <div class="info-content">
-              <p>注意：新增的用户默认密码是：123456</p>
+              <p>{{ $t('user.account.defaultPassword') }}</p>
             </div>
           </div>
           <div v-loading="formLoading">
             <el-form ref="formRef" :model="formData" :rules="rules" label-width="80px">
-              <el-form-item label="用户名" prop="nickName">
+              <el-form-item :label="$t('user.account.userName')" prop="nickName">
                 <el-input v-model="formData.nickName" />
               </el-form-item>
-              <el-form-item label="登录账号" prop="loginName">
+              <el-form-item :label="$t('user.account.loginName')" prop="loginName">
                 <el-input v-model="formData.loginName" :disabled="dialogType === 'edit'" />
                 <div v-if="dialogType === 'add'" class="form-tip">
-                  登录名规则:
-                  必须以英文字母开头，只能包含字母、数字、下划线，最小3个字符，最大10个字符
+                  {{ $t('user.account.loginNameRule') }}
                 </div>
               </el-form-item>
-              <el-form-item label="手机号" prop="tel">
+              <el-form-item :label="$t('user.account.phone')" prop="tel">
                 <el-input v-model="formData.tel" />
               </el-form-item>
-              <el-form-item label="邮箱" prop="email">
+              <el-form-item :label="$t('user.account.email')" prop="email">
                 <el-input v-model="formData.email" />
               </el-form-item>
-              <el-form-item label="角色" prop="roles">
+              <el-form-item :label="$t('user.account.role')" prop="roles">
                 <el-checkbox-group v-model="formData.roleIds">
                   <el-checkbox v-for="role in roleOptions" :key="role.id" :value="role.id">
                     {{ role.name }}
                   </el-checkbox>
                 </el-checkbox-group>
               </el-form-item>
-              <el-form-item label="备注" prop="remarks">
+              <el-form-item :label="$t('user.account.remarks')" prop="remarks">
                 <el-input v-model="formData.remarks" type="textarea" :rows="3" />
               </el-form-item>
             </el-form>
@@ -87,16 +88,22 @@
           <template #footer>
             <div class="dialog-footer">
               <el-button
-                :title="dialogType === 'add' ? '取消添加用户' : '取消编辑用户'"
+                :title="
+                  dialogType === 'add'
+                    ? $t('user.account.cancelAdd')
+                    : $t('user.account.cancelEdit')
+                "
                 @click="dialogVisible = false"
-                >取消</el-button
+                >{{ $t('user.account.cancel') }}</el-button
               >
               <el-button
-                :title="dialogType === 'add' ? '保存添加用户' : '保存编辑用户'"
+                :title="
+                  dialogType === 'add' ? $t('user.account.saveAdd') : $t('user.account.saveEdit')
+                "
                 type="primary"
                 @click="handleSubmit"
                 :loading="submitLoading"
-                >提交</el-button
+                >{{ $t('user.account.submit') }}</el-button
               >
             </div>
           </template>
@@ -121,7 +128,9 @@
   import { SearchChangeParams, SearchFormItem } from '@/types/search-form'
   import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
   import { useCheckedColumns } from '@/composables/useCheckedColumns'
+  import { useI18n } from 'vue-i18n'
 
+  const { t } = useI18n()
   const router = useRouter()
 
   const dialogType = ref('add')
@@ -150,41 +159,41 @@
   // 表单配置项
   const formItems: SearchFormItem[] = [
     {
-      label: '登录账号',
+      label: t('user.account.formItems.loginName'),
       prop: 'loginName',
       type: 'input',
       config: {
-        placeholder: '请输入登录账号',
+        placeholder: t('user.account.formItems.loginNamePlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
     },
     {
-      label: '手机号',
+      label: t('user.account.formItems.phone'),
       prop: 'tel',
       type: 'input',
       config: {
-        placeholder: '请输入电话号码',
+        placeholder: t('user.account.formItems.phonePlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
     },
     {
-      label: '邮箱',
+      label: t('user.account.formItems.email'),
       prop: 'email',
       type: 'input',
       config: {
-        placeholder: '请输入邮箱',
+        placeholder: t('user.account.formItems.emailPlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
     },
     {
-      label: '位置',
+      label: t('user.account.formItems.location'),
       prop: 'location',
       type: 'input',
       config: {
-        placeholder: '请输入位置',
+        placeholder: t('user.account.formItems.locationPlaceholder'),
         clearable: true
       },
       onChange: handleFormChange
@@ -228,15 +237,15 @@
 
   // 列配置
   const columnOptions = [
-    { label: '勾选', type: 'selection' },
-    { label: '用户名', prop: 'nickName' },
-    { label: '手机号', prop: 'tel' },
-    { label: '登录账号', prop: 'loginName' },
-    { label: '角色', prop: 'roles' },
-    { label: '状态', prop: 'status' },
-    { label: '位置', prop: 'location' },
-    { label: '更新日期', prop: 'updateDate' },
-    { label: '操作', prop: 'operation' }
+    { label: t('user.account.table.selection'), type: 'selection' },
+    { label: t('user.account.table.userName'), prop: 'nickName' },
+    { label: t('user.account.table.phone'), prop: 'tel' },
+    { label: t('user.account.table.loginName'), prop: 'loginName' },
+    { label: t('user.account.table.role'), prop: 'roles' },
+    { label: t('user.account.table.status'), prop: 'status' },
+    { label: t('user.account.table.location'), prop: 'location' },
+    { label: t('user.account.table.updateDate'), prop: 'updateDate' },
+    { label: t('user.account.table.operation'), prop: 'operation' }
   ]
 
   // 1: 在线 2: 离线 3: 正常 4: 锁定 5: 注销
@@ -263,19 +272,19 @@
   const buildTagText = (status: number) => {
     switch (status) {
       case 1:
-        return '在线'
+        return t('user.account.status.online')
       case 2:
-        return '离线'
+        return t('user.account.status.offline')
       case 3:
-        return '正常'
+        return t('user.account.status.normal')
       case 4:
-        return '设备锁定'
+        return t('user.account.status.deviceLocked')
       case 5:
-        return '账号锁定'
+        return t('user.account.status.accountLocked')
       case 6:
-        return '注销'
+        return t('user.account.status.cancelled')
       default:
-        return '未知'
+        return t('user.account.status.unknown')
     }
   }
 
@@ -286,7 +295,7 @@
     // { type: 'index', label: '序号', width: 80 }, // 序号列
     {
       prop: 'icon',
-      label: '用户名',
+      label: t('user.account.table.userName'),
       formatter: (row: any) => {
         return h('div', { class: 'user', style: 'display: flex; align-items: center' }, [
           h('img', { class: 'avatar', src: formatAvatar(row.icon, row.id) }),
@@ -297,11 +306,11 @@
         ])
       }
     },
-    { prop: 'tel', label: '手机号' },
-    { prop: 'loginName', label: '登录账号' },
+    { prop: 'tel', label: t('user.account.table.phone') },
+    { prop: 'loginName', label: t('user.account.table.loginName') },
     {
       prop: 'roles',
-      label: '角色',
+      label: t('user.account.table.role'),
       formatter: (row: any) => {
         if (!row.roles || row.roles.length === 0) {
           return h('span', '-')
@@ -328,15 +337,15 @@
     },
     {
       prop: 'status',
-      label: '状态',
+      label: t('user.account.table.status'),
       formatter: (row) => {
         return h(ElTag, { type: getTagType(row.status) }, () => buildTagText(row.status))
       }
     },
-    { prop: 'location', label: '位置' },
+    { prop: 'location', label: t('user.account.table.location') },
     {
       prop: 'updateDate',
-      label: '更新日期',
+      label: t('user.account.table.updateDate'),
       sortable: true,
       formatter: (row: any) => {
         return formatDate(row.updateDate)
@@ -344,26 +353,26 @@
     },
     {
       prop: 'operation',
-      label: '操作',
+      label: t('user.account.table.operation'),
       width: 180,
       // fixed: 'right', // 固定在右侧
       // disabled: true,
       formatter: (row: any) => {
         return h('div', [
           h(ArtButtonTable, {
-            title: '编辑用户信息',
+            title: t('user.account.operation.edit'),
             type: 'edit',
             auth: 'user_edit',
             onClick: () => showDialog('edit', row)
           }),
           h(ArtButtonTable, {
-            title: '删除用户',
+            title: t('user.account.operation.delete'),
             type: 'delete',
             auth: 'user_delete',
             onClick: () => deleteUser(row.id)
           }),
           h(ArtButtonTable, {
-            title: '给用户分配额外权限',
+            title: t('user.account.operation.assign'),
             type: 'more',
             auth: 'user_assign',
             onClick: () => navigateToPermissionPage(row)
@@ -380,11 +389,11 @@
       if (response.code === ApiStatus.success) {
         roleOptions.value = response.data
       } else {
-        ElMessage.error(response.message || '获取角色列表失败')
+        ElMessage.error(response.message || t('user.account.dialog.operationFailed'))
       }
     } catch (error) {
       console.error('获取角色列表失败:', error)
-      ElMessage.error('获取角色列表时发生错误')
+      ElMessage.error(t('user.account.dialog.operationFailed'))
     }
   }
 
@@ -413,11 +422,11 @@
         pagination.size = response.data.size
         pagination.pages = response.data.pages
       } else {
-        ElMessage.error(response.message || '获取用户列表失败')
+        ElMessage.error(response.message || t('user.account.dialog.operationFailed'))
       }
     } catch (error) {
       console.error('获取用户列表失败:', error)
-      ElMessage.error('获取用户列表时发生错误')
+      ElMessage.error(t('user.account.dialog.operationFailed'))
     } finally {
       loading.value = false
     }
@@ -456,11 +465,11 @@
           formData.roleIds = []
         }
       } else {
-        ElMessage.error(response.message || '获取用户详情失败')
+        ElMessage.error(response.message || t('user.account.dialog.operationFailed'))
       }
     } catch (error) {
       console.error('获取用户详情失败:', error)
-      ElMessage.error('获取用户详情时发生错误')
+      ElMessage.error(t('user.account.dialog.operationFailed'))
     } finally {
       formLoading.value = false
     }
@@ -468,9 +477,14 @@
 
   // 处理头像URL
   const formatAvatar = (icon: string, userId: number) => {
-    if (!icon || icon === '' || !icon.startsWith('http')) {
+    if (!icon) {
       return `https://api.dicebear.com/9.x/adventurer/svg?seed=${userId}`
     }
+
+    if (icon.startsWith('upload')) {
+      return `${import.meta.env.VITE_API_URL}/` + icon
+    }
+
     return icon
   }
 
@@ -503,28 +517,32 @@
   }
 
   const deleteUser = (userId: number) => {
-    ElMessageBox.confirm('确定要注销该用户吗？', '注销用户', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    })
+    ElMessageBox.confirm(
+      t('user.account.dialog.confirmDelete'),
+      t('user.account.dialog.confirmDeleteTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'error'
+      }
+    )
       .then(async () => {
         try {
           const response = await UserService.deleteUser(userId)
           if (response.success) {
-            ElMessage.success('注销成功')
+            ElMessage.success(t('user.account.dialog.deleteSuccess'))
             loadUserData() // 重新加载数据
           } else {
-            ElMessage.error(response.message || '注销失败')
+            ElMessage.error(response.message || t('user.account.dialog.deleteFailed'))
           }
         } catch (error) {
           console.error('注销用户失败:', error)
-          ElMessage.error('注销用户失败，请重试')
+          ElMessage.error(t('user.account.dialog.deleteError'))
         }
       })
       .catch(() => {
         // 用户取消操作，无需提示或处理，捕获 rejection 防止控制台报错
-        ElMessage.info('取消注销用户操作') // 可以选择性地添加提示
+        ElMessage.info(t('user.account.dialog.cancelDelete')) // 可以选择性地添加提示
       })
   }
 
@@ -548,20 +566,22 @@
 
   const rules = reactive<FormRules>({
     nickName: [
-      { required: true, message: '请输入用户名', trigger: 'blur' },
-      { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+      { required: true, message: t('user.account.rules.nickName.required'), trigger: 'blur' },
+      { min: 2, max: 20, message: t('user.account.rules.nickName.length'), trigger: 'blur' }
     ],
     loginName: [
-      { required: true, message: '请输入登录账号', trigger: 'blur' },
-      { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' },
+      { required: true, message: t('user.account.rules.loginName.required'), trigger: 'blur' },
+      { min: 3, max: 10, message: t('user.account.rules.loginName.length'), trigger: 'blur' },
       {
         pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
-        message: '必须以英文字母开头，只能包含字母、数字、下划线',
+        message: t('user.account.rules.loginName.pattern'),
         trigger: 'blur'
       }
     ],
-    tel: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }],
-    email: [{ type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }]
+    tel: [
+      { pattern: /^1[3-9]\d{9}$/, message: t('user.account.rules.tel.pattern'), trigger: 'blur' }
+    ],
+    email: [{ type: 'email', message: t('user.account.rules.email.pattern'), trigger: 'blur' }]
   })
 
   const formRef = ref<FormInstance>()
@@ -603,15 +623,19 @@
           }
 
           if (response.code === ApiStatus.success) {
-            ElMessage.success(dialogType.value === 'add' ? '添加成功' : '更新成功')
+            ElMessage.success(
+              dialogType.value === 'add'
+                ? t('user.account.dialog.addSuccess')
+                : t('user.account.dialog.editSuccess')
+            )
             dialogVisible.value = false
             loadUserData() // 操作完成后重新加载数据
           } else {
-            ElMessage.error(response.message || '操作失败')
+            ElMessage.error(response.message || t('user.account.dialog.operationFailed'))
           }
         } catch (error) {
           console.error('保存用户信息失败:', error)
-          ElMessage.error('保存用户信息时发生错误')
+          ElMessage.error(t('user.account.dialog.saveError'))
         } finally {
           submitLoading.value = false
         }

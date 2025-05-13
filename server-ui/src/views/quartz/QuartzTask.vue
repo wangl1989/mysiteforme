@@ -17,40 +17,44 @@
           @refresh="loadTaskList"
         >
           <template #left>
-            <ElButton title="新增定时任务" @click="handleAdd" v-auth="'quartzjob_add'" v-ripple
-              >新增任务</ElButton
+            <ElButton
+              title="{{ $t('quartzTask.button.add') }}"
+              @click="handleAdd"
+              v-auth="'quartzjob_add'"
+              v-ripple
+              >{{ $t('quartzTask.button.add') }}</ElButton
             >
             <ElButton
-              title="批量删除定时任务"
+              title="{{ $t('quartzTask.button.batchDelete') }}"
               type="danger"
               @click="handleBatchDelete"
               v-auth="'quartzjob_delete'"
               v-ripple
-              >批量删除</ElButton
+              >{{ $t('quartzTask.button.batchDelete') }}</ElButton
             >
             <ElButton
-              title="批量暂停定时任务"
+              title="{{ $t('quartzTask.button.batchPause') }}"
               type="warning"
               @click="handleBatchPause"
               v-auth="'quartzjob_pause'"
               v-ripple
-              >批量暂停</ElButton
+              >{{ $t('quartzTask.button.batchPause') }}</ElButton
             >
             <ElButton
-              title="批量恢复定时任务"
+              title="{{ $t('quartzTask.button.batchResume') }}"
               type="success"
               @click="handleBatchResume"
               v-auth="'quartzjob_resume'"
               v-ripple
-              >批量恢复</ElButton
+              >{{ $t('quartzTask.button.batchResume') }}</ElButton
             >
             <ElButton
-              title="立即执行定时任务"
+              title="{{ $t('quartzTask.button.batchRun') }}"
               type="info"
               @click="handleBatchRun"
               v-auth="'quartzjob_run'"
               v-ripple
-              >立即执行</ElButton
+              >{{ $t('quartzTask.button.batchRun') }}</ElButton
             >
           </template>
         </ArtTableHeader>
@@ -77,7 +81,11 @@
       <!-- 添加/编辑对话框 -->
       <ElDialog
         v-model="dialogVisible"
-        :title="dialogType === 'add' ? '新增定时任务' : '编辑定时任务'"
+        :title="
+          dialogType === 'add'
+            ? $t('quartzTask.dialog.addTitle')
+            : $t('quartzTask.dialog.editTitle')
+        "
         width="600px"
         :close-on-click-modal="false"
         :destroy-on-close="true"
@@ -89,51 +97,71 @@
           label-width="100px"
           label-position="right"
         >
-          <ElFormItem label="任务组名" prop="groupName">
-            <ElInput v-model="formData.groupName" placeholder="请输入任务组名" />
+          <ElFormItem :label="$t('quartzTask.form.groupName')" prop="groupName">
+            <ElInput
+              v-model="formData.groupName"
+              :placeholder="$t('quartzTask.form.groupNamePlaceholder')"
+            />
           </ElFormItem>
-          <ElFormItem label="任务名称" prop="name">
-            <ElInput v-model="formData.name" placeholder="请输入任务名称" />
+          <ElFormItem :label="$t('quartzTask.form.name')" prop="name">
+            <ElInput v-model="formData.name" :placeholder="$t('quartzTask.form.namePlaceholder')" />
           </ElFormItem>
-          <ElFormItem label="Cron表达式" prop="cron">
-            <ElInput v-model="formData.cron" placeholder="请输入Cron表达式" />
+          <ElFormItem :label="$t('quartzTask.form.cron')" prop="cron">
+            <ElInput v-model="formData.cron" :placeholder="$t('quartzTask.form.cronPlaceholder')" />
           </ElFormItem>
-          <ElFormItem label="目标Bean" prop="targetBean">
-            <ElInput v-model="formData.targetBean" placeholder="请输入目标Bean名称" />
+          <ElFormItem :label="$t('quartzTask.form.targetBean')" prop="targetBean">
+            <ElInput
+              v-model="formData.targetBean"
+              :placeholder="$t('quartzTask.form.targetBeanPlaceholder')"
+            />
           </ElFormItem>
-          <ElFormItem label="目标方法" prop="trgetMethod">
-            <ElInput v-model="formData.trgetMethod" placeholder="请输入目标方法名称" />
+          <ElFormItem :label="$t('quartzTask.form.targetMethod')" prop="trgetMethod">
+            <ElInput
+              v-model="formData.trgetMethod"
+              :placeholder="$t('quartzTask.form.targetMethodPlaceholder')"
+            />
           </ElFormItem>
-          <ElFormItem label="执行参数" prop="params">
-            <ElInput v-model="formData.params" placeholder="请输入执行参数" />
+          <ElFormItem :label="$t('quartzTask.form.params')" prop="params">
+            <ElInput
+              v-model="formData.params"
+              :placeholder="$t('quartzTask.form.paramsPlaceholder')"
+            />
           </ElFormItem>
-          <ElFormItem label="任务状态" prop="status">
+          <ElFormItem :label="$t('quartzTask.form.status')" prop="status">
             <ElRadioGroup v-model="formData.status">
-              <ElRadio :value="0">正常</ElRadio>
-              <ElRadio :value="1">暂停</ElRadio>
+              <ElRadio :value="0">{{ $t('quartzTask.status.normal') }}</ElRadio>
+              <ElRadio :value="1">{{ $t('quartzTask.status.pause') }}</ElRadio>
             </ElRadioGroup>
           </ElFormItem>
-          <ElFormItem label="备注" prop="remarks">
+          <ElFormItem :label="$t('quartzTask.form.remarks')" prop="remarks">
             <ElInput
               v-model="formData.remarks"
               type="textarea"
               :rows="3"
-              placeholder="请输入备注信息"
+              :placeholder="$t('quartzTask.form.remarksPlaceholder')"
             />
           </ElFormItem>
         </ElForm>
         <template #footer>
           <ElButton
-            :title="dialogType === 'add' ? '取消新增定时任务' : '取消编辑定时任务'"
+            :title="
+              dialogType === 'add'
+                ? $t('quartzTask.dialog.cancelAdd')
+                : $t('quartzTask.dialog.cancelEdit')
+            "
             @click="dialogVisible = false"
-            >取消</ElButton
+            >{{ $t('common.cancel') }}</ElButton
           >
           <ElButton
-            :title="dialogType === 'add' ? '保存新增定时任务' : '保存编辑定时任务'"
+            :title="
+              dialogType === 'add'
+                ? $t('quartzTask.dialog.submitAdd')
+                : $t('quartzTask.dialog.submitEdit')
+            "
             type="primary"
             @click="submitForm"
             :loading="submitLoading"
-            >确定</ElButton
+            >{{ $t('common.confirm') }}</ElButton
           >
         </template>
       </ElDialog>
@@ -155,6 +183,9 @@
   import { useCheckedColumns, type ColumnOption } from '@/composables/useCheckedColumns'
   import ArtButtonTable from '@/components/core/forms/ArtButtonTable.vue'
   import type { SearchFormItem } from '@/types/search-form'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 加载状态
   const loading = ref(false)
@@ -203,37 +234,41 @@
   // 表单验证规则
   const formRules = reactive<FormRules>({
     name: [
-      { required: true, message: '请输入任务名称', trigger: 'blur' },
-      { max: 100, message: '长度不能超过100个字符', trigger: 'blur' }
+      { required: true, message: t('quartzTask.rules.name.required'), trigger: 'blur' },
+      { max: 100, message: t('quartzTask.rules.name.length'), trigger: 'blur' }
     ],
-    cron: [{ required: true, message: '请输入Cron表达式', trigger: 'blur' }],
-    targetBean: [{ required: true, message: '请输入目标Bean', trigger: 'blur' }],
-    trgetMethod: [{ required: true, message: '请输入目标方法', trigger: 'blur' }],
-    status: [{ required: true, message: '请选择任务状态', trigger: 'change' }]
+    cron: [{ required: true, message: t('quartzTask.rules.cron.required'), trigger: 'blur' }],
+    targetBean: [
+      { required: true, message: t('quartzTask.rules.targetBean.required'), trigger: 'blur' }
+    ],
+    trgetMethod: [
+      { required: true, message: t('quartzTask.rules.targetMethod.required'), trigger: 'blur' }
+    ],
+    status: [{ required: true, message: t('quartzTask.rules.status.required'), trigger: 'change' }]
   })
 
   // 搜索表单配置
   const formItems: SearchFormItem[] = [
     {
-      label: '任务名称',
+      label: t('quartzTask.form.name'),
       prop: 'name',
       type: 'input',
       elColSpan: 5,
       config: {
-        placeholder: '请输入任务名称搜索',
+        placeholder: t('quartzTask.search.namePlaceholder'),
         clearable: true
       }
     },
     {
-      label: '任务状态',
+      label: t('quartzTask.form.status'),
       prop: 'status',
       type: 'select',
       options: () => [
-        { label: '正常', value: 0 },
-        { label: '暂停', value: 1 }
+        { label: t('quartzTask.status.normal'), value: 0 },
+        { label: t('quartzTask.status.pause'), value: 1 }
       ],
       config: {
-        placeholder: '请选择状态',
+        placeholder: t('quartzTask.search.statusPlaceholder'),
         clearable: true
       }
     }
@@ -241,15 +276,16 @@
 
   // 表格列配置
   const columnOptions: ColumnOption[] = [
-    { prop: 'groupName', label: '任务组名', minWidth: 150 },
-    { prop: 'name', label: '任务名称', minWidth: 150 },
-    { prop: 'cron', label: 'Cron表达式', minWidth: 150 },
-    { prop: 'targetBean', label: '目标Bean', minWidth: 180 },
-    { prop: 'trgetMethod', label: '目标方法', minWidth: 120 },
-    { prop: 'params', label: '参数', minWidth: 120 },
+    { type: 'selection' },
+    { prop: 'groupName', label: t('quartzTask.table.groupName'), minWidth: 150 },
+    { prop: 'name', label: t('quartzTask.table.name'), minWidth: 150 },
+    { prop: 'cron', label: t('quartzTask.table.cron'), minWidth: 150 },
+    { prop: 'targetBean', label: t('quartzTask.table.targetBean'), minWidth: 180 },
+    { prop: 'trgetMethod', label: t('quartzTask.table.targetMethod'), minWidth: 120 },
+    { prop: 'params', label: t('quartzTask.table.params'), minWidth: 120 },
     {
       prop: 'status',
-      label: '状态',
+      label: t('quartzTask.table.status'),
       width: 100,
       formatter: (row) => {
         return h(
@@ -258,45 +294,45 @@
             type: row.status === 0 ? 'success' : 'warning',
             size: 'small'
           },
-          () => (row.status === 0 ? '正常' : '暂停')
+          () => (row.status === 0 ? t('quartzTask.status.normal') : t('quartzTask.status.pause'))
         )
       }
     },
-    { prop: 'updateDate', label: '更新时间', minWidth: 180, sortable: true },
+    { prop: 'updateDate', label: t('quartzTask.table.updateDate'), minWidth: 180, sortable: true },
     {
       prop: 'actions',
-      label: '操作',
+      label: t('quartzTask.table.operation'),
       fixed: 'right',
       width: 320,
       formatter: (row) => {
         return h(ElSpace, { size: 'small' }, () => [
           h(ArtButtonTable, {
-            title: '编辑定时任务',
+            title: t('quartzTask.operation.edit'),
             type: 'edit',
             auth: 'quartzjob_edit',
             onClick: () => handleEdit(row)
           }),
           h(ArtButtonTable, {
-            title: '删除定时任务',
+            title: t('quartzTask.operation.delete'),
             type: 'delete',
             auth: 'quartzjob_delete',
             onClick: () => handleDelete(row)
           }),
           row.status === 0
             ? h(ArtButtonTable, {
-                title: '暂停定时任务',
+                title: t('quartzTask.operation.pause'),
                 type: 'warning',
                 auth: 'quartzjob_pause',
                 onClick: () => handlePause(row)
               })
             : h(ArtButtonTable, {
-                title: '恢复定时任务',
+                title: t('quartzTask.operation.resume'),
                 type: 'success',
                 auth: 'quartzjob_resume',
                 onClick: () => handleResume(row)
               }),
           h(ArtButtonTable, {
-            title: '立即执行任务',
+            title: t('quartzTask.operation.run'),
             type: 'info',
             auth: 'quartzjob_run',
             onClick: () => handleRun(row)
@@ -318,11 +354,11 @@
         taskList.value = res.data.records
         pagination.total = res.data.total
       } else {
-        ElMessage.error(res.message || '获取定时任务列表失败')
+        ElMessage.error(res.message || t('quartzTask.message.getListFailed'))
       }
     } catch (error) {
-      console.error('获取定时任务列表失败:', error)
-      ElMessage.error('获取定时任务列表时发生错误')
+      console.error(t('quartzTask.message.getListError'), error)
+      ElMessage.error(t('quartzTask.message.getListError'))
     } finally {
       loading.value = false
     }
@@ -431,15 +467,33 @@
           }
 
           if (res.success) {
-            ElMessage.success(dialogType.value === 'add' ? '添加成功' : '编辑成功')
+            ElMessage.success(
+              dialogType.value === 'add'
+                ? t('quartzTask.message.addSuccess')
+                : t('quartzTask.message.editSuccess')
+            )
             dialogVisible.value = false
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || (dialogType.value === 'add' ? '添加失败' : '编辑失败'))
+            ElMessage.error(
+              res.message ||
+                (dialogType.value === 'add'
+                  ? t('quartzTask.message.addFailed')
+                  : t('quartzTask.message.editFailed'))
+            )
           }
         } catch (error) {
-          console.error(dialogType.value === 'add' ? '添加任务失败:' : '编辑任务失败:', error)
-          ElMessage.error(dialogType.value === 'add' ? '添加任务时发生错误' : '编辑任务时发生错误')
+          console.error(
+            dialogType.value === 'add'
+              ? t('quartzTask.message.addError')
+              : t('quartzTask.message.editError'),
+            error
+          )
+          ElMessage.error(
+            dialogType.value === 'add'
+              ? t('quartzTask.message.addError')
+              : t('quartzTask.message.editError')
+          )
         } finally {
           submitLoading.value = false
         }
@@ -449,23 +503,27 @@
 
   // 处理单个删除
   const handleDelete = (row: QuartzTaskRecordModel) => {
-    ElMessageBox.confirm(`确定要删除任务 "${row.name}" 吗？此操作不可恢复！`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTask.dialog.confirmDelete', { name: row.name }),
+      t('quartzTask.dialog.confirmDeleteTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await QuartzTaskService.deleteQuartzTask([row.id])
           if (res.success) {
-            ElMessage.success('删除成功')
+            ElMessage.success(t('quartzTask.message.deleteSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '删除失败')
+            ElMessage.error(res.message || t('quartzTask.message.deleteFailed'))
           }
         } catch (error) {
-          console.error('删除任务失败:', error)
-          ElMessage.error('删除任务时发生错误')
+          console.error(t('quartzTask.message.deleteError'), error)
+          ElMessage.error(t('quartzTask.message.deleteError'))
         }
       })
       .catch(() => {
@@ -476,28 +534,32 @@
   // 处理批量删除
   const handleBatchDelete = () => {
     if (selectedTasks.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('quartzTask.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要删除选中的任务吗？此操作不可恢复！', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTask.dialog.confirmBatchDelete'),
+      t('quartzTask.dialog.confirmDeleteTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const taskIds = selectedTasks.value.map((task) => task.id)
           const res = await QuartzTaskService.deleteQuartzTask(taskIds)
           if (res.success) {
-            ElMessage.success('批量删除成功')
+            ElMessage.success(t('quartzTask.message.batchDeleteSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '批量删除失败')
+            ElMessage.error(res.message || t('quartzTask.message.batchDeleteFailed'))
           }
         } catch (error) {
-          console.error('批量删除任务失败:', error)
-          ElMessage.error('批量删除任务时发生错误')
+          console.error(t('quartzTask.message.batchDeleteError'), error)
+          ElMessage.error(t('quartzTask.message.batchDeleteError'))
         }
       })
       .catch(() => {
@@ -507,23 +569,27 @@
 
   // 暂停单个任务
   const handlePause = (row: QuartzTaskRecordModel) => {
-    ElMessageBox.confirm(`确定要暂停任务 "${row.name}" 吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTask.dialog.confirmPause', { name: row.name }),
+      t('common.tips'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await QuartzTaskService.paushQuartzTask([row.id])
           if (res.success) {
-            ElMessage.success('暂停成功')
+            ElMessage.success(t('quartzTask.message.pauseSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '暂停失败')
+            ElMessage.error(res.message || t('quartzTask.message.pauseFailed'))
           }
         } catch (error) {
-          console.error('暂停任务失败:', error)
-          ElMessage.error('暂停任务时发生错误')
+          console.error(t('quartzTask.message.pauseError'), error)
+          ElMessage.error(t('quartzTask.message.pauseError'))
         }
       })
       .catch(() => {
@@ -534,13 +600,13 @@
   // 批量暂停任务
   const handleBatchPause = () => {
     if (selectedTasks.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('quartzTask.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要暂停选中的任务吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('quartzTask.dialog.confirmBatchPause'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -548,14 +614,14 @@
           const taskIds = selectedTasks.value.map((task) => task.id)
           const res = await QuartzTaskService.paushQuartzTask(taskIds)
           if (res.success) {
-            ElMessage.success('批量暂停成功')
+            ElMessage.success(t('quartzTask.message.batchPauseSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '批量暂停失败')
+            ElMessage.error(res.message || t('quartzTask.message.batchPauseFailed'))
           }
         } catch (error) {
-          console.error('批量暂停任务失败:', error)
-          ElMessage.error('批量暂停任务时发生错误')
+          console.error(t('quartzTask.message.batchPauseError'), error)
+          ElMessage.error(t('quartzTask.message.batchPauseError'))
         }
       })
       .catch(() => {
@@ -565,41 +631,45 @@
 
   // 恢复单个任务
   const handleResume = (row: QuartzTaskRecordModel) => {
-    ElMessageBox.confirm(`确定要恢复任务 "${row.name}" 吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('quartzTask.dialog.confirmResume', { name: row.name }),
+      t('common.tips'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
       .then(async () => {
         try {
           const res = await QuartzTaskService.resumeQuartzTask([row.id])
           if (res.success) {
-            ElMessage.success('恢复成功')
+            ElMessage.success(t('quartzTask.message.resumeSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '恢复失败')
+            ElMessage.error(res.message || t('quartzTask.message.resumeFailed'))
           }
         } catch (error) {
-          console.error('恢复任务失败:', error)
-          ElMessage.error('恢复任务时发生错误')
+          console.error(t('quartzTask.message.resumeError'), error)
+          ElMessage.error(t('quartzTask.message.resumeError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消恢复任务')
+        ElMessage.info(t('quartzTask.message.cancelResume'))
       })
   }
 
   // 批量恢复任务
   const handleBatchResume = () => {
     if (selectedTasks.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('quartzTask.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要恢复选中的任务吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('quartzTask.dialog.confirmBatchResume'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -607,58 +677,58 @@
           const taskIds = selectedTasks.value.map((task) => task.id)
           const res = await QuartzTaskService.resumeQuartzTask(taskIds)
           if (res.success) {
-            ElMessage.success('批量恢复成功')
+            ElMessage.success(t('quartzTask.message.batchResumeSuccess'))
             loadTaskList() // 重新加载数据
           } else {
-            ElMessage.error(res.message || '批量恢复失败')
+            ElMessage.error(res.message || t('quartzTask.message.batchResumeFailed'))
           }
         } catch (error) {
-          console.error('批量恢复任务失败:', error)
-          ElMessage.error('批量恢复任务时发生错误')
+          console.error(t('quartzTask.message.batchResumeError'), error)
+          ElMessage.error(t('quartzTask.message.batchResumeError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消批量恢复任务')
+        ElMessage.info(t('quartzTask.message.cancelBatchResume'))
       })
   }
 
   // 执行单个任务
   const handleRun = (row: QuartzTaskRecordModel) => {
-    ElMessageBox.confirm(`确定要立即执行任务 "${row.name}" 吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('quartzTask.dialog.confirmRun', { name: row.name }), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
         try {
           const res = await QuartzTaskService.runQuartzTask([row.id])
           if (res.success) {
-            ElMessage.success('执行成功')
+            ElMessage.success(t('quartzTask.message.runSuccess'))
           } else {
-            ElMessage.error(res.message || '执行失败')
+            ElMessage.error(res.message || t('quartzTask.message.runFailed'))
           }
         } catch (error) {
-          console.error('执行任务失败:', error)
-          ElMessage.error('执行任务时发生错误')
+          console.error(t('quartzTask.message.runError'), error)
+          ElMessage.error(t('quartzTask.message.runError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消执行任务')
+        ElMessage.info(t('quartzTask.message.cancelRun'))
       })
   }
 
   // 批量执行任务
   const handleBatchRun = () => {
     if (selectedTasks.value.length === 0) {
-      ElMessage.warning('请至少选择一条记录')
+      ElMessage.warning(t('quartzTask.message.selectAtLeastOne'))
       return
     }
 
-    ElMessageBox.confirm('确定要立即执行选中的任务吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('quartzTask.dialog.confirmBatchRun'), t('common.tips'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
       .then(async () => {
@@ -666,18 +736,18 @@
           const taskIds = selectedTasks.value.map((task) => task.id)
           const res = await QuartzTaskService.runQuartzTask(taskIds)
           if (res.success) {
-            ElMessage.success('批量执行成功')
+            ElMessage.success(t('quartzTask.message.batchRunSuccess'))
           } else {
-            ElMessage.error(res.message || '批量执行失败')
+            ElMessage.error(res.message || t('quartzTask.message.batchRunFailed'))
           }
         } catch (error) {
-          console.error('批量执行任务失败:', error)
-          ElMessage.error('批量执行任务时发生错误')
+          console.error(t('quartzTask.message.batchRunError'), error)
+          ElMessage.error(t('quartzTask.message.batchRunError'))
         }
       })
       .catch(() => {
         // 用户取消操作
-        ElMessage.info('用户取消立即执行选中的任务')
+        ElMessage.info(t('quartzTask.message.cancelBatchRun'))
       })
   }
 

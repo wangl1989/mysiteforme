@@ -1,6 +1,7 @@
-package com.mysiteforme.admin.aspect;
+package com.mysiteforme.admin.annotation;
 
 import com.mysiteforme.admin.util.LimitType;
+import com.mysiteforme.admin.util.MessageConstants;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,20 +9,38 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
 
-    String keyPrefix() default "rate_limit:"; // Redis Key前缀
+    /**
+     * Redis Key前缀
+     */
+    String keyPrefix() default "rate_limit:";
 
-    int limit() default 100; // 时间窗口内最大请求数
+    /**
+     * 时间窗口内最大请求数
+     */
+    int limit() default 100;
 
-    int period(); // 时间窗口长度
+    /**
+     * 时间窗口长度(每1分钟的限制多少请求，这个1分钟就是period)
+     */
+    int period();
 
-    TimeUnit timeUnit() default TimeUnit.SECONDS; // 时间单位
+    /**
+     * 时间单位
+     */
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
 
-    LimitType limitType() default LimitType.IP; // 限流类型：IP, USER, API等
+    /**
+     * 限流类型：IP, USER, API等
+     */
+    LimitType limitType() default LimitType.IP;
 
-    String message() default "请求过于频繁，请稍后再试"; // 超限提示信息
+    /**
+     * 超限提示信息
+     */
+    String message() default MessageConstants.Api.API_LIMIT_EXCEPTION;
 }
 

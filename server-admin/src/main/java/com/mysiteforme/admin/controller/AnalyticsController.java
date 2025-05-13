@@ -1,9 +1,11 @@
 package com.mysiteforme.admin.controller;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.VisitLogs;
 import com.mysiteforme.admin.entity.request.AddClickEventsRequest;
 import com.mysiteforme.admin.entity.request.AddVisitLogsRequest;
 import com.mysiteforme.admin.service.VisitLogsService;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import jakarta.validation.Valid;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnalyticsController {
 
     private final VisitLogsService visitLogsService;
+    @RateLimit(period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
     @PostMapping("visitLogs")
     public Result visitLogs(@RequestBody @Valid AddVisitLogsRequest request){
         if(request == null){
@@ -34,6 +39,7 @@ public class AnalyticsController {
         return Result.success();
     }
 
+    @RateLimit(period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.IP)
     @PostMapping("batchEventLogs")
     public Result clickEvents(@RequestBody AddClickEventsRequest request){
         if(request == null){

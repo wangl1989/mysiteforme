@@ -7,29 +7,29 @@
           <el-card class="box-card">
             <template #header>
               <div class="card-header">
-                <span>菜单树</span>
+                <span>{{ $t('menu.menuPermission.title.menuTree') }}</span>
                 <div class="card-header-actions">
                   <!-- 用户权限保存按钮 -->
                   <span v-if="permissionType.toLowerCase() === 'user'">
                     <el-button
-                      title="分配用户额外权限"
+                      :title="$t('menu.menuPermission.button.saveUserPermission')"
                       type="primary"
                       size="small"
                       @click="savePermissions"
                     >
-                      保存用户权限
+                      {{ $t('menu.menuPermission.button.saveUserPermission') }}
                     </el-button>
                   </span>
 
                   <!-- 角色权限保存按钮 -->
                   <span v-if="permissionType.toLowerCase() === 'role' || !permissionType">
                     <el-button
-                      title="分配角色菜单和权限"
+                      :title="$t('menu.menuPermission.button.saveRolePermission')"
                       type="primary"
                       size="small"
                       @click="savePermissions"
                     >
-                      保存角色权限
+                      {{ $t('menu.menuPermission.button.saveRolePermission') }}
                     </el-button>
                   </span>
                 </div>
@@ -75,33 +75,35 @@
           <el-card class="box-card" v-loading="loading">
             <template #header>
               <div class="card-header">
-                <span>权限详情</span>
+                <span>{{ $t('menu.menuPermission.title.permissionDetail') }}</span>
                 <span v-if="selectedMenu" class="selected-node-info">
-                  当前选中菜单: {{ formatTitle(selectedMenu) }}
+                  {{ $t('menu.menuPermission.title.currentMenu') }}: {{ formatTitle(selectedMenu) }}
                 </span>
                 <span v-if="permissionType.toLowerCase() === 'user'" class="selected-node-info">
-                  (用户: {{ userName }})
+                  ({{ $t('menu.menuPermission.title.userPrefix') }}: {{ userName }})
                 </span>
                 <span
                   v-else-if="permissionType.toLowerCase() === 'role'"
                   class="selected-node-info"
                 >
-                  (角色: {{ roleName }})
+                  ({{ $t('menu.menuPermission.title.rolePrefix') }}: {{ roleName }})
                 </span>
               </div>
             </template>
 
             <div v-if="!selectedMenu" class="empty-state">
-              <el-empty description="请在左侧选择一个菜单以查看权限详情" />
+              <el-empty :description="$t('menu.menuPermission.empty.selectMenu')" />
             </div>
 
             <div v-else class="permission-details" ref="permissionDetailsRef">
               <!-- 顶部汇总区域 -->
               <div class="permission-summary" v-if="hasAnySelectedPermissions">
                 <div class="summary-header">
-                  <span class="summary-title">已选权限</span>
+                  <span class="summary-title">{{
+                    $t('menu.menuPermission.permission.selected')
+                  }}</span>
                   <el-button type="primary" text size="small" @click="clearAllSelectedPermissions">
-                    清空
+                    {{ $t('menu.menuPermission.button.clear') }}
                   </el-button>
                 </div>
                 <div
@@ -136,7 +138,11 @@
                         <div class="title-icon">
                           <el-icon><Connection /></el-icon>
                         </div>
-                        <div class="title-text">API权限 ({{ apiPermissions.length }})</div>
+                        <div class="title-text"
+                          >{{ $t('menu.menuPermission.permission.apiPermission') }} ({{
+                            apiPermissions.length
+                          }})</div
+                        >
                         <div class="selected-progress">
                           <el-progress
                             :percentage="
@@ -156,7 +162,10 @@
                     </div>
                   </template>
                   <div class="permission-list">
-                    <el-empty v-if="apiPermissions.length === 0" description="暂无API权限" />
+                    <el-empty
+                      v-if="apiPermissions.length === 0"
+                      :description="$t('menu.menuPermission.permission.noApiPermission')"
+                    />
                     <div
                       v-else
                       class="permission-scrollable-container"
@@ -206,7 +215,7 @@
                                 effect="plain"
                                 class="common-tag"
                               >
-                                公共API
+                                {{ $t('menu.menuPermission.permission.publicApi') }}
                               </el-tag>
                             </div>
                           </div>
@@ -224,7 +233,11 @@
                         <div class="title-icon">
                           <el-icon><Mouse /></el-icon>
                         </div>
-                        <div class="title-text">按钮权限 ({{ buttonPermissions.length }})</div>
+                        <div class="title-text"
+                          >{{ $t('menu.menuPermission.permission.buttonPermission') }} ({{
+                            buttonPermissions.length
+                          }})</div
+                        >
                         <div class="selected-progress">
                           <el-progress
                             :percentage="
@@ -245,7 +258,10 @@
                     </div>
                   </template>
                   <div class="permission-list">
-                    <el-empty v-if="buttonPermissions.length === 0" description="暂无按钮权限" />
+                    <el-empty
+                      v-if="buttonPermissions.length === 0"
+                      :description="$t('menu.menuPermission.permission.noButtonPermission')"
+                    />
                     <div
                       v-else
                       class="permission-scrollable-container"
@@ -301,7 +317,11 @@
                         <div class="title-icon">
                           <el-icon><Link /></el-icon>
                         </div>
-                        <div class="title-text">路由权限 ({{ pagePermissions.length }})</div>
+                        <div class="title-text"
+                          >{{ $t('menu.menuPermission.permission.routePermission') }} ({{
+                            pagePermissions.length
+                          }})</div
+                        >
                         <div class="selected-progress">
                           <el-progress
                             :percentage="
@@ -321,7 +341,10 @@
                     </div>
                   </template>
                   <div class="permission-list">
-                    <el-empty v-if="pagePermissions.length === 0" description="暂无路由权限" />
+                    <el-empty
+                      v-if="pagePermissions.length === 0"
+                      :description="$t('menu.menuPermission.permission.noRoutePermission')"
+                    />
                     <div
                       v-else
                       class="permission-scrollable-container"
@@ -387,6 +410,9 @@
   import { MenuListType } from '@/types/menu'
   import { menuService, MenuApiService } from '@/api/menuApi'
   import type { TagProps } from 'element-plus'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   // 定义自定义的权限项类型
   interface PermissionItem {
@@ -483,11 +509,11 @@
           menuListData.value = [processMenuDetail(response.data)]
         }
       } else {
-        ElMessage.error(response.message || '获取菜单数据失败')
+        ElMessage.error(response.message || t('menu.menuPermission.message.getMenuDataFailed'))
       }
     } catch (error) {
       console.error('获取菜单数据失败:', error)
-      ElMessage.error('获取菜单数据失败')
+      ElMessage.error(t('menu.menuPermission.message.getMenuDataFailed'))
     } finally {
       loading.value = false
     }
@@ -596,7 +622,7 @@
             })
           }
         } else {
-          ElMessage.warning('未提供用户ID，无法加载权限数据')
+          ElMessage.warning(t('menu.menuPermission.message.noUserId'))
         }
       } else {
         // 角色权限分配场景
@@ -629,12 +655,12 @@
             })
           }
         } else {
-          ElMessage.warning('未提供角色ID，无法加载权限数据')
+          ElMessage.warning(t('menu.menuPermission.message.noRoleId'))
         }
       }
     } catch (error) {
       console.error('初始化数据失败:', error)
-      ElMessage.error('加载权限数据失败')
+      ElMessage.error(t('menu.menuPermission.message.loadPermissionFailed'))
     } finally {
       loading.value = false
     }
@@ -664,11 +690,13 @@
         checkedMenuIds.value = (menuIds || []).map((id) => `m_${id}`)
         checkedPermissionIds.value = permissionIds || []
       } else {
-        ElMessage.warning(response.message || '获取角色权限失败')
+        ElMessage.warning(
+          response.message || t('menu.menuPermission.message.getRolePermissionFailed')
+        )
       }
     } catch (error) {
       console.error('获取角色权限失败:', error)
-      ElMessage.error('获取角色权限失败，请重试')
+      ElMessage.error(t('menu.menuPermission.message.getRolePermissionFailed'))
     }
   }
 
@@ -767,11 +795,15 @@
 
   // 清空所有选中的权限
   const clearAllSelectedPermissions = () => {
-    ElMessageBox.confirm('确定要清空当前菜单下所有已选择的权限吗?', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+    ElMessageBox.confirm(
+      t('menu.menuPermission.dialog.confirmClear'),
+      t('menu.menuPermission.dialog.tip'),
+      {
+        confirmButtonText: t('menu.menuPermission.dialog.confirm'),
+        cancelButtonText: t('menu.menuPermission.dialog.cancel'),
+        type: 'warning'
+      }
+    )
       .then(() => {
         // 将所有权限的选中状态设为false
         apiPermissions.value.forEach((perm) => {
@@ -792,7 +824,7 @@
           )
         }
 
-        ElMessage.success('已清空当前菜单下所有已选择的权限')
+        ElMessage.success(t('menu.menuPermission.dialog.cleared'))
       })
       .catch(() => {
         // 用户取消操作
@@ -808,11 +840,13 @@
         // 获取权限ID并设置到checkedPermissionIds
         checkedPermissionIds.value = response.data || []
       } else {
-        ElMessage.warning(response.message || '获取用户权限失败')
+        ElMessage.warning(
+          response.message || t('menu.menuPermission.message.getUserPermissionFailed')
+        )
       }
     } catch (error) {
       console.error('获取用户权限失败:', error)
-      ElMessage.error('获取用户权限失败，请重试')
+      ElMessage.error(t('menu.menuPermission.message.getUserPermissionFailed'))
     } finally {
       loading.value = false
     }
@@ -824,18 +858,22 @@
     if (permissionType.value.toLowerCase() === 'user') {
       // 用户权限保存
       if (!userId.value) {
-        ElMessage.warning('请先选择一个用户')
+        ElMessage.warning(t('menu.menuPermission.dialog.selectUser'))
         return
       }
 
       // 检查权限ID集合是否为空，如果为空则弹出确认框
       if (checkedPermissionIds.value.length === 0) {
         try {
-          await ElMessageBox.confirm('您当前正在清空用户单独权限，是否确认？', '清空确认', {
-            confirmButtonText: '确认',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
+          await ElMessageBox.confirm(
+            t('menu.menuPermission.dialog.confirmClearUser'),
+            t('menu.menuPermission.dialog.clearConfirmTitle'),
+            {
+              confirmButtonText: t('menu.menuPermission.dialog.confirmBtn'),
+              cancelButtonText: t('menu.menuPermission.dialog.cancel'),
+              type: 'warning'
+            }
+          )
           // 用户确认清空权限，继续执行
         } catch {
           // 用户取消清空权限，中止操作
@@ -852,20 +890,20 @@
         })
 
         if (response.success) {
-          ElMessage.success('用户权限设置保存成功')
+          ElMessage.success(t('menu.menuPermission.dialog.userPermissionSaved'))
         } else {
-          ElMessage.error(response.message || '保存失败')
+          ElMessage.error(response.message || t('menu.menuPermission.dialog.saveFailed'))
         }
       } catch (error) {
         console.error('保存用户权限失败:', error)
-        ElMessage.error('保存用户权限失败，请重试')
+        ElMessage.error(t('menu.menuPermission.dialog.saveUserPermissionFailed'))
       } finally {
         loading.value = false
       }
     } else {
       // 角色权限保存
       if (!roleId.value) {
-        ElMessage.warning('请先选择一个角色')
+        ElMessage.warning(t('menu.menuPermission.dialog.selectRole'))
         return
       }
 
@@ -884,9 +922,9 @@
         })
 
         if (response.success) {
-          ElMessage.success('角色权限设置保存成功')
+          ElMessage.success(t('menu.menuPermission.dialog.rolePermissionSaved'))
         } else {
-          ElMessage.error(response.message || '保存失败')
+          ElMessage.error(response.message || t('menu.menuPermission.dialog.saveFailed'))
         }
         // 刷新列表数据
         const menuStore = useMenuStore()
@@ -895,7 +933,7 @@
         closeLoading() // 关闭加载动画
       } catch (error) {
         console.error('保存角色权限失败:', error)
-        ElMessage.error('保存角色权限失败，请重试')
+        ElMessage.error(t('menu.menuPermission.dialog.saveRolePermissionFailed'))
       } finally {
         loading.value = false
       }

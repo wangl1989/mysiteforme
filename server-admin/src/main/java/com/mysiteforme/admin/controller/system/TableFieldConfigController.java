@@ -1,6 +1,8 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.request.*;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.MessageUtil;
 import jakarta.validation.Valid;
@@ -14,6 +16,8 @@ import com.mysiteforme.admin.util.Result;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * <p>
  * TableFieldConfig  前端控制器
@@ -26,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/admin/tableFieldConfig")
 @RequiredArgsConstructor
+@RateLimit(limit = 10, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class TableFieldConfigController{
 
     private final TableFieldConfigService tableFieldConfigService;

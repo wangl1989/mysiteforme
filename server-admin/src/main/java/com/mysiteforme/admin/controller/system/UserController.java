@@ -8,6 +8,7 @@
 
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.entity.DTO.LocationDTO;
 import com.mysiteforme.admin.entity.Role;
 import com.mysiteforme.admin.entity.UpdateCurrentUserRequest;
@@ -15,7 +16,7 @@ import com.mysiteforme.admin.entity.VO.UserVO;
 import com.mysiteforme.admin.entity.request.*;
 import com.mysiteforme.admin.entity.response.LocationResponse;
 import com.mysiteforme.admin.service.UserCacheService;
-import com.mysiteforme.admin.util.ToolUtil;
+import com.mysiteforme.admin.util.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -27,18 +28,17 @@ import com.mysiteforme.admin.base.MySecurityUser;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.service.MenuService;
 import com.mysiteforme.admin.service.UserService;
-import com.mysiteforme.admin.util.Constants;
-import com.mysiteforme.admin.util.MessageConstants;
-import com.mysiteforme.admin.util.Result;
 
 import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/user")
 @RequiredArgsConstructor
+@RateLimit(limit = 50, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class UserController {
 
     private final UserService userService;

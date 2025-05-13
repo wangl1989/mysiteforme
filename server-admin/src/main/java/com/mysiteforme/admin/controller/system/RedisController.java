@@ -4,19 +4,24 @@
  */
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.annotation.RateLimit;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.entity.request.PageListRedisRequest;
 import com.mysiteforme.admin.service.RedisService;
+import com.mysiteforme.admin.util.LimitType;
 import com.mysiteforme.admin.util.MessageConstants;
 import com.mysiteforme.admin.util.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/redis")
 @RequiredArgsConstructor
+@RateLimit(limit = 30, period = 1, timeUnit = TimeUnit.MINUTES, limitType = LimitType.USER)
 public class RedisController {
 
     private final RedisService redisService;
