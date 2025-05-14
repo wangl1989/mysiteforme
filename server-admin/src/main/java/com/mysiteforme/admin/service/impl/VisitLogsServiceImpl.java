@@ -123,7 +123,14 @@ public class VisitLogsServiceImpl extends ServiceImpl<VisitLogsDao, VisitLogs> i
                 })
                 .map(Long::parseLong)
                 .collect(Collectors.toSet());
-        return !ids.contains(userId);
+        if(!ids.contains(userId)){
+            String todayKey = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            // 如果是新用户，则需要把这个用户ID放到已记录缓存中：USER_BEFOR_TODAY_CREATED
+            redisTemplate.opsForSet().add(RedisConstants.USER_BEFOR_TODAY_CREATED + todayKey, userId);
+            redisTemplate.expire(RedisConstants.USER_BEFOR_TODAY_CREATED + todayKey,2, TimeUnit.DAYS);
+            return true;
+        }
+        return false;
     }
 
     /**
