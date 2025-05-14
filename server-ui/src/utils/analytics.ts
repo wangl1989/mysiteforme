@@ -227,7 +227,7 @@ class Analytics {
     const userInfo = this.getCurrentUserInfo()
 
     const batchEventLogsData: BatchEventLogsData = {
-      userId: userInfo.userId, // 未登录用户为0
+      userId: userInfo.userId || 0, // 未登录用户为0
       loginName: userInfo.loginName, // 未登录用户为空
       nickName: userInfo.nickName, // 未登录用户为空
       events: events
