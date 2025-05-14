@@ -17,7 +17,7 @@
         <el-table-column label="用户" prop="avatar" width="180px">
           <template #default="scope">
             <div style="display: flex; align-items: center">
-              <img class="avatar" :src="scope.row.icon || defaultAvatar" />
+              <img class="avatar" :src="scope.row.icon" />
               <span class="user-name">{{ scope.row.nickName || scope.row.loginName }}</span>
             </div>
           </template>
@@ -46,7 +46,6 @@
   import { onMounted, ref } from 'vue'
   import { AnalyticsService } from '@/api/analyticsApi'
   import { IndexUserCollectionResponse } from '@/api/model/analyticsModel'
-  import defaultAvatar from '@/assets/img/avatar/avatar7.jpg'
 
   const tableData = ref<IndexUserCollectionResponse[]>([])
   const loading = ref(false)
@@ -59,7 +58,7 @@
       if (response.success && response.data) {
         tableData.value = response.data.map((user) => ({
           ...user,
-          icon: formatAvatar(user.icon, user.id),
+          icon: getImgUrl(user.icon, user.id),
           pro: 0
         }))
         addAnimation()
@@ -72,16 +71,21 @@
     }
   }
 
-  const handleMore = () => {
-    router.push('/system/user/account')
-  }
-
-  // 处理头像URL
-  const formatAvatar = (icon: string, userId: number) => {
-    if (!icon || icon === '' || !icon.startsWith('http')) {
+  // 获取图片url
+  const getImgUrl = (url: string | undefined, userId: string | number) => {
+    if (!url) {
       return `https://api.dicebear.com/9.x/adventurer/svg?seed=${userId}`
     }
-    return icon
+
+    if (url.startsWith('upload')) {
+      return `${import.meta.env.VITE_API_URL}/` + url
+    }
+
+    return url
+  }
+
+  const handleMore = () => {
+    router.push('/system/user/account')
   }
 
   onMounted(() => {
