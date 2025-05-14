@@ -631,6 +631,7 @@
                 nickName: form.nickName,
                 email: email,
                 tel: tel,
+                icon: userDetail.value.icon,
                 remarks: form.des,
                 location: form.location
               }
