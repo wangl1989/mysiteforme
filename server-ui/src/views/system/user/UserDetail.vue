@@ -662,7 +662,6 @@
                   return
                 }
               }
-
               // 更新用户信息
               const res = await UserService.updateCurrentUserInfo(params)
               if (res.success) {
@@ -672,7 +671,7 @@
                   id: userStore.info.id || 0,
                   name: params.nickName,
                   username: params.loginName,
-                  avatar: params.icon,
+                  avatar: params.icon || '',
                   email: params.email,
                   tel: params.tel,
                   location: params.location || '',
