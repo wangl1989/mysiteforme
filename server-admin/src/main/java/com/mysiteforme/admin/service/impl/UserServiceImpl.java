@@ -419,6 +419,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 		}
 		wrapper.eq(User::getDelFlag, false);
 		User user = baseMapper.selectOne(wrapper);
+		if(user == null){
+			throw MyException.builder().businessError(MessageConstants.User.USER_NOT_FOUND).build();
+		}
 		return userCacheService.findUserByIdDetails(user.getId());
 	}
 

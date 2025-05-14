@@ -1574,9 +1574,8 @@ INSERT INTO mysiteforme.sys_user (id, login_name, nick_name, icon, password, sal
 
 create table if not exists sys_user_device
 (
-    id              bigint auto_increment
-        primary key,
-    user_id         bigint                             not null comment '用户ID',
+    id              bigint auto_increment primary key,
+    user_id         bigint                             null comment '用户ID',
     device_id       varchar(100)                       not null comment '设备ID',
     user_agent      varchar(200)                       null comment '用户设备信息',
     last_login_ip   varchar(50)                        null comment '最后登录IP',
