@@ -36,7 +36,6 @@ public class BaseQuartzTaskRequest {
     /**
      * 执行参数
      */
-    @NotBlank(message = MessageConstants.QuartzTask.TASK_PARAMS_NOT_EMPTY)
     private String params;
     /**
      * 任务状态 0:正常  1：暂停

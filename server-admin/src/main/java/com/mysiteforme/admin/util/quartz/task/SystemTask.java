@@ -8,12 +8,17 @@
 
 package com.mysiteforme.admin.util.quartz.task;
 
+import com.mysiteforme.admin.service.DailyStatsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component("systemTask")
+@RequiredArgsConstructor
 public class SystemTask {
+
+    private final DailyStatsService dailyStatsService;
 
     /**
      * 同步文章点击量
@@ -28,4 +33,10 @@ public class SystemTask {
     public void createArticleIndex(String params) {
         log.info("测试定时任务,createArticleIndex");
     }
+
+    public void synchronizationDailyStas(){
+        dailyStatsService.aggregateDailyStats();;
+    }
+
+
 }
