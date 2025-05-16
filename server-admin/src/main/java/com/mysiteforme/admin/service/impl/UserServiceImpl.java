@@ -124,6 +124,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 				if (StringUtils.isNotBlank(user.getEmail())) {
 					newUser.setEmail(DesensitizedUtil.email(user.getEmail()));
 				}
+				String loginName = user.getLoginName();
+				if (StringUtils.isNotBlank(loginName)) {
+					newUser.setLoginName(StringUtils.overlay(loginName, "*****", 2, loginName.length()-1));
+				}
 
 				// 设置用户状态
 				newUser.setStatus(getUserStatus(user.getLoginName(),user.getDelFlag()));
