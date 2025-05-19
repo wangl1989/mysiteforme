@@ -1,3 +1,5 @@
+/*!40101 SET NAMES utf8 */;
+
 /*
 UPDATE SQL
 */

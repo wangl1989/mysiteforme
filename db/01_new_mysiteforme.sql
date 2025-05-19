@@ -1,3 +1,5 @@
+/*!40101 SET NAMES utf8 */;
+
 create table if not exists analytics_click_events
 (
     id            bigint auto_increment comment '主键'

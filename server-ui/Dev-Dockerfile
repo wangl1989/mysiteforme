@@ -1,0 +1,41 @@
+# Dockerfile.node-build-tools
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# 针对性安装编译依赖
+# 核心：C/C++编译器, make, python, autotools (gifsicle需要)
+# 图像处理库的开发包
+RUN apk update && \
+    apk add --no-cache \
+      g++ \
+      make \
+      python3 \
+      autoconf \
+      automake \
+      libtool \
+      nasm \
+      pkgconfig \
+      zlib-dev \
+      libpng-dev \
+      libjpeg-turbo-dev \
+      giflib-dev \
+      libwebp-dev \
+      rsync && \
+    echo "Build dependencies installed."
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 设置 pnpm 镜像源
+RUN pnpm config set registry https://registry.npmmirror.com/
+
+COPY package.json ./
+
+COPY pnpm-lock.yaml* ./
+
+RUN pnpm install --frozen-lockfile --shamefully-hoist
+
+COPY . .
+
+CMD ["pnpm", "run", "dev"]

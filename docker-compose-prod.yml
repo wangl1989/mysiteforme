@@ -1,0 +1,31 @@
+services:
+  backend: # 你的 Spring Boot 应用
+    # 生产环境使用预制卷
+    image: registry.cn-hangzhou.aliyuncs.com/mysiteforme/public:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=${ENV}
+    restart: always
+
+  frontend:
+    build:
+      dockerfile: Prod-Dockerfile
+    ports:
+      - "80:80"      # 主入口，比如 http://localhost
+      - "443:443"    # 如果配置了 HTTPS
+    volumes:
+     - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf # 挂载你的主 Nginx 配置文件
+     - ./server-ui/dist:/usr/share/nginx/html # 将前端构建输出挂载到 Nginx 的静态资源目录
+     # - ./proxy/nginx-ssl.conf:/etc/nginx/conf.d/default.conf # 如果有 SSL 配置
+     # - ./certs:/etc/nginx/certs # 如果有 SSL 证书
+    restart: always
+
+  db:
+    restart: always
+    # 生产环境应确保数据持久化到可靠的地方
+    # volumes:
+    #   - /path/on/host/prod_mysql_data:/var/lib/mysql # 明确指定宿主机路径
+
+  cache:
+    restart: always
+    # volumes:
+    #   - /path/on/host/prod_redis_data:/data # 明确指定宿主机路径

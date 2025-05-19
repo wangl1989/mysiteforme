@@ -1,0 +1,78 @@
+services:
+  backend:
+    env_file: .env.${ENV}
+    container_name: my-springboot-container
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://db:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_DRUID_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_DRUID_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_REDIS_HOST} # 应用连接 Redis 的主机名，与下面 Redis 服务名一致
+      - SPRING_DATA_REDIS_PORT=6379  # 应用连接 Redis 的端口
+      - SPRING_DATA_REDIS_PASSWORD=${SPRING_REDIS_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  frontend:
+    build:
+      context: ./server-ui
+    env_file: .env.${ENV}
+    container_name: frontend-container
+    depends_on:
+      - backend
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  db: # MySQL 服务
+    image: mysql:8.0                            # 建议使用主版本号，如 8.0，而不是特定补丁版本 8.0.42
+    container_name: mysql-db-container
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}              # 这个数据库会被自动创建
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql               # 数据持久化
+      - ./db:/docker-entrypoint-initdb.d        # 关键：挂载 SQL 初始化脚本目录
+    command:
+      - --lower_case_table_names=1              # 确保表名不区分大小写
+      - --character-set-server=utf8mb4          # 设置字符集为 UTF-8
+      - --collation-server=utf8mb4_unicode_ci   # 确保排序规则为 Unicode
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    networks:
+      - app-net
+    healthcheck: # (可选但推荐) 添加健康检查，配合 app 的 depends_on.condition
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"] # 注意这里用的是容器内的环境变量
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s # 给 MySQL 启动和执行初始化脚本足够的时间
+
+  # ... (你的 Redis 服务定义) ...
+  cache:
+      image: redis:7  # 建议使用主版本号，如 7，而不是特定补丁版本 7.4.3
+      container_name: redis-cache-container
+      volumes:
+        - redis-data:/data # Redis 数据持久化
+      restart: always
+      networks:
+        - app-net
+      # (可选) Redis 健康检查
+      # healthcheck:
+      #   test: ["CMD", "redis-cli", "ping"]
+      #   interval: 10s
+      #   timeout: 5s
+      #   retries: 3
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  mysql-data: # 这个卷会由 Docker 自动管理
+  redis-data: # 这个卷也会由 Docker 自动管理

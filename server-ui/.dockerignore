@@ -1,0 +1,17 @@
+node_modules
+.git
+.gitignore
+.github
+.husky
+.history
+.DS_Store
+dist
+README.md
+*.log
+Dockerfile
+docker-compose.yml
+.dockerignore
+.env.local
+.env.*.local
+.vscode
+*.ini 
