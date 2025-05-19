@@ -16,11 +16,11 @@ spring:
     default-timeout: 30s
     rollback-on-commit-failure: true
   mail:
-    host: smtp.163.com
+    host: smtp.qq.com
     port: 465
     protocol: smtp
-    username: mysiteforme@163.com
-    password: DFbdcXzG9C3wueLP
+    username: 1115784675@qq.com
+    password: lszqyobzkogdhhbg
     properties:
       mail:
         smtp:
@@ -81,17 +81,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-      enabled: true
-management:
-  endpoints:
-    web:
-      base-path: /actuator
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-    shutdown:
       enabled: true
 #mybatisPlus
 mybatis-plus:
@@ -177,16 +166,12 @@ logging:
     org.springframework.security.web.FilterChainProxy: DEBUG
     org.springframework.security: TRACE
     org.springframework.cache: DEBUG
-
-#搜索文件生成包的位置
-#本地路径
-lucence-dic: D://lucence
-
 ---
+
 #测试环境配置
 server:
   #端口
-  port: 8085
+  port: 8080
 spring:
   config:
     activate:
@@ -195,7 +180,7 @@ spring:
   data:
     redis:
       database: 0
-      host: 127.0.0.1
+      host: cache
       port: 6379
       password:      # 密码（默认为空）
       timeout: 6000  # 连接超时时长（毫秒）
@@ -222,12 +207,8 @@ logging:
     root: INFO
     com.mysiteforme: DEBUG
     org.springframework: INFO
-
-#搜索文件生成包的位置
-#本地路径
-lucence-dic: home/mysiteforme/lucence
-
 ---
+
 #生产环境配置
 server:
   #端口
@@ -266,9 +247,6 @@ logging:
     root: INFO
     com.mysiteforme: DEBUG
     org.springframework: INFO
-#搜索文件生成包的位置
-#阿里云路径
-lucence-dic : /opt/lucence
 
 
 

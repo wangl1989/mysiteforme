@@ -1,0 +1,20 @@
+services:
+  backend: # 你的 Spring Boot 应用
+    build:
+      context: ./server-admin
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=${ENV}
+  frontend:
+    build:
+      dockerfile: Dev-Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-3006}:3006"
+    # 命令：安装 pnpm (如果不存在)，安装依赖，然后启动开发服务器
+    # --host 0.0.0.0 使得开发服务器可以从 Docker 外部访问
+    volumes:
+      - ./server-ui:/app # 将本地 server-ui 目录挂载到容器的 /app 目录
+      - frontend-node-modules:/app/node_modules # 将 node_modules 存储在命名卷中，避免每次都重新安装，并防止被宿主机覆盖
+
+volumes:
+  frontend-node-modules: # 为前端开发模式的 node_modules 创建一个命名卷

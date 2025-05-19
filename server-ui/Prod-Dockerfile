@@ -1,0 +1,51 @@
+FROM node:18-alpine AS build-stage
+
+WORKDIR /app
+
+RUN apk update && \
+    apk add --no-cache \
+      g++ \
+      make \
+      python3 \
+      autoconf \
+      automake \
+      libtool \
+      nasm \
+      pkgconfig \
+      zlib-dev \
+      libpng-dev \
+      libjpeg-turbo-dev \
+      giflib-dev \
+      libwebp-dev \
+      rsync && \
+    echo "Build dependencies installed."
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 设置 pnpm 镜像源
+RUN pnpm config set registry https://registry.npmmirror.com/
+
+COPY package.json ./
+
+COPY pnpm-lock.yaml* ./
+
+RUN echo "Running pnpm install..." && \
+    pnpm install --frozen-lockfile --shamefully-hoist && \
+    echo "pnpm install finished."
+
+COPY . .
+
+RUN pnpm run build
+
+FROM nginx:stable-alpine
+# 移除默认的 Nginx 配置
+RUN rm /etc/nginx/conf.d/default.conf
+# 复制自定义的 Nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/
+# 复制构建好的前端静态文件
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+# 暴露 80 端口
+EXPOSE 80
+# 启动 Nginx
+CMD ["nginx", "-g", "daemon off;"]

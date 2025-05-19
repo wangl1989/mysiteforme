@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
+	<groupId>com.myself</groupId>
 	<artifactId>mysiteforme</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.5</version>
 		<relativePath/>
 	</parent>
 
@@ -32,22 +32,29 @@
 		<fastjson.version>2.0.45</fastjson.version>
 		<jackson.version>2.16.1</jackson.version>
 		<druid.version>1.2.20</druid.version>
+		<security.version>6.2.5</security.version>
 		<guava.version>32.0.1-android</guava.version>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>central</id>
-			<url>https://repo.maven.apache.org/maven2</url>
+			<id>public</id>
+			<url>https://maven.aliyun.com/repository/public</url>
 		</repository>
 		<repository>
-			<id>aliyunmaven</id>
-			<url>https://maven.aliyun.com/repository/public/</url>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
 		</repository>
 	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>3.29.2-GA</version> <!-- 尝试一个最新的稳定版 -->
+			</dependency>
+
 			<dependency>
 				<groupId>com.baomidou</groupId>
 				<artifactId>mybatis-plus-bom</artifactId>
@@ -59,15 +66,37 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<!--<dependency>-->
-			<!--<groupId>org.springframework.boot</groupId>-->
-			<!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-			<!--<scope>provided</scope>-->
-		<!--</dependency>-->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-handler</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-tcnative</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+			<version>4.1.118.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-tcnative</artifactId>
+			<version>2.0.9.Final</version>
 		</dependency>
 
 		<dependency>
@@ -80,10 +109,12 @@
 			<artifactId>commons-pool2</artifactId>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -108,7 +139,19 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>net.minidev</groupId>
+					<artifactId>json-smart</artifactId>
+				</exclusion>
+			</exclusions>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+			<version>2.5.2</version>
 		</dependency>
 
 		<dependency>
@@ -183,22 +226,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid-spring-boot-starter</artifactId>
 			<version>${druid.version}</version>
@@ -264,13 +291,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.9</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.qiniu</groupId>
 			<artifactId>happy-dns-java</artifactId>
 			<version>0.1.6</version>
@@ -321,50 +341,9 @@
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-all</artifactId>
-			<version>5.8.16</version>
+			<version>5.8.24</version>
 		</dependency>
 
-		<!--对分词索引查询解析-->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-queryparser</artifactId>
-			<version>8.10.0</version>
-		</dependency>
-
-		<!--高亮 -->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-highlighter</artifactId>
-			<version>8.10.0</version>
-		</dependency>
-
-		<!--smartcn 中文分词器 SmartChineseAnalyzer  smartcn分词器 需要lucene依赖 且和lucene版本同步-->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers-smartcn</artifactId>
-			<version>8.10.0</version>
-		</dependency>
-
-		<!--ik-analyzer 中文分词器-->
-		<dependency>
-			<groupId>cn.bestwu</groupId>
-			<artifactId>ik-analyzers</artifactId>
-			<version>5.1.0</version>
-		</dependency>
-
-		<!--MMSeg4j 分词器-->
-		<dependency>
-			<groupId>com.chenlb.mmseg4j</groupId>
-			<artifactId>mmseg4j-solr</artifactId>
-			<version>2.4.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.solr</groupId>
-					<artifactId>solr-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -372,16 +351,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Jakarta EE 9+ 的 Servlet API-->
 		<dependency>
@@ -401,6 +371,12 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.1</version> <!-- 或更高版本 -->
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
 				<configuration>
@@ -408,6 +384,20 @@
 					<target>17</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.7.1</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase> <!-- 在较早的阶段执行 -->
+						<goals>
+							<goal>detect</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- 跳过单元测试 -->
 			<plugin>
