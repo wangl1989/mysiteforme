@@ -168,3 +168,23 @@ export interface UserDeviceRecord {
   online: boolean // 是否在线
   currentDevice: boolean // 是否当前设备
 }
+
+/**
+ * 用户历史聊天记录查询参数
+ */
+export interface UserHistoryChatParams {
+  limit: number // 0代表所有聊天记录
+}
+
+/**
+ * 用户历史聊天记录响应
+ */
+export interface UserHistoryChatResponse {
+  chatId: string
+  chatList: Array<{
+    chatId: string
+    type: string
+    text: string
+    time: Date
+  }>
+}

@@ -174,6 +174,134 @@ async function request<T = any>(config: AxiosRequestConfig): Promise<T> {
   }
 }
 
+/**
+ * 获取认证头，处理token刷新逻辑
+ */
+async function getAuthHeaders() {
+  // 基本headers
+  const userStore = useUserStore()
+  const headers = {
+    'Content-Type': 'application/json',
+    'Device-Id': getDeviceIdSync() || '',
+    'Accept-Language': userStore.language
+  } as Record<string, string>
+
+  // 添加token逻辑
+  const token = getCurrentToken()
+  if (token) {
+    // 检查token是否需要刷新
+    const refreshToken = getCurrentRefreshToken()
+    const needsRefresh = isTokenExpiringSoon(token)
+
+    if (needsRefresh && refreshToken) {
+      // 复用现有的token刷新逻辑
+      if (!refreshingTokenPromise) {
+        refreshingTokenPromise = doRefreshToken(refreshToken).finally(() => {
+          refreshingTokenPromise = null
+        })
+      }
+
+      try {
+        // 等待token刷新完成
+        const newToken = await refreshingTokenPromise
+        headers['Authorization'] = `Bearer ${newToken}`
+      } catch (error) {
+        // 如果刷新失败但旧token尚未完全过期，仍继续使用旧的
+        if (!isTokenExpired(token)) {
+          headers['Authorization'] = `Bearer ${token}`
+        } else {
+          throw error // 如果已过期，则抛出错误
+        }
+      }
+    } else {
+      // token状态正常，直接使用
+      headers['Authorization'] = `Bearer ${token}`
+    }
+  }
+
+  return headers
+}
+
+/**
+ * 获取聊天内容的流式数据
+ * @param chatId 聊天ID
+ * @param content 发送内容
+ * @param options 配置选项
+ * @returns 返回一个Promise，完成后得到完整的响应内容
+ */
+async function getChatContent({
+  chatId,
+  content,
+  onChunk = null,
+  onComplete = null,
+  abortSignal = null
+}: {
+  chatId: string
+  content: string
+  onChunk?: ((chunk: string) => void) | null
+  onComplete?: ((fullResponse: string) => void) | null
+  abortSignal?: AbortSignal | null
+}): Promise<string> {
+  const params = {
+    chatId: chatId || '',
+    content: content || ''
+  }
+  const baseURL = import.meta.env.VITE_API_URL
+  let fullResponse = ''
+
+  try {
+    // 获取带有完整认证逻辑的headers
+    const headers = await getAuthHeaders()
+    const res = await fetch(`${baseURL}/api/admin/ai/chat`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(params),
+      signal: abortSignal // 添加终止控制
+    })
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`)
+    }
+
+    const reader = res.body?.getReader()
+    if (!reader) {
+      throw new Error('Response body is null')
+    }
+
+    const decoder = new TextDecoder()
+
+    // 处理流数据
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        break
+      }
+
+      const chunk = decoder.decode(value)
+      fullResponse += chunk
+
+      // 调用块回调
+      if (onChunk) {
+        onChunk(chunk)
+      }
+    }
+
+    // 调用完成回调
+    if (onComplete) {
+      onComplete(fullResponse)
+    }
+
+    return fullResponse
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.log('请求被用户取消')
+    } else {
+      console.error('获取聊天内容出错:', error)
+    }
+    throw error
+  }
+}
+
 // API 方法集合
 const api = {
   get<T>(config: AxiosRequestConfig): Promise<T> {
@@ -187,6 +315,16 @@ const api = {
   },
   del<T>(config: AxiosRequestConfig): Promise<T> {
     return request({ ...config, method: 'DELETE' }) // DELETE 请求
+  },
+  // 流式获取聊天内容
+  getChatContent(options: {
+    chatId: string
+    content: string
+    onChunk?: (chunk: string) => void
+    onComplete?: (fullResponse: string) => void
+    abortSignal?: AbortSignal
+  }): Promise<string> {
+    return getChatContent(options)
   }
 }
 

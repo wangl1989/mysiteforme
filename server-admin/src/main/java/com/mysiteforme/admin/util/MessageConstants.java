@@ -446,4 +446,11 @@ public class MessageConstants {
 
     }
 
+    public static class Chat {
+
+        public static final String CHAT_ID_CAN_NOT_EMPTY = "message.chat.chat_id_can_not_empty";
+
+        public static final String CONTENT_CAN_NOT_EMPTY = "message.chat.content_can_not_empty";
+    }
+
 }

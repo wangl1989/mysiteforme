@@ -11,7 +11,9 @@ import {
   AssignUserPermissionParams,
   UserLocationResponse,
   UpdateCurrentUserInfoParams,
-  UserDeviceRecord
+  UserDeviceRecord,
+  UserHistoryChatParams,
+  UserHistoryChatResponse
 } from './model/userModel'
 export class UserService {
   // 登录 - 接收 body 和 header 值
@@ -131,6 +133,14 @@ export class UserService {
   static getUserDevice() {
     return request.get<BaseResult<UserDeviceRecord>>({
       url: '/api/admin/userDevice/userDevices'
+    })
+  }
+
+  // 获取用户历史聊天记录
+  static getUserHistoryChat(params: UserHistoryChatParams) {
+    return request.get<BaseResult<UserHistoryChatResponse[]>>({
+      url: '/api/admin/ai/getHistoryList',
+      params
     })
   }
 }

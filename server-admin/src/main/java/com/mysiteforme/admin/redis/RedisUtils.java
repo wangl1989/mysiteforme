@@ -254,6 +254,15 @@ public class RedisUtils {
         }
     }
 
+    public void rightPushList(String key,Object value){
+        try {
+            redisTemplate.opsForList().rightPush(key, value);
+        } catch (Exception e) {
+            log.error("Redis数据异常:设置list全部数据异常", e);
+            throw MyException.builder().systemError(userTips).build();
+        }
+    }
+
     public void rightPushListAll(String key,Object... objects){
         try {
             redisTemplate.opsForList().rightPushAll(key, objects);

@@ -109,7 +109,7 @@ public class SecurityConfig {
                     // // 1. 允许直接访问的接口：验证码接口,登录放行
                     .requestMatchers("/genCaptcha", "/login", "/api/auth/refresh",
                             "/error","/favicon.ico","/static/**",
-                            "/druid/**","/actuator/**","/upload/**","/register/**","/api/analytics/**").permitAll()
+                            "/druid/**","/actuator/**","/upload/**","/register/**","/api/analytics/**","/api/actuator/**").permitAll()
                     // 2. 添加API路径模式
                     .requestMatchers("/api/admin/**").access((authentication, context) -> {
                         // 判断是否已认证

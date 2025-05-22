@@ -47,6 +47,9 @@ importers:
       highlight.js:
         specifier: ^11.10.0
         version: 11.10.0
+      markdown-it:
+        specifier: ^14.1.0
+        version: 14.1.0
       md-editor-v3:
         specifier: ^4.17.0
         version: 4.21.3(@codemirror/view@6.35.0)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3))
@@ -93,6 +96,9 @@ importers:
       '@eslint/js':
         specifier: ^9.9.1
         version: 9.15.0
+      '@types/markdown-it':
+        specifier: ^14.1.2
+        version: 14.1.2
       '@types/node':
         specifier: ^22.1.0
         version: 22.10.0

@@ -176,4 +176,14 @@ public class RedisConstants {
 	 */
 	public static final String REFRESH_TOKEN_STR_FORMAT_KEY = "auth:refresh:%s:%s";
 
+	/**
+	 * ai聊天历史记录
+	 */
+	public static final String AI_HISTORY_KEY_PREFIX = "ai:chat:history:";
+
+	/**
+	 * 设备关联聊天历史记录
+	 */
+	public static final String AI_DEVICE_HISTORY_KEY_PREFIX = "ai:chat:deviceId:";
+
 }

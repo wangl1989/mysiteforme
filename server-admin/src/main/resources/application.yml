@@ -12,6 +12,15 @@ spring:
   #激活哪一个环境的配置文件
   profiles:
     active: dev # 默认使用开发环境
+  ai:
+    dashscope:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      api-key: ${aliyun_dashscope_api_key}
+      chat:
+        options:
+          enable-search: true
+          model: qwen-plus-latest
+      read-timeout: 120
   transaction:
     default-timeout: 30s
     rollback-on-commit-failure: true
@@ -28,12 +37,12 @@ spring:
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 10000
-          timeout: 10000
+          connectiontimeout: 100000
+          timeout: 100000
           socketFactory:
             fallback: false
             class: javax.net.ssl.SSLSocketFactory
-    test-connection: true
+    test-connection: false
 
   #视图配置
   mvc:
@@ -82,6 +91,15 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+management:
+  endpoints:
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
 #mybatisPlus
 mybatis-plus:
   mapper-locations: classpath:mapper/**.xml

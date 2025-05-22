@@ -6,9 +6,9 @@ import { SystemConfig } from '../types'
 export const createBaseConfig = (): SystemConfig => ({
   // 系统信息
   systemInfo: {
-    name: 'Art Design Pro',
+    name: 'MysiteForMe',
     login: {
-      username: 'admin',
+      username: 'test',
       password: '123456'
     }
   },
