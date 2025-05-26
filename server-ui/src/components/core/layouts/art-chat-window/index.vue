@@ -106,7 +106,7 @@
   import { ref, onMounted } from 'vue'
   import { Picture, Paperclip } from '@element-plus/icons-vue'
   import mittBus from '@/utils/mittBus'
-  import aiAvatar from '@/assets/img/avatar/avatar10.jpg'
+  import aiAvatar from '@/assets/img/avatar/qwen.png'
   import request from '@/utils/http'
   import { useUserStore } from '@/store/modules/user'
   import { UserService } from '@/api/usersApi'
@@ -146,6 +146,8 @@
 
   const userAvatar = ref('') // 使用导入的头像
 
+  const thinking = ref('正在思考中...')
+
   const userStore = useUserStore()
 
   // 获取用户历史聊天记录
@@ -160,7 +162,7 @@
               id: messageId.value++,
               sender: item.type === 'user' ? userStore.info.name || 'Ricky' : 'AI',
               content: item.text,
-              time: formatDate(item.time, 'mm:ss'),
+              time: formatDate(item.time, 'hh:mm:ss'),
               isMe: item.type === 'user' ? true : false,
               avatar: item.type === 'user' ? userAvatar.value : aiAvatar
             })
@@ -212,7 +214,7 @@
         id: messageId.value++,
         sender: item.type === 'user' ? userStore.info.name || 'Ricky' : 'AI Bot',
         content: item.text,
-        time: formatDate(item.time, 'mm:ss'),
+        time: formatDate(item.time, 'hh:mm:ss'),
         isMe: item.type === 'user',
         avatar: item.type === 'user' ? userAvatar.value : aiAvatar
       })
@@ -250,7 +252,11 @@
       id: messageId.value++,
       sender: userStore.info.name || 'Ricky',
       content: text,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }),
       isMe: true,
       avatar: userAvatar.value
     })
@@ -263,9 +269,13 @@
     try {
       const result = {
         id: messageId.value++,
-        sender: 'Art Bot',
-        content: '',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sender: 'AI Bot',
+        content: thinking.value,
+        time: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }),
         isMe: false,
         avatar: aiAvatar
       }
@@ -274,6 +284,7 @@
         chatId: chatId.value,
         content: text,
         onChunk: (chunk) => {
+          thinking.value = ''
           messages.value[messages.value.length - 1].content += chunk
           scrollToBottom()
         },

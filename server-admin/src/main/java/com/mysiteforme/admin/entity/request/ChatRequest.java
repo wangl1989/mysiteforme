@@ -12,4 +12,6 @@ public class ChatRequest {
 
     @NotBlank(message = MessageConstants.Chat.CONTENT_CAN_NOT_EMPTY)
     private String content;
+
+    private String deviceId;
 }

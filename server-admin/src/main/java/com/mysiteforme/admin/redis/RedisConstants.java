@@ -186,4 +186,24 @@ public class RedisConstants {
 	 */
 	public static final String AI_DEVICE_HISTORY_KEY_PREFIX = "ai:chat:deviceId:";
 
+	/**
+	 * AI 代码设计初始需求
+	 */
+	public static final String AI_REQUIREMENT_KET_PREFIX = "ai:chat:requirement:";
+
+	/**
+	 * AI 获取需求对应的实体类
+	 */
+	public static final String AI_REQUIREMENT_ENTITY_KET_PREFIX = "ai:chat:requirement:entity:";
+
+	/**
+	 * AI 获取实体类之间的关系
+	 */
+	public static final String AI_REQUIREMENT_RELATIONSHIP_KET_PREFIX = "ai:chat:requirement:relationship:";
+
+	/**
+	 * AI 获取额外的需求KEY
+	 */
+	public static final String AI_REQUIREMENT_ADDITIONAL_KET_PREFIX = "ai:chat:requirement:additional:";
+
 }

@@ -1,5 +1,6 @@
 package com.mysiteforme.admin.controller.system;
 
+import com.mysiteforme.admin.entity.aiEntity.BusinessRequirement;
 import com.mysiteforme.admin.entity.request.ChatRequest;
 import com.mysiteforme.admin.exception.MyException;
 import com.mysiteforme.admin.service.ChatService;
@@ -39,6 +40,7 @@ public class ChatController {
         if(StringUtils.isBlank(deviceId)){
             throw MyException.builder().businessError(MessageConstants.User.DEVICE_ID_REQUIRED).build();
         }
-        return chatService.getMessage(request, deviceId);
+        request.setDeviceId(deviceId);
+        return chatService.analyzeUserRequirements(request);
     }
 }
