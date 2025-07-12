@@ -23,7 +23,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
 
-		<commons-lang3.version>3.13.0</commons-lang3.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<commons-codec.version>1.16.0</commons-codec.version>
 		<fileupload.version>1.5</fileupload.version>
 		<mybatisplus-spring-boot-starter.version>3.5.10.1</mybatisplus-spring-boot-starter.version>
