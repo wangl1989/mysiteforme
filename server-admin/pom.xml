@@ -25,7 +25,7 @@
 
 		<commons-lang3.version>3.13.0</commons-lang3.version>
 		<commons-codec.version>1.16.0</commons-codec.version>
-		<fileupload.version>1.5</fileupload.version>
+		<fileupload.version>1.6.0</fileupload.version>
 		<mybatisplus-spring-boot-starter.version>3.5.10.1</mybatisplus-spring-boot-starter.version>
 		<mybatisplus.version>3.5.10.1</mybatisplus.version>
 		<mybatis-plus-generator.version>3.5.10.1</mybatis-plus-generator.version>
